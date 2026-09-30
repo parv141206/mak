@@ -1,0 +1,1027 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="mak">
+  <schema id="org.gnome.shell.extensions.mak" path="/org/gnome/shell/extensions/mak/">
+    
+    <!-- ═════════════════════════════════════════════════════════════════════
+         1. DOCK SETTINGS
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="dock-enabled">
+      <default>true</default>
+      <summary>Enable Dock</summary>
+      <description>Master switch for the macOS floating glass dock.</description>
+    </key>
+
+    <!-- Dock Geometry & Layout -->
+    <key type="s" name="dock-position">
+      <default>'bottom'</default>
+      <choices>
+        <choice value='bottom'/>
+        <choice value='left'/>
+        <choice value='right'/>
+      </choices>
+      <summary>Dock Screen Position</summary>
+      <description>Edge of the screen where the dock floats.</description>
+    </key>
+
+    <key type="s" name="dock-alignment">
+      <default>'center'</default>
+      <choices>
+        <choice value='start'/>
+        <choice value='center'/>
+        <choice value='end'/>
+      </choices>
+      <summary>Dock Alignment</summary>
+      <description>Alignment along the screen edge: start, center, or end.</description>
+    </key>
+
+    <key type="i" name="icon-size">
+      <default>60</default>
+      <range min="24" max="128"/>
+      <summary>Dock Icon Size</summary>
+      <description>Base resting icon size in pixels.</description>
+    </key>
+
+    <key type="i" name="icon-spacing">
+      <default>12</default>
+      <range min="0" max="48"/>
+      <summary>Icon Spacing</summary>
+      <description>Gap between neighboring dock icons in pixels.</description>
+    </key>
+
+    <key type="i" name="edge-margin">
+      <default>4</default>
+      <range min="0" max="24"/>
+      <summary>Edge Margin</summary>
+      <description>Floating gap between dock and monitor edge in pixels.</description>
+    </key>
+
+    <key type="d" name="dock-scale">
+      <default>1.0</default>
+      <range min="0.5" max="2.0"/>
+      <summary>Dock Scale Multiplier</summary>
+      <description>Scales icons, padding, and pill together.</description>
+    </key>
+
+    <key type="b" name="auto-shrink-to-fit">
+      <default>true</default>
+      <summary>Auto Shrink to Fit</summary>
+      <description>Automatically shrink dock when it exceeds monitor bounds.</description>
+    </key>
+
+    <key type="b" name="multi-monitor">
+      <default>false</default>
+      <summary>Multi Monitor Dock</summary>
+      <description>Display dock on every connected monitor.</description>
+    </key>
+
+    <key type="b" name="isolate-monitors">
+      <default>false</default>
+      <summary>Isolate Monitors</summary>
+      <description>Show running windows only on each dock's monitor.</description>
+    </key>
+
+    <key type="b" name="isolate-workspaces">
+      <default>false</default>
+      <summary>Isolate Workspaces</summary>
+      <description>Show running apps only from current active workspace.</description>
+    </key>
+
+    <!-- Magnification & Spring Physics -->
+    <key type="b" name="dock-magnification">
+      <default>true</default>
+      <summary>Enable Magnification</summary>
+      <description>Enable macOS-style magnification zoom on cursor hover.</description>
+    </key>
+
+    <key type="d" name="magnification">
+      <default>2.6</default>
+      <range min="1.0" max="3.5"/>
+      <summary>Peak Magnification</summary>
+      <description>Peak magnification factor under the cursor.</description>
+    </key>
+
+    <key type="i" name="zoom-range">
+      <default>100</default>
+      <range min="40" max="500"/>
+      <summary>Zoom Spread Range</summary>
+      <description>Gaussian magnification spread radius in pixels.</description>
+    </key>
+
+    <key type="d" name="magnification-curve">
+      <default>2.0</default>
+      <range min="0.5" max="5.0"/>
+      <summary>Magnification Curve</summary>
+      <description>Magnification curve shape sharpness.</description>
+    </key>
+
+    <key type="i" name="animation-smoothness">
+      <default>50</default>
+      <range min="5" max="300"/>
+      <summary>Animation Smoothness</summary>
+      <description>Magnification follow time-constant in ms.</description>
+    </key>
+
+    <key type="d" name="spring-tension">
+      <default>1.0</default>
+      <range min="0.1" max="1.0"/>
+      <summary>Spring Tension</summary>
+      <description>Spring tension for physics animations.</description>
+    </key>
+
+    <key type="d" name="spring-damping">
+      <default>0.50</default>
+      <range min="0.2" max="1.0"/>
+      <summary>Spring Damping</summary>
+      <description>Spring damping ratio.</description>
+    </key>
+
+    <key type="i" name="hover-lift">
+      <default>20</default>
+      <range min="0" max="24"/>
+      <summary>Hover Lift</summary>
+      <description>Icon lift in pixels on hover.</description>
+    </key>
+
+    <key type="i" name="bounce-height">
+      <default>70</default>
+      <range min="0" max="80"/>
+      <summary>Bounce Height</summary>
+      <description>Launch bounce height in pixels (0 disables bounce).</description>
+    </key>
+
+    <key type="d" name="bounce-decay">
+      <default>0.50</default>
+      <range min="0.30" max="0.95"/>
+      <summary>Bounce Decay</summary>
+      <description>Bounce height decay per hop.</description>
+    </key>
+
+    <!-- Dock Glass Pill & Appearance -->
+    <key type="i" name="dock-radius">
+      <default>25</default>
+      <range min="0" max="40"/>
+      <summary>Dock Corner Radius</summary>
+      <description>Corner radius of the dock glass pill.</description>
+    </key>
+
+    <key type="d" name="background-opacity">
+      <default>0.25</default>
+      <range min="0.05" max="1.0"/>
+      <summary>Background Opacity</summary>
+      <description>Dock pill glass background opacity.</description>
+    </key>
+
+    <key type="s" name="pill-color">
+      <default>'rgba(42, 42, 50, 0.40)'</default>
+      <summary>Pill Color</summary>
+      <description>Dock pill background tint color.</description>
+    </key>
+
+    <key type="i" name="border-width">
+      <default>1</default>
+      <range min="0" max="6"/>
+      <summary>Border Width</summary>
+      <description>Dock pill glass outline border width.</description>
+    </key>
+
+    <key type="s" name="border-color">
+      <default>'rgba(255, 255, 255, 0.28)'</default>
+      <summary>Border Color</summary>
+      <description>Dock border color CSS string.</description>
+    </key>
+
+    <key type="i" name="pill-thickness">
+      <default>88</default>
+      <range min="36" max="120"/>
+      <summary>Pill Thickness</summary>
+      <description>Dock pill thickness in pixels.</description>
+    </key>
+
+    <key type="b" name="pill-thickness-auto">
+      <default>true</default>
+      <summary>Auto Pill Thickness</summary>
+      <description>Scale pill thickness automatically with icon size.</description>
+    </key>
+
+    <key type="b" name="dock-blur">
+      <default>true</default>
+      <summary>Dock Blur</summary>
+      <description>Hardware accelerated Gaussian glass blur behind dock.</description>
+    </key>
+
+    <!-- Autohide Behavior -->
+    <key type="s" name="auto-hide-mode">
+      <default>'dodge'</default>
+      <choices>
+        <choice value='never'/>
+        <choice value='dodge'/>
+        <choice value='always'/>
+      </choices>
+      <summary>Auto-hide Mode</summary>
+      <description>never, dodge (intellihide when covered), or always.</description>
+    </key>
+
+    <key type="i" name="hide-delay">
+      <default>200</default>
+      <range min="0" max="2000"/>
+      <summary>Hide Delay</summary>
+      <description>Milliseconds before auto-hide triggers.</description>
+    </key>
+
+    <key type="i" name="reveal-pressure">
+      <default>200</default>
+      <range min="0" max="1000"/>
+      <summary>Reveal Pressure</summary>
+      <description>Reveal pressure threshold in ms (0 = instant).</description>
+    </key>
+
+    <key type="b" name="show-autohide-handle">
+      <default>true</default>
+      <summary>Show Autohide Handle</summary>
+      <description>Leave dock edge indicator visible while hidden.</description>
+    </key>
+
+    <key type="b" name="pressure-sense">
+      <default>false</default>
+      <summary>Pressure Sense Dwell</summary>
+      <description>Pointer must linger at screen edge before dock appears.</description>
+    </key>
+
+    <key type="d" name="pressure-sense-sensitivity">
+      <default>0.5</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Pressure Sensitivity</summary>
+      <description>Sensitivity for edge dwell detection.</description>
+    </key>
+
+    <key type="b" name="lock-layout">
+      <default>false</default>
+      <summary>Lock Layout</summary>
+      <description>Prevent moving or removing pinned icons.</description>
+    </key>
+
+    <!-- Click & Interaction Actions -->
+    <key type="b" name="click-to-minimize">
+      <default>true</default>
+      <summary>Click to Minimize</summary>
+      <description>Clicking focused app icon minimizes its windows.</description>
+    </key>
+
+    <key type="s" name="left-click-action">
+      <default>'smart'</default>
+      <choices>
+        <choice value='smart'/>
+        <choice value='minimize'/>
+        <choice value='cycle'/>
+        <choice value='preview'/>
+        <choice value='nothing'/>
+      </choices>
+      <summary>Left Click Action</summary>
+      <description>Primary click action on dock application icons.</description>
+    </key>
+
+    <key type="s" name="middle-click-action">
+      <default>'new-window'</default>
+      <choices>
+        <choice value='new-window'/>
+        <choice value='smart'/>
+        <choice value='nothing'/>
+      </choices>
+      <summary>Middle Click Action</summary>
+      <description>Middle click action on dock application icons.</description>
+    </key>
+
+    <key type="s" name="scroll-action">
+      <default>'minimize-restore'</default>
+      <choices>
+        <choice value='minimize-restore'/>
+        <choice value='cycle'/>
+        <choice value='nothing'/>
+      </choices>
+      <summary>Scroll Action</summary>
+      <description>Mouse scroll action over application icons.</description>
+    </key>
+
+    <key type="b" name="drag-to-open">
+      <default>true</default>
+      <summary>Drag to Open</summary>
+      <description>Drag icon outside dock to launch or activate.</description>
+    </key>
+
+    <!-- Running Indicators -->
+    <key type="s" name="indicator-style">
+      <default>'glow-dots'</default>
+      <choices>
+        <choice value='dot'/>
+        <choice value='dots'/>
+        <choice value='line'/>
+        <choice value='pill'/>
+        <choice value='glow'/>
+        <choice value='glow-dots'/>
+      </choices>
+      <summary>Running Indicator Style</summary>
+      <description>Visual indicator style for active applications.</description>
+    </key>
+
+    <key type="i" name="indicator-size">
+      <default>5</default>
+      <range min="3" max="14"/>
+      <summary>Indicator Size</summary>
+      <description>Indicator dot/line size in pixels.</description>
+    </key>
+
+    <key type="s" name="indicator-color">
+      <default>'#ffffff'</default>
+      <summary>Indicator Color</summary>
+      <description>Indicator accent color (hex or CSS string).</description>
+    </key>
+
+    <key type="b" name="show-window-count">
+      <default>true</default>
+      <summary>Show Window Count</summary>
+      <description>Show multiple indicator dots for multiple windows.</description>
+    </key>
+
+    <key type="b" name="show-badges">
+      <default>true</default>
+      <summary>Notification Badges</summary>
+      <description>Show red unread notification count badge over icons.</description>
+    </key>
+
+    <key type="s" name="badge-color">
+      <default>'rgba(224,48,48,1.0)'</default>
+      <summary>Badge Color</summary>
+      <description>Notification badge background color.</description>
+    </key>
+
+    <!-- Special Dock Items -->
+    <key type="b" name="show-apps-button">
+      <default>true</default>
+      <summary>Show Applications Button</summary>
+      <description>Show the applications launcher grid button on the dock.</description>
+    </key>
+
+    <key type="b" name="show-trash">
+      <default>true</default>
+      <summary>Show Trash</summary>
+      <description>Show Trash can with dynamic full/empty state.</description>
+    </key>
+
+    <key type="b" name="show-downloads">
+      <default>true</default>
+      <summary>Show Downloads Stack</summary>
+      <description>Show Downloads folder stack with bounce animation on new file.</description>
+    </key>
+
+    <key type="s" name="downloads-view">
+      <default>'fan'</default>
+      <choices>
+        <choice value='fan'/>
+        <choice value='grid'/>
+        <choice value='list'/>
+      </choices>
+      <summary>Downloads View Style</summary>
+      <description>Default stack opening style: fan, grid, or list.</description>
+    </key>
+
+    <key type="i" name="downloads-max-files">
+      <default>11</default>
+      <range min="3" max="11"/>
+      <summary>Downloads Max Files</summary>
+      <description>Maximum files shown in the Downloads stack popup.</description>
+    </key>
+
+    <key type="s" name="downloads-sort">
+      <default>'newest'</default>
+      <choices>
+        <choice value='newest'/>
+        <choice value='name'/>
+        <choice value='type'/>
+      </choices>
+      <summary>Downloads Sort Order</summary>
+      <description>Sort order for Downloads stack: newest, name, or type.</description>
+    </key>
+
+    <key type="b" name="show-mounted-devices">
+      <default>true</default>
+      <summary>Show Mounted Volumes</summary>
+      <description>Show mounted disks and drives on the dock.</description>
+    </key>
+
+    <key type="b" name="show-removable-devices">
+      <default>true</default>
+      <summary>Show Removable Media</summary>
+      <description>Show USB drives, phones, and cameras on the dock.</description>
+    </key>
+
+    <key type="b" name="show-network-devices">
+      <default>true</default>
+      <summary>Show Network Devices</summary>
+      <description>Show mounted network locations on the dock.</description>
+    </key>
+
+    <!-- Window Previews & Tooltips -->
+    <key type="b" name="show-previews">
+      <default>true</default>
+      <summary>Live Window Previews</summary>
+      <description>Show live thumbnail previews when hovering app icons.</description>
+    </key>
+
+    <key type="i" name="preview-delay">
+      <default>600</default>
+      <range min="100" max="3000"/>
+      <summary>Preview Delay</summary>
+      <description>Hover delay in ms before showing live preview.</description>
+    </key>
+
+    <key type="i" name="preview-size">
+      <default>200</default>
+      <range min="80" max="400"/>
+      <summary>Preview Size</summary>
+      <description>Window preview max thumbnail width in pixels.</description>
+    </key>
+
+    <key type="s" name="preview-window-mode">
+      <default>'hidden'</default>
+      <choices>
+        <choice value='hidden'/>
+        <choice value='all'/>
+      </choices>
+      <summary>Preview Window Mode</summary>
+      <description>Show previews for hidden windows only or all windows.</description>
+    </key>
+
+    <key type="b" name="preview-close-buttons">
+      <default>false</default>
+      <summary>Preview Close Buttons</summary>
+      <description>Show close button directly on each preview thumbnail.</description>
+    </key>
+
+    <key type="b" name="show-tooltip">
+      <default>true</default>
+      <summary>Show Tooltips</summary>
+      <description>Show application title tooltip on hover.</description>
+    </key>
+
+    <key type="i" name="tooltip-delay">
+      <default>25</default>
+      <range min="0" max="2000"/>
+      <summary>Tooltip Delay</summary>
+      <description>Tooltip appearance delay in milliseconds.</description>
+    </key>
+
+    <key type="b" name="enable-genie-effect">
+      <default>true</default>
+      <summary>Genie Effect</summary>
+      <description>macOS magic lamp genie minimize/restore animation.</description>
+    </key>
+
+    <key type="i" name="genie-duration">
+      <default>120</default>
+      <range min="50" max="1000"/>
+      <summary>Genie Duration</summary>
+      <description>Genie animation duration in milliseconds.</description>
+    </key>
+
+
+    <!-- ═════════════════════════════════════════════════════════════════════
+         2. TOP BAR & APPLE MENU SETTINGS
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="topbar-enabled">
+      <default>true</default>
+      <summary>Enable Top Bar Enhancements</summary>
+      <description>Master switch for macOS menu bar and top panel styling.</description>
+    </key>
+
+    <key type="b" name="topbar-apple-menu">
+      <default>true</default>
+      <summary>Apple Menu</summary>
+      <description>Display the Apple logo menu at the left of the top panel.</description>
+    </key>
+
+    <key type="s" name="topbar-apple-icon">
+      <default>'apple'</default>
+      <choices>
+        <choice value='apple'/>
+        <choice value='arch'/>
+        <choice value='fedora'/>
+        <choice value='debian'/>
+        <choice value='ubuntu'/>
+        <choice value='linux'/>
+      </choices>
+      <summary>Menu Logo Icon</summary>
+      <description>Branding icon for the system menu button.</description>
+    </key>
+
+    <key type="b" name="topbar-app-title">
+      <default>true</default>
+      <summary>Active Application Title</summary>
+      <description>Show current active application name next to Apple menu.</description>
+    </key>
+
+    <key type="b" name="topbar-hide-activities">
+      <default>true</default>
+      <summary>Hide Activities Button</summary>
+      <description>Hide the default GNOME 'Activities' button.</description>
+    </key>
+
+    <key type="b" name="topbar-macos-accelerators">
+      <default>true</default>
+      <summary>macOS Accelerators</summary>
+      <description>Display accelerator symbols using macOS characters (⌘ ⌥ ^ ⎋).</description>
+    </key>
+
+    <key type="s" name="topbar-app-store-command">
+      <default>'gnome-software'</default>
+      <summary>App Store Command</summary>
+      <description>Command triggered when clicking App Store in Apple menu.</description>
+    </key>
+
+    <key type="as" name="topbar-force-quit-shortcut">
+      <default><![CDATA[['<Alt><Super>Escape']]]></default>
+      <summary>Force Quit Shortcut</summary>
+      <description>Shortcut to open the macOS Force Quit dialog.</description>
+    </key>
+
+    <key type="b" name="topbar-hide-lock-button">
+      <default>false</default>
+      <summary>Hide Lock Button</summary>
+      <description>Hide Lock Screen quick settings action button.</description>
+    </key>
+
+    <key type="b" name="topbar-hide-power-button">
+      <default>false</default>
+      <summary>Hide Power Button</summary>
+      <description>Hide Power off quick settings action button.</description>
+    </key>
+
+    <key type="b" name="topbar-hide-settings-button">
+      <default>false</default>
+      <summary>Hide Settings Button</summary>
+      <description>Hide Settings quick settings action button.</description>
+    </key>
+
+    <key type="b" name="topbar-blur">
+      <default>true</default>
+      <summary>Top Bar Frosted Glass Blur</summary>
+      <description>Dynamic frosted blur effect behind the top panel.</description>
+    </key>
+
+    <key type="i" name="topbar-blur-radius">
+      <default>28</default>
+      <range min="5" max="100"/>
+      <summary>Top Bar Blur Radius</summary>
+      <description>Gaussian blur radius for the top panel.</description>
+    </key>
+
+    <key type="d" name="topbar-transparency">
+      <default>0.35</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Top Bar Transparency</summary>
+      <description>Background opacity for the top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-pill-style">
+      <default>true</default>
+      <summary>Pill Button Style</summary>
+      <description>Apply smooth macOS pill styling to status indicators.</description>
+    </key>
+
+
+    <!-- ═════════════════════════════════════════════════════════════════════
+         3. SPOTLIGHT SEARCH SETTINGS
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="spotlight-enabled">
+      <default>true</default>
+      <summary>Enable Spotlight</summary>
+      <description>Master switch for macOS Spotlight search modal.</description>
+    </key>
+
+    <key type="as" name="spotlight-shortcut">
+      <default><![CDATA[['<Super>space']]]></default>
+      <summary>Spotlight Shortcut</summary>
+      <description>Keyboard shortcut to open and close Spotlight.</description>
+    </key>
+
+    <key type="i" name="spotlight-width">
+      <default>640</default>
+      <range min="400" max="1200"/>
+      <summary>Spotlight Width</summary>
+      <description>Modal search window width in pixels.</description>
+    </key>
+
+    <key type="s" name="spotlight-position">
+      <default>'center'</default>
+      <choices>
+        <choice value='center'/>
+        <choice value='top'/>
+        <choice value='bottom'/>
+      </choices>
+      <summary>Spotlight Position</summary>
+      <description>Vertical placement on screen.</description>
+    </key>
+
+    <key type="i" name="spotlight-opacity">
+      <default>90</default>
+      <range min="65" max="100"/>
+      <summary>Spotlight Opacity</summary>
+      <description>Background opacity percentage.</description>
+    </key>
+
+    <key type="i" name="spotlight-max-results">
+      <default>8</default>
+      <range min="3" max="20"/>
+      <summary>Maximum Results</summary>
+      <description>Maximum search items displayed simultaneously.</description>
+    </key>
+
+    <key type="b" name="spotlight-adaptive-ranking">
+      <default>true</default>
+      <summary>Adaptive Ranking</summary>
+      <description>Learn and prioritize frequently chosen applications and commands.</description>
+    </key>
+
+    <key type="s" name="spotlight-default-search-engine">
+      <default>'google'</default>
+      <choices>
+        <choice value='google'/>
+        <choice value='duckduckgo'/>
+        <choice value='bing'/>
+        <choice value='brave'/>
+        <choice value='ecosia'/>
+        <choice value='kagi'/>
+      </choices>
+      <summary>Default Search Engine</summary>
+      <description>Web search fallback engine.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-apps">
+      <default>true</default>
+      <summary>Search Applications</summary>
+      <description>Find and launch installed desktop applications.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-windows">
+      <default>true</default>
+      <summary>Search Open Windows</summary>
+      <description>Switch to matching open windows across workspaces.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-files">
+      <default>true</default>
+      <summary>Search Files and Documents</summary>
+      <description>Query local documents, recent files, and downloads.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-clipboard">
+      <default>true</default>
+      <summary>Search Clipboard History</summary>
+      <description>Access previously copied text snippets.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-calc">
+      <default>true</default>
+      <summary>Inline Calculator</summary>
+      <description>Evaluate mathematical equations and formulas inline.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-weather">
+      <default>true</default>
+      <summary>Weather Lookup</summary>
+      <description>Fetch instant weather forecasts.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-dictionary">
+      <default>true</default>
+      <summary>Dictionary Lookup</summary>
+      <description>Look up word definitions directly in search.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-currency">
+      <default>true</default>
+      <summary>Currency Conversions</summary>
+      <description>Convert foreign currency rates.</description>
+    </key>
+
+    <key type="b" name="spotlight-search-system-actions">
+      <default>true</default>
+      <summary>System Actions</summary>
+      <description>Trigger sleep, restart, lock screen, and shutdown.</description>
+    </key>
+
+    <key type="b" name="spotlight-gnome-search-providers">
+      <default>true</default>
+      <summary>GNOME Search Providers</summary>
+      <description>Integrate results from GNOME Contacts, Files, and Calendar.</description>
+    </key>
+
+
+    <!-- ═════════════════════════════════════════════════════════════════════
+         4. WINDOW GAPS SETTINGS
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="gaps-enabled">
+      <default>true</default>
+      <summary>Enable Window Gaps</summary>
+      <description>Add elegant outer screen margins around application windows.</description>
+    </key>
+
+    <key type="b" name="gap-uniform">
+      <default>true</default>
+      <summary>Uniform Gap</summary>
+      <description>Apply the same padding to top, bottom, left, and right.</description>
+    </key>
+
+    <key type="i" name="gap-size">
+      <default>12</default>
+      <range min="0" max="200"/>
+      <summary>Uniform Gap Size</summary>
+      <description>Outer margin in pixels applied to all screen edges.</description>
+    </key>
+
+    <key type="i" name="gap-top">
+      <default>12</default>
+      <range min="0" max="200"/>
+      <summary>Top Margin</summary>
+      <description>Gap from the top edge in pixels.</description>
+    </key>
+
+    <key type="i" name="gap-bottom">
+      <default>12</default>
+      <range min="0" max="200"/>
+      <summary>Bottom Margin</summary>
+      <description>Gap from the bottom edge in pixels.</description>
+    </key>
+
+    <key type="i" name="gap-left">
+      <default>12</default>
+      <range min="0" max="200"/>
+      <summary>Left Margin</summary>
+      <description>Gap from the left edge in pixels.</description>
+    </key>
+
+    <key type="i" name="gap-right">
+      <default>12</default>
+      <range min="0" max="200"/>
+      <summary>Right Margin</summary>
+      <description>Gap from the right edge in pixels.</description>
+    </key>
+
+    <key type="b" name="gaps-maximized">
+      <default>true</default>
+      <summary>Gaps for Maximized Windows</summary>
+      <description>Retain outer screen margins even when windows are maximized.</description>
+    </key>
+
+
+    <!-- ═════════════════════════════════════════════════════════════════════
+         5. ROUNDED CORNERS, BORDERS & SHADOWS
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="corners-enabled">
+      <default>true</default>
+      <summary>Enable Rounded Corners</summary>
+      <description>Anti-aliased squircle rounded corners on all windows.</description>
+    </key>
+
+    <key type="i" name="corner-radius">
+      <default>16</default>
+      <range min="0" max="40"/>
+      <summary>Window Corner Radius</summary>
+      <description>Corner curvature radius in pixels.</description>
+    </key>
+
+    <key type="d" name="corner-smoothing">
+      <default>0.8</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Squircle Smoothing</summary>
+      <description>Curvature smoothing exponent for Apple-like squircle corners.</description>
+    </key>
+
+    <key type="i" name="corner-border-width">
+      <default>1</default>
+      <range min="0" max="20"/>
+      <summary>Window Border Width</summary>
+      <description>Subtle window boundary stroke in pixels.</description>
+    </key>
+
+    <key type="s" name="corner-border-color">
+      <default>'rgba(255,255,255,0.18)'</default>
+      <summary>Window Border Color</summary>
+      <description>Window border color (CSS string).</description>
+    </key>
+
+    <key type="b" name="unround-maximized">
+      <default>false</default>
+      <summary>Unround Maximized</summary>
+      <description>Square off corners when window is maximized (false keeps them rounded).</description>
+    </key>
+
+    <key type="b" name="unround-fullscreen">
+      <default>false</default>
+      <summary>Unround Fullscreen</summary>
+      <description>Square off corners when window is fullscreen.</description>
+    </key>
+
+    <key type="b" name="skip-libadwaita-app">
+      <default>false</default>
+      <summary>Skip Libadwaita</summary>
+      <description>Skip applying shader corners to native Libadwaita apps.</description>
+    </key>
+
+    <key type="b" name="skip-libhandy-app">
+      <default>false</default>
+      <summary>Skip LibHandy</summary>
+      <description>Skip applying shader corners to LibHandy apps.</description>
+    </key>
+
+    <!-- Window Drop Shadows -->
+    <key type="b" name="shadow-enabled">
+      <default>true</default>
+      <summary>Enable Window Shadows</summary>
+      <description>High fidelity macOS window drop shadows.</description>
+    </key>
+
+    <key type="b" name="keep-shadow-maximized">
+      <default>false</default>
+      <summary>Keep Shadow for Maximized</summary>
+      <description>Render drop shadow around maximized windows with gaps.</description>
+    </key>
+
+    <key type="i" name="focused-shadow-h-offset">
+      <default>0</default>
+      <range min="-20" max="20"/>
+      <summary>Focused Horizontal Offset</summary>
+      <description>Horizontal shadow offset for focused window.</description>
+    </key>
+
+    <key type="i" name="focused-shadow-v-offset">
+      <default>4</default>
+      <range min="0" max="40"/>
+      <summary>Focused Vertical Offset</summary>
+      <description>Vertical shadow offset for focused window.</description>
+    </key>
+
+    <key type="i" name="focused-shadow-blur">
+      <default>28</default>
+      <range min="0" max="80"/>
+      <summary>Focused Shadow Blur</summary>
+      <description>Gaussian shadow blur radius for focused window.</description>
+    </key>
+
+    <key type="i" name="focused-shadow-spread">
+      <default>4</default>
+      <range min="-10" max="20"/>
+      <summary>Focused Shadow Spread</summary>
+      <description>Shadow spread expansion radius.</description>
+    </key>
+
+    <key type="i" name="focused-shadow-opacity">
+      <default>60</default>
+      <range min="0" max="100"/>
+      <summary>Focused Shadow Opacity</summary>
+      <description>Shadow darkness percentage for active window.</description>
+    </key>
+
+    <key type="i" name="unfocused-shadow-h-offset">
+      <default>0</default>
+      <range min="-20" max="20"/>
+      <summary>Unfocused Horizontal Offset</summary>
+      <description>Horizontal shadow offset for background windows.</description>
+    </key>
+
+    <key type="i" name="unfocused-shadow-v-offset">
+      <default>2</default>
+      <range min="0" max="40"/>
+      <summary>Unfocused Vertical Offset</summary>
+      <description>Vertical shadow offset for background windows.</description>
+    </key>
+
+    <key type="i" name="unfocused-shadow-blur">
+      <default>12</default>
+      <range min="0" max="80"/>
+      <summary>Unfocused Shadow Blur</summary>
+      <description>Gaussian shadow blur radius for background windows.</description>
+    </key>
+
+    <key type="i" name="unfocused-shadow-spread">
+      <default>-1</default>
+      <range min="-10" max="20"/>
+      <summary>Unfocused Shadow Spread</summary>
+      <description>Shadow spread radius for background windows.</description>
+    </key>
+
+    <key type="i" name="unfocused-shadow-opacity">
+      <default>65</default>
+      <range min="0" max="100"/>
+      <summary>Unfocused Shadow Opacity</summary>
+      <description>Shadow darkness percentage for background windows.</description>
+    </key>
+
+
+    <!-- ═════════════════════════════════════════════════════════════════════
+         6. GLASS BLUR ENGINE SETTINGS
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="blur-enabled">
+      <default>true</default>
+      <summary>Enable Global Blur</summary>
+      <description>Hardware accelerated Shell blur engine.</description>
+    </key>
+
+    <key type="i" name="blur-sigma">
+      <default>30</default>
+      <range min="10" max="80"/>
+      <summary>Blur Sigma Radius</summary>
+      <description>Gaussian blur intensity radius.</description>
+    </key>
+
+    <key type="d" name="blur-brightness">
+      <default>0.65</default>
+      <range min="0.2" max="1.0"/>
+      <summary>Blur Brightness</summary>
+      <description>Brightness factor applied behind glass surfaces.</description>
+    </key>
+
+    <key type="d" name="blur-noise-amount">
+      <default>0.0</default>
+      <range min="0.0" max="0.5"/>
+      <summary>Blur Noise Amount</summary>
+      <description>Subtle film grain / noise amount.</description>
+    </key>
+
+    <key type="b" name="blur-panel">
+      <default>true</default>
+      <summary>Blur Top Panel</summary>
+      <description>Blur desktop top bar panel background.</description>
+    </key>
+
+    <key type="b" name="blur-dock">
+      <default>true</default>
+      <summary>Blur Dock</summary>
+      <description>Blur dock pill background.</description>
+    </key>
+
+    <key type="b" name="blur-overview">
+      <default>true</default>
+      <summary>Blur Overview</summary>
+      <description>Blur wallpaper in activities overview.</description>
+    </key>
+
+    <key type="b" name="blur-appfolder">
+      <default>true</default>
+      <summary>Blur App Folders</summary>
+      <description>Blur background in app drawer folders.</description>
+    </key>
+
+
+    <!-- ═════════════════════════════════════════════════════════════════════
+         7. THEME & SYSTEM INTEGRATION
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="s" name="theme-mode">
+      <default>'dark-amoled'</default>
+      <choices>
+        <choice value='dark-amoled'/>
+        <choice value='dark-solid'/>
+        <choice value='light-solid'/>
+      </choices>
+      <summary>Active macOS Theme</summary>
+      <description>Selected theme: dark-amoled, dark-solid, or light-solid.</description>
+    </key>
+
+    <key type="s" name="accent-color">
+      <default>'purple'</default>
+      <choices>
+        <choice value='purple'/>
+        <choice value='blue'/>
+        <choice value='graphite'/>
+        <choice value='orange'/>
+        <choice value='green'/>
+      </choices>
+      <summary>Accent Color</summary>
+      <description>System-wide macOS accent color.</description>
+    </key>
+
+    <key type="b" name="sync-flatpak">
+      <default>true</default>
+      <summary>Sync Flatpak</summary>
+      <description>Automatically propagate theme overrides to Flatpak runtime.</description>
+    </key>
+
+    <key type="b" name="sync-gtk2">
+      <default>true</default>
+      <summary>Sync GTK 2</summary>
+      <description>Update ~/.gtkrc-2.0 when theme changes.</description>
+    </key>
+
+    <key type="b" name="sync-gtk3">
+      <default>true</default>
+      <summary>Sync GTK 3</summary>
+      <description>Update ~/.config/gtk-3.0 when theme changes.</description>
+    </key>
+
+    <key type="b" name="sync-gtk4">
+      <default>true</default>
+      <summary>Sync GTK 4</summary>
+      <description>Update ~/.config/gtk-4.0 when theme changes.</description>
+    </key>
+
+  </schema>
+</schemalist>

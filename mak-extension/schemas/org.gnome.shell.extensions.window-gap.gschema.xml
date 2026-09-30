@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SPDX-License-Identifier: GPL-2.0-or-later -->
+<!-- Copyright (C) 2026 Amir Hossein Karimi -->
+<schemalist>
+  <schema id="org.gnome.shell.extensions.window-gap" path="/org/gnome/shell/extensions/window-gap/">
+    <key name="uniform" type="b">
+      <default>true</default>
+      <summary>Same gap on all edges</summary>
+      <description>When enabled, gap-size is applied to top, bottom, left, and right.</description>
+    </key>
+    <key name="gap-size" type="i">
+      <default>20</default>
+      <range min="0" max="200"/>
+      <summary>Uniform gap size</summary>
+      <description>Margin in pixels applied to all edges when uniform mode is enabled.</description>
+    </key>
+    <key name="margin-top" type="i">
+      <default>20</default>
+      <range min="0" max="200"/>
+      <summary>Top margin</summary>
+      <description>Gap from the top edge of the screen in pixels.</description>
+    </key>
+    <key name="margin-bottom" type="i">
+      <default>20</default>
+      <range min="0" max="200"/>
+      <summary>Bottom margin</summary>
+      <description>Gap from the bottom edge of the screen in pixels.</description>
+    </key>
+    <key name="margin-left" type="i">
+      <default>20</default>
+      <range min="0" max="200"/>
+      <summary>Left margin</summary>
+      <description>Gap from the left edge of the screen in pixels.</description>
+    </key>
+    <key name="margin-right" type="i">
+      <default>20</default>
+      <range min="0" max="200"/>
+      <summary>Right margin</summary>
+      <description>Gap from the right edge of the screen in pixels.</description>
+    </key>
+  </schema>
+</schemalist>

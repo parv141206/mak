@@ -1,0 +1,97 @@
+[
+  {
+    "idx": 0,
+    "title": "Gnome",
+    "path": "/icons/gnome-icon-symbolic.svg"
+  },
+  {
+    "idx": 1,
+    "title": "Fedora",
+    "path": "/icons/fedora-icon-symbolic.svg"
+  },
+  {
+    "idx": 2,
+    "title": "Debian",
+    "path": "/icons/debian-icon-symbolic.svg"
+  },
+  {
+    "idx": 3,
+    "title": "Arch",
+    "path": "/icons/arch-icon-symbolic.svg"
+  },
+  {
+    "idx": 4,
+    "title": "Manjaro",
+    "path": "/icons/manjaro-icon-symbolic.svg"
+  },
+  {
+    "idx": 5,
+    "title": "Cachy OS",
+    "path": "/icons/cachyos-icon-symbolic.svg"
+  },
+  {
+    "idx": 6,
+    "title": "Pop!_OS",
+    "path": "/icons/pop-os-icon-symbolic.svg"
+  },
+  {
+    "idx": 7,
+    "title": "OpenSUSE",
+    "path": "/icons/opensuse-icon-symbolic.svg"
+  },
+  {
+    "idx": 8,
+    "title": "Ubuntu",
+    "path": "/icons/ubuntu-icon-symbolic.svg"
+  },
+  {
+    "idx": 9,
+    "title": "Linux",
+    "path": "/icons/linux-icon-symbolic.svg"
+  },
+  {
+    "idx": 10,
+    "title": "Apple",
+    "path": "/icons/apple-icon-symbolic.svg"
+  },
+  {
+    "idx": 11,
+    "title": "Windows",
+    "path": "/icons/windows-icon-symbolic.svg"
+  },
+  {
+    "idx": 12,
+    "title": "Grid",
+    "path": "/icons/menugrid-icon-symbolic.svg"
+  },
+  {
+    "idx": 13,
+    "title": "Shutdown",
+    "path": "/icons/shutdown-icon-symbolic.svg"
+  },
+  {
+    "idx": 14,
+    "title": "Nobara",
+    "path": "/icons/nobara-icon-symbolic.svg"
+  },
+  {
+    "idx": 15,
+    "title": "Steam Deck",
+    "path": "/icons/steam-deck-icon-symbolic.svg"
+  },
+  {
+    "idx": 16,
+    "title": "Bazzite",
+    "path": "/icons/bazzite-icon-symbolic.svg"
+  },
+  {
+    "idx": 17,
+    "title": "Universal Blue",
+    "path": "/icons/ublue-icon-symbolic.svg"
+  },
+  {
+    "idx": 18,
+    "title": "Framework",
+    "path": "/icons/framework-icon-symbolic.svg"
+  }
+]

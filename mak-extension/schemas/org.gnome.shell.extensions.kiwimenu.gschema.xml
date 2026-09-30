@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="kiwimenu@kemma">
+  <schema path="/org/gnome/shell/extensions/kiwimenu/" id="org.gnome.shell.extensions.kiwimenu">
+    <key type="i" name="icon">
+      <default>0</default>
+      <summary>Menu Icon</summary>
+      <description>Change the Menu Button Icon</description>
+    </key>
+    <key type="b" name="activity-menu-visibility">
+      <default>true</default>
+      <summary>Hide Activity Menu</summary>
+      <description>Change Activity Menu Visibility Status</description>
+    </key>
+    <key type="b" name="hide-lock-button">
+      <default>false</default>
+      <summary>Hide Lock Screen quick settings button</summary>
+      <description>Hide the lock screen quick settings action when enabled</description>
+    </key>
+    <key type="b" name="hide-power-button">
+      <default>false</default>
+      <summary>Hide Power quick settings button</summary>
+      <description>Hide the power quick settings action when enabled</description>
+    </key>
+    <key type="b" name="hide-settings-button">
+      <default>false</default>
+      <summary>Hide Settings quick settings button</summary>
+      <description>Hide the settings quick settings action when enabled</description>
+    </key>
+    <key type="s" name="app-store-command">
+      <default>'gnome-software'</default>
+      <summary>App Store command</summary>
+      <description>Command executed when launching the App Store menu item</description>
+    </key>
+    <key type="b" name="custom-menu-enabled">
+      <default>false</default>
+      <summary>Enable custom menu item</summary>
+      <description>Enable or disable the custom menu item</description>
+    </key>
+    <key type="s" name="custom-menu-label">
+      <default>''</default>
+      <summary>Custom menu item label</summary>
+      <description>The label text to display for the custom menu item</description>
+    </key>
+    <key type="s" name="custom-menu-command">
+      <default>''</default>
+      <summary>Custom menu item command</summary>
+      <description>Command to execute when the custom menu item is activated</description>
+    </key>
+    <key type="s" name="custom-menu-icon">
+      <default>''</default>
+      <summary>Custom menu item icon</summary>
+      <description>Path to an image file used as the icon for the custom menu item</description>
+    </key>
+    <key type="as" name="custom-menu-shortcut">
+      <default>[]</default>
+      <summary>Custom menu item shortcut</summary>
+      <description>Keyboard shortcut that runs the custom menu item command</description>
+    </key>
+    <key type="b" name="macos-accelerators">
+      <default>false</default>
+      <summary>macOS style accelerator symbols</summary>
+      <description>Display accelerator hints using macOS symbols (⌘ ⌥ ^ ⎋) instead of text</description>
+    </key>
+    <key type="as" name="force-quit-shortcut">
+      <default><![CDATA[['<Alt><Super>Escape']]]></default>
+      <summary>Force Quit shortcut</summary>
+      <description>Keyboard shortcut that opens the Force Quit window</description>
+    </key>
+    <key type="i" name="prefs-default-width">
+      <default>700</default>
+      <summary>Default width for the preferences window</summary>
+    </key>
+    <key type="i" name="prefs-default-height">
+      <default>600</default>
+      <summary>Default height for the preferences window</summary>
+    </key>
+  </schema>
+</schemalist>

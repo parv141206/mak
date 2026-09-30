@@ -1,0 +1,4352 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+// Copyright (C) 2026 Furkan
+
+import { Extension } from "resource:///org/gnome/shell/extensions/extension.js";
+import St from "gi://St";
+import Clutter from "gi://Clutter";
+import Gio from "gi://Gio";
+import GioUnix from "gi://GioUnix";
+import Meta from "gi://Meta";
+import Shell from "gi://Shell";
+import Soup from "gi://Soup";
+import GLib from "gi://GLib";
+import Pango from "gi://Pango";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
+import * as ModalDialog from "resource:///org/gnome/shell/ui/modalDialog.js";
+import * as Dialog from "resource:///org/gnome/shell/ui/dialog.js";
+import * as SystemActions from "resource:///org/gnome/shell/misc/systemActions.js";
+import * as Screenshot from "resource:///org/gnome/shell/ui/screenshot.js";
+import { Spinner } from "resource:///org/gnome/shell/ui/animation.js";
+import {
+  getGnomeAppPalette,
+  getSurfaceAppearance,
+  resolveColorSource,
+} from "./appearance.js";
+import {
+  buildAppSearchText,
+  isSettingsPanelApp,
+} from "./app-search.js";
+import { GnomeSearchProviderManager } from "./gnome-search-providers.js";
+import { buildSearchUri, getSearchEngine } from "./search-engines.js";
+import { getNextResultIndex } from "./result-selection.js";
+import {
+  ACTION_SYMBOL_PATTERN,
+  ACTION_WORD_PATTERN,
+  CLIPBOARD_QUERY_PATTERN,
+  cycleQueryMode,
+  getQueryModeByPrefix,
+  getQueryModeCycle,
+  getQueryModeToken,
+  matchTypedQueryMode,
+  parseDictionaryQuery,
+  parseWeatherQuery,
+} from "./query-modes.js";
+import {
+  describeAccel,
+  formatConflictSummary,
+} from "./keybinding-conflicts.js";
+import { findConflictsFor, replaceConflicts } from "./keybinding-settings.js";
+
+// Mutter keys its keybinding table on this name process-wide, so another
+// extension registering the same name makes ours fail. It cannot simply be
+// made unique: mutter also reads the accelerator from the GSettings key of the
+// same name, so renaming it means renaming the schema key and discarding every
+// shortcut a user has already set.
+const CONFLICT_PROMPT_RETRY_SECONDS = 2;
+const CONFLICT_PROMPT_MAX_ATTEMPTS = 30;
+const TOGGLE_KEYBINDING_NAME = "toggle-shortcut";
+const FILE_SEARCH_DELAY_MS = 80;
+const REMOTE_SEARCH_DELAY_MS = 220;
+// Clipboard writes are coalesced: a burst of copies produces one disk write
+// instead of one per entry.
+const CLIPBOARD_SAVE_DEBOUNCE_MS = 400;
+// Remote lookups are read-only and cheap to repeat, so a short cache spares the
+// third-party APIs when a query is retyped.
+const REMOTE_CACHE_TTL_MS = 5 * 60 * 1000;
+const REMOTE_CACHE_MAX_ENTRIES = 32;
+// libsoup forwards this to g_socket_set_timeout, so it is an inactivity budget
+// per I/O operation rather than a deadline for the whole request. A server that
+// keeps dribbling bytes is not covered.
+const NETWORK_IDLE_TIMEOUT_SECONDS = 10;
+// g_file_replace_contents copies an existing file's mode onto the temp file it
+// renames into place, which would defeat PRIVATE on every write after the
+// first. REPLACE_DESTINATION suppresses that copy (and refuses to follow a
+// symlink), so the history file ends up 0600 whether or not it already existed.
+const CLIPBOARD_FILE_FLAGS =
+  Gio.FileCreateFlags.PRIVATE | Gio.FileCreateFlags.REPLACE_DESTINATION;
+const RESULTS_REVEAL_ANIMATION_MS = 85;
+const RESULTS_COLLAPSE_ANIMATION_MS = 45;
+const RESULTS_MIN_HEIGHT = 120;
+const RESULTS_MAX_HEIGHT_FRACTION = 0.52;
+const OPEN_ANIMATION_MS = 250;
+const OPEN_TRANSLATION_Y = -10;
+const OPEN_SCALE = 0.985;
+const TOP_POSITION_FRACTION = 0.12;
+const CENTER_POSITION_FRACTION = 0.22;
+const STRONG_LOCAL_MATCH_SCORE = 600;
+// Local results below this relevance score are hidden entirely (only the web
+// search remains). Substring/word/prefix matches clear it; scattered
+// subsequence matches — the usual source of unrelated results — do not.
+const MINIMUM_LOCAL_MATCH_SCORE = 500;
+const RESUMABLE_SESSION_TTL_MS = 5 * 60 * 1000;
+const MONITOR_EDGE_MARGIN = 24;
+const RANKING_HISTORY_LIMIT = 50;
+const RANKING_HISTORY_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+const SETTINGS_PROVIDER_DESKTOP_ID = "org.gnome.Settings.desktop";
+const FILES_PROVIDER_DESKTOP_ID = "org.gnome.Nautilus.desktop";
+const GNOME_INTERFACE_SCHEMA_ID = "org.gnome.desktop.interface";
+const SEARCH_SOURCE_SETTING_KEYS = [
+  "applications-search-enabled",
+  "windows-search-enabled",
+  "files-search-enabled",
+  "clipboard-search-enabled",
+  "calculator-search-enabled",
+  "weather-search-enabled",
+  "dictionary-search-enabled",
+  "currency-search-enabled",
+  "web-search-enabled",
+  "system-actions-search-enabled",
+  "gnome-search-providers-enabled",
+];
+const SOURCE_RANK_BONUS = {
+  app: 100,
+  appAction: 60,
+  settings: 90,
+  window: 80,
+  folder: 35,
+  file: 10,
+};
+const QUERY_MODE_PRESENTATION = {
+  generic: { label: "All results", iconName: "system-search-symbolic" },
+  currency: { label: "Currency", iconName: "view-refresh-symbolic" },
+  weather: { label: "Weather", iconName: "weather-clear-symbolic" },
+  dictionary: {
+    label: "Dictionary",
+    iconName: "accessories-dictionary-symbolic",
+  },
+  clipboard: { label: "Clipboard", iconName: "edit-paste-symbolic" },
+  actions: { label: "Actions", iconName: "system-run-symbolic" },
+  calculator: {
+    label: "Calculator",
+    iconName: "accessories-calculator-symbolic",
+  },
+};
+const MODE_PROMPTS = {
+  weather: "Type a place name",
+  dictionary: "Type a word to define",
+};
+const CURRENCY_ALIASES = {
+  yen: "JPY",
+  euro: "EUR",
+  euros: "EUR",
+  dollar: "USD",
+  dollars: "USD",
+  pound: "GBP",
+  pounds: "GBP",
+  rupee: "INR",
+};
+const SYSTEM_FOLDERS = [
+  {
+    name: "Downloads",
+    action: {
+      icon: "folder-download-symbolic",
+      keywords: ["downloads", "download folder"],
+    },
+  },
+  {
+    name: "Documents",
+    action: {
+      icon: "folder-documents-symbolic",
+      keywords: ["documents", "docs", "document folder"],
+    },
+  },
+  {
+    name: "Pictures",
+    action: {
+      icon: "folder-pictures-symbolic",
+      keywords: ["pictures", "photos", "images"],
+    },
+  },
+  { name: "Videos", action: null },
+  { name: "Music", action: null },
+];
+
+// Every diagnostic goes through these two, so the journal carries one prefix
+// rather than the two spellings that had grown up in different parts of the
+// file, and there is a single place to quieten logging if it ever needs it.
+// Nothing here logs during normal operation — these are failure paths only.
+function logError(message) {
+  console.error(`Superbar: ${message}`);
+}
+
+function logWarning(message) {
+  console.warn(`Superbar: ${message}`);
+}
+
+function normalizeSearchText(value) {
+  return String(value ?? "")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function rgba(color, alpha = 1) {
+  const [red, green, blue] = color;
+  return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+}
+
+function scoreSingleSearchTerm(haystack, needle) {
+  if (!needle) return 0;
+  if (!haystack) return -1;
+
+  if (haystack === needle) return 1000;
+  if (haystack.startsWith(needle)) {
+    return 880 - Math.min(80, haystack.length - needle.length);
+  }
+
+  const words = haystack.split(/[^\p{L}\p{N}]+/u).filter(Boolean);
+  const wordIndex = words.findIndex((word) => word.startsWith(needle));
+  if (wordIndex !== -1) {
+    const lengthPenalty = Math.min(80, haystack.length - needle.length);
+    return 760 - wordIndex * 8 - lengthPenalty;
+  }
+
+  const includeIndex = haystack.indexOf(needle);
+  if (includeIndex !== -1) {
+    return 620 - Math.min(140, includeIndex * 4);
+  }
+
+  let queryIndex = 0;
+  let firstMatch = -1;
+  let lastMatch = -1;
+  let contiguousMatches = 0;
+
+  for (let index = 0; index < haystack.length; index += 1) {
+    if (haystack[index] !== needle[queryIndex]) continue;
+
+    if (firstMatch === -1) firstMatch = index;
+    if (lastMatch === index - 1) contiguousMatches += 1;
+    lastMatch = index;
+    queryIndex += 1;
+
+    if (queryIndex === needle.length) {
+      const span = lastMatch - firstMatch + 1;
+      const gapPenalty = Math.max(0, span - needle.length) * 10;
+      const startPenalty = firstMatch * 3;
+      return Math.max(
+        120,
+        420 + contiguousMatches * 5 - gapPenalty - startPenalty,
+      );
+    }
+  }
+
+  return -1;
+}
+
+function scoreSearchMatch(text, query) {
+  const haystack = normalizeSearchText(text);
+  const needle = normalizeSearchText(query);
+  if (!needle) return 0;
+  if (!haystack) return -1;
+
+  const phraseScore = scoreSingleSearchTerm(haystack, needle);
+  const terms = needle.split(/\s+/).filter(Boolean);
+  if (terms.length < 2) return phraseScore;
+
+  const termScores = terms.map((term) =>
+    scoreSingleSearchTerm(haystack, term),
+  );
+  if (termScores.some((score) => score < 0)) return phraseScore;
+
+  const averageScore =
+    termScores.reduce((total, score) => total + score, 0) /
+    termScores.length;
+  const orderedBonus = haystack.includes(needle) ? 60 : 0;
+  const tokenScore = Math.min(
+    970,
+    Math.round(averageScore - (terms.length - 1) * 12 + orderedBonus),
+  );
+
+  return Math.max(phraseScore, tokenScore);
+}
+
+function evaluateMathExpression(expression) {
+  const compactExpression = expression.replace(/\s+/g, "");
+  const tokens =
+    compactExpression.match(/(?:\d+(?:\.\d*)?|\.\d+|[()+\-*/%^])/g) ?? [];
+
+  if (tokens.join("") !== compactExpression) return null;
+
+  let position = 0;
+
+  const parsePrimary = () => {
+    const token = tokens[position];
+
+    if (token === "(") {
+      position++;
+      const value = parseExpression();
+      if (tokens[position] !== ")")
+        throw new Error("Missing closing parenthesis");
+      position++;
+      return value;
+    }
+
+    if (token === undefined || !/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(token))
+      throw new Error("Expected a number");
+
+    position++;
+    return Number(token);
+  };
+
+  const parsePower = () => {
+    const left = parsePrimary();
+    if (tokens[position] !== "^") return left;
+
+    position++;
+    return left ** parseUnary();
+  };
+
+  const parseUnary = () => {
+    const token = tokens[position];
+    if (token === "+" || token === "-") {
+      position++;
+      const value = parseUnary();
+      return token === "-" ? -value : value;
+    }
+
+    return parsePower();
+  };
+
+  const parseTerm = () => {
+    let value = parseUnary();
+
+    while (["*", "/", "%"].includes(tokens[position])) {
+      const operator = tokens[position++];
+      const right = parseUnary();
+
+      if (operator === "*") value *= right;
+      else if (operator === "/") value /= right;
+      else value %= right;
+    }
+
+    return value;
+  };
+
+  const parseExpression = () => {
+    let value = parseTerm();
+
+    while (tokens[position] === "+" || tokens[position] === "-") {
+      const operator = tokens[position++];
+      const right = parseTerm();
+      value = operator === "+" ? value + right : value - right;
+    }
+
+    return value;
+  };
+
+  try {
+    const result = parseExpression();
+    if (position !== tokens.length || !Number.isFinite(result)) return null;
+    return Math.round(result * 1e10) / 1e10;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function ensureActorVisibleInScrollView(scrollView, actor) {
+  const adjustment = scrollView.get_vadjustment
+    ? scrollView.get_vadjustment()
+    : scrollView.get_vscroll_bar().get_adjustment();
+  const value = adjustment.value;
+  const pageSize =
+    adjustment.page_size ?? adjustment.pageSize ?? scrollView.height;
+  const upper = adjustment.upper;
+  const padding = 6;
+
+  if (!pageSize || upper <= pageSize) return;
+
+  const box = actor.get_allocation_box();
+  let y1 = box.y1;
+  let y2 = box.y2;
+  let parent = actor.get_parent();
+
+  while (parent && parent !== scrollView) {
+    const parentBox = parent.get_allocation_box();
+    y1 += parentBox.y1;
+    y2 += parentBox.y1;
+    parent = parent.get_parent();
+  }
+
+  if (!parent) return;
+
+  let targetValue = value;
+  if (y1 < value + padding) {
+    targetValue = y1 - padding;
+  } else if (y2 > value + pageSize - padding) {
+    targetValue = y2 + padding - pageSize;
+  }
+
+  targetValue = Math.max(0, Math.min(upper - pageSize, targetValue));
+  if (targetValue !== value) {
+    adjustment.set_value(targetValue);
+  }
+}
+
+export default class SearchBar extends Extension {
+  initTranslations() {
+    // Translation handled at Mak suite root
+  }
+
+  // The Shell marks an extension whose enable() throws as ERROR and never
+  // calls disable() for it, so anything already registered — the keybinding
+  // above all — would stay registered against a dead extension until the
+  // session restarts. Undo it here, then let the Shell report the failure.
+  enable() {
+    try {
+      this._enable();
+    } catch (error) {
+      try {
+        this.disable();
+      } catch (cleanupError) {
+        logError(`cleanup after a failed enable also failed: ${cleanupError}`);
+      }
+      throw error;
+    }
+  }
+
+  _enable() {
+    this._enabled = true;
+    this._searchGeneration = 0;
+    this._pendingActivation = null;
+    this._resumableSession = null;
+    this._activeMonitorIndex = null;
+    this._settings = this.getSettings();
+
+    // Grab the shortcut before building anything else. Setup below talks to
+    // D-Bus, the clipboard, and search providers; if any of that throws, the
+    // extension still answers the hotkey instead of looking enabled while
+    // silently having no way to open.
+    this._keybindingAdded = false;
+    this._ensureKeybinding();
+    this._queueConflictPrompt();
+
+    this._shellSettings = St.Settings.get();
+    this._themeContext = St.ThemeContext.get_for_stage(global.stage);
+    try {
+      this._interfaceSettings = new Gio.Settings({
+        schema_id: GNOME_INTERFACE_SCHEMA_ID,
+      });
+    } catch (_e) {
+      this._interfaceSettings = null;
+    }
+    this._rankingHistory = new Map();
+    this._lastRankingHistoryWrite = null;
+    this._loadRankingHistory();
+    this._session = new Soup.Session({ timeout: NETWORK_IDLE_TIMEOUT_SECONDS });
+    this._remoteCache = new Map();
+    this._clipboard = St.Clipboard.get_default();
+    this._clipboardSelection = null;
+    this._clipboardHistory = [];
+    this._clipboardSearchHistory = null;
+    this._clipboardHistoryLoaded = false;
+    this._pendingClipboardEntries = [];
+    this._clipboardHistoryDirty = false;
+    this._clipboardSaveInFlight = false;
+    this._clipboardSaveId = null;
+    this._clipboardSaveCancellable = null;
+    this._clipboardLoadCancellable = null;
+    this._loadClipboardHistory();
+
+    try {
+      this._searchProviderSettings = new Gio.Settings({
+        schema_id: "org.gnome.desktop.search-providers",
+      });
+    } catch (_e) {
+      this._searchProviderSettings = null;
+    }
+    this._searchProviderManager = new GnomeSearchProviderManager(
+      this._searchProviderSettings,
+    );
+    this._searchProviderSettings?.connectObject(
+      "changed",
+      () => {
+        this._refreshAppCache();
+        this._refreshCurrentSearch();
+      },
+      this,
+    );
+
+    this._appSystem = Shell.AppSystem.get_default();
+    this._appUsage = Shell.AppUsage.get_default();
+    this._systemActions = SystemActions.getDefault();
+    this._appSystem.connectObject(
+      "installed-changed",
+      () => {
+        this._searchProviderManager?.discover();
+        this._refreshAppCache();
+        this._refreshCurrentSearch();
+      },
+      this,
+    );
+    this._refreshAppCache();
+    this._windowTracker = Shell.WindowTracker.get_default();
+    this._windowTracker.connectObject(
+      "tracked-windows-changed",
+      () => this._refreshCurrentSearch(),
+      this,
+    );
+    this._folderCache = SYSTEM_FOLDERS.map(({ name, action }) => {
+      const uri = Gio.File.new_for_path(
+        GLib.build_filenamev([GLib.get_home_dir(), name]),
+      ).get_uri();
+
+      return {
+        searchResult: {
+          type: "file",
+          label: name,
+          subtitle: "Folder",
+          icon: "folder-symbolic",
+          uri,
+        },
+        actionCommand: action
+          ? {
+              label: `Open ${name}`,
+              uri,
+              icon: action.icon,
+              keywords: action.keywords,
+            }
+          : null,
+      };
+    });
+
+    this._container = new St.Widget({
+      style_class: "spotlight-container",
+      layout_manager: new Clutter.BinLayout(),
+      reactive: true,
+      can_focus: true,
+    });
+
+    this._materialLayer = new St.Widget({
+      style_class: "spotlight-material",
+      x_expand: true,
+      y_expand: true,
+    });
+    this._contentLayer = new St.BoxLayout({
+      style_class: "spotlight-content",
+      vertical: true,
+      x_expand: true,
+      y_expand: true,
+    });
+
+    this._container.add_child(this._materialLayer);
+    this._container.add_child(this._contentLayer);
+
+    this._inputRow = new St.BoxLayout({
+      style_class: "spotlight-input-row",
+      vertical: false,
+    });
+
+    this._icon = new St.Icon({
+      icon_name: "system-search-symbolic",
+      style_class: "spotlight-icon",
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+
+    this._entry = new St.Entry({
+      hint_text: "Search",
+      style_class: "spotlight-entry",
+      can_focus: true,
+      x_expand: true,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+
+    // The active mode's prefix lives in a chip rather than in the entry, so it
+    // stays visible without the user having to edit around it to change the
+    // query.
+    this._modeChip = new St.BoxLayout({
+      style_class: "spotlight-mode-chip",
+      vertical: false,
+      y_align: Clutter.ActorAlign.CENTER,
+      visible: false,
+    });
+    this._modeChipLabel = new St.Label({
+      style_class: "spotlight-mode-chip-label",
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._modeChip.add_child(this._modeChipLabel);
+
+    this._inputRow.add_child(this._icon);
+    this._inputRow.add_child(this._modeChip);
+    this._inputRow.add_child(this._entry);
+
+    this._modeIndicator = new St.BoxLayout({
+      style_class: "spotlight-mode-indicator",
+      vertical: false,
+      reactive: false,
+      can_focus: false,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._modeInner = new St.BoxLayout({
+      style_class: "spotlight-mode-inner",
+      vertical: false,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._modeDot = new St.Widget({
+      style_class: "spotlight-mode-dot",
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._modeLabel = this._createSingleLineLabel({
+      text: "All results",
+      style_class: "spotlight-mode-label",
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._modeInner.add_child(this._modeDot);
+    this._modeInner.add_child(this._modeLabel);
+    this._modeIndicator.add_child(this._modeInner);
+    this._inputRow.add_child(this._modeIndicator);
+    this._contentLayer.add_child(this._inputRow);
+
+    this._headerDivider = new St.Widget({
+      style_class: "spotlight-divider",
+      x_expand: true,
+    });
+    this._contentLayer.add_child(this._headerDivider);
+
+    this._resultsBox = new St.BoxLayout({
+      style_class: "spotlight-results-box",
+      vertical: true,
+      x_expand: true,
+    });
+
+    this._statusBox = new St.BoxLayout({
+      style_class: "spotlight-status",
+      vertical: true,
+      x_expand: true,
+      y_expand: true,
+      visible: false,
+    });
+    this._statusSpinner = new Spinner(22, {
+      animate: false,
+      hideOnStop: true,
+    });
+    this._statusSpinner.add_style_class_name("spotlight-status-icon");
+    this._statusSpinner.x_align = Clutter.ActorAlign.CENTER;
+    this._statusLabel = this._createSingleLineLabel({
+      style_class: "spotlight-status-label",
+      x_align: Clutter.ActorAlign.CENTER,
+      x_expand: true,
+    });
+    this._statusLabel.clutter_text.set_line_alignment(Pango.Alignment.CENTER);
+    this._statusBox.add_child(this._statusSpinner);
+    this._statusBox.add_child(this._statusLabel);
+    this._resultsBox.add_child(this._statusBox);
+
+    this._resultsScroll = new St.ScrollView({
+      style_class: "spotlight-results-scroll",
+      x_expand: true,
+      overlay_scrollbars: true,
+    });
+    this._resultsScroll.set_child(this._resultsBox);
+    this._resultsScroll.set_policy(
+      St.PolicyType.NEVER,
+      St.PolicyType.AUTOMATIC,
+    );
+
+    this._resultsClip = new St.Widget({
+      style_class: "spotlight-results-clip",
+      layout_manager: new Clutter.BinLayout(),
+      x_expand: true,
+      clip_to_allocation: true,
+    });
+    this._resultsClip.add_child(this._resultsScroll);
+    this._resultsScroll.height = 0;
+    this._resultsClip.height = 0;
+    this._resultsClip.connectObject(
+      "notify::height",
+      () => {
+        if (this._settings?.get_string("bar-position") === "bottom") {
+          this._repositionContainer();
+        }
+      },
+      this,
+    );
+    this._contentLayer.add_child(this._resultsClip);
+
+    this._footerDivider = new St.Widget({
+      style_class: "spotlight-divider spotlight-footer-divider",
+      x_expand: true,
+    });
+    this._contentLayer.add_child(this._footerDivider);
+
+    this._footer = new St.BoxLayout({
+      style_class: "spotlight-footer",
+      vertical: false,
+      x_expand: true,
+    });
+    this._actionsHint = new St.BoxLayout({
+      style_class: "spotlight-actions-hint",
+      vertical: false,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    this._actionsKey = new St.Label({
+      text: ">",
+      style_class: "spotlight-footer-key spotlight-actions-key",
+    });
+    this._actionsHint.add_child(this._actionsKey);
+    this._actionsHint.add_child(
+      new St.Label({
+        text: "Actions",
+        style_class: "spotlight-footer-label",
+      }),
+    );
+    this._footer.add_child(this._actionsHint);
+    this._footerSpacer = new St.Widget({ x_expand: true });
+    this._footer.add_child(this._footerSpacer);
+
+    this._footerHints = new St.BoxLayout({
+      style_class: "spotlight-footer-hints",
+      vertical: false,
+      x_align: Clutter.ActorAlign.END,
+      y_align: Clutter.ActorAlign.CENTER,
+    });
+    const createFooterHint = (key, label) => {
+      const hint = new St.BoxLayout({
+        style_class: "spotlight-footer-hint",
+        vertical: false,
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      hint.add_child(
+        new St.Label({ text: key, style_class: "spotlight-footer-key" }),
+      );
+      hint.add_child(
+        new St.Label({ text: label, style_class: "spotlight-footer-label" }),
+      );
+      this._footerHints.add_child(hint);
+      return hint;
+    };
+    this._modeHint = createFooterHint("Tab", "Mode");
+    this._navigateHint = createFooterHint("↑↓", "Navigate");
+    this._openHint = createFooterHint("↵", "Open");
+    this._closeHint = createFooterHint("Esc", "Close");
+    this._updateModeHint();
+    this._footer.add_child(this._footerHints);
+    this._contentLayer.add_child(this._footer);
+
+    this._entry.clutter_text.connectObject(
+      "key-press-event",
+      (actor, event) => {
+        if (!this._searchOpen) return Clutter.EVENT_PROPAGATE;
+
+        const key = event.get_key_symbol();
+
+        // Shift+Tab arrives as its own keysym, not as Tab with a modifier.
+        if (key === Clutter.KEY_Tab || key === Clutter.KEY_ISO_Left_Tab) {
+          const cycled = this._cycleQueryMode(
+            key === Clutter.KEY_ISO_Left_Tab ? -1 : 1,
+          );
+          return cycled ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
+        }
+
+        if (key === Clutter.KEY_Down) {
+          const nextIndex = getNextResultIndex(
+            this._selectedIndex,
+            this._results.length,
+          );
+          if (nextIndex !== this._selectedIndex) {
+            this._setSelected(nextIndex);
+          }
+          return Clutter.EVENT_STOP;
+        }
+
+        if (key === Clutter.KEY_Up) {
+          if (this._selectedIndex > 0) {
+            this._setSelected(this._selectedIndex - 1);
+          } else if (this._selectedIndex === 0) {
+            this._setSelected(-1);
+          }
+          return Clutter.EVENT_STOP;
+        }
+
+        if (key === Clutter.KEY_Return || key === Clutter.KEY_KP_Enter) {
+          const targetIndex =
+            this._selectedIndex > -1 ? this._selectedIndex : 0;
+          if (this._results.length > 0) {
+            this._activateResult(targetIndex);
+          } else {
+            this._queueFirstResultActivation();
+          }
+          return Clutter.EVENT_STOP;
+        }
+
+        if (
+          key === Clutter.KEY_BackSpace &&
+          this._queryModePrefix &&
+          this._isCaretAtStart()
+        ) {
+          this._setQueryModePrefix("");
+          this._onTextChanged();
+          return Clutter.EVENT_STOP;
+        }
+
+        if (key === Clutter.KEY_Escape) {
+          if (this._queryText().length > 0) {
+            this._resetSearch();
+          } else {
+            this._closeSearch({ preserveSession: false });
+          }
+          return Clutter.EVENT_STOP;
+        }
+
+        return Clutter.EVENT_PROPAGATE;
+      },
+      "text-changed",
+      () => this._onTextChanged(),
+      this,
+    );
+
+    Main.layoutManager.addChrome(this._container);
+    this._repositionContainer();
+
+    this._container.set_pivot_point(0.5, 0.5);
+    this._container.opacity = 0;
+    this._container.scale_x = OPEN_SCALE;
+    this._container.scale_y = OPEN_SCALE;
+    this._container.translation_y = OPEN_TRANSLATION_Y;
+    this._container.hide();
+
+    this._searchOpen = false;
+    this._queryModePrefix = "";
+    this._selectedIndex = -1;
+    this._results = [];
+    this._resultRows = [];
+    this._resultMetadataActors = [];
+    this._clipboardCopyButtons = [];
+    this._calculatorCopyLabel = null;
+    this._copiedClipboardValue = null;
+    this._resultsState = "hidden";
+    this._applyQueryMode(this._classifyQuery(""));
+
+    this._shellSettings.connectObject(
+      "notify::color-scheme",
+      () => this._updateTheme(),
+      "notify::shell-color-scheme",
+      () => this._updateTheme(),
+      this,
+    );
+    if (this._interfaceSettings?.settings_schema.has_key("accent-color")) {
+      this._interfaceSettings.connectObject(
+        "changed::accent-color",
+        () => this._updateTheme(),
+        this,
+      );
+    }
+    Main.sessionMode.connectObject("updated", () => this._updateTheme(), this);
+    this._themeContext.connectObject(
+      "changed",
+      () => {
+        this._updateTheme();
+        this._repositionContainer();
+        this._queueResultsHeightUpdate();
+      },
+      this,
+    );
+    Main.layoutManager.connectObject(
+      "monitors-changed",
+      () => this._onMonitorConfigurationChanged(),
+      this._container,
+    );
+    global.display.connectObject(
+      "workareas-changed",
+      () => {
+        this._repositionContainer();
+        this._queueResultsHeightUpdate();
+      },
+      this._container,
+    );
+    this._updateTheme();
+
+    this._settings.connectObject(
+      "changed::toggle-shortcut",
+      () => this._ensureKeybinding(),
+      "changed::bar-width",
+      () => {
+        this._repositionContainer();
+        this._queueResultsHeightUpdate();
+      },
+      "changed::bar-position",
+      () => this._repositionContainer(),
+      "changed::theme-mode",
+      () => this._updateTheme(),
+      "changed::color-source",
+      () => this._updateTheme(),
+      "changed::light-color-preset",
+      () => this._updateTheme(),
+      "changed::dark-color-preset",
+      () => this._updateTheme(),
+      "changed::background-opacity",
+      () => this._updateTheme(),
+      "changed::clipboard-monitor-enabled",
+      () => this._startClipboardMonitoring(),
+      "changed::clipboard-history-clear-request",
+      () => this._clearClipboardHistory(),
+      "changed::max-results",
+      () => this._refreshCurrentSearch(),
+      "changed::default-search-engine",
+      () => this._refreshCurrentSearch(),
+      "changed::adaptive-ranking-enabled",
+      () => this._refreshCurrentSearch(),
+      "changed::ranking-history",
+      () => {
+        // This key is written by the extension itself on every activation. Only
+        // an external write (prefs clearing the history) needs to be picked up;
+        // reacting to our own would reparse what we just serialized and re-run
+        // the whole search, which is visible when the panel stays open after a
+        // clipboard copy.
+        if (
+          this._settings.get_string("ranking-history") ===
+          this._lastRankingHistoryWrite
+        ) {
+          return;
+        }
+        this._loadRankingHistory();
+        this._refreshCurrentSearch();
+      },
+      this,
+    );
+    SEARCH_SOURCE_SETTING_KEYS.forEach((key) => {
+      this._settings.connectObject(
+        `changed::${key}`,
+        () => {
+          this._updateModeHint();
+          this._refreshCurrentSearch();
+        },
+        this,
+      );
+    });
+
+    this._startClipboardMonitoring();
+  }
+
+  // Mutter keeps the grab in sync with the GSettings key on its own, so this
+  // only ever has to register once. It is called again when the shortcut
+  // changes so that a combination rejected at startup can still take effect
+  // once the user picks a different one.
+  // GSettings keybinding keys are always lists; Superbar uses only the first
+  // entry, and an empty list means the shortcut was turned off.
+  _toggleAccel() {
+    const [accel = ""] = this._settings.get_strv("toggle-shortcut");
+    return accel;
+  }
+
+  _ensureKeybinding() {
+    if (this._keybindingAdded) return;
+
+    const action = Main.wm.addKeybinding(
+      TOGGLE_KEYBINDING_NAME,
+      this._settings,
+      Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+      Shell.ActionMode.NORMAL |
+        Shell.ActionMode.OVERVIEW |
+        Shell.ActionMode.POPUP,
+      this._toggleSearch.bind(this),
+    );
+
+    if (action !== Meta.KeyBindingAction.NONE) {
+      this._keybindingAdded = true;
+      return;
+    }
+
+    // An empty list means the user deliberately disabled the shortcut.
+    const accel = this._toggleAccel();
+    if (!accel) return;
+
+    // Mutter refuses only when a keybinding of the same NAME already exists;
+    // it allows two grabs on one accelerator, which is the whole reason the
+    // conflict check below exists. So this is another extension having taken
+    // the name, and picking a different combination would not help.
+    logWarning(
+      `mutter refused the keybinding name ` +
+        `"${TOGGLE_KEYBINDING_NAME}"; another extension has registered it`,
+    );
+    Main.notify(
+      "Superbar could not register its shortcut",
+      `${describeAccel(accel)} could not be bound because another extension ` +
+        `registered the same keybinding name.`,
+    );
+  }
+
+  // GNOME assigns Alt+Space to the window menu and Superbar ships the same
+  // default, and mutter lets both grabs exist at once — so which one answers
+  // depends on what has focus, and the launcher reads as though it only works
+  // sometimes. Preferences shows the conflict, but someone who never opens
+  // preferences has no way to learn any of this, so say it once here.
+  _queueConflictPrompt() {
+    // Shell.ActionMode.NONE means the session cannot be interrupted right now:
+    // it is still starting, or something holds a modal grab — Alt+Tab, a drag,
+    // the lock screen. Opening a dialog then is worse than it sounds, because
+    // a modal grabs input while the Shell's uiGroup is still transparent and
+    // the user faces a dialog they cannot see.
+    //
+    // Waiting on startup-complete is not enough: that signal fires once per
+    // Shell process, so an extension enabled later — by the Extensions app, or
+    // mid-drag — would hook a signal that has already gone and never ask at
+    // all. Retrying a few times covers every case with public API only.
+    let attempts = 0;
+    this._conflictPromptId = GLib.timeout_add_seconds(
+      GLib.PRIORITY_DEFAULT,
+      CONFLICT_PROMPT_RETRY_SECONDS,
+      () => {
+        if (!this._enabled) {
+          this._conflictPromptId = null;
+          return GLib.SOURCE_REMOVE;
+        }
+
+        if (Main.actionMode === Shell.ActionMode.NONE) {
+          if (++attempts < CONFLICT_PROMPT_MAX_ATTEMPTS)
+            return GLib.SOURCE_CONTINUE;
+
+          // Someone has held a grab for minutes. Asking is not urgent enough
+          // to keep a timer alive for the rest of the session.
+          this._conflictPromptId = null;
+          return GLib.SOURCE_REMOVE;
+        }
+
+        this._conflictPromptId = null;
+        this._runConflictCheck();
+        return GLib.SOURCE_REMOVE;
+      },
+    );
+  }
+
+  _runConflictCheck() {
+    if (!this._enabled) return;
+
+    try {
+      this._presentConflictPrompt();
+    } catch (error) {
+      logWarning(`could not check the shortcut for conflicts: ${error}`);
+    }
+  }
+
+  _presentConflictPrompt() {
+    const accel = this._toggleAccel();
+    if (!accel) return;
+
+    const conflicts = findConflictsFor(accel);
+    if (conflicts.length === 0) return;
+
+    // Locking the screen disables the extension and unlocking enables it
+    // again, running this check afresh. Without remembering what was already
+    // asked, a conflict someone chose to leave alone would put this dialog on
+    // screen after every unlock. Picking a different shortcut asks again.
+    if (this._settings.get_string("conflict-prompt-accel") === accel) return;
+
+    // A banner is too easy to miss for something that decides whether the
+    // launcher opens at all, and leaving it unanswered leaves the shortcut in
+    // the state that made it look broken. Ask outright instead.
+    const dialog = new ModalDialog.ModalDialog({ destroyOnClose: true });
+    dialog.contentLayout.add_child(
+      new Dialog.MessageDialogContent({
+        title: `${describeAccel(accel)} is already in use`,
+        description:
+          `${describeAccel(accel)} opens Superbar. ` +
+          `${formatConflictSummary(conflicts)}.\n\n` +
+          `While both are assigned, which one responds depends on what has ` +
+          `focus, so Superbar will seem to open only sometimes. Anything ` +
+          `cleared here can be put back from Superbar preferences.`,
+      }),
+    );
+
+    dialog.setButtons([
+      // Not offered as "keep both": holding both is the broken state that
+      // makes the launcher look unreliable, and naming it as a choice invites
+      // people straight into it.
+      {
+        label: "Not Now",
+        action: () => dialog.close(),
+        key: Clutter.KEY_Escape,
+      },
+      {
+        label: "Choose Another",
+        action: () => {
+          dialog.close();
+          if (this._enabled) this.openPreferences();
+        },
+      },
+      {
+        label: "Use for Superbar",
+        action: () => {
+          dialog.close();
+          // Runs from a Clutter signal handler: anything thrown here would
+          // escape into the Shell's main loop.
+          try {
+            if (this._enabled) this._claimShortcut();
+          } catch (error) {
+            logError(`could not take over the shortcut: ${error}`);
+          }
+        },
+        default: true,
+      },
+    ]);
+
+    // The dialog parents itself into the Shell's modalDialogGroup, not into
+    // anything this extension owns, so disable() has to be able to close it —
+    // locking the screen disables the extension with the dialog still up.
+    this._conflictDialog = dialog;
+    dialog.connect("closed", () => {
+      this._conflictDialog = null;
+    });
+
+    dialog.open();
+
+    // Recorded only once the question is actually on screen: committing before
+    // that would let an interruption suppress it permanently.
+    this._settings.set_string("conflict-prompt-accel", accel);
+  }
+
+  // Rescans rather than reusing the conflicts the dialog was built from: the
+  // dialog can stay on screen for a long time, and acting on what was true
+  // when it opened could clear a shortcut the user has since changed.
+  _claimShortcut() {
+    const accel = this._toggleAccel();
+    if (!accel) return;
+
+    const conflicts = findConflictsFor(accel);
+    if (conflicts.length === 0) return;
+
+    const cleared = replaceConflicts(this._settings, conflicts);
+    if (cleared.length === 0) {
+      Main.notify(
+        "Superbar could not take over the shortcut",
+        `${describeAccel(accel)} could not be cleared. Choose a different shortcut in Superbar preferences.`,
+      );
+      return;
+    }
+
+    Main.notify(
+      `${describeAccel(accel)} now opens only Superbar`,
+      "The shortcuts that were cleared can be put back from Superbar preferences.",
+    );
+  }
+
+  disable() {
+    this._enabled = false;
+    if (this._keybindingAdded) {
+      Main.wm.removeKeybinding(TOGGLE_KEYBINDING_NAME);
+      this._keybindingAdded = false;
+    }
+    this._conflictDialog?.close();
+    this._conflictDialog = null;
+    this._removeSource("_conflictPromptId");
+    this._cancelPendingSearch();
+    this._removeLater("_selectionScrollLaterId");
+    this._removeLater("_resultsHeightLaterId");
+    this._clipboardLoadCancellable?.cancel();
+    this._clipboardLoadCancellable = null;
+    this._flushClipboardHistoryNow();
+
+    this._settings?.disconnectObject(this);
+    this._clipboardSelection?.disconnectObject(this);
+    this._searchProviderSettings?.disconnectObject(this);
+    this._appSystem?.disconnectObject(this);
+    this._windowTracker?.disconnectObject(this);
+    this._entry?.clutter_text.disconnectObject(this);
+    this._shellSettings?.disconnectObject(this);
+    this._interfaceSettings?.disconnectObject(this);
+    Main.sessionMode.disconnectObject(this);
+    this._themeContext?.disconnectObject(this);
+    if (this._container) {
+      Main.layoutManager.disconnectObject(this._container);
+      global.display.disconnectObject(this._container);
+    }
+
+    this._destroyClickShield();
+
+    this._resultsClip?.remove_all_transitions();
+    this._resultsClip?.disconnectObject(this);
+    if (this._resultsBox) this._clearResults();
+
+    if (this._container) {
+      this._container.remove_all_transitions();
+      Main.layoutManager.removeChrome(this._container);
+      this._container.destroy();
+      this._container = null;
+    }
+
+    if (this._session) {
+      this._session.abort();
+      this._session = null;
+    }
+
+    this._icon = null;
+    this._entry = null;
+    this._inputRow = null;
+    this._modeIndicator = null;
+    this._modeInner = null;
+    this._modeDot = null;
+    this._modeLabel = null;
+    this._headerDivider = null;
+    this._resultsBox = null;
+    this._resultsScroll = null;
+    this._resultsClip = null;
+    this._statusBox = null;
+    this._statusSpinner = null;
+    this._statusLabel = null;
+    this._footerDivider = null;
+    this._footer = null;
+    this._actionsHint = null;
+    this._actionsKey = null;
+    this._footerSpacer = null;
+    this._footerHints = null;
+    this._modeChip = null;
+    this._modeChipLabel = null;
+    this._modeHint = null;
+    this._navigateHint = null;
+    this._openHint = null;
+    this._closeHint = null;
+    this._contentLayer = null;
+    this._resultsExpandUpward = null;
+    this._materialLayer = null;
+    this._settings = null;
+    this._appSystem = null;
+    this._appUsage = null;
+    this._systemActions = null;
+    this._appCache = null;
+    this._windowTracker = null;
+    this._folderCache = null;
+    this._searchProviderManager = null;
+    this._searchProviderSettings = null;
+    this._shellSettings = null;
+    this._interfaceSettings = null;
+    this._themeContext = null;
+    this._gnomeAppPalette = null;
+    this._clipboard = null;
+    this._clipboardSelection = null;
+    this._clipboardHistory = null;
+    this._clipboardSearchHistory = null;
+    this._pendingClipboardEntries = null;
+    this._clipboardHistoryLoaded = false;
+    this._clipboardSaveCancellable = null;
+    this._clipboardLoadCancellable = null;
+    this._remoteCache?.clear();
+    this._remoteCache = null;
+    this._rankingHistory?.clear();
+    this._rankingHistory = null;
+    this._lastRankingHistoryWrite = null;
+    this._results = null;
+    this._resultRows = null;
+    this._resultMetadataActors = null;
+    this._clipboardCopyButtons = null;
+    this._calculatorCopyLabel = null;
+    this._copiedClipboardValue = null;
+    this._resultsState = null;
+    this._selectedIndex = -1;
+    this._pendingActivation = null;
+    this._resumableSession = null;
+    this._activeMonitorIndex = null;
+    this._searchOpen = false;
+  }
+
+  _removeSource(propertyName) {
+    const sourceId = this[propertyName];
+    if (!sourceId) return;
+
+    GLib.Source.remove(sourceId);
+    this[propertyName] = null;
+  }
+
+  // Laters live on the compositor rather than the main loop, so they are
+  // cancelled through MetaLaters instead of GLib.Source.
+  _removeLater(propertyName) {
+    const laterId = this[propertyName];
+    if (!laterId) return;
+
+    global.compositor.get_laters().remove(laterId);
+    this[propertyName] = null;
+  }
+
+  _refreshCurrentSearch() {
+    if (!this._searchOpen || !this._queryText().trim()) return;
+    this._onTextChanged(true);
+  }
+
+  _isSearchSourceEnabled(key) {
+    return this._settings?.get_boolean(key) ?? true;
+  }
+
+  _loadRankingHistory() {
+    this._rankingHistory?.clear();
+    if (!this._settings || !this._rankingHistory) return;
+
+    try {
+      const entries = JSON.parse(
+        this._settings.get_string("ranking-history"),
+      );
+      if (!Array.isArray(entries)) return;
+
+      const now = Date.now();
+      entries.slice(0, RANKING_HISTORY_LIMIT).forEach((entry) => {
+        if (
+          typeof entry?.key !== "string" ||
+          !Number.isFinite(entry.count) ||
+          !Number.isFinite(entry.lastUsed)
+        ) {
+          return;
+        }
+
+        const age = now - entry.lastUsed;
+        if (age < 0 || age > RANKING_HISTORY_MAX_AGE_MS) return;
+
+        this._rankingHistory.set(entry.key, {
+          count: Math.max(1, Math.min(1000, Math.floor(entry.count))),
+          lastUsed: entry.lastUsed,
+        });
+      });
+    } catch (_e) {
+      // Invalid ranking data is ignored and replaced on the next activation.
+    }
+  }
+
+  _saveRankingHistory() {
+    if (!this._settings || !this._rankingHistory) return;
+
+    const entries = [...this._rankingHistory.entries()]
+      .sort((a, b) => b[1].lastUsed - a[1].lastUsed)
+      .slice(0, RANKING_HISTORY_LIMIT)
+      .map(([key, value]) => ({
+        key,
+        count: value.count,
+        lastUsed: value.lastUsed,
+      }));
+
+    this._rankingHistory.clear();
+    entries.forEach(({ key, count, lastUsed }) => {
+      this._rankingHistory.set(key, { count, lastUsed });
+    });
+
+    const serialized = JSON.stringify(entries);
+    if (serialized !== this._settings.get_string("ranking-history")) {
+      this._lastRankingHistoryWrite = serialized;
+      this._settings.set_string("ranking-history", serialized);
+    }
+  }
+
+  _getResultAppIdentity(result) {
+    return result.appIdentity ?? result.appId;
+  }
+
+  _getResultAppAction(result) {
+    return result.appAction ?? "launch";
+  }
+
+  _getResultRankingKey(result) {
+    const appIdentity = this._getResultAppIdentity(result);
+    if (result.type === "app" && appIdentity) {
+      return `app:${this._getResultAppAction(result)}:${appIdentity}`;
+    }
+    if (result.type === "window" && appIdentity) {
+      return `app:switch:${appIdentity}`;
+    }
+    if (result.type !== "system") return null;
+
+    const actionId =
+      result.systemAction ??
+      result.argv?.join("\u001f") ??
+      result.label;
+    return actionId ? `action:${actionId}` : null;
+  }
+
+  _isAdaptiveRankingEnabled() {
+    return Boolean(
+      this._settings?.get_boolean("adaptive-ranking-enabled") &&
+        this._rankingHistory,
+    );
+  }
+
+  _getAdaptiveRankingBoost(result) {
+    if (!this._isAdaptiveRankingEnabled()) return 0;
+
+    const key = this._getResultRankingKey(result);
+    const entry = key ? this._rankingHistory.get(key) : null;
+    if (!entry) return 0;
+
+    const age = Math.max(0, Date.now() - entry.lastUsed);
+    const recencyBoost =
+      50 * Math.max(0, 1 - age / RANKING_HISTORY_MAX_AGE_MS);
+    const frequencyBoost = Math.min(40, Math.log2(entry.count + 1) * 12);
+    return Math.round(recencyBoost + frequencyBoost);
+  }
+
+  _recordResultUsage(result) {
+    if (!this._isAdaptiveRankingEnabled()) return;
+
+    const key = this._getResultRankingKey(result);
+    if (!key) return;
+
+    const previous = this._rankingHistory.get(key);
+    this._rankingHistory.set(key, {
+      count: Math.min(1000, (previous?.count ?? 0) + 1),
+      lastUsed: Date.now(),
+    });
+    this._saveRankingHistory();
+  }
+
+  // Against the whole query, chip included: a deferred search carries the text
+  // it was scheduled for, and the entry holds only the part after the prefix.
+  _isCurrentQuery(text, generation = null) {
+    return (
+      this._enabled &&
+      this._queryText().trim() === text &&
+      (generation === null || generation === this._searchGeneration)
+    );
+  }
+
+  _cancelPendingSearch() {
+    this._removeSource("_searchTimeout");
+
+    this._networkCancellable?.cancel();
+    this._networkCancellable = null;
+
+    this._fileSearchCancellable?.cancel();
+    this._fileSearchCancellable = null;
+
+    this._providerSearchCancellable?.cancel();
+    this._providerSearchCancellable = null;
+
+    if (this._fileSearchProcess) {
+      try {
+        this._fileSearchProcess.force_exit();
+      } catch (_e) {
+        // The process may already have exited.
+      }
+      this._fileSearchProcess = null;
+    }
+  }
+
+  _queueFirstResultActivation() {
+    const text = this._queryText().trim();
+    if (!text) return;
+
+    this._pendingActivation = {
+      text,
+      generation: this._searchGeneration,
+    };
+  }
+
+  _consumePendingActivation() {
+    const pending = this._pendingActivation;
+    if (!pending) return false;
+
+    this._pendingActivation = null;
+    return this._isCurrentQuery(pending.text, pending.generation);
+  }
+
+  _hasPendingSearch() {
+    return Boolean(
+      this._searchTimeout ||
+        this._networkCancellable ||
+        this._fileSearchCancellable ||
+        this._providerSearchCancellable ||
+        this._fileSearchProcess,
+    );
+  }
+
+  _saveResumableSession() {
+    const text = this._queryText();
+    if (!text.trim()) {
+      this._resumableSession = null;
+      return false;
+    }
+
+    // Expiry is checked lazily on the next open, avoiding another main-loop
+    // source that would need lifecycle cleanup.
+    this._resumableSession = {
+      text,
+      closedAt: Date.now(),
+      hadPendingSearch: this._hasPendingSearch(),
+    };
+    return true;
+  }
+
+  _takeResumableSession() {
+    const session = this._resumableSession;
+    this._resumableSession = null;
+
+    if (!session) return null;
+
+    const age = Date.now() - session.closedAt;
+    if (
+      age < 0 ||
+      age > RESUMABLE_SESSION_TTL_MS ||
+      this._queryText() !== session.text
+    ) {
+      return null;
+    }
+
+    return session;
+  }
+
+  _invalidatePendingSearch({ clearResumableSession = false } = {}) {
+    this._searchGeneration += 1;
+    this._pendingActivation = null;
+    if (clearResumableSession) this._resumableSession = null;
+    this._cancelPendingSearch();
+    return this._searchGeneration;
+  }
+
+  // --- Open / Close ---
+
+  _destroyClickShield() {
+    if (!this._clickShield) return;
+
+    this._clickShieldGesture?.disconnectObject(this);
+    this._clickShieldGesture = null;
+    this._clickShield.disconnectObject(this);
+    Main.layoutManager.removeChrome(this._clickShield);
+    this._clickShield.destroy();
+    this._clickShield = null;
+  }
+
+  _toggleSearch() {
+    // The shortcut is registered before the UI is built, so a failure part way
+    // through enable() can leave the handler live with nothing to show.
+    if (!this._enabled || !this._container || !this._entry) return;
+
+    if (this._searchOpen) {
+      this._closeSearch();
+    } else {
+      this._openSearch();
+    }
+  }
+
+  _openSearch() {
+    if (this._searchOpen) return;
+
+    this._activeMonitorIndex = this._getTargetMonitorIndex();
+    this._searchOpen = true;
+
+    try {
+      this._presentSearch();
+    } catch (error) {
+      // Without this the flag stays true while nothing is on screen, and the
+      // shortcut reads as dead until it has been pressed a second time to
+      // toggle the state back.
+      logError(`failed to open the search bar: ${error}`);
+      this._abandonOpenSearch();
+    }
+  }
+
+  _abandonOpenSearch() {
+    this._searchOpen = false;
+    // The entry may already hold stage key focus; leaving it there once the
+    // container is hidden swallows every keystroke until something else takes
+    // focus back.
+    global.stage.set_key_focus(null);
+    this._destroyClickShield();
+    this._container?.remove_all_transitions();
+    this._container?.hide();
+  }
+
+  _presentSearch() {
+    const resumableSession = this._takeResumableSession();
+    const resumed = resumableSession !== null;
+    const currentQuery = this._classifyQuery(this._queryText());
+
+    if (resumed) {
+      if (
+        currentQuery.kind === "clipboard" ||
+        resumableSession.hadPendingSearch ||
+        this._results.length === 0
+      ) {
+        this._onTextChanged(true);
+      } else {
+        this._applyQueryMode(currentQuery);
+        this._updateSelection();
+      }
+    } else {
+      this._resetSearch();
+    }
+
+    this._repositionContainer();
+    this._pollClipboard();
+
+    this._destroyClickShield();
+
+    this._clickShield = new St.Widget({
+      reactive: true,
+    });
+    this._resizeClickShield();
+    Main.layoutManager.addChrome(this._clickShield);
+    this._container
+      .get_parent()
+      .set_child_above_sibling(this._container, this._clickShield);
+    // button-press-event only ever fired for pointer buttons, so a touch tap
+    // outside the bar raised nothing and left it open. A gesture covers both:
+    // touch counts as a press of the primary button.
+    this._clickShieldGesture = new Clutter.ClickGesture();
+    // Both restore what button-press-event did: close on the press rather than
+    // waiting for the release, and accept any button rather than only primary.
+    this._clickShieldGesture.set_recognize_on_press(true);
+    this._clickShieldGesture.set_required_button(0);
+    this._clickShieldGesture.connectObject(
+      "recognize",
+      () => this._closeSearch(),
+      this,
+    );
+    this._clickShield.add_action(this._clickShieldGesture);
+
+    this._container.remove_all_transitions();
+    this._container.opacity = 0;
+    this._container.scale_x = OPEN_SCALE;
+    this._container.scale_y = OPEN_SCALE;
+    this._container.translation_y = OPEN_TRANSLATION_Y;
+    this._container.show();
+    global.stage.set_key_focus(this._entry);
+    if (resumed) this._entry.clutter_text.set_selection(0, -1);
+
+    this._container.ease({
+      opacity: 255,
+      scale_x: 1.0,
+      scale_y: 1.0,
+      translation_y: 0,
+      duration: OPEN_ANIMATION_MS,
+      mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
+    });
+  }
+
+  _closeSearch({ preserveSession = true } = {}) {
+    if (!this._searchOpen) return;
+
+    const savedSession = preserveSession && this._saveResumableSession();
+    this._searchOpen = false;
+    this._clipboardSearchHistory = null;
+    global.stage.set_key_focus(null);
+    if (savedSession) {
+      this._invalidatePendingSearch();
+    } else {
+      this._resetSearch();
+    }
+
+    this._destroyClickShield();
+
+    this._container.remove_all_transitions();
+    this._container.ease({
+      opacity: 0,
+      scale_x: OPEN_SCALE,
+      scale_y: OPEN_SCALE,
+      duration: 130,
+      mode: Clutter.AnimationMode.EASE_IN_QUAD,
+      onComplete: () => {
+        if (this._searchOpen || !this._container) return;
+
+        this._container.hide();
+      },
+    });
+  }
+
+  _resetSearch() {
+    this._removeLater("_selectionScrollLaterId");
+    this._copiedClipboardValue = null;
+    this._clipboardSearchHistory = null;
+
+    const hadModePrefix = this._queryModePrefix.length > 0;
+    this._setQueryModePrefix("");
+
+    if (this._entry.get_text().length > 0) {
+      // set_text() emits text-changed synchronously, which invalidates the
+      // active generation and cancels pending work in one place.
+      this._entry.set_text("");
+    } else if (hadModePrefix) {
+      this._onTextChanged();
+    } else {
+      this._invalidatePendingSearch({ clearResumableSession: true });
+      this._hideResults();
+    }
+  }
+
+  // --- Search ---
+
+  _onTextChanged(preserveSelection = false) {
+    // Promotion rewrites the entry, which re-enters here with the prefix
+    // already lifted into the chip.
+    if (this._promoteTypedQueryMode()) return;
+
+    const raw = this._queryText();
+    const text = raw.trim();
+    const generation = this._invalidatePendingSearch({
+      clearResumableSession: true,
+    });
+    const query = this._classifyQuery(raw);
+    if (query.kind === "clipboard") {
+      // Keep clipboard results in their entry order for this query session.
+      // The monitor still updates the persisted MRU order, which becomes
+      // visible after leaving and reopening/resetting clipboard search.
+      if (this._clipboardSearchHistory === null) {
+        this._clipboardSearchHistory = [...this._clipboardHistory];
+      }
+    } else {
+      this._clipboardSearchHistory = null;
+    }
+    this._applyQueryMode(query);
+
+    if (text.length === 0) {
+      this._hideResults();
+      return;
+    }
+
+    // A mode reached by Tab starts with no argument, and there is nothing to
+    // ask a third-party API for until one is typed.
+    if (query.payload === "" && MODE_PROMPTS[query.kind]) {
+      this._showStatus("empty", MODE_PROMPTS[query.kind]);
+      return;
+    }
+
+    if (query.kind === "currency") {
+      this._scheduleRemoteSearch(text, generation, (cancellable) =>
+        this._fetchCurrency(text, query.payload, generation, cancellable),
+      );
+      return;
+    }
+
+    if (query.kind === "weather") {
+      this._scheduleRemoteSearch(text, generation, (cancellable) =>
+        this._fetchWeather(text, query.payload, generation, cancellable),
+      );
+      return;
+    }
+
+    if (query.kind === "dictionary") {
+      this._scheduleRemoteSearch(text, generation, (cancellable) =>
+        this._fetchDictionary(text, query.payload, generation, cancellable),
+      );
+      return;
+    }
+
+    if (query.kind === "clipboard") {
+      this._showResults(
+        this._searchClipboardHistory(query.payload),
+        preserveSelection,
+      );
+      return;
+    }
+
+    if (query.kind === "actions") {
+      this._showResults(
+        this._searchSystemCommands(query.payload),
+        preserveSelection,
+      );
+      return;
+    }
+
+    if (query.kind === "calculator") {
+      this._showResults(
+        [
+          {
+            type: "calc",
+            label: `= ${query.payload}`,
+            subtitle: "Press Enter to copy",
+            icon: "accessories-calculator-symbolic",
+            value: String(query.payload),
+            answerContext: text,
+          },
+        ],
+        preserveSelection,
+      );
+      return;
+    }
+
+    const providersEnabled =
+      this._isSearchSourceEnabled("gnome-search-providers-enabled") &&
+      (this._searchProviderManager?.getEnabledProviders().length ?? 0) > 0;
+    const nativeFilesEnabled =
+      text.length >= 2 &&
+      this._isSearchSourceEnabled("files-search-enabled") &&
+      !(
+        providersEnabled &&
+        this._searchProviderManager?.isProviderEnabled(
+          FILES_PROVIDER_DESKTOP_ID,
+        )
+      );
+
+    // Apps, windows, and common folders are cheap and render immediately.
+    // If only asynchronous sources can answer, keep a loading state visible
+    // instead of briefly claiming that there are no results.
+    const immediateResults = this._buildGenericResults(text);
+    if (
+      immediateResults.length === 0 &&
+      (providersEnabled || nativeFilesEnabled)
+    ) {
+      this._showStatus("loading", "Searching…");
+    } else {
+      this._showResults(immediateResults, preserveSelection);
+    }
+
+    if (!providersEnabled && !nativeFilesEnabled) return;
+
+    this._scheduleCurrentQuery(
+      text,
+      generation,
+      FILE_SEARCH_DELAY_MS,
+      () => {
+        let fileResults = [];
+        let providerResults = [];
+        const showMergedResults = () => {
+          if (!this._isCurrentQuery(text, generation)) return;
+          this._showResults(
+            this._buildGenericResults(
+              text,
+              fileResults,
+              providerResults,
+            ),
+            true,
+          );
+        };
+
+        if (nativeFilesEnabled) {
+          const fileCancellable = new Gio.Cancellable();
+          this._fileSearchCancellable = fileCancellable;
+          this._searchFiles(text, fileCancellable).then((results) => {
+            if (this._fileSearchCancellable === fileCancellable) {
+              this._fileSearchCancellable = null;
+            }
+            if (!this._isCurrentQuery(text, generation)) return;
+
+            fileResults = results;
+            showMergedResults();
+          });
+        }
+
+        if (providersEnabled) {
+          const providerCancellable = new Gio.Cancellable();
+          this._providerSearchCancellable = providerCancellable;
+          this._searchProviderManager
+            .search(text, providerCancellable, (results) => {
+              if (!this._isCurrentQuery(text, generation)) return;
+
+              providerResults = results;
+              showMergedResults();
+            })
+            .finally(() => {
+              if (this._providerSearchCancellable === providerCancellable) {
+                this._providerSearchCancellable = null;
+              }
+            });
+        }
+      },
+    );
+  }
+
+  _parseCurrencyQuery(text) {
+    const match = text
+      .trim()
+      .match(
+        /^(\d+(?:\.\d+)?)\s*([a-zA-Z]+)\s+to\s+([a-zA-Z]+)$/i,
+      );
+    if (!match) return null;
+
+    const normalizeCode = (value) =>
+      CURRENCY_ALIASES[value.toLowerCase()] ?? value.toUpperCase();
+    return {
+      amount: match[1],
+      from: normalizeCode(match[2]),
+      to: normalizeCode(match[3]),
+    };
+  }
+
+  _parseWeatherQuery(text) {
+    return parseWeatherQuery(text);
+  }
+
+  _parseDictionaryQuery(text) {
+    return parseDictionaryQuery(text);
+  }
+
+  _classifyQuery(text) {
+    const currencyQuery = this._isSearchSourceEnabled(
+      "currency-search-enabled",
+    )
+      ? this._parseCurrencyQuery(text)
+      : null;
+    if (currencyQuery !== null) {
+      return { kind: "currency", payload: currencyQuery };
+    }
+
+    const weatherQuery = this._isSearchSourceEnabled("weather-search-enabled")
+      ? this._parseWeatherQuery(text)
+      : null;
+    if (weatherQuery !== null) {
+      return { kind: "weather", payload: weatherQuery };
+    }
+
+    const dictionaryQuery = this._isSearchSourceEnabled(
+      "dictionary-search-enabled",
+    )
+      ? this._parseDictionaryQuery(text)
+      : null;
+    if (dictionaryQuery !== null) {
+      return { kind: "dictionary", payload: dictionaryQuery };
+    }
+
+    const clipboardQuery = this._isSearchSourceEnabled(
+      "clipboard-search-enabled",
+    )
+      ? this._parseClipboardQuery(text)
+      : null;
+    if (clipboardQuery !== null) {
+      return { kind: "clipboard", payload: clipboardQuery };
+    }
+
+    const actionQuery = this._isSearchSourceEnabled(
+      "system-actions-search-enabled",
+    )
+      ? this._parseActionQuery(text)
+      : null;
+    if (actionQuery !== null) {
+      return { kind: "actions", payload: actionQuery };
+    }
+
+    const trimmed = text.trim();
+    if (
+      this._isSearchSourceEnabled("calculator-search-enabled") &&
+      this._isMathExpression(trimmed)
+    ) {
+      const result = evaluateMathExpression(trimmed);
+      if (result !== null) {
+        return { kind: "calculator", payload: result };
+      }
+    }
+
+    return { kind: "generic", payload: trimmed };
+  }
+
+  _applyQueryMode(query) {
+    const mode =
+      QUERY_MODE_PRESENTATION[query.kind] ?? QUERY_MODE_PRESENTATION.generic;
+    this._icon.icon_name = mode.iconName;
+    if (this._modeLabel) this._modeLabel.text = mode.label;
+  }
+
+  // The chip holds a prefix that would otherwise sit in the entry, so the query
+  // everything downstream reads is the two joined back together.
+  _queryText() {
+    return `${this._queryModePrefix}${this._entry?.get_text() ?? ""}`;
+  }
+
+  // An empty entry reports its caret as -1 rather than 0, and a selection has
+  // to keep Backspace for itself.
+  _isCaretAtStart() {
+    const clutterText = this._entry.clutter_text;
+    if (clutterText.get_selection()) return false;
+    return (
+      this._entry.get_text().length === 0 ||
+      clutterText.get_cursor_position() === 0
+    );
+  }
+
+  _setQueryModePrefix(prefix) {
+    if (this._queryModePrefix === prefix) return;
+
+    this._queryModePrefix = prefix;
+    const token = getQueryModeToken(prefix);
+    if (this._modeChipLabel) this._modeChipLabel.text = token;
+    if (this._modeChip) this._modeChip.visible = token.length > 0;
+    if (this._entry) this._entry.hint_text = getQueryModeByPrefix(prefix).hint;
+  }
+
+  _cycleQueryMode(direction) {
+    const next = cycleQueryMode({
+      text: this._entry.get_text(),
+      kind: this._classifyQuery(this._queryText()).kind,
+      direction,
+      isModeEnabled: (key) => this._isSearchSourceEnabled(key),
+    });
+    if (next === null) return false;
+
+    this._setQueryModePrefix(next.prefix);
+    // set_text only fires the search when the text actually changes, so an
+    // unchanged entry has to be searched by hand.
+    if (next.query === this._entry.get_text()) {
+      this._onTextChanged();
+    } else {
+      this._entry.set_text(next.query);
+    }
+    this._entry.clutter_text.set_cursor_position(next.query.length);
+    return true;
+  }
+
+  // Typing "clip " should arrive at the same place as pressing Tab.
+  _promoteTypedQueryMode() {
+    if (this._queryModePrefix) return false;
+
+    const typed = matchTypedQueryMode(this._entry.get_text(), (key) =>
+      this._isSearchSourceEnabled(key),
+    );
+    if (typed === null) return false;
+
+    this._setQueryModePrefix(typed.mode.prefix);
+    this._entry.set_text(typed.query);
+    this._entry.clutter_text.set_cursor_position(typed.query.length);
+    return true;
+  }
+
+  // A cycle of one leaves Tab with nothing to do, so stop advertising it.
+  _updateModeHint() {
+    if (!this._modeHint) return;
+    this._modeHint.visible =
+      getQueryModeCycle((key) => this._isSearchSourceEnabled(key)).length > 1;
+  }
+
+  _scheduleCurrentQuery(text, generation, delay, callback) {
+    this._removeSource("_searchTimeout");
+
+    this._searchTimeout = GLib.timeout_add(
+      GLib.PRIORITY_DEFAULT,
+      delay,
+      () => {
+        this._searchTimeout = null;
+        if (this._isCurrentQuery(text, generation)) callback();
+        return GLib.SOURCE_REMOVE;
+      },
+    );
+  }
+
+  _scheduleRemoteSearch(text, generation, callback) {
+    this._showStatus("loading", "Searching…");
+
+    this._scheduleCurrentQuery(
+      text,
+      generation,
+      REMOTE_SEARCH_DELAY_MS,
+      () => {
+        const cancellable = new Gio.Cancellable();
+        this._networkCancellable = cancellable;
+        callback(cancellable).finally(() => {
+          if (this._networkCancellable === cancellable)
+            this._networkCancellable = null;
+        });
+      },
+    );
+  }
+
+  _buildGenericResults(text, fileResults = [], providerResults = []) {
+    const windowContext = this._createWindowSearchContext();
+    const filesEnabled = this._isSearchSourceEnabled("files-search-enabled");
+    const folderMatches = filesEnabled
+      ? this._folderCache
+          .map(({ searchResult }) => {
+            const matchScore = scoreSearchMatch(searchResult.label, text);
+            return {
+              ...searchResult,
+              _source: "folder",
+              _relevanceScore: matchScore,
+            };
+          })
+          .filter((folder) => folder._relevanceScore >= 0)
+      : [];
+
+    const matchedFileResults = fileResults
+      .map((result) => {
+        const labelScore = scoreSearchMatch(result.label, text);
+        const subtitleScore = scoreSearchMatch(
+          result.subtitle ?? "",
+          text,
+        );
+        return {
+          ...result,
+          _source: "file",
+          _relevanceScore: Math.max(
+            labelScore,
+            subtitleScore < 0 ? -1 : subtitleScore - 120,
+          ),
+        };
+      })
+      .filter((result) => result._relevanceScore >= 0);
+
+    const localResults = this._dedupeResults(
+      this._rankGenericResults(
+        [
+          ...(this._isSearchSourceEnabled("applications-search-enabled")
+            ? this._searchApps(text, windowContext)
+            : []),
+          ...(this._isSearchSourceEnabled("windows-search-enabled")
+            ? this._searchWindows(text, windowContext)
+            : []),
+          ...folderMatches,
+          ...matchedFileResults,
+        ],
+      ),
+    );
+    const maxResults = this._settings.get_int("max-results");
+    const strongLocalResults = [];
+    const weakLocalResults = [];
+
+    for (const result of localResults) {
+      const relevance = result._relevanceScore ?? -1;
+      delete result._relevanceScore;
+
+      // Hide results that only matched weakly (e.g. a scattered subsequence
+      // buried in an app's description) so unrelated entries don't appear.
+      if (relevance < MINIMUM_LOCAL_MATCH_SCORE) continue;
+
+      // Relevance may come from hidden app metadata or source-specific
+      // penalties. Visible-text strength separately controls whether the web
+      // fallback appears before or after this local result.
+      const visibleMatchScore = this._getVisibleResultMatchScore(result, text);
+
+      if (visibleMatchScore >= STRONG_LOCAL_MATCH_SCORE) {
+        strongLocalResults.push(result);
+      } else {
+        weakLocalResults.push(result);
+      }
+    }
+
+    const mergedResults = this._dedupeResults([
+      ...strongLocalResults,
+      ...providerResults,
+      ...weakLocalResults,
+    ]);
+    if (!this._isSearchSourceEnabled("web-search-enabled")) {
+      return mergedResults.slice(0, maxResults);
+    }
+
+    const searchEngine = getSearchEngine(
+      this._settings.get_string("default-search-engine"),
+    );
+    const webResult = {
+      type: "web",
+      label: text,
+      subtitle: `Search with ${searchEngine.label}`,
+      icon: "web-browser-symbolic",
+      query: text,
+    };
+
+    return [
+      ...mergedResults.slice(0, Math.max(0, maxResults - 1)),
+      webResult,
+    ].slice(0, maxResults);
+  }
+
+  _parseClipboardQuery(text) {
+    const normalized = text.trim();
+    const match = normalized.match(CLIPBOARD_QUERY_PATTERN);
+    if (!match) return null;
+    return (match[1] ?? "").trim();
+  }
+
+  _getClipboardHistoryPath() {
+    return GLib.build_filenamev([
+      GLib.get_user_data_dir(),
+      "search-bar-clipboard-history.json",
+    ]);
+  }
+
+  _loadClipboardHistory() {
+    const historyPath = this._getClipboardHistoryPath();
+    const file = Gio.File.new_for_path(historyPath);
+    // disable() and enable() run on every screen lock, so without a cancellable
+    // a load started before the lock can land after the unlock and overwrite
+    // the state the new cycle has already built up.
+    const cancellable = new Gio.Cancellable();
+    this._clipboardLoadCancellable = cancellable;
+
+    file.load_contents_async(cancellable, (_file, res) => {
+      if (this._clipboardLoadCancellable === cancellable) {
+        this._clipboardLoadCancellable = null;
+      }
+      if (!this._enabled || cancellable.is_cancelled()) return;
+
+      try {
+        const [success, contents] = file.load_contents_finish(res);
+        if (!success) return;
+
+        const data = JSON.parse(new TextDecoder().decode(contents));
+        // A clear that happened while this load was in flight already
+        // established the authoritative state; restoring the file we read
+        // before it would resurrect the entries the user just deleted.
+        if (Array.isArray(data) && !this._clipboardHistoryLoaded) {
+          this._clipboardHistory = data
+            .filter((entry) => typeof entry?.text === "string")
+            .slice(0, this._settings.get_int("clipboard-history-limit"));
+        }
+      } catch (_e) {
+        // history file missing or corrupt; start fresh
+      } finally {
+        // g_file_replace_contents preserves an existing file's mode, so PRIVATE
+        // alone never retightens a history file written by an older version.
+        // This has to run whether or not the contents parsed.
+        GLib.chmod(historyPath, 0o600);
+        this._flushPendingClipboardEntries();
+      }
+    });
+  }
+
+  // Captures that arrive before the history file has finished loading are held
+  // back: storing them immediately would append to a still-empty list and
+  // overwrite the saved history on disk, and the load would then discard the
+  // captured entry.
+  _flushPendingClipboardEntries() {
+    if (this._clipboardHistoryLoaded) return;
+    this._clipboardHistoryLoaded = true;
+
+    const pending = this._pendingClipboardEntries ?? [];
+    this._pendingClipboardEntries = [];
+    pending.forEach((text) => this._storeClipboardEntry(text));
+  }
+
+  _saveClipboardHistory() {
+    this._clipboardHistoryDirty = true;
+    if (this._clipboardSaveId) return;
+
+    this._clipboardSaveId = GLib.timeout_add(
+      GLib.PRIORITY_DEFAULT_IDLE,
+      CLIPBOARD_SAVE_DEBOUNCE_MS,
+      () => {
+        this._clipboardSaveId = null;
+        this._writeClipboardHistory();
+        return GLib.SOURCE_REMOVE;
+      },
+    );
+  }
+
+  _writeClipboardHistory() {
+    // A second write while one is in flight would race it, so leave the dirty
+    // flag set and let the in-flight completion pick the newer state up.
+    if (!this._clipboardHistoryDirty || this._clipboardSaveInFlight) return;
+
+    this._clipboardHistoryDirty = false;
+    this._clipboardSaveInFlight = true;
+
+    const cancellable = new Gio.Cancellable();
+    this._clipboardSaveCancellable = cancellable;
+
+    const file = Gio.File.new_for_path(this._getClipboardHistoryPath());
+    file.replace_contents_bytes_async(
+      new GLib.Bytes(this._encodeClipboardHistory()),
+      null,
+      false,
+      CLIPBOARD_FILE_FLAGS,
+      cancellable,
+      (_file, res) => {
+        // A callback from a superseded write must not clear the latch belonging
+        // to the write that replaced it.
+        if (this._clipboardSaveCancellable !== cancellable) return;
+
+        this._clipboardSaveCancellable = null;
+        this._clipboardSaveInFlight = false;
+        try {
+          file.replace_contents_finish(res);
+        } catch (_e) {
+          // save errors are non-fatal; silently ignore
+        }
+        if (this._enabled && this._clipboardHistoryDirty) {
+          this._writeClipboardHistory();
+        }
+      },
+    );
+  }
+
+  _encodeClipboardHistory() {
+    return new TextEncoder().encode(
+      JSON.stringify(this._clipboardHistory ?? []),
+    );
+  }
+
+  // disable() cannot wait on an async write, so a still-pending save is flushed
+  // synchronously. Same creation flags, so the permissions stay correct.
+  _flushClipboardHistoryNow() {
+    this._removeSource("_clipboardSaveId");
+
+    if (this._clipboardSaveInFlight) {
+      // An in-flight write cannot be waited on, and letting it land after the
+      // synchronous one below would put stale content back on disk. The write
+      // below carries the current history, so cancelling loses nothing.
+      this._clipboardSaveCancellable?.cancel();
+      this._clipboardSaveCancellable = null;
+      this._clipboardSaveInFlight = false;
+      this._clipboardHistoryDirty = true;
+    }
+
+    if (!this._clipboardHistoryDirty) return;
+
+    this._clipboardHistoryDirty = false;
+    try {
+      Gio.File.new_for_path(this._getClipboardHistoryPath()).replace_contents(
+        this._encodeClipboardHistory(),
+        null,
+        false,
+        CLIPBOARD_FILE_FLAGS,
+        null,
+      );
+    } catch (_e) {
+      // save errors are non-fatal; silently ignore
+    }
+  }
+
+  _clearClipboardHistory() {
+    this._clipboardHistory = [];
+    this._clipboardSearchHistory = null;
+    this._pendingClipboardEntries = [];
+    // An empty history is authoritative, so a load still in flight must not
+    // write the pre-clear contents back over it.
+    this._clipboardHistoryLoaded = true;
+    this._saveClipboardHistory();
+
+    if (
+      !this._searchOpen ||
+      !this._isSearchSourceEnabled("clipboard-search-enabled")
+    ) {
+      return;
+    }
+
+    const query = this._parseClipboardQuery(this._queryText().trim());
+    if (query !== null) this._showResults([]);
+  }
+
+  _startClipboardMonitoring() {
+    this._clipboardSelection?.disconnectObject(this);
+    this._clipboardSelection = null;
+    if (!this._settings.get_boolean("clipboard-monitor-enabled")) return;
+
+    // The extension runs inside the compositor, so Mutter's own selection
+    // object tells us when clipboard ownership changes instead of us polling
+    // for it. The signal only reports the change; the text still has to be
+    // read back asynchronously.
+    this._clipboardSelection = global.display.get_selection();
+    this._clipboardSelection.connectObject(
+      "owner-changed",
+      (_selection, selectionType) => {
+        // Also fires for PRIMARY (mouse selection) and drag-and-drop.
+        if (selectionType !== Meta.SelectionType.SELECTION_CLIPBOARD) return;
+        this._pollClipboard();
+      },
+      this,
+    );
+    this._pollClipboard();
+  }
+
+  _pollClipboard() {
+    this._clipboard.get_text(St.ClipboardType.CLIPBOARD, (...args) => {
+      if (!this._enabled) return;
+      const textArg = args.find((arg) => typeof arg === "string");
+      this._storeClipboardEntry(textArg ?? "");
+    });
+  }
+
+  _storeClipboardEntry(text) {
+    if (typeof text !== "string") return;
+
+    const normalized = text.trim();
+    if (!normalized) return;
+
+    if (!this._clipboardHistoryLoaded) {
+      this._pendingClipboardEntries.push(text);
+      return;
+    }
+
+    if (this._clipboardHistory[0]?.text === text) return;
+
+    this._clipboardHistory = [
+      {
+        text,
+        preview: normalized.replace(/\s+/g, " ").slice(0, 80),
+        timestamp: Date.now(),
+      },
+      ...this._clipboardHistory.filter((entry) => entry.text !== text),
+    ].slice(0, this._settings.get_int("clipboard-history-limit"));
+
+    this._saveClipboardHistory();
+
+    if (
+      this._searchOpen &&
+      this._isSearchSourceEnabled("clipboard-search-enabled")
+    ) {
+      const query = this._parseClipboardQuery(this._queryText().trim());
+      if (query !== null) {
+        this._showResults(this._searchClipboardHistory(query), true);
+      }
+    }
+  }
+
+  _getVisibleResultMatchScore(result, query) {
+    return Math.max(
+      scoreSearchMatch(result.label ?? "", query),
+      scoreSearchMatch(result.subtitle ?? "", query),
+    );
+  }
+
+  _rankResultsByQuery(
+    results,
+    query,
+    textSelector = (result) => result.label ?? "",
+  ) {
+    return results
+      .map((result, index) => ({
+        score: scoreSearchMatch(textSelector(result), query),
+        result,
+        index,
+      }))
+      .filter((entry) => entry.score >= 0)
+      .sort((a, b) => b.score - a.score || a.index - b.index)
+      .map((entry) => entry.result);
+  }
+
+  _rankGenericResults(results) {
+    const rankedResults = results.map((result, index) => ({
+      result,
+      index,
+      score:
+        result._relevanceScore +
+        (SOURCE_RANK_BONUS[result._source] ?? 0) +
+        (result._contextBoost ?? 0) +
+        this._getAdaptiveRankingBoost(result),
+    }));
+    const lowestWindowScoreByApp = new Map();
+
+    for (const entry of rankedResults) {
+      if (entry.result.type !== "window") continue;
+
+      const identity = this._getResultAppIdentity(entry.result);
+      if (!identity) continue;
+
+      const currentScore = lowestWindowScoreByApp.get(identity);
+      if (currentScore === undefined || entry.score < currentScore) {
+        lowestWindowScoreByApp.set(identity, entry.score);
+      }
+    }
+
+    for (const entry of rankedResults) {
+      if (
+        entry.result.type !== "app" ||
+        entry.result.appAction !== "new-window"
+      ) {
+        continue;
+      }
+
+      const identity = this._getResultAppIdentity(entry.result);
+      const lowestWindowScore = lowestWindowScoreByApp.get(identity);
+      if (lowestWindowScore !== undefined) {
+        entry.score = Math.min(entry.score, lowestWindowScore - 1);
+      }
+    }
+
+    return rankedResults
+      .sort((a, b) => {
+        const scoreDifference = b.score - a.score;
+        if (scoreDifference !== 0) return scoreDifference;
+
+        if (
+          a.result.type === "app" &&
+          b.result.type === "app" &&
+          a.result.appId &&
+          b.result.appId
+        ) {
+          const usageOrder = this._appUsage.compare(
+            a.result.appId,
+            b.result.appId,
+          );
+          if (usageOrder !== 0) return usageOrder;
+        }
+
+        const matchDifference =
+          b.result._relevanceScore - a.result._relevanceScore;
+        return matchDifference || a.index - b.index;
+      })
+      .map(({ result }) => {
+        const publicResult = { ...result };
+        delete publicResult._source;
+        delete publicResult._contextBoost;
+        // _relevanceScore is kept so _buildGenericResults can apply a relevance
+        // floor; it is stripped there once the results are partitioned.
+        return publicResult;
+      });
+  }
+
+  _searchClipboardHistory(query) {
+    const history = this._clipboardSearchHistory ?? this._clipboardHistory;
+    return this._rankResultsByQuery(
+      history.map((entry) => ({
+        type: "clipboard",
+        label: entry.preview ?? entry.text.replace(/\s+/g, " ").slice(0, 80),
+        subtitle: "Clipboard history",
+        icon: "edit-paste-symbolic",
+        value: entry.text,
+        timestamp: entry.timestamp,
+      })),
+      query,
+      (result) => result.value,
+    );
+  }
+
+  _parseActionQuery(text) {
+    const normalized = text.trim();
+    if (normalized === ">") return "";
+
+    const symbolMatch = normalized.match(ACTION_SYMBOL_PATTERN);
+    if (symbolMatch) return symbolMatch[1].trim();
+
+    const prefixMatch = normalized.match(ACTION_WORD_PATTERN);
+    if (prefixMatch) return (prefixMatch[1] ?? "").trim();
+
+    return null;
+  }
+
+  _refreshAppCache() {
+    const hasSettingsProvider = this._searchProviderManager?.hasProvider(
+      SETTINGS_PROVIDER_DESKTOP_ID,
+    );
+    this._appCache = this._appSystem
+      .get_installed()
+      .filter((appInfo) => {
+        const shouldShow =
+          typeof appInfo.should_show !== "function" ||
+          appInfo.should_show();
+        // Hidden Settings panels are a fallback only. When GNOME's Settings
+        // provider exists it owns matching, ordering, and activation.
+        const settingsPanelFallback =
+          !shouldShow &&
+          !hasSettingsProvider &&
+          isSettingsPanelApp(appInfo);
+        return shouldShow || settingsPanelFallback;
+      })
+      .map((appInfo) => {
+        const label =
+          appInfo.get_display_name?.() ?? appInfo.get_name() ?? "Application";
+        const genericName = appInfo.get_generic_name?.()?.trim() ?? "";
+        const description = appInfo.get_description?.()?.trim() ?? "";
+        const keywords = appInfo.get_keywords?.() ?? [];
+        const appId = appInfo.get_id();
+        const shouldShow =
+          typeof appInfo.should_show !== "function" ||
+          appInfo.should_show();
+        const settingsPanel =
+          !shouldShow &&
+          !hasSettingsProvider &&
+          isSettingsPanelApp(appInfo);
+        const appIdentity = this._getAppIdentity(
+          appInfo,
+          appId,
+          label,
+        );
+
+        return {
+          type: "app",
+          label,
+          gicon: appInfo.get_icon(),
+          appId,
+          appIdentity,
+          appInfo,
+          settingsPanel,
+          classKeys: this._getAppWindowClassKeys(appInfo, appId),
+          searchText: buildAppSearchText({
+            label,
+            name: appInfo.get_name?.(),
+            genericName,
+            description,
+            keywords,
+            appId,
+            settingsPanel,
+          }),
+        };
+      })
+      .filter((app) => Boolean(app.appId));
+  }
+
+  _getAppIdentity(appInfo, fallbackId = "", fallbackName = "") {
+    const name =
+      appInfo?.get_display_name?.() ??
+      appInfo?.get_name?.() ??
+      fallbackName;
+    const commandline =
+      appInfo?.get_commandline?.() ??
+      appInfo?.get_executable?.() ??
+      "";
+    const startupWmClass = appInfo?.get_startup_wm_class?.() ?? "";
+    const normalizedName = normalizeSearchText(name);
+    const normalizedCommandline = normalizeSearchText(commandline);
+    const normalizedWmClass = normalizeSearchText(startupWmClass);
+
+    if (normalizedCommandline || normalizedWmClass) {
+      return [
+        normalizedName,
+        normalizedCommandline,
+        normalizedWmClass,
+      ].join("\u001f");
+    }
+
+    return fallbackId || normalizedName;
+  }
+
+  _getShellAppIdentity(app) {
+    if (!app) return "";
+
+    return this._getAppIdentity(
+      app.get_app_info?.(),
+      app.get_id?.() ?? "",
+      app.get_name?.() ?? "",
+    );
+  }
+
+  // Candidate WM_CLASS keys for an installed app, used to match open windows
+  // directly when GNOME fails to associate them with the app's ShellApp
+  // (common for Chrome/Chromium/Electron apps and PWAs).
+  _getAppWindowClassKeys(appInfo, appId = "") {
+    const keys = new Set();
+    const add = (value) => {
+      const normalized = normalizeSearchText(value ?? "");
+      if (normalized) keys.add(normalized);
+    };
+
+    add(appInfo?.get_startup_wm_class?.());
+
+    const base = String(appId).replace(/\.desktop$/, "");
+    add(base);
+    add(base.split(".").pop());
+
+    const executable = appInfo?.get_executable?.() ?? "";
+    if (executable) add(executable.split("/").pop());
+
+    return [...keys];
+  }
+
+  _getWindowClassKeys(window) {
+    const keys = [];
+    const push = (value) => {
+      const normalized = normalizeSearchText(value ?? "");
+      if (normalized) keys.push(normalized);
+    };
+
+    push(window.get_wm_class?.());
+    push(window.get_wm_class_instance?.());
+
+    return keys;
+  }
+
+  _createWindowSearchContext() {
+    const orderedWindows = global.display.get_tab_list(
+      Meta.TabList.NORMAL_ALL,
+      null,
+    );
+    const windowsByClass = new Map();
+    const windowData = orderedWindows.map((window, mruIndex) => {
+      for (const key of this._getWindowClassKeys(window)) {
+        const bucket = windowsByClass.get(key);
+        if (bucket) bucket.push(window);
+        else windowsByClass.set(key, [window]);
+      }
+
+      const title = window.get_title()?.trim() ?? "";
+      const app = this._windowTracker.get_window_app(window);
+      const appName = app?.get_name()?.trim() ?? "";
+      const appId = app?.get_id() ?? null;
+      const appIdentity = this._getShellAppIdentity(app);
+      const label = title || appName || "Untitled window";
+      const appKey =
+        appIdentity || appId || normalizeSearchText(appName) || "unknown";
+
+      return {
+        window,
+        mruIndex,
+        title,
+        app,
+        appName,
+        appId,
+        appIdentity,
+        label,
+        workspace: window.get_workspace(),
+        monitorIndex: window.get_monitor(),
+        duplicateKey: `${appKey}\u001f${normalizeSearchText(label)}`,
+      };
+    });
+
+    return {
+      activeWorkspace: global.workspace_manager.get_active_workspace(),
+      targetMonitor: this._resolveActiveMonitorIndex(),
+      orderedWindows,
+      searchableWindows: new Set(orderedWindows),
+      windowsByClass,
+      windowData,
+      windowDataByWindow: new Map(
+        windowData.map((data) => [data.window, data]),
+      ),
+    };
+  }
+
+  _getShellAppSearchScores(text) {
+    const scores = new Map();
+
+    try {
+      const matchGroups = Shell.AppSystem.search(text) ?? [];
+      matchGroups.forEach((group, groupIndex) => {
+        group.forEach((appId) => {
+          scores.set(appId, 940 - groupIndex * 90);
+        });
+      });
+    } catch (_e) {
+      // Fall back to Superbar's own matcher if Shell search is unavailable.
+    }
+
+    return scores;
+  }
+
+  _searchApps(text, windowContext) {
+    const {
+      activeWorkspace,
+      targetMonitor,
+      orderedWindows,
+      searchableWindows,
+      windowsByClass,
+      windowDataByWindow,
+    } = windowContext;
+    const shellSearchScores = this._getShellAppSearchScores(text);
+    const runningAppsByIdentity = new Map();
+
+    for (const runningApp of this._appSystem.get_running?.() ?? []) {
+      const identity = this._getShellAppIdentity(runningApp);
+      if (!identity) continue;
+
+      const existing = runningAppsByIdentity.get(identity);
+      if (
+        !existing ||
+        runningApp.get_windows().length > existing.get_windows().length
+      ) {
+        runningAppsByIdentity.set(identity, runningApp);
+      }
+    }
+
+    return (this._appCache ?? []).flatMap((app) => {
+      const labelScore = scoreSearchMatch(app.label, text);
+      const metadataScore = scoreSearchMatch(app.searchText, text);
+      const matchScore = Math.max(
+        labelScore,
+        metadataScore < 0 ? -1 : metadataScore - 80,
+        shellSearchScores.get(app.appId) ?? -1,
+      );
+      if (matchScore < 0) return [];
+
+      const shellApp = this._appSystem.lookup_app(app.appId);
+
+      if (app.settingsPanel) {
+        return [
+          {
+            type: "app",
+            label: app.label,
+            subtitle: "Settings",
+            metadata: "Setting",
+            gicon: app.gicon,
+            appId: app.appId,
+            appIdentity: app.appIdentity,
+            appInfo: app.appInfo,
+            appAction: "open-settings",
+            _source: "settings",
+            _relevanceScore: matchScore,
+            _contextBoost: 0,
+          },
+        ];
+      }
+
+      const equivalentRunningApp = runningAppsByIdentity.get(
+        app.appIdentity,
+      );
+      const actionApp =
+        shellApp?.get_windows().length > 0
+          ? shellApp
+          : equivalentRunningApp ?? shellApp;
+
+      // Start with the windows GNOME associates with the app, then add any
+      // whose WM_CLASS matches — this recovers windows for apps GNOME didn't
+      // link to their .desktop file (e.g. Chrome). Re-ordered by MRU.
+      const matchedWindows = new Set(
+        (actionApp?.get_windows() ?? []).filter((window) =>
+          searchableWindows.has(window),
+        ),
+      );
+      for (const key of app.classKeys ?? []) {
+        for (const window of windowsByClass.get(key) ?? []) {
+          matchedWindows.add(window);
+        }
+      }
+      const appWindows = orderedWindows.filter((window) =>
+        matchedWindows.has(window),
+      );
+      let contextBoost = 0;
+
+      if (appWindows.length > 0) contextBoost += 45;
+      if (actionApp?.is_on_workspace(activeWorkspace)) contextBoost += 20;
+      if (
+        appWindows.some(
+          (window) =>
+            windowDataByWindow.get(window)?.monitorIndex === targetMonitor,
+        )
+      ) {
+        contextBoost += 15;
+      }
+
+      const results = [];
+      if (appWindows.length > 0) {
+        results.push({
+          type: "app",
+          label: app.label,
+          subtitle: "Switch to active window",
+          gicon: app.gicon,
+          appId: app.appId,
+          appIdentity: app.appIdentity,
+          appAction: "activate",
+          shellApp: actionApp,
+          activateWindow: appWindows[0] ?? null,
+          _source: "app",
+          _relevanceScore: matchScore,
+          _contextBoost: contextBoost,
+        });
+
+        if (actionApp?.can_open_new_window?.()) {
+          results.push({
+            type: "app",
+            label: `New ${app.label} Window`,
+            subtitle: "Open another window",
+            gicon: app.gicon,
+            appId: app.appId,
+            appIdentity: app.appIdentity,
+            appAction: "new-window",
+            shellApp: actionApp,
+            _source: "appAction",
+            _relevanceScore: matchScore,
+            _contextBoost: 0,
+          });
+        }
+
+        return results;
+      }
+
+      return [{
+        type: app.type,
+        label: app.label,
+        subtitle: "Open application",
+        gicon: app.gicon,
+        appId: app.appId,
+        appIdentity: app.appIdentity,
+        appAction: "launch",
+        shellApp: actionApp,
+        _source: "app",
+        _relevanceScore: matchScore,
+        _contextBoost: contextBoost,
+      }];
+    });
+  }
+
+  _dedupeResults(results) {
+    const seenUris = new Set();
+    const seenAppActions = new Set();
+
+    return results.filter((result) => {
+      if (result.type === "app") {
+        const identity = this._getResultAppIdentity(result);
+        const key = `${identity}\u001f${this._getResultAppAction(result)}`;
+        if (seenAppActions.has(key)) return false;
+
+        seenAppActions.add(key);
+        return true;
+      }
+
+      if (!result.uri) return true;
+      if (seenUris.has(result.uri)) return false;
+
+      seenUris.add(result.uri);
+      return true;
+    });
+  }
+
+  _searchWindows(text, windowContext) {
+    const { activeWorkspace, targetMonitor, windowData } = windowContext;
+    const duplicateCounts = new Map();
+    const duplicateIndexes = new Map();
+    const launchableAppIdentities = new Set(
+      (this._appCache ?? []).map((app) => app.appIdentity),
+    );
+
+    for (const data of windowData) {
+      duplicateCounts.set(
+        data.duplicateKey,
+        (duplicateCounts.get(data.duplicateKey) ?? 0) + 1,
+      );
+    }
+
+    return windowData
+      .map((data) => {
+        const {
+          window,
+          mruIndex,
+          title,
+          app,
+          appName,
+          appId,
+          appIdentity,
+          label,
+          workspace,
+          monitorIndex,
+          duplicateKey,
+        } = data;
+        const titleScore = scoreSearchMatch(title, text);
+        const appScore = scoreSearchMatch(appName, text);
+        let contextBoost = Math.max(0, 24 - mruIndex * 3);
+
+        if (appScore >= 0 && launchableAppIdentities.has(appIdentity)) {
+          return null;
+        }
+
+        if (workspace === activeWorkspace) contextBoost += 45;
+        if (monitorIndex === targetMonitor) contextBoost += 20;
+
+        const locationParts = [];
+        if (workspace === activeWorkspace) {
+          locationParts.push("Current workspace");
+        } else if (workspace) {
+          locationParts.push(`Workspace ${workspace.index() + 1}`);
+        }
+
+        if ((Main.layoutManager.monitors?.length ?? 0) > 1) {
+          locationParts.push(`Monitor ${monitorIndex + 1}`);
+        }
+
+        const duplicateCount = duplicateCounts.get(duplicateKey) ?? 1;
+        if (duplicateCount > 1) {
+          const duplicateIndex =
+            (duplicateIndexes.get(duplicateKey) ?? 0) + 1;
+          duplicateIndexes.set(duplicateKey, duplicateIndex);
+          locationParts.push(
+            `Window ${duplicateIndex} of ${duplicateCount}`,
+          );
+        }
+
+        const repeatsAppName =
+          normalizeSearchText(label) === normalizeSearchText(appName);
+        const actionLabel =
+          appName && !repeatsAppName
+            ? `Switch to ${appName}`
+            : "Switch to open window";
+        const subtitle = [actionLabel, ...locationParts].join(" · ");
+
+        return {
+          type: "window",
+          label,
+          subtitle,
+          gicon: app?.get_icon?.() ?? null,
+          icon: "go-jump-symbolic",
+          window,
+          appId,
+          appIdentity,
+          _source: "window",
+          _relevanceScore: Math.max(
+            titleScore,
+            appScore < 0 ? -1 : appScore - 35,
+          ),
+          _contextBoost: contextBoost,
+        };
+      })
+      .filter((window) => window && window._relevanceScore >= 0);
+  }
+
+  _searchSystemCommands(text) {
+    const systemActions = this._systemActions;
+    const folderCommands = (this._folderCache ?? []).flatMap(
+      ({ actionCommand }) => (actionCommand ? [actionCommand] : []),
+    );
+    const commands = [
+      {
+        label: "Shut Down",
+        systemAction: "power-off",
+        available: systemActions.canPowerOff,
+        icon: "system-shutdown-symbolic",
+        keywords: ["poweroff", "power off", "shutdown", "off"],
+      },
+      {
+        label: "Restart",
+        systemAction: "restart",
+        available: systemActions.canRestart,
+        icon: "view-refresh-symbolic",
+        keywords: ["reboot", "reload", "restart"],
+      },
+      {
+        label: "Log Out",
+        systemAction: "logout",
+        available: systemActions.canLogout,
+        icon: "system-log-out-symbolic",
+        keywords: ["logout", "sign out", "log out"],
+      },
+      {
+        label: "Lock Screen",
+        systemAction: "lock-screen",
+        available: systemActions.canLockScreen,
+        icon: "system-lock-screen-symbolic",
+        keywords: ["lock", "screen lock"],
+      },
+      {
+        label: "Sleep",
+        systemAction: "suspend",
+        available: systemActions.canSuspend,
+        icon: "weather-clear-night-symbolic",
+        keywords: ["suspend", "sleep"],
+      },
+      {
+        label: "Open Settings",
+        argv: ["gnome-control-center"],
+        icon: "org.gnome.Settings-symbolic",
+        keywords: ["settings", "preferences", "control center"],
+      },
+      {
+        label: "Wi-Fi Settings",
+        argv: ["gnome-control-center", "wifi"],
+        icon: "network-wireless-signal-excellent-symbolic",
+        keywords: ["wifi", "wi-fi", "wireless", "network"],
+      },
+      {
+        label: "Bluetooth Settings",
+        argv: ["gnome-control-center", "bluetooth"],
+        icon: "bluetooth-active-symbolic",
+        keywords: ["bluetooth", "bt"],
+      },
+      {
+        label: "Display Settings",
+        argv: ["gnome-control-center", "display"],
+        icon: "video-display-symbolic",
+        keywords: ["display", "monitor", "screen settings"],
+      },
+      {
+        label: "Sound Settings",
+        argv: ["gnome-control-center", "sound"],
+        icon: "audio-volume-high-symbolic",
+        keywords: ["sound", "audio", "volume settings"],
+      },
+      ...folderCommands,
+      {
+        label: "Take Screenshot",
+        systemAction: "screenshot",
+        icon: "applets-screenshooter-symbolic",
+        keywords: ["screenshot", "screen capture", "capture"],
+      },
+    ];
+    return commands
+      .filter((command) => command.available ?? true)
+      .map((c, index) => {
+        const labelScore = scoreSearchMatch(c.label, text);
+        const keywordScore = scoreSearchMatch(
+          (c.keywords ?? []).join(" "),
+          text,
+        );
+        const result = {
+          type: "system",
+          label: c.label,
+          subtitle: "System action",
+          icon: c.icon,
+          systemAction: c.systemAction,
+          argv: c.argv,
+          uri: c.uri,
+        };
+        return {
+          matchScore: Math.max(
+            labelScore,
+            keywordScore < 0 ? -1 : keywordScore - 60,
+          ),
+          result,
+          index,
+        };
+      })
+      .filter((entry) => entry.matchScore >= 0)
+      .map((entry) => ({
+        ...entry,
+        score:
+          entry.matchScore + this._getAdaptiveRankingBoost(entry.result),
+      }))
+      .sort((a, b) => b.score - a.score || a.index - b.index)
+      .map(({ result }) => result);
+  }
+
+  _runSystemAction(result) {
+    try {
+      if (result.systemAction) {
+        const systemActions = this._systemActions;
+
+        switch (result.systemAction) {
+          case "power-off":
+            systemActions.activatePowerOff();
+            break;
+          case "restart":
+            systemActions.activateRestart();
+            break;
+          case "logout":
+            systemActions.activateLogout();
+            break;
+          case "lock-screen":
+            systemActions.activateLockScreen();
+            break;
+          case "suspend":
+            systemActions.activateSuspend();
+            break;
+          case "screenshot":
+            Screenshot.showScreenshotUI();
+            break;
+        }
+        return;
+      }
+
+      if (result.uri) {
+        this._openUri(result.uri);
+        return;
+      }
+
+      if (result.argv) {
+        const executable = GLib.find_program_in_path(result.argv[0]);
+        if (!executable) return;
+
+        Gio.Subprocess.new(
+          [executable, ...result.argv.slice(1)],
+          Gio.SubprocessFlags.NONE,
+        );
+      }
+    } catch (e) {
+      logError(`action failed (${result.label}): ${e.message}`);
+    }
+  }
+
+  _searchFiles(text, cancellable = null) {
+    return new Promise((resolve) => {
+      try {
+        const binary =
+          GLib.find_program_in_path("localsearch") ??
+          GLib.find_program_in_path("tracker3");
+        if (!binary) {
+          resolve([]);
+          return;
+        }
+
+        const proc = new Gio.Subprocess({
+          // Each value is a distinct argument; user input is never shell code.
+          argv: [binary, "search", "--limit=6", text],
+          flags:
+            Gio.SubprocessFlags.STDOUT_PIPE | Gio.SubprocessFlags.STDERR_PIPE,
+        });
+        this._fileSearchProcess = proc;
+        proc.init(null);
+        proc.communicate_utf8_async(null, cancellable, (proc, res) => {
+          try {
+            const [, stdout] = proc.communicate_utf8_finish(res);
+            if (!stdout) return resolve([]);
+
+            const ansiRegex =
+              /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g;
+            const lines = stdout
+              .replace(ansiRegex, "")
+              .split("\n")
+              .filter((l) => l.includes("file://"));
+
+            const fileResults = lines.flatMap((line) => {
+              try {
+                const uri = line.trim().split(/\s+/)[0];
+                const file = Gio.File.new_for_uri(uri);
+                const fileInfo = file.query_info(
+                  "standard::symbolic-icon,standard::type",
+                  Gio.FileQueryInfoFlags.NONE,
+                  null,
+                );
+                const parentPath = file.get_parent()?.get_path() ?? "";
+                const homePath = GLib.get_home_dir();
+                const displayParent = parentPath.startsWith(homePath)
+                  ? `~${parentPath.slice(homePath.length)}`
+                  : parentPath;
+                const kind =
+                  fileInfo.get_file_type() === Gio.FileType.DIRECTORY
+                    ? "Folder"
+                    : "File";
+
+                return [
+                  {
+                    type: "file",
+                    label: file.get_basename() ?? uri,
+                    subtitle: displayParent
+                      ? `${kind} · ${displayParent}`
+                      : kind,
+                    gicon: fileInfo.get_symbolic_icon(),
+                    uri,
+                  },
+                ];
+              } catch (_e) {
+                return [];
+              }
+            });
+            resolve(fileResults);
+          } catch (_e) {
+            resolve([]);
+          } finally {
+            if (this._fileSearchProcess === proc)
+              this._fileSearchProcess = null;
+          }
+        });
+      } catch (_e) {
+        this._fileSearchProcess = null;
+        resolve([]);
+      }
+    });
+  }
+
+  // --- Web Fetches ---
+
+  async _fetchJson(url, cancellable) {
+    const cached = this._remoteCache?.get(url);
+    if (cached && cached.expiry > Date.now()) return cached.data;
+
+    const message = Soup.Message.new("GET", url);
+    const bytes = await this._session.send_and_read_async(
+      message,
+      GLib.PRIORITY_DEFAULT,
+      cancellable,
+    );
+    const data = JSON.parse(new TextDecoder().decode(bytes.get_data()));
+
+    // These APIs return a JSON body on failures too. Caching one would pin the
+    // error in place for the whole TTL, with no way for the user to retry.
+    if (this._remoteCache && message.get_status() === Soup.Status.OK) {
+      // Insertion order doubles as the eviction order.
+      this._remoteCache.delete(url);
+      this._remoteCache.set(url, {
+        data,
+        expiry: Date.now() + REMOTE_CACHE_TTL_MS,
+      });
+      while (this._remoteCache.size > REMOTE_CACHE_MAX_ENTRIES) {
+        this._remoteCache.delete(this._remoteCache.keys().next().value);
+      }
+    }
+
+    return data;
+  }
+
+  _showRemoteError(text, generation, cancellable, message) {
+    if (
+      this._isCurrentQuery(text, generation) &&
+      !cancellable?.is_cancelled()
+    ) {
+      this._showStatus("error", message);
+    }
+  }
+
+  async _fetchWeather(
+    text,
+    query,
+    generation = null,
+    cancellable = null,
+  ) {
+    try {
+      // Step 1: Resolve the city name to coordinates
+      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=1&language=en&format=json`;
+      const geoData = await this._fetchJson(geoUrl, cancellable);
+
+      if (!this._isCurrentQuery(text, generation)) return;
+
+      if (!geoData.results?.length) {
+        this._showNoResults(text);
+        return;
+      }
+
+      const { name, latitude, longitude, country_code } = geoData.results[0];
+      const cityName = country_code
+        ? `${name}, ${country_code.toUpperCase()}`
+        : name;
+
+      // Step 2: Fetch weather for those coordinates
+      const weatherUrl =
+        `https://api.open-meteo.com/v1/forecast` +
+        `?latitude=${latitude}&longitude=${longitude}` +
+        `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m` +
+        `&daily=temperature_2m_max,temperature_2m_min` +
+        `&timezone=auto&forecast_days=1`;
+      const w = await this._fetchJson(weatherUrl, cancellable);
+
+      if (!this._isCurrentQuery(text, generation)) return;
+
+      const c = w.current;
+      const d = w.daily;
+      const code = c.weather_code;
+
+      this._showResults([
+        {
+          type: "weather",
+          icon: this._weatherIcon(code),
+          temp: `${Math.round(c.temperature_2m)}°C`,
+          description: this._wmoDescription(code),
+          city: cityName,
+          details:
+            `Feels like ${Math.round(c.apparent_temperature)}°C` +
+            `  ·  Wind ${Math.round(c.wind_speed_10m)} km/h` +
+            `  ·  Humidity ${c.relative_humidity_2m}%` +
+            `  ·  ↑${Math.round(d.temperature_2m_max[0])}°  ↓${Math.round(d.temperature_2m_min[0])}°`,
+          uri: `https://wttr.in/${encodeURIComponent(name)}`,
+        },
+      ]);
+    } catch (_e) {
+      this._showRemoteError(
+        text,
+        generation,
+        cancellable,
+        "Weather is unavailable right now",
+      );
+    }
+  }
+
+  _weatherIcon(code) {
+    if (code <= 1) return "weather-clear-symbolic";
+    if (code === 2) return "weather-few-clouds-symbolic";
+    if (code === 3) return "weather-overcast-symbolic";
+    if (code === 45 || code === 48) return "weather-fog-symbolic";
+    if (code >= 95) return "weather-storm-symbolic";
+    if ((code >= 71 && code <= 77) || code === 85 || code === 86)
+      return "weather-snow-symbolic";
+    return "weather-showers-symbolic";
+  }
+
+  _wmoDescription(code) {
+    const map = {
+      0: "Clear sky",
+      1: "Mainly clear",
+      2: "Partly cloudy",
+      3: "Overcast",
+      45: "Fog",
+      48: "Icing fog",
+      51: "Light drizzle",
+      53: "Moderate drizzle",
+      55: "Dense drizzle",
+      56: "Light freezing drizzle",
+      57: "Dense freezing drizzle",
+      61: "Slight rain",
+      63: "Moderate rain",
+      65: "Heavy rain",
+      66: "Light freezing rain",
+      67: "Heavy freezing rain",
+      71: "Slight snow",
+      73: "Moderate snow",
+      75: "Heavy snow",
+      77: "Snow grains",
+      80: "Slight showers",
+      81: "Moderate showers",
+      82: "Violent showers",
+      85: "Slight snow showers",
+      86: "Heavy snow showers",
+      95: "Thunderstorm",
+      96: "Thunderstorm, slight hail",
+      99: "Thunderstorm, heavy hail",
+    };
+    return map[code] ?? "Unknown";
+  }
+
+  async _fetchDictionary(
+    text,
+    word,
+    generation = null,
+    cancellable = null,
+  ) {
+    try {
+      const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`;
+      const data = await this._fetchJson(url, cancellable);
+
+      if (!this._isCurrentQuery(text, generation)) return;
+
+      if (data?.length > 0) {
+        const meaning = data[0].meanings[0].definitions[0].definition;
+        this._showResults([
+          {
+            type: "web",
+            label: `${word}: ${meaning}`,
+            subtitle: "Dictionary definition",
+            icon: "accessories-dictionary-symbolic",
+            query: word,
+            metadata: "Definition",
+          },
+        ]);
+      } else {
+        this._showNoResults(text);
+      }
+    } catch (_e) {
+      this._showRemoteError(
+        text,
+        generation,
+        cancellable,
+        "Dictionary is unavailable right now",
+      );
+    }
+  }
+
+  async _fetchCurrency(
+    text,
+    conversion,
+    generation = null,
+    cancellable = null,
+  ) {
+    const { amount, from, to } = conversion;
+
+    if (from.length !== 3 || to.length !== 3) {
+      if (this._isCurrentQuery(text, generation)) this._showNoResults(text);
+      return;
+    }
+
+    try {
+      const url = `https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`;
+      const data = await this._fetchJson(url, cancellable);
+
+      if (!this._isCurrentQuery(text, generation)) return;
+
+      if (data.rates?.[to] !== undefined) {
+        this._showResults([
+          {
+            type: "calc",
+            label: `${data.rates[to]} ${to}`,
+            subtitle: "Press Enter to copy",
+            icon: "view-refresh-symbolic",
+            value: String(data.rates[to]),
+            answerContext: text,
+          },
+        ]);
+      } else {
+        this._showNoResults(text);
+      }
+    } catch (_e) {
+      this._showRemoteError(
+        text,
+        generation,
+        cancellable,
+        "Currency conversion is unavailable",
+      );
+    }
+  }
+
+  // --- Math ---
+
+  _isMathExpression(text) {
+    return (
+      /^[\d\s\+\-\*\/\(\)\.\%\^]+$/.test(text) && /[\+\-\*\/\%\^]/.test(text)
+    );
+  }
+
+  // --- Results ---
+
+  _resultsMatch(first, second) {
+    if (!first || !second || first.type !== second.type) return false;
+
+    switch (first.type) {
+      case "app":
+        return (
+          this._getResultAppIdentity(first) ===
+            this._getResultAppIdentity(second) &&
+          this._getResultAppAction(first) ===
+            this._getResultAppAction(second)
+        );
+      case "window":
+        return first.window === second.window;
+      case "provider":
+        return (
+          first.provider?.desktopId === second.provider?.desktopId &&
+          first.providerResultId === second.providerResultId
+        );
+      case "file":
+      case "weather":
+        return first.uri === second.uri;
+      case "web":
+        return first.query === second.query && first.label === second.label;
+      case "clipboard":
+      case "calc":
+        return first.value === second.value;
+      case "system":
+        return (
+          first.systemAction === second.systemAction &&
+          first.label === second.label
+        );
+      default:
+        return first.label === second.label;
+    }
+  }
+
+  _showResults(results, preserveSelection = false) {
+    const selectedResult =
+      preserveSelection && this._selectedIndex >= 0
+        ? this._results[this._selectedIndex]
+        : null;
+
+    if (results.length === 0) {
+      this._showNoResults(this._queryText().trim());
+      return;
+    }
+
+    this._resultsState = "rows";
+    this._updateDividerVisibility();
+    this._results = results;
+    this._selectedIndex = selectedResult
+      ? results.findIndex((result) =>
+          this._resultsMatch(result, selectedResult),
+        )
+      : -1;
+
+    if (this._consumePendingActivation()) {
+      this._activateResult(0);
+      return;
+    }
+
+    this._prepareResultRows(results.length);
+
+    results.forEach((result, index) => {
+      const row = this._resultRows[index];
+      row._superbarIndex = index;
+      row._superbarType = result.type;
+      row.add_style_class_name(`result-${result.type}`);
+
+      if (result.type === "weather") {
+        row.add_style_class_name("weather-card");
+
+        const infoBox = new St.BoxLayout({
+          vertical: true,
+          x_expand: true,
+          y_align: Clutter.ActorAlign.CENTER,
+        });
+        const cityLabel = this._createSingleLineLabel({
+          text: result.city,
+          style_class: "weather-city",
+          x_expand: true,
+        });
+        const descriptionLabel = this._createSingleLineLabel({
+          text: result.description,
+          style_class: "weather-desc",
+          x_expand: true,
+        });
+        const detailsLabel = this._createSingleLineLabel({
+          text: result.details,
+          style_class: "weather-details",
+          x_expand: true,
+        });
+        infoBox.add_child(cityLabel);
+        infoBox.add_child(descriptionLabel);
+        infoBox.add_child(detailsLabel);
+
+        const card = new St.BoxLayout({
+          style_class: "spotlight-weather-content",
+          vertical: false,
+          x_expand: true,
+        });
+        card.add_child(this._createResultIcon(result));
+        card.add_child(infoBox);
+        card.add_child(
+          new St.Label({
+            text: result.temp,
+            style_class: "weather-temp",
+            y_align: Clutter.ActorAlign.CENTER,
+          }),
+        );
+        row.set_child(card);
+      } else if (result.type === "calc") {
+        row.add_style_class_name("answer");
+
+        const answerBox = new St.BoxLayout({
+          style_class: "spotlight-answer-content",
+          vertical: false,
+          x_expand: true,
+        });
+        answerBox.add_child(this._createResultIcon(result));
+
+        const answerText = new St.BoxLayout({
+          vertical: true,
+          x_expand: true,
+          y_align: Clutter.ActorAlign.CENTER,
+          style_class: "spotlight-result-text",
+        });
+        if (result.answerContext) {
+          const contextLabel = this._createSingleLineLabel({
+            text: result.answerContext,
+            style_class: "spotlight-answer-context",
+            x_expand: true,
+          });
+          answerText.add_child(contextLabel);
+        }
+        const answerValueLabel = this._createSingleLineLabel({
+          text: result.label,
+          style_class: "spotlight-result-label",
+          x_expand: true,
+        });
+        answerText.add_child(answerValueLabel);
+        if (result.subtitle) {
+          const answerSubtitleLabel = this._createSingleLineLabel({
+            text: result.subtitle,
+            style_class: "spotlight-result-subtitle",
+            x_expand: true,
+          });
+          answerText.add_child(answerSubtitleLabel);
+          this._calculatorCopyLabel = answerSubtitleLabel;
+        }
+        answerBox.add_child(answerText);
+        row.set_child(answerBox);
+      } else {
+        const rowBox = new St.BoxLayout({
+          style_class: "spotlight-result-row-content",
+          vertical: false,
+          x_expand: true,
+        });
+        rowBox.add_child(this._createResultIcon(result));
+
+        const textBox = new St.BoxLayout({
+          vertical: true,
+          x_expand: true,
+          y_align: Clutter.ActorAlign.CENTER,
+          style_class: "spotlight-result-text",
+        });
+        const titleLabel = this._createSingleLineLabel({
+          text: result.label,
+          style_class: "spotlight-result-label",
+          x_expand: true,
+        });
+        textBox.add_child(titleLabel);
+
+        if (result.subtitle) {
+          const subtitleLabel = this._createSingleLineLabel({
+            text: result.subtitle,
+            style_class: "spotlight-result-subtitle",
+            x_expand: true,
+          });
+          textBox.add_child(subtitleLabel);
+        }
+
+        rowBox.add_child(textBox);
+
+        if (result.type === "clipboard") {
+          const copyButton = new St.Button({
+            label:
+              result.value === this._copiedClipboardValue
+                ? "copied"
+                : "copy",
+            style_class: "spotlight-result-copy",
+            y_align: Clutter.ActorAlign.CENTER,
+            can_focus: false,
+          });
+          if (result.value === this._copiedClipboardValue) {
+            copyButton.add_style_class_name("copied");
+          }
+          copyButton.connectObject(
+            "clicked",
+            () => this._copyClipboardResult(index),
+            this,
+          );
+          this._clipboardCopyButtons.push({
+            actor: copyButton,
+            value: result.value,
+          });
+          rowBox.add_child(copyButton);
+        } else {
+          const metadata = this._getResultMetadata(result);
+          if (metadata) {
+            const metadataLabel = this._createSingleLineLabel({
+              text: metadata,
+              style_class: "spotlight-result-metadata",
+              y_align: Clutter.ActorAlign.CENTER,
+            });
+            this._resultMetadataActors.push(metadataLabel);
+            rowBox.add_child(metadataLabel);
+          }
+        }
+
+        row.set_child(rowBox);
+      }
+    });
+
+    this._applyResponsiveVisibility();
+    this._updateSelection();
+    this._updateResultsHeight();
+  }
+
+  _prepareResultRows(count) {
+    this._removeLater("_selectionScrollLaterId");
+    this._statusSpinner.stop();
+    this._statusBox.hide();
+    this._resultMetadataActors = [];
+    this._clipboardCopyButtons = [];
+    this._calculatorCopyLabel = null;
+
+    while (this._resultRows.length > count) {
+      const row = this._resultRows.pop();
+      row.disconnectObject(this);
+      row.destroy();
+    }
+
+    while (this._resultRows.length < count) {
+      const row = new St.Button({
+        style_class: "spotlight-result-row",
+        x_expand: true,
+        can_focus: false,
+      });
+      row._superbarIndex = this._resultRows.length;
+      row.connectObject(
+        "clicked",
+        () => this._activateResult(row._superbarIndex),
+        this,
+      );
+      this._resultRows.push(row);
+      this._resultsBox.add_child(row);
+    }
+
+    this._resultRows.forEach((row) => {
+      row.remove_style_class_name("answer");
+      row.remove_style_class_name("weather-card");
+      row.remove_style_class_name("selected");
+      row.remove_style_class_name("inactive-selection");
+      if (row._superbarType) {
+        row.remove_style_class_name(`result-${row._superbarType}`);
+      }
+
+      row.get_child()?.destroy();
+      row._superbarType = null;
+    });
+  }
+
+  _createSingleLineLabel(properties) {
+    const label = new St.Label(properties);
+    label.clutter_text.set_ellipsize(Pango.EllipsizeMode.END);
+    label.clutter_text.set_single_line_mode(true);
+    return label;
+  }
+
+  _createResultIcon(result) {
+    const icon = result.gicon
+      ? new St.Icon({
+          gicon: result.gicon,
+          icon_size: 32,
+          style_class: "spotlight-result-icon",
+          x_align: Clutter.ActorAlign.CENTER,
+          y_align: Clutter.ActorAlign.CENTER,
+        })
+      : new St.Icon({
+          icon_name: result.icon || "system-search-symbolic",
+          icon_size: 32,
+          style_class: "spotlight-result-icon",
+          x_align: Clutter.ActorAlign.CENTER,
+          y_align: Clutter.ActorAlign.CENTER,
+        });
+    return icon;
+  }
+
+  _getResultMetadata(result) {
+    if (result.metadata) return result.metadata;
+
+    const labels = {
+      app: "App",
+      window: "Window",
+      file: result.subtitle?.startsWith("Folder") ? "Folder" : "File",
+      web: "Web",
+      clipboard: "Clipboard",
+      provider: "Result",
+      system: "Action",
+    };
+    return labels[result.type] ?? "";
+  }
+
+  _showNoResults(query) {
+    this._showStatus("empty", `No Results for ‘${query}’`);
+  }
+
+  _showStatus(kind, message) {
+    this._clearResults();
+    this._resultsState = kind;
+    this._updateDividerVisibility();
+    this._statusBox.remove_style_class_name("empty");
+    this._statusBox.remove_style_class_name("loading");
+    this._statusBox.remove_style_class_name("error");
+    this._statusBox.add_style_class_name(kind);
+    this._statusLabel.text = message;
+    this._statusBox.show();
+    if (kind === "loading") this._statusSpinner.play();
+    else this._statusSpinner.stop();
+    this._updateResultsHeight();
+  }
+
+  _hideResults() {
+    this._clearResults();
+    this._resultsState = "hidden";
+    this._updateDividerVisibility();
+    this._setResultsHeight(0);
+  }
+
+  _clearResults() {
+    this._resultsState = "clearing";
+    this._results = [];
+    this._selectedIndex = -1;
+    this._removeLater("_selectionScrollLaterId");
+    this._resultRows.forEach((row) => {
+      row.disconnectObject(this);
+      row.destroy();
+    });
+    this._resultRows = [];
+    this._resultMetadataActors = [];
+    this._clipboardCopyButtons = [];
+    this._calculatorCopyLabel = null;
+    this._statusSpinner?.stop();
+    this._statusBox?.hide();
+  }
+
+  _activateWindow(window) {
+    const timestamp = global.get_current_time();
+    const shellApp = this._windowTracker.get_window_app(window);
+
+    if (shellApp?.activate_window) {
+      shellApp.activate_window(window, timestamp);
+    } else {
+      window.get_workspace()?.activate(timestamp);
+      window.activate(timestamp);
+    }
+  }
+
+  _openUri(uri) {
+    Gio.AppInfo.launch_default_for_uri(uri, null);
+  }
+
+  _activateResult(index) {
+    const result = this._results[index];
+    if (!result) return;
+
+    // Copy actions stay open so their inline feedback remains visible. This
+    // applies to clicking the row as well as keyboard activation.
+    if (result.type === "clipboard") {
+      this._copyClipboardResult(index);
+      return;
+    }
+    if (result.type === "calc") {
+      this._copyCalculatorResult(index);
+      return;
+    }
+
+    // Clear the search before focus leaves Superbar. Some actions switch
+    // windows or sessions immediately, so cleanup must happen first.
+    this._closeSearch({ preserveSession: false });
+    this._recordResultUsage(result);
+
+    if (result.type === "app") {
+      try {
+        const shellApp =
+          result.shellApp ??
+          this._appSystem.lookup_app(result.appId);
+        if (result.appAction === "open-settings") {
+          const appInfo =
+            result.appInfo ?? GioUnix.DesktopAppInfo.new(result.appId);
+          if (!appInfo) throw new Error("Settings panel is unavailable");
+          appInfo.launch([], null);
+        } else if (result.appAction === "new-window") {
+          if (!shellApp?.open_new_window) {
+            throw new Error("Application cannot open a new window");
+          }
+          shellApp.open_new_window(-1);
+        } else if (result.appAction === "activate" && result.activateWindow) {
+          // Raise the matched window directly. shellApp.activate() would open a
+          // new instance for apps GNOME hasn't associated with their windows.
+          this._activateWindow(result.activateWindow);
+        } else if (shellApp) {
+          shellApp.activate();
+        } else {
+          const appInfo = GioUnix.DesktopAppInfo.new(result.appId);
+          if (appInfo) appInfo.launch([], null);
+        }
+      } catch (e) {
+        logError(`failed to launch app: ${e}`);
+      }
+    } else if (result.type === "provider") {
+      if (result.clipboardText) {
+        this._clipboard.set_text(
+          St.ClipboardType.CLIPBOARD,
+          result.clipboardText,
+        );
+      }
+      this._searchProviderManager
+        ?.activate(result, global.get_current_time())
+        .catch((error) =>
+          logError(`search provider activation failed: ${error}`),
+        );
+    } else if (result.type === "weather" || result.type === "file") {
+      this._openUri(result.uri);
+    } else if (result.type === "web") {
+      const uri =
+        result.uri ??
+        buildSearchUri(
+          this._settings.get_string("default-search-engine"),
+          result.query,
+        );
+      this._openUri(uri);
+    } else if (result.type === "system") {
+      this._runSystemAction(result);
+    } else if (result.type === "window") {
+      this._activateWindow(result.window);
+    }
+  }
+
+  _copyClipboardResult(index) {
+    const result = this._results[index];
+    if (result?.type !== "clipboard") return;
+
+    this._clipboard.set_text(St.ClipboardType.CLIPBOARD, result.value);
+    this._recordResultUsage(result);
+    this._copiedClipboardValue = result.value;
+    this._setSelected(index);
+
+    this._clipboardCopyButtons.forEach(({ actor, value }) => {
+      const copied = value === result.value;
+      actor.label = copied ? "copied" : "copy";
+      if (copied) actor.add_style_class_name("copied");
+      else actor.remove_style_class_name("copied");
+    });
+  }
+
+  _copyCalculatorResult(index) {
+    const result = this._results[index];
+    if (result?.type !== "calc") return;
+
+    this._clipboard.set_text(St.ClipboardType.CLIPBOARD, result.value);
+    result.subtitle = "Copied";
+    if (this._calculatorCopyLabel) {
+      this._calculatorCopyLabel.text = result.subtitle;
+    }
+    this._setSelected(index);
+  }
+
+  _setSelected(index) {
+    this._selectedIndex = index;
+    this._updateSelection();
+  }
+
+  _updateSelection() {
+    const rows = this._resultRows;
+    rows.forEach((row, i) => {
+      row.remove_style_class_name("selected");
+      row.remove_style_class_name("inactive-selection");
+      row.set_style(null);
+
+      if (i === this._selectedIndex) {
+        row.add_style_class_name("selected");
+        if (this._gnomeAppPalette) {
+          row.set_style(
+            `background-color: ${rgba(this._gnomeAppPalette.accent, 0.25)};`,
+          );
+        }
+      } else if (this._selectedIndex === -1 && i === 0) {
+        row.add_style_class_name("inactive-selection");
+        if (this._gnomeAppPalette) {
+          row.set_style(
+            `background-color: ${rgba(this._gnomeAppPalette.accent, 0.14)};`,
+          );
+        }
+      }
+    });
+
+    if (this._selectedIndex >= 0) {
+      this._queueScrollToSelection();
+    } else {
+      this._removeLater("_selectionScrollLaterId");
+    }
+  }
+
+  _queueScrollToSelection() {
+    this._removeLater("_selectionScrollLaterId");
+
+    this._resultsBox.queue_relayout();
+    // _scrollToSelection reads allocations, so it has to run after the relayout
+    // queued above. BEFORE_REDRAW would not do: laters run from the stage's
+    // before-update, which is still ahead of clutter_stage_maybe_relayout, so
+    // it would read the previous frame's geometry — as would the zero-delay
+    // PRIORITY_DEFAULT timeout this used to be. IDLE runs at
+    // G_PRIORITY_DEFAULT_IDLE (200), below the frame clock's
+    // CLUTTER_PRIORITY_REDRAW (150), so the frame that performs the relayout
+    // goes first. The cost is that sustained animation can delay it.
+    this._selectionScrollLaterId = global.compositor
+      .get_laters()
+      .add(Meta.LaterType.IDLE, () => {
+        this._selectionScrollLaterId = null;
+        if (this._enabled) this._scrollToSelection();
+        return GLib.SOURCE_REMOVE;
+      });
+  }
+
+  _scrollToSelection() {
+    if (this._selectedIndex < 0) return;
+
+    const row = this._resultRows[this._selectedIndex];
+    if (!row) return;
+
+    ensureActorVisibleInScrollView(this._resultsScroll, row);
+  }
+
+  _getResultsMaxHeight() {
+    const monitorIndex = this._resolveActiveMonitorIndex();
+    const workArea = Main.layoutManager.getWorkAreaForMonitor(monitorIndex);
+    if (!workArea) return 450;
+
+    return Math.max(
+      RESULTS_MIN_HEIGHT,
+      Math.floor(workArea.height * RESULTS_MAX_HEIGHT_FRACTION),
+    );
+  }
+
+  _updateResultsHeight(animate = true) {
+    if (!this._resultsBox || this._resultsState === "hidden") return;
+
+    this._resultsBox.queue_relayout();
+    const preferredWidth = Math.max(
+      1,
+      this._resultsBox.width,
+      this._resultsClip.width,
+      this._container.width,
+    );
+    const [, naturalHeight] =
+      this._resultsBox.get_preferred_height(preferredWidth);
+    const minimumHeight =
+      this._resultsState === "rows" ? 0 : RESULTS_MIN_HEIGHT;
+    const height = Math.min(
+      Math.max(minimumHeight, naturalHeight),
+      this._getResultsMaxHeight(),
+    );
+    this._setResultsHeight(height, animate);
+  }
+
+  _queueResultsHeightUpdate() {
+    this._removeLater("_resultsHeightLaterId");
+    if (this._resultsState === "hidden") return;
+
+    // Reads allocation-derived widths, so it needs the settled layout for the
+    // same reason _queueScrollToSelection does.
+    this._resultsHeightLaterId = global.compositor
+      .get_laters()
+      .add(Meta.LaterType.IDLE, () => {
+        this._resultsHeightLaterId = null;
+        if (this._enabled) this._updateResultsHeight(false);
+        return GLib.SOURCE_REMOVE;
+      });
+  }
+
+  _setResultsHeight(targetHeight, animate = true) {
+    const height = Math.max(0, targetHeight);
+    const currentHeight = Math.max(0, this._resultsClip.height);
+    const isShrinking = height < currentHeight;
+    const shouldAnimate =
+      animate &&
+      this._searchOpen &&
+      currentHeight !== height &&
+      (currentHeight === 0 || isShrinking);
+
+    this._resultsClip.remove_all_transitions();
+    this._resultsScroll.set_height(height);
+
+    if (!shouldAnimate) {
+      this._resultsClip.set_height(height);
+      this._repositionContainer();
+      return;
+    }
+
+    this._resultsClip.ease({
+      height,
+      duration: isShrinking
+        ? RESULTS_COLLAPSE_ANIMATION_MS
+        : RESULTS_REVEAL_ANIMATION_MS,
+      mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
+      onComplete: () => this._repositionContainer(),
+    });
+  }
+
+  // --- Layout ---
+
+  _updateDividerVisibility() {
+    if (!this._headerDivider || !this._footerDivider) return;
+
+    if (this._resultsState !== "hidden") {
+      this._headerDivider.show();
+      this._footerDivider.show();
+      return;
+    }
+
+    if (this._settings?.get_string("bar-position") === "bottom") {
+      this._headerDivider.hide();
+      this._footerDivider.show();
+    } else {
+      this._headerDivider.show();
+      this._footerDivider.hide();
+    }
+  }
+
+  _updateContentDirection(positionKey) {
+    const expandUpward = positionKey === "bottom";
+    if (
+      this._resultsExpandUpward === expandUpward ||
+      !this._contentLayer
+    ) {
+      return;
+    }
+
+    const children = expandUpward
+      ? [
+          this._resultsClip,
+          this._headerDivider,
+          this._inputRow,
+          this._footerDivider,
+          this._footer,
+        ]
+      : [
+          this._inputRow,
+          this._headerDivider,
+          this._resultsClip,
+          this._footerDivider,
+          this._footer,
+        ];
+
+    children.forEach((child, index) => {
+      this._contentLayer.set_child_at_index(child, index);
+    });
+    this._resultsExpandUpward = expandUpward;
+    this._updateDividerVisibility();
+    this._contentLayer.queue_relayout();
+  }
+
+  _isValidMonitorIndex(index, monitors = Main.layoutManager.monitors ?? []) {
+    return (
+      Number.isInteger(index) && index >= 0 && index < monitors.length
+    );
+  }
+
+  _getTargetMonitorIndex() {
+    const monitors = Main.layoutManager.monitors ?? [];
+    if (monitors.length === 0) return 0;
+
+    const candidateIndices = [
+      Main.layoutManager.focusIndex,
+      global.display.focus_window?.get_monitor(),
+      global.display.get_current_monitor(),
+      Main.layoutManager.primaryIndex,
+    ];
+
+    return (
+      candidateIndices.find((index) =>
+        this._isValidMonitorIndex(index, monitors),
+      ) ?? 0
+    );
+  }
+
+  _resolveActiveMonitorIndex() {
+    const monitors = Main.layoutManager.monitors ?? [];
+    const monitorIndex = this._activeMonitorIndex;
+
+    if (this._isValidMonitorIndex(monitorIndex, monitors)) {
+      return monitorIndex;
+    }
+
+    return this._getTargetMonitorIndex();
+  }
+
+  _onMonitorConfigurationChanged() {
+    this._activeMonitorIndex = this._searchOpen
+      ? this._getTargetMonitorIndex()
+      : null;
+    this._resizeClickShield();
+    this._repositionContainer();
+    this._queueResultsHeightUpdate();
+  }
+
+  _resizeClickShield() {
+    if (!this._clickShield) return;
+
+    this._clickShield.set_position(0, 0);
+    this._clickShield.set_size(global.stage.width, global.stage.height);
+  }
+
+  _repositionContainer() {
+    if (!this._container || !this._settings) return;
+
+    const monitors = Main.layoutManager.monitors ?? [];
+    if (monitors.length === 0) return;
+
+    const monitorIndex = this._resolveActiveMonitorIndex();
+    this._activeMonitorIndex = monitorIndex;
+
+    const workArea = Main.layoutManager.getWorkAreaForMonitor(monitorIndex);
+    if (!workArea) return;
+
+    const configuredWidth = this._settings.get_int("bar-width");
+    const availableWidth = Math.max(
+      1,
+      workArea.width - MONITOR_EDGE_MARGIN * 2,
+    );
+    const containerWidth = Math.min(configuredWidth, availableWidth);
+    const positionKey = this._settings.get_string("bar-position");
+    const fractionMap = {
+      top: TOP_POSITION_FRACTION,
+      center: CENTER_POSITION_FRACTION,
+    };
+    const fraction = fractionMap[positionKey] ?? fractionMap.center;
+
+    this._updateContentDirection(positionKey);
+
+    this._container.set_size(containerWidth, -1);
+    this._applyResponsiveVisibility(containerWidth);
+    const [, naturalHeight] =
+      this._container.get_preferred_height(containerWidth);
+    const containerHeight = Math.max(1, naturalHeight);
+    const minimumY = workArea.y + MONITOR_EDGE_MARGIN;
+    const maximumY = Math.max(
+      minimumY,
+      workArea.y +
+        workArea.height -
+        containerHeight -
+        MONITOR_EDGE_MARGIN,
+    );
+    const preferredY =
+      positionKey === "bottom"
+        ? workArea.y +
+          workArea.height -
+          Math.floor(workArea.height * TOP_POSITION_FRACTION) -
+          containerHeight
+        : workArea.y + Math.floor(workArea.height * fraction);
+    const y = Math.max(minimumY, Math.min(maximumY, preferredY));
+    const x =
+      workArea.x + Math.floor((workArea.width - containerWidth) / 2);
+
+    this._container.set_position(x, y);
+  }
+
+  _applyResponsiveVisibility(width = null) {
+    const availableWidth = width ?? this._container?.width ?? 0;
+    if (availableWidth <= 0) return;
+
+    if (this._modeIndicator) {
+      this._modeIndicator.visible = availableWidth >= 560;
+    }
+    if (this._navigateHint) {
+      this._navigateHint.visible = availableWidth >= 680;
+    }
+    if (this._openHint) this._openHint.visible = availableWidth >= 440;
+    if (this._closeHint) this._closeHint.visible = availableWidth >= 400;
+
+    const showMetadata = availableWidth >= 620;
+    this._resultMetadataActors?.forEach((actor) => {
+      actor.visible = showMetadata;
+    });
+  }
+
+  // --- Theme ---
+
+  _updateTheme() {
+    // Main.getStyleVariant() reflects the shell chrome rather than the system
+    // color-scheme, so System mode follows St.Settings directly.
+    const colorSource = resolveColorSource(
+      this._settings.get_string("color-source"),
+    );
+    const surfaceAppearance = getSurfaceAppearance({
+      configuredMode: this._settings.get_string("theme-mode"),
+      systemPrefersDark:
+        this._shellSettings.color_scheme ===
+        St.SystemColorScheme.PREFER_DARK,
+      lightPresetKey: this._settings.get_string("light-color-preset"),
+      darkPresetKey: this._settings.get_string("dark-color-preset"),
+      opacityPercentage: this._settings.get_int("background-opacity"),
+    });
+    const { variant: styleVariant, opacity } = surfaceAppearance;
+    const gnomeAppPalette =
+      colorSource === "gnome-apps"
+        ? getGnomeAppPalette(styleVariant, this._getSystemAccentName())
+        : null;
+    const color = gnomeAppPalette?.background ?? surfaceAppearance.color;
+
+    if (styleVariant === "dark") {
+      this._container.add_style_class_name("dark-mode");
+    } else {
+      this._container.remove_style_class_name("dark-mode");
+    }
+
+    if (gnomeAppPalette) {
+      this._container.add_style_class_name("gnome-app-colors");
+    } else {
+      this._container.remove_style_class_name("gnome-app-colors");
+    }
+
+    const [red, green, blue] = color;
+    this._materialLayer.set_style(
+      `background-color: rgba(${red}, ${green}, ${blue}, ${opacity});`,
+    );
+
+    if (gnomeAppPalette) {
+      this._applyGnomeAppColors(styleVariant, gnomeAppPalette);
+    } else {
+      this._clearGnomeAppColors();
+      this._applySystemTextColor(styleVariant);
+    }
+  }
+
+  _getSystemAccentName() {
+    if (!this._interfaceSettings?.settings_schema.has_key("accent-color")) {
+      return "blue";
+    }
+
+    try {
+      return this._interfaceSettings.get_string("accent-color");
+    } catch (_e) {
+      return "blue";
+    }
+  }
+
+  _applyGnomeAppColors(styleVariant, palette) {
+    const foregroundAlpha = styleVariant === "dark" ? 1 : 0.8;
+    const foreground = rgba(palette.foreground, foregroundAlpha);
+    const selectedForeground = rgba(palette.foreground, 0.98);
+
+    this._gnomeAppPalette = palette;
+    this._container.set_style(`color: ${foreground};`);
+    this._entry?.set_style(
+      `color: ${foreground}; ` +
+        `caret-color: ${rgba(palette.accentForeground, 0.96)}; ` +
+        `selection-background-color: ${rgba(palette.accent, 0.3)}; ` +
+        `selected-color: ${selectedForeground};`,
+    );
+    this._modeDot?.set_style(
+      `background-color: ${rgba(palette.accent, 0.85)};`,
+    );
+    this._statusSpinner?.set_style(
+      `color: ${rgba(palette.accentForeground, 0.82)};`,
+    );
+    this._actionsKey?.set_style(
+      `border-color: ${rgba(palette.accent, 0.12)}; ` +
+        `background-color: ${rgba(palette.accent, 0.11)}; ` +
+        `color: ${rgba(palette.accentForeground, 0.82)};`,
+    );
+    this._modeChip?.set_style(
+      `border-color: ${rgba(palette.accent, 0.18)}; ` +
+        `background-color: ${rgba(palette.accent, 0.14)};`,
+    );
+    this._modeChipLabel?.set_style(
+      `color: ${rgba(palette.accentForeground, 0.86)};`,
+    );
+    this._updateSelection();
+  }
+
+  _clearGnomeAppColors() {
+    this._gnomeAppPalette = null;
+    this._modeDot?.set_style(null);
+    this._statusSpinner?.set_style(null);
+    this._actionsKey?.set_style(null);
+    this._modeChip?.set_style(null);
+    this._modeChipLabel?.set_style(null);
+    this._resultRows?.forEach((row) => row.set_style(null));
+  }
+
+  _applySystemTextColor(styleVariant) {
+    // The shell loads only one stylesheet variant at a time, so its foreground
+    // color is only meaningful when that variant matches the bar's. When they
+    // differ, fall back to the fixed colors in stylesheet.css.
+    if (Main.getStyleVariant() !== styleVariant) {
+      this._container.set_style(null);
+      this._entry?.set_style(null);
+      return;
+    }
+
+    const color = Main.uiGroup
+      .get_theme_node()
+      .get_foreground_color()
+      .to_string();
+
+    // Result labels inherit the container's inline color, but the entry's text
+    // does not pick up an ancestor's inline color, so it must be set directly.
+    this._container.set_style(`color: ${color};`);
+    this._entry?.set_style(`color: ${color};`);
+  }
+}

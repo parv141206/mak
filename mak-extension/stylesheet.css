@@ -1,0 +1,1064 @@
+/* BMS Liquid Glass & Blur Imports */
+@import url("modules/blur/bms/styles/panel.css");
+@import url("modules/blur/bms/styles/dash.css");
+@import url("modules/blur/bms/styles/popup/base.css");
+@import url("modules/blur/bms/styles/popup/transparent.css");
+@import url("modules/blur/bms/styles/popup/light.css");
+@import url("modules/blur/bms/styles/popup/dark.css");
+@import url("modules/blur/bms/styles/popup/menu-items.css");
+@import url("modules/blur/bms/styles/overview.css");
+@import url("modules/blur/bms/styles/appfolders.css");
+@import url("modules/blur/bms/styles/panel-light-text.css");
+
+/* =====================================================================
+ * Mak — Unified macOS Experience Suite Stylesheet
+ * ===================================================================== */
+
+/* ── Top Bar Panel & macOS Styling ────────────────────────────────────────── */
+#panel.mak-panel,
+.mak-panel {
+    background-color: rgba(22, 22, 28, 0.28);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    transition: background-color 200ms ease;
+}
+
+#panel.mak-panel:overview,
+.mak-panel:overview {
+    background-color: transparent !important;
+    border-bottom-color: transparent !important;
+}
+
+.mak-app-title-label {
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #f5f5f7;
+    padding-left: 6px;
+    padding-right: 8px;
+    letter-spacing: -0.2px;
+}
+
+/* Panel pill buttons */
+.mak-panel .panel-button {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: #f0f0f2;
+    border-radius: 12px;
+    padding: 0 8px;
+    margin: 2px 2px;
+    transition: background-color 150ms ease;
+}
+
+.mak-panel .panel-button:hover {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    color: #ffffff;
+}
+
+.mak-panel .panel-button:active {
+    background-color: rgba(255, 255, 255, 0.24) !important;
+}
+
+/* AquaDockPro — stylesheet.
+ *
+ * The pill background colour/radius/border is set inline from the cached config
+ * (so live colour edits and theme switches need no static reload). The rules
+ * here cover the parts that are cheaper to express statically: indicator dots,
+ * separators and badges. Later phases add their own classes (tooltip, menu,
+ * previews, downloads).
+ *
+ * Shadows are intentionally disabled: Mutter handles these moving surfaces
+ * more consistently when they remain flat. */
+
+/* Force-hide the default GNOME dash when AquaDockPro is active. */
+.aqua-dash-hidden,
+.aqua-dash-hidden * {
+    opacity: 0;
+    width: 0;
+}
+
+/* ── Dock background pill ─────────────────────────────────────────────────── */
+.aqua-bg {
+    background-color: rgba(26, 26, 32, 0.35);
+    border:           1px solid rgba(255, 255, 255, 0.16);
+    box-shadow:       none;
+}
+
+.aqua-autohide-handle {
+    box-shadow:       none;
+}
+
+/* ── Icon slot ────────────────────────────────────────────────────────────── */
+.aqua-item {
+    background-color: transparent;
+    border:           none;
+    padding:          0;
+}
+.aqua-item:focus {
+    background-color: transparent;
+    border:           none;
+    outline:          none;
+}
+.aqua-focus-pill {
+    background-color: rgba(255, 255, 255, 0.10);
+    border:           1px solid rgba(255, 255, 255, 0.42);
+    border-radius:    999px;
+    box-shadow:       none;
+}
+.aqua-high-contrast .aqua-focus-pill {
+    background-color: rgba(255, 255, 255, 0.24);
+    border:           2px solid #ffffff;
+}
+.aqua-high-contrast .aqua-separator {
+    background-color: #ffffff;
+}
+
+/* ── Running indicators (positioned/sized from JS) ────────────────────────── */
+.aqua-dot {
+    background-color: rgba(235, 235, 235, 0.92);
+    border-radius:    3px;
+    box-shadow:       none;
+}
+.aqua-indic-line {
+    background-color: rgba(235, 235, 235, 0.92);
+    border-radius:    2px;
+    box-shadow:       none;
+}
+.aqua-indic-pill {
+    background-color: rgba(235, 235, 235, 0.92);
+    border-radius:    4px;
+    box-shadow:       none;
+}
+.aqua-indic-glow {
+    background-color: transparent;
+    border-radius:    999px;
+    box-shadow:       none;
+}
+.aqua-indic-glow-dots {
+    border-radius:    999px;
+    background-color: rgba(235, 235, 235, 0.95);
+    box-shadow:       none;
+}
+
+/* ── Section separator ────────────────────────────────────────────────────── */
+.aqua-separator {
+    background-color: rgba(255, 255, 255, 0.22);
+    border-radius:    1px;
+}
+.aqua-spacer {
+    background-color: transparent;
+}
+
+/* ── App-name tooltip (colours/radius/border set inline) ──────────────────── */
+.aqua-tooltip {
+    background-color: rgba(32, 32, 36, 0.92);
+    color:            #f2f2f4;
+    border-radius:    9px;
+    padding:          6px 12px;
+    font-size:        10pt;
+    font-weight:      500;
+    letter-spacing:   0.01em;
+    box-shadow:       none;
+}
+
+/* ── Context menu (box colours/radius set inline) ─────────────────────────── */
+.aqua-menu,
+.aqua-menu .popup-menu-boxpointer {
+    -arrow-rise: 0;
+    box-shadow:  none;
+}
+.aqua-menu .popup-menu-content {
+    background-color: rgba(35, 36, 40, 0.94);
+    border-radius:    12px;
+    box-shadow:       none;
+    padding:          5px 0;
+    min-width:        220px;
+    max-width:        220px;
+}
+.aqua-menu .popup-menu-item {
+    color:         rgba(235, 235, 240, 0.90);
+    font-size:     10.5pt;
+    padding:       7px 16px;
+    border-radius: 7px;
+    margin:        0 6px;
+    transition:    background-color 100ms ease;
+}
+.aqua-menu .popup-menu-item:hover,
+.aqua-menu .popup-menu-item:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+.aqua-menu .popup-menu-item:active {
+    background-color: rgba(255, 255, 255, 0.16);
+}
+.aqua-menu.aqua-file-item-menu .popup-menu-content {
+    min-width: 0;
+    max-width: 220px;
+    padding:   4px 0;
+}
+.aqua-menu.aqua-file-item-menu {
+    min-width:       0;
+    max-width:       220px;
+    -boxpointer-gap: 4px;
+}
+.aqua-menu.aqua-file-item-menu .popup-menu-item {
+    padding: 6px 10px;
+    margin:  0 4px;
+}
+.aqua-menu .popup-separator-menu-item { padding: 0; }
+.aqua-menu .popup-separator-menu-item .popup-separator-menu-item-separator {
+    background-color: rgba(255, 255, 255, 0.12);
+    margin:           5px 6px;
+    height:           1px;
+}
+
+/* ── Window previews ──────────────────────────────────────────────────────── */
+.aqua-preview-box {
+    background-color: transparent;
+    padding:          8px;
+    box-shadow:       none;
+    border:           none;
+}
+.aqua-preview-col {
+    background-color: transparent;
+    box-shadow:       none;
+    border:           1px solid transparent;
+    border-radius:    14px;
+    padding:          4px;
+    transition:       background-color 100ms ease, border-color 100ms ease;
+}
+.aqua-preview-content {
+    background-color: transparent;
+    box-shadow:       none;
+    border:           none;
+}
+.aqua-preview-col:hover,
+.aqua-preview-col:focus {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-color:     rgba(255, 255, 255, 0.14);
+}
+.aqua-preview-col:active {
+    background-color: rgba(255, 255, 255, 0.13);
+    border-color:     rgba(255, 255, 255, 0.18);
+}
+.aqua-preview-thumb {
+    background-color: rgba(14, 14, 18, 0.92);
+    border:           1px solid rgba(255, 255, 255, 0.18);
+    border-radius:    12px;
+    box-shadow:       none;
+    overflow:         hidden;
+}
+.aqua-preview-title {
+    color:      rgba(240, 240, 244, 0.88);
+    font-size:  9pt;
+    max-width:  200px;
+    text-align: center;
+}
+.aqua-preview-close {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 0 6px;
+}
+.aqua-preview-close:hover,
+.aqua-preview-close:focus { background-color: rgba(255, 255, 255, 0.16); }
+.aqua-preview-more {
+    color: rgba(240, 240, 244, 0.78);
+    font-size: 9pt;
+    padding: 0 8px;
+}
+.aqua-preview-navigation {
+    padding: 2px 4px 0 4px;
+}
+.aqua-preview-page-button {
+    background-color: rgba(20, 20, 24, 0.94);
+    color:            #ffffff;
+    border:           1px solid rgba(255, 255, 255, 0.28);
+    border-radius:    999px;
+    padding:          2px 10px;
+    font-size:        12pt;
+}
+.aqua-preview-page-button:hover,
+.aqua-preview-page-button:focus {
+    background-color: rgba(255, 255, 255, 0.18);
+    border-color:     rgba(255, 255, 255, 0.62);
+}
+.aqua-preview-page-status {
+    color:       rgba(245, 245, 248, 0.94);
+    font-size:   9pt;
+    min-width:   72px;
+    text-align:  center;
+}
+.aqua-preview-box.aqua-high-contrast .aqua-preview-col:focus,
+.aqua-preview-box.aqua-high-contrast .aqua-preview-page-button:focus {
+    border: 2px solid #ffffff;
+}
+.aqua-preview-box.aqua-high-contrast .aqua-preview-thumb,
+.aqua-dl-panel.aqua-high-contrast,
+.aqua-high-contrast .aqua-dl-fan-label-pill,
+.aqua-high-contrast .aqua-dl-fan-thumb {
+    border-color: #ffffff;
+}
+
+/* ── Notification badge ───────────────────────────────────────────────────── */
+.aqua-badge {
+    background-color: #e03030;
+    color:            #ffffff;
+    font-size:        7.5pt;
+    font-weight:      700;
+    border-radius:    10px;
+    padding:          1px 5px;
+    min-width:        16px;
+    min-height:       16px;
+    text-align:       center;
+    box-shadow:       none;
+    border:           1px solid rgba(255, 255, 255, 0.30);
+}
+
+/* ── Downloads stack ──────────────────────────────────────────────────────── */
+.aqua-dl-panel {
+    background-color: rgba(26, 26, 32, 0.35);
+    border:           1px solid rgba(255, 255, 255, 0.16);
+    border-radius:    18px;
+    box-shadow:       none;
+    padding:          0;
+    min-width:        340px;
+}
+.aqua-dl-panel.aqua-dl-fan { min-width: 300px; }
+.aqua-dl-fan-panel {
+    background-color: transparent;
+    border:           none;
+    box-shadow:       none;
+}
+.aqua-dl-flyer { box-shadow: none; border-radius: 8px; }
+
+.aqua-dl-fan-row {
+    background-color:    transparent;
+    border:              none;
+    box-shadow:          none;
+    padding:             0;
+    border-radius:       11px;
+    transition-duration: 120ms;
+}
+.aqua-dl-fan-row-sel { background-color: rgba(255, 255, 255, 0.16); }
+.aqua-dl-fan-row-inner { padding: 0 6px; }
+.aqua-dl-fan-thumb { transition-duration: 140ms; }
+.aqua-dl-fan-label {
+    color:          #f2f2f5;
+    font-size:      10.5pt;
+    font-weight:    500;
+    letter-spacing: 0.01em;
+}
+.aqua-dl-fan-more { color: rgba(210, 210, 220, 0.80); }
+
+.aqua-dl-header { padding: 12px 12px 8px 16px; }
+.aqua-dl-hdr-label {
+    color:          #f4f4f6;
+    font-size:      12.5pt;
+    font-weight:    600;
+    letter-spacing: 0.01em;
+}
+.aqua-dl-hdr-sub {
+    color:       rgba(230, 230, 236, 0.55);
+    font-size:   8.5pt;
+    font-weight: 400;
+}
+.aqua-dl-open-btn {
+    background-color: rgba(255, 255, 255, 0.12);
+    color:            rgba(240, 240, 245, 0.90);
+    border:           1px solid rgba(255, 255, 255, 0.14);
+    border-radius:    8px;
+    padding:          5px 14px;
+    font-size:        9.5pt;
+    font-weight:      500;
+    box-shadow:       none;
+}
+.aqua-dl-open-btn:hover { background-color: rgba(255, 255, 255, 0.20); }
+.aqua-dl-open-btn:focus {
+    background-color: rgba(255, 255, 255, 0.18);
+    border-color:     rgba(255, 255, 255, 0.28);
+}
+.aqua-dl-open-btn:active { background-color: rgba(255, 255, 255, 0.24); }
+.aqua-dl-divider {
+    background-color: rgba(255, 255, 255, 0.10);
+    height:           1px;
+    margin:           2px 12px 4px 12px;
+}
+.aqua-dl-filebox { padding: 4px 10px 12px 10px; }
+.aqua-dl-filebox-grid { padding: 8px 12px 14px 12px; }
+.aqua-dl-row {
+    background-color: transparent;
+    border:           1px solid transparent;
+    border-radius:    10px;
+    padding:          0;
+    transition:       background-color 120ms ease, border-color 120ms ease;
+}
+.aqua-dl-row:hover,
+.aqua-dl-row:focus,
+.aqua-dl-row-sel {
+    background-color: rgba(255, 255, 255, 0.10);
+    border-color:     rgba(255, 255, 255, 0.10);
+}
+.aqua-dl-row-grid { border-radius: 12px; }
+.aqua-dl-row-inner { padding: 6px 10px; }
+
+/* SPDX-License-Identifier: GPL-2.0-or-later */
+/* Copyright (C) 2026 Furkan */
+
+/* =====================================================================
+ * Superbar surface and components
+ * ===================================================================== */
+
+/* ---------------------------------------------------------------------
+ * 1. Surface and foreground stack
+ * --------------------------------------------------------------------- */
+
+.spotlight-container {
+    border-radius: 28px;
+    color: rgba(28, 28, 28, 0.94);
+}
+
+.spotlight-material,
+.spotlight-content {
+    border-radius: 28px;
+}
+
+.spotlight-material {
+    background-color: rgba(245, 245, 244, 0.90);
+    border: 1px solid rgba(255, 255, 255, 0.72);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+.spotlight-content {
+    background-color: transparent;
+}
+
+/* ---------------------------------------------------------------------
+ * 2. Search header and mode indicator
+ * --------------------------------------------------------------------- */
+
+.spotlight-input-row {
+    height: 64px;
+    padding: 0 16px;
+    spacing: 12px;
+}
+
+.spotlight-icon {
+    icon-size: 20px;
+    color: rgba(38, 38, 38, 0.62);
+}
+
+.spotlight-entry,
+.spotlight-entry:focus {
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    box-shadow: none;
+    color: rgba(28, 28, 28, 0.94);
+    caret-color: rgba(0, 104, 225, 0.94);
+    caret-size: 2px;
+    selection-background-color: rgba(71, 153, 225, 0.22);
+    selected-color: rgba(28, 28, 28, 0.96);
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.spotlight-entry StLabel.hint-text {
+    color: rgba(38, 38, 38, 0.48);
+}
+
+.spotlight-mode-indicator {
+    padding: 0;
+    border-radius: 999px;
+    background-color: transparent;
+}
+
+.spotlight-mode-inner {
+    min-height: 28px;
+    padding: 0 10px;
+    spacing: 7px;
+    border-radius: 999px;
+    background-color: rgba(255, 255, 255, 0.58);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
+}
+
+.spotlight-mode-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background-color: rgba(61, 151, 229, 0.78);
+}
+
+.spotlight-mode-label {
+    color: rgba(38, 38, 38, 0.68);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* The chip stands in for text the user would otherwise have typed, so it is
+ * sized against the entry rather than the small footer keys. */
+.spotlight-mode-chip {
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid rgba(74, 158, 226, 0.16);
+    border-radius: 10px;
+    background-color: rgba(74, 158, 226, 0.12);
+}
+
+.spotlight-mode-chip-label {
+    color: rgba(20, 72, 120, 0.82);
+    font-size: 17px;
+    font-weight: 500;
+}
+
+.spotlight-divider {
+    height: 1px;
+    background-color: rgba(38, 38, 38, 0.12);
+}
+
+/* ---------------------------------------------------------------------
+ * 3. Results viewport, stable status, and scrollbar
+ * --------------------------------------------------------------------- */
+
+.spotlight-results-clip,
+.spotlight-results-scroll {
+    background-color: transparent;
+}
+
+.spotlight-results-box {
+    padding: 8px 6px;
+    spacing: 2px;
+}
+
+.spotlight-status {
+    padding: 40px 20px;
+    spacing: 10px;
+    color: rgba(38, 38, 38, 0.64);
+}
+
+.spotlight-status.loading {
+    padding: 28px 20px;
+    spacing: 12px;
+}
+
+.spotlight-status-icon {
+    icon-size: 22px;
+    color: rgba(59, 146, 219, 0.72);
+}
+
+.spotlight-status-label {
+    color: rgba(38, 38, 38, 0.64);
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.spotlight-results-scroll StScrollBar {
+    min-width: 8px;
+    margin: 6px 2px 6px 0;
+}
+
+.spotlight-results-scroll StScrollBar .vhandle,
+.spotlight-results-scroll StScrollBar .v-handle {
+    min-width: 6px;
+    border: none;
+    border-radius: 999px;
+    background-color: rgba(38, 38, 38, 0.18);
+}
+
+.spotlight-results-scroll StScrollBar .vhandle:hover,
+.spotlight-results-scroll StScrollBar .v-handle:hover {
+    background-color: rgba(38, 38, 38, 0.28);
+}
+
+/* ---------------------------------------------------------------------
+ * 4. Result rows
+ * --------------------------------------------------------------------- */
+
+.spotlight-result-row {
+    /* St adds padding and border outside min-height: 46 + 16 + 2 = 64. */
+    min-height: 46px;
+    padding: 8px 12px 8px 9px;
+    spacing: 12px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background-color: transparent;
+    color: rgba(28, 28, 28, 0.94);
+    transition-duration: 150ms;
+}
+
+.spotlight-result-row:hover {
+    background-color: rgba(38, 38, 38, 0.055);
+}
+
+.spotlight-result-row:active {
+    background-color: rgba(38, 38, 38, 0.085);
+}
+
+.spotlight-result-row-content,
+.spotlight-answer-content,
+.spotlight-weather-content {
+    spacing: 12px;
+}
+
+.spotlight-result-row.inactive-selection {
+    background-color: rgba(71, 153, 225, 0.14);
+}
+
+.spotlight-result-row.selected,
+.spotlight-result-row.selected:hover,
+.spotlight-result-row:focus {
+    background-color: rgba(71, 153, 225, 0.25);
+}
+
+.spotlight-result-icon {
+    icon-size: 32px;
+    margin: 0 6px;
+    color: rgba(38, 38, 38, 0.72);
+}
+
+.spotlight-result-text {
+    spacing: 2px;
+}
+
+.spotlight-result-label {
+    color: rgba(28, 28, 28, 0.94);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.spotlight-result-subtitle {
+    color: rgba(38, 38, 38, 0.64);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.spotlight-result-metadata {
+    margin-left: 14px;
+    color: rgba(38, 38, 38, 0.65);
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.spotlight-result-copy {
+    min-width: 40px;
+    margin-left: 14px;
+    padding: 6px 8px;
+    border: none;
+    border-radius: 7px;
+    background-color: transparent;
+    color: rgba(38, 38, 38, 0.65);
+    font-size: 12px;
+    font-weight: 500;
+    transition-duration: 120ms;
+}
+
+.spotlight-result-copy:hover {
+    background-color: rgba(71, 153, 225, 0.10);
+    color: rgba(26, 82, 132, 0.70);
+}
+
+.spotlight-result-copy:active,
+.spotlight-result-copy.copied {
+    background-color: transparent;
+    color: rgba(20, 104, 172, 0.88);
+}
+
+/* ---------------------------------------------------------------------
+ * 5. Calculator answer and weather cards
+ * --------------------------------------------------------------------- */
+
+.spotlight-result-row.answer {
+    min-height: 60px;
+    margin: 4px 2px;
+    padding: 16px 18px;
+    border-radius: 15px;
+    background-color: rgba(255, 255, 255, 0.48);
+}
+
+.spotlight-result-row.answer:hover {
+    background-color: rgba(255, 255, 255, 0.72);
+}
+
+.spotlight-result-row.answer.selected,
+.spotlight-result-row.answer:focus {
+    background-color: rgba(71, 153, 225, 0.18);
+}
+
+.spotlight-answer-context {
+    color: rgba(38, 38, 38, 0.64);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.spotlight-result-row.answer .spotlight-result-label {
+    color: rgba(28, 28, 28, 0.94);
+    font-size: 32px;
+    font-weight: 400;
+}
+
+.spotlight-result-row.answer .spotlight-result-subtitle {
+    color: rgba(38, 38, 38, 0.65);
+    font-size: 12px;
+}
+
+.spotlight-result-row.weather-card {
+    min-height: 50px;
+    margin: 4px 2px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background-color: rgba(255, 255, 255, 0.48);
+}
+
+.spotlight-result-row.weather-card:hover {
+    background-color: rgba(255, 255, 255, 0.72);
+}
+
+.spotlight-result-row.weather-card.selected,
+.spotlight-result-row.weather-card:focus {
+    background-color: rgba(71, 153, 225, 0.18);
+}
+
+.weather-temp {
+    margin-left: 14px;
+    color: rgba(28, 28, 28, 0.94);
+    font-size: 34px;
+    font-weight: 300;
+}
+
+.weather-desc {
+    color: rgba(38, 38, 38, 0.64);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.weather-city {
+    color: rgba(28, 28, 28, 0.94);
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.weather-details {
+    margin-top: 3px;
+    color: rgba(38, 38, 38, 0.64);
+    font-size: 13px;
+    font-weight: 400;
+}
+
+/* ---------------------------------------------------------------------
+ * 6. Compact keyboard footer
+ * --------------------------------------------------------------------- */
+
+.spotlight-footer {
+    /* 21px content plus 13px vertical padding yields the 34px footer. */
+    min-height: 21px;
+    padding: 6px 14px 7px;
+    spacing: 18px;
+    color: rgba(38, 38, 38, 0.58);
+}
+
+.spotlight-actions-hint {
+    spacing: 6px;
+    color: rgba(38, 38, 38, 0.62);
+}
+
+.spotlight-footer-key {
+    min-width: 8px;
+    min-height: 16px;
+    padding: 0 5px;
+    border: 1px solid rgba(38, 38, 38, 0.10);
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.58);
+    color: rgba(38, 38, 38, 0.66);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.spotlight-actions-hint .spotlight-footer-key {
+    min-width: 12px;
+    border-color: rgba(74, 158, 226, 0.10);
+    background-color: rgba(74, 158, 226, 0.09);
+    color: rgba(20, 72, 120, 0.66);
+    text-align: center;
+}
+
+.spotlight-footer-label {
+    color: rgba(38, 38, 38, 0.58);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.spotlight-footer-hints {
+    spacing: 16px;
+}
+
+.spotlight-footer-hint {
+    spacing: 4px;
+}
+
+/* ---------------------------------------------------------------------
+ * 7. Dark variant
+ * --------------------------------------------------------------------- */
+
+.dark-mode.spotlight-container {
+    color: rgba(250, 250, 250, 0.94);
+}
+
+.dark-mode .spotlight-material {
+    background-color: rgba(23, 23, 23, 0.90);
+    border-color: rgba(255, 255, 255, 0.11);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+}
+
+.dark-mode .spotlight-icon {
+    color: rgba(235, 235, 235, 0.64);
+}
+
+.dark-mode .spotlight-entry,
+.dark-mode .spotlight-entry:focus {
+    color: rgba(250, 250, 250, 0.94);
+    selection-background-color: rgba(62, 142, 213, 0.32);
+    selected-color: rgba(255, 255, 255, 0.98);
+}
+
+.dark-mode .spotlight-entry StLabel.hint-text {
+    color: rgba(220, 220, 220, 0.46);
+}
+
+.dark-mode .spotlight-mode-indicator {
+    background-color: transparent;
+}
+
+.dark-mode .spotlight-mode-chip {
+    border-color: rgba(115, 194, 249, 0.16);
+    background-color: rgba(78, 168, 235, 0.16);
+}
+
+.dark-mode .spotlight-mode-chip-label {
+    color: rgba(150, 210, 255, 0.88);
+}
+
+.dark-mode .spotlight-mode-inner {
+    background-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.13);
+}
+
+.dark-mode .spotlight-mode-label {
+    color: rgba(225, 225, 225, 0.68);
+}
+
+.dark-mode .spotlight-divider {
+    background-color: rgba(255, 255, 255, 0.09);
+}
+
+.dark-mode .spotlight-status,
+.dark-mode .spotlight-status-label {
+    color: rgba(225, 225, 225, 0.62);
+}
+
+.dark-mode .spotlight-status-icon {
+    color: rgba(105, 186, 246, 0.78);
+}
+
+.dark-mode .spotlight-results-scroll StScrollBar .vhandle,
+.dark-mode .spotlight-results-scroll StScrollBar .v-handle {
+    background-color: rgba(255, 255, 255, 0.14);
+}
+
+.dark-mode .spotlight-results-scroll StScrollBar .vhandle:hover,
+.dark-mode .spotlight-results-scroll StScrollBar .v-handle:hover {
+    background-color: rgba(255, 255, 255, 0.22);
+}
+
+.dark-mode .spotlight-result-row {
+    color: rgba(250, 250, 250, 0.94);
+}
+
+.dark-mode .spotlight-result-row:hover {
+    background-color: rgba(255, 255, 255, 0.055);
+}
+
+.dark-mode .spotlight-result-row:active {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark-mode .spotlight-result-row.inactive-selection {
+    background-color: rgba(62, 142, 213, 0.14);
+}
+
+.dark-mode .spotlight-result-row.selected,
+.dark-mode .spotlight-result-row.selected:hover,
+.dark-mode .spotlight-result-row:focus {
+    background-color: rgba(62, 142, 213, 0.25);
+}
+
+.dark-mode .spotlight-result-icon {
+    color: rgba(225, 225, 225, 0.72);
+}
+
+.dark-mode .spotlight-result-label,
+.dark-mode .spotlight-result-row.answer .spotlight-result-label,
+.dark-mode .weather-temp,
+.dark-mode .weather-city {
+    color: rgba(250, 250, 250, 0.94);
+}
+
+.dark-mode .spotlight-result-subtitle,
+.dark-mode .spotlight-answer-context,
+.dark-mode .weather-desc,
+.dark-mode .weather-details {
+    color: rgba(225, 225, 225, 0.62);
+}
+
+.dark-mode .spotlight-result-metadata,
+.dark-mode .spotlight-result-row.answer .spotlight-result-subtitle {
+    color: rgba(210, 210, 210, 0.60);
+}
+
+.dark-mode .spotlight-result-copy {
+    background-color: transparent;
+    color: rgba(210, 210, 210, 0.60);
+}
+
+.dark-mode .spotlight-result-copy:hover {
+    background-color: rgba(78, 168, 235, 0.10);
+    color: rgba(139, 205, 255, 0.78);
+}
+
+.dark-mode .spotlight-result-copy:active,
+.dark-mode .spotlight-result-copy.copied {
+    background-color: transparent;
+    color: rgba(181, 224, 255, 0.94);
+}
+
+.dark-mode .spotlight-result-row.answer,
+.dark-mode .spotlight-result-row.weather-card {
+    background-color: rgba(255, 255, 255, 0.055);
+}
+
+.dark-mode .spotlight-result-row.answer:hover,
+.dark-mode .spotlight-result-row.weather-card:hover {
+    background-color: rgba(255, 255, 255, 0.075);
+}
+
+.dark-mode .spotlight-result-row.answer.selected,
+.dark-mode .spotlight-result-row.answer:focus,
+.dark-mode .spotlight-result-row.weather-card.selected,
+.dark-mode .spotlight-result-row.weather-card:focus {
+    background-color: rgba(62, 142, 213, 0.18);
+}
+
+.dark-mode .spotlight-footer {
+    color: rgba(210, 210, 210, 0.52);
+}
+
+.dark-mode .spotlight-actions-hint {
+    color: rgba(220, 220, 220, 0.62);
+}
+
+.dark-mode .spotlight-footer-label {
+    color: rgba(210, 210, 210, 0.56);
+}
+
+.dark-mode .spotlight-footer-key {
+    border-color: rgba(255, 255, 255, 0.08);
+    background-color: rgba(255, 255, 255, 0.06);
+    color: rgba(225, 225, 225, 0.66);
+}
+
+.dark-mode .spotlight-actions-hint .spotlight-footer-key {
+    border-color: rgba(115, 194, 249, 0.10);
+    background-color: rgba(78, 168, 235, 0.10);
+    color: rgba(139, 205, 255, 0.76);
+}
+
+/* ---------------------------------------------------------------------
+ * 8. GNOME application palette
+ * --------------------------------------------------------------------- */
+
+.gnome-app-colors.spotlight-container,
+.gnome-app-colors .spotlight-entry,
+.gnome-app-colors .spotlight-entry:focus,
+.gnome-app-colors .spotlight-result-row,
+.gnome-app-colors .spotlight-result-label,
+.gnome-app-colors .spotlight-result-row.answer .spotlight-result-label,
+.gnome-app-colors .weather-temp,
+.gnome-app-colors .weather-city {
+    color: rgba(0, 0, 6, 0.80);
+}
+
+.gnome-app-colors .spotlight-icon,
+.gnome-app-colors .spotlight-mode-label,
+.gnome-app-colors .spotlight-status,
+.gnome-app-colors .spotlight-status-label,
+.gnome-app-colors .spotlight-result-subtitle,
+.gnome-app-colors .spotlight-answer-context,
+.gnome-app-colors .weather-desc,
+.gnome-app-colors .weather-details,
+.gnome-app-colors .spotlight-result-metadata,
+.gnome-app-colors .spotlight-result-row.answer .spotlight-result-subtitle,
+.gnome-app-colors .spotlight-result-copy,
+.gnome-app-colors .spotlight-footer,
+.gnome-app-colors .spotlight-actions-hint,
+.gnome-app-colors .spotlight-footer-label {
+    color: rgba(0, 0, 6, 0.55);
+}
+
+.gnome-app-colors .spotlight-entry StLabel.hint-text {
+    color: rgba(0, 0, 6, 0.46);
+}
+
+.gnome-app-colors .spotlight-material {
+    border-color: rgba(0, 0, 6, 0.15);
+}
+
+.gnome-app-colors .spotlight-divider {
+    background-color: rgba(0, 0, 6, 0.12);
+}
+
+.gnome-app-colors .spotlight-footer-key {
+    border-color: rgba(0, 0, 6, 0.12);
+    color: rgba(0, 0, 6, 0.62);
+}
+
+.gnome-app-colors.dark-mode.spotlight-container,
+.gnome-app-colors.dark-mode .spotlight-entry,
+.gnome-app-colors.dark-mode .spotlight-entry:focus,
+.gnome-app-colors.dark-mode .spotlight-result-row,
+.gnome-app-colors.dark-mode .spotlight-result-label,
+.gnome-app-colors.dark-mode .spotlight-result-row.answer .spotlight-result-label,
+.gnome-app-colors.dark-mode .weather-temp,
+.gnome-app-colors.dark-mode .weather-city {
+    color: rgba(255, 255, 255, 1);
+}
+
+.gnome-app-colors.dark-mode .spotlight-icon,
+.gnome-app-colors.dark-mode .spotlight-mode-label,
+.gnome-app-colors.dark-mode .spotlight-status,
+.gnome-app-colors.dark-mode .spotlight-status-label,
+.gnome-app-colors.dark-mode .spotlight-result-subtitle,
+.gnome-app-colors.dark-mode .spotlight-answer-context,
+.gnome-app-colors.dark-mode .weather-desc,
+.gnome-app-colors.dark-mode .weather-details,
+.gnome-app-colors.dark-mode .spotlight-result-metadata,
+.gnome-app-colors.dark-mode .spotlight-result-row.answer .spotlight-result-subtitle,
+.gnome-app-colors.dark-mode .spotlight-result-copy,
+.gnome-app-colors.dark-mode .spotlight-footer,
+.gnome-app-colors.dark-mode .spotlight-actions-hint,
+.gnome-app-colors.dark-mode .spotlight-footer-label {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.gnome-app-colors.dark-mode .spotlight-entry StLabel.hint-text {
+    color: rgba(255, 255, 255, 0.46);
+}
+
+.gnome-app-colors.dark-mode .spotlight-material {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.gnome-app-colors.dark-mode .spotlight-divider {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.gnome-app-colors.dark-mode .spotlight-footer-key {
+    border-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.62);
+}

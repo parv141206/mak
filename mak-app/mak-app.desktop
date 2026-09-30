@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Mak
+GenericName=macOS Experience Control Center
+Comment=Unified settings and sentinel for macOS Dock, Top Bar, Spotlight, and Themes
+Exec=/home/parv/.local/bin/mak-app
+Icon=preferences-desktop-display
+Terminal=false
+Categories=Utility;Settings;DesktopSettings;
+Keywords=mac;macos;dock;topbar;spotlight;theme;gaps;
+StartupNotify=true

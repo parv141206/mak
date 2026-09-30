@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-License-Identifier: GPL-2.0-or-later
+Copyright (C) 2026 Furkan
+-->
+<schemalist>
+  <schema id="org.gnome.shell.extensions.superbar" path="/org/gnome/shell/extensions/superbar/">
+    <key name="toggle-shortcut" type="as">
+      <default><![CDATA[['<Alt>space']]]></default>
+      <summary>Toggle Superbar</summary>
+      <description>Shortcut to open and close Superbar.</description>
+    </key>
+    <key name="conflict-prompt-accel" type="s">
+      <default>''</default>
+      <summary>Shortcut Already Raised as Conflicting</summary>
+      <description>The toggle shortcut the conflict question was last asked about. Locking the screen disables the extension and unlocking enables it again, so without this the same question would be asked after every unlock.</description>
+    </key>
+    <key name="replaced-keybindings" type="s">
+      <default>''</default>
+      <summary>Replaced System Shortcuts</summary>
+      <description>Serialized record of the GNOME shortcuts that were cleared to free the Superbar shortcut, kept so they can be restored.</description>
+    </key>
+    <key name="clipboard-monitor-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Clipboard Monitoring</summary>
+      <description>Continuously monitor the clipboard to build history.</description>
+    </key>
+    <key name="clipboard-history-limit" type="i">
+      <default>50</default>
+      <range min="10" max="200"/>
+      <summary>Clipboard History Limit</summary>
+      <description>Maximum number of clipboard entries to remember.</description>
+    </key>
+    <key name="clipboard-history-clear-request" type="u">
+      <default>0</default>
+      <summary>Clipboard History Clear Request</summary>
+      <description>Internal counter used to clear clipboard history in the running extension.</description>
+    </key>
+    <key name="max-results" type="i">
+      <default>8</default>
+      <range min="3" max="20"/>
+      <summary>Maximum Search Results</summary>
+      <description>How many results to show in the search bar at once.</description>
+    </key>
+    <key name="default-search-engine" type="s">
+      <default>'google'</default>
+      <summary>Default Search Engine</summary>
+      <description>Search engine used to open web searches.</description>
+    </key>
+    <key name="applications-search-enabled" type="b">
+      <default>true</default>
+      <summary>Search Applications</summary>
+      <description>Include installed applications in generic searches.</description>
+    </key>
+    <key name="windows-search-enabled" type="b">
+      <default>true</default>
+      <summary>Search Open Windows</summary>
+      <description>Include matching open windows in generic searches.</description>
+    </key>
+    <key name="files-search-enabled" type="b">
+      <default>true</default>
+      <summary>Search Files and Folders</summary>
+      <description>Include common folders and indexed local files in generic searches.</description>
+    </key>
+    <key name="clipboard-search-enabled" type="b">
+      <default>true</default>
+      <summary>Search Clipboard History</summary>
+      <description>Enable clipboard history queries in Superbar.</description>
+    </key>
+    <key name="calculator-search-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Calculator Results</summary>
+      <description>Evaluate mathematical expressions in Superbar.</description>
+    </key>
+    <key name="weather-search-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Weather Results</summary>
+      <description>Enable Superbar weather queries through Open-Meteo.</description>
+    </key>
+    <key name="dictionary-search-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Dictionary Results</summary>
+      <description>Enable Superbar dictionary queries.</description>
+    </key>
+    <key name="currency-search-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Currency Results</summary>
+      <description>Enable Superbar currency conversion queries.</description>
+    </key>
+    <key name="web-search-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Web Search</summary>
+      <description>Include a web search fallback in generic searches.</description>
+    </key>
+    <key name="system-actions-search-enabled" type="b">
+      <default>true</default>
+      <summary>Search System Actions</summary>
+      <description>Enable prefixed system action queries.</description>
+    </key>
+    <key name="gnome-search-providers-enabled" type="b">
+      <default>true</default>
+      <summary>Use GNOME Search Providers</summary>
+      <description>Include results supplied by applications enabled in GNOME Search settings.</description>
+    </key>
+    <key name="adaptive-ranking-enabled" type="b">
+      <default>true</default>
+      <summary>Enable Adaptive Ranking</summary>
+      <description>Prioritize previously selected applications and system actions.</description>
+    </key>
+    <key name="ranking-history" type="s">
+      <default>'[]'</default>
+      <summary>Adaptive Ranking History</summary>
+      <description>Internal history of selected application identifiers and named system actions.</description>
+    </key>
+    <key name="bar-width" type="i">
+      <default>640</default>
+      <range min="400" max="1200"/>
+      <summary>Bar Width</summary>
+      <description>Width of the Superbar in pixels.</description>
+    </key>
+    <key name="bar-position" type="s">
+      <default>'center'</default>
+      <summary>Vertical Position</summary>
+      <description>Vertical position of the Superbar: top, center, or bottom.</description>
+    </key>
+    <key name="theme-mode" type="s">
+      <default>'system'</default>
+      <summary>Color Theme</summary>
+      <description>Color theme for Superbar: system, light, or dark.</description>
+    </key>
+    <key name="color-source" type="s">
+      <default>'superbar'</default>
+      <summary>Color Source</summary>
+      <description>Use Superbar's built-in palette or match the semantic colors used by GNOME applications.</description>
+    </key>
+    <key name="light-color-preset" type="s">
+      <default>'neutral'</default>
+      <summary>Light Background Color</summary>
+      <description>Named background color preset used when Superbar is in light mode.</description>
+    </key>
+    <key name="dark-color-preset" type="s">
+      <default>'neutral'</default>
+      <summary>Dark Background Color</summary>
+      <description>Named background color preset used when Superbar is in dark mode.</description>
+    </key>
+    <key name="background-opacity" type="i">
+      <default>90</default>
+      <range min="65" max="100"/>
+      <summary>Background Opacity</summary>
+      <description>Opacity percentage of the Superbar background surface.</description>
+    </key>
+  </schema>
+</schemalist>
