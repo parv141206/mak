@@ -27,6 +27,12 @@ export class SpotlightModule {
         }
     }
 
+    toggle() {
+        if (this._searchBar && typeof this._searchBar._toggleSearch === 'function') {
+            this._searchBar._toggleSearch();
+        }
+    }
+
     disable() {
         if (!this._searchBar) return;
         try {

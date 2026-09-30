@@ -115,17 +115,10 @@ export class UserSwitcherController {
   }
 
   _updateVisibility() {
-    const realUserCount = countRealUsers(this._userManager);
-    const shouldShow = realUserCount > 1;
-
-    if (shouldShow && !this._userSwitcher) {
+    if (!this._userSwitcher) {
       // Add button to panel
       this._userSwitcher = new UserSwitcherButton(this._extension);
-      Main.panel.addToStatusArea('KiwiUserSwitcher', this._userSwitcher, 1, 'right');
-    } else if (!shouldShow && this._userSwitcher) {
-      // Remove button from panel
-      this._userSwitcher.destroy();
-      this._userSwitcher = null;
+      Main.panel.addToStatusArea('MakUserSwitcher', this._userSwitcher, 8, 'right');
     }
   }
 }
@@ -134,7 +127,7 @@ export const UserSwitcherButton = GObject.registerClass(
   { GTypeName: 'MakUserSwitcherButton' },
   class UserSwitcherButton extends PanelMenu.Button {
     _init(extension) {
-      super._init(1.0, 'KiwiUserSwitcher');
+      super._init(1.0, 'MakUserSwitcher');
 
       this._extension = extension;
       this._menuSignals = [];
@@ -144,12 +137,21 @@ export const UserSwitcherButton = GObject.registerClass(
       this._cancellable = new Gio.Cancellable();
       this._isDestroyed = false;
       this._gettext = extension?.gettext?.bind(extension) ?? ((text) => text);
-      this._buttonIcon = new St.Icon({
-        icon_name: DEFAULT_BUTTON_ICON,
-        icon_size: 18,
-        style_class: 'kiwi-user-switcher-button',
+
+      this._container = new St.BoxLayout({
+        style_class: 'mak-user-switcher-container',
+        y_align: Clutter.ActorAlign.CENTER,
       });
-      this.add_child(this._buttonIcon);
+
+      this._nameLabel = new St.Label({
+        text: 'Ankur Thakur',
+        style_class: 'mak-user-switcher-label',
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      this._container.add_child(this._nameLabel);
+      this.add_child(this._container);
+      this.add_style_class_name('mak-user-switcher-button');
+      this._updatePanelIcon();
 
       if (this.menu?.actor) {
         this.menu.actor.add_style_class_name('kiwi-user-switcher-menu');
@@ -229,24 +231,20 @@ export const UserSwitcherButton = GObject.registerClass(
         return;
       }
 
-      if (!this._userManager.is_loaded) {
-        return;
-      }
-
       this.menu.removeAll();
 
       const currentUserName = GLib.get_user_name();
-      const users = this._collectVisibleUsers(currentUserName);
+      const users = this._userManager.is_loaded ? this._collectVisibleUsers(currentUserName) : [];
       const sessionInfo = await this._getSessionInfo();
       if (this._isDestroyed || !this.menu) {
         return;
       }
 
       if (users.length === 0) {
-        const placeholder = new PopupMenu.PopupMenuItem(this._gettext('No eligible user accounts found'));
-        placeholder.setSensitive(false);
-        placeholder.actor.add_style_class_name('kiwi-user-switcher-empty');
-        this.menu.addMenuItem(placeholder);
+        const displayName = this._nameLabel?.get_text() || 'Ankur Thakur';
+        const userItem = new PopupMenu.PopupMenuItem(displayName);
+        userItem.setSensitive(false);
+        this.menu.addMenuItem(userItem);
       } else {
         const gridSection = new PopupMenu.PopupMenuSection();
         
@@ -661,8 +659,21 @@ export const UserSwitcherButton = GObject.registerClass(
     }
 
     _updatePanelIcon(users, currentUserName) {
-      this._buttonIcon.gicon = null;
-      this._buttonIcon.icon_name = DEFAULT_BUTTON_ICON;
+      let displayName = 'Ankur Thakur';
+      const currentUser = users?.find?.((u) => u.get_user_name() === currentUserName);
+      if (currentUser) {
+        displayName = currentUser.get_real_name() || currentUser.get_user_name() || 'Ankur Thakur';
+      }
+      const settings = this._extension?.getSettings?.('org.gnome.shell.extensions.mak');
+      const customName = settings?.get_string?.('topbar-user-name');
+      if (customName && customName.trim().length > 0) {
+        displayName = customName.trim();
+      } else if (displayName === 'parv') {
+        displayName = 'Ankur Thakur';
+      }
+      if (this._nameLabel) {
+        this._nameLabel.set_text(displayName);
+      }
     }
   }
 );

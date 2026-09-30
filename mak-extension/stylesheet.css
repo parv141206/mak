@@ -143,6 +143,92 @@
     color: #1d1d1f !important;
 }
 
+/* Hide default GNOME Activities & Workspace Indicators completely */
+#panelActivities,
+.mak-panel #panelActivities,
+.mak-panel .workspace-indicator,
+.mak-panel .workspace-indicators,
+.mak-panel .workspace-pill,
+#panelActivities * {
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    visible: false !important;
+    border: none !important;
+}
+
+/* Hide any global app menus or Siri button */
+.mak-app-menu-button,
+.mak-panel .mak-app-menu-button,
+.mak-siri-button,
+.mak-panel .mak-siri-button,
+.mak-siri-icon {
+    width: 0 !important;
+    height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    visible: false !important;
+    border: none !important;
+}
+
+/* Fast User Switching Button */
+.mak-user-switcher-button {
+    margin: 2px 1px !important;
+    padding: 0 6px !important;
+    border-radius: 5px !important;
+}
+
+.mak-user-switcher-label {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #f2f2f5 !important;
+    padding: 0 2px !important;
+}
+
+.mak-panel.light-mode .mak-user-switcher-label {
+    color: #1d1d1f !important;
+}
+
+/* macOS Spotlight & Control Center Buttons */
+.mak-spotlight-button,
+.mak-control-center-button {
+    margin: 2px 1px !important;
+    padding: 0 4px !important;
+    border-radius: 5px !important;
+}
+
+/* Far-Right macOS Clock */
+.mak-clock-button {
+    margin: 2px 0 2px 1px !important;
+    padding: 0 8px 0 4px !important;
+    border-radius: 5px !important;
+}
+
+/* macOS Discrete Quick Settings Icons (clean without capsule background) */
+.mak-panel .quick-settings,
+.mak-panel #panelRight .quick-settings {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 4px !important;
+    margin: 2px 1px !important;
+    border-radius: 5px !important;
+}
+
+.mak-panel .quick-settings:hover,
+.mak-panel #panelRight .quick-settings:hover {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+.mak-panel.light-mode .quick-settings:hover,
+.mak-panel.light-mode #panelRight .quick-settings:hover {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+
 /* AquaDockPro — stylesheet.
  *
  * The pill background colour/radius/border is set inline from the cached config

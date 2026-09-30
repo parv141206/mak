@@ -606,6 +606,48 @@
       <description>Apply smooth macOS pill styling to status indicators.</description>
     </key>
 
+    <key type="b" name="topbar-user-switcher">
+      <default>true</default>
+      <summary>User Switcher</summary>
+      <description>Display user switcher name and menu in top bar.</description>
+    </key>
+
+    <key type="s" name="topbar-user-name">
+      <default>'Ankur Thakur'</default>
+      <summary>User Display Name</summary>
+      <description>Display name shown for user switcher in top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-spotlight-button">
+      <default>true</default>
+      <summary>Spotlight Search Button</summary>
+      <description>Show Spotlight magnifying glass search button in top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-control-center">
+      <default>true</default>
+      <summary>Control Center Button</summary>
+      <description>Show macOS dual-slider Control Center toggle button in top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-siri-button">
+      <default>false</default>
+      <summary>Siri Orb Button</summary>
+      <description>Show Siri swirl orb button in top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-clock-right">
+      <default>true</default>
+      <summary>Clock on Far Right</summary>
+      <description>Place clock and notification center at the far right of the top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-global-menu">
+      <default>false</default>
+      <summary>Global App Menus</summary>
+      <description>Display macOS File, Edit, View, Window, Help menus next to App Name.</description>
+    </key>
+
 
     <!-- ═════════════════════════════════════════════════════════════════════
          3. SPOTLIGHT SEARCH SETTINGS
