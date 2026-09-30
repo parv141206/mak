@@ -11,6 +11,8 @@ THEMES = {
         "name": "macOS Dark (Graphite)",
         "theme_name": ">>>Mac-Dark-solid-purple",
         "color_scheme": "prefer-dark",
+        "icon_theme": "MacTahoe-purple-dark",
+        "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "dock_pill_color": "rgba(42, 42, 50, 0.40)",
         "dock_border_color": "rgba(255, 255, 255, 0.28)",
@@ -22,6 +24,8 @@ THEMES = {
         "name": "macOS AMOLED Dark (Deep Midnight)",
         "theme_name": ">>>Mac-Dark-Amoled-purple",
         "color_scheme": "prefer-dark",
+        "icon_theme": "MacTahoe-purple-dark",
+        "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "dock_pill_color": "rgba(10, 10, 12, 0.60)",
         "dock_border_color": "rgba(255, 255, 255, 0.16)",
@@ -33,6 +37,8 @@ THEMES = {
         "name": "macOS Light (Crisp Apple)",
         "theme_name": ">>>Mac-Light-solid-purple",
         "color_scheme": "prefer-light",
+        "icon_theme": "MacTahoe-purple-light",
+        "cursor_theme": "MacTahoe-light",
         "is_dark": False,
         "dock_pill_color": "rgba(255, 255, 255, 0.42)",
         "dock_border_color": "rgba(255, 255, 255, 0.65)",
@@ -59,6 +65,7 @@ GRAPHITE_PALETTE_OVERRIDE = """
 @define-color dialog_fg_color #dadada;
 @define-color popover_bg_color #303032;
 @define-color popover_fg_color #dadada;
+@define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
 AMOLED_PALETTE_OVERRIDE = """
@@ -79,16 +86,38 @@ AMOLED_PALETTE_OVERRIDE = """
 @define-color dialog_fg_color #dadada;
 @define-color popover_bg_color #0d0d0f;
 @define-color popover_fg_color #dadada;
+@define-color placeholder_text_color rgba(255, 255, 255, 0.45);
+"""
+
+LIGHT_PALETTE_OVERRIDE = """
+/* ── Mak macOS Crisp Apple Light Palette ─────────────────────────────────── */
+@define-color window_bg_color #f5f5f7;
+@define-color window_fg_color #1d1d1f;
+@define-color view_bg_color #ffffff;
+@define-color view_fg_color #1d1d1f;
+@define-color headerbar_bg_color #ebebef;
+@define-color headerbar_fg_color #1d1d1f;
+@define-color headerbar_border_color rgba(0, 0, 0, 0.12);
+@define-color sidebar_bg_color #e8e8ed;
+@define-color sidebar_fg_color #1d1d1f;
+@define-color secondary_sidebar_bg_color #e2e2e7;
+@define-color card_bg_color #ffffff;
+@define-color card_fg_color #1d1d1f;
+@define-color dialog_bg_color #f5f5f7;
+@define-color dialog_fg_color #1d1d1f;
+@define-color popover_bg_color #ffffff;
+@define-color popover_fg_color #1d1d1f;
+@define-color placeholder_text_color rgba(0, 0, 0, 0.45);
 """
 
 TRAFFIC_LIGHTS_OVERRIDE = """
 /* ── Mak Clean macOS Traffic Light Button Controls ────────────────────────── */
 windowcontrols,
 headerbar windowcontrols {
-    border: none !important;
-    background: none !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
+    border: none;
+    background: none;
+    background-color: transparent;
+    box-shadow: none;
 }
 
 windowcontrols button,
@@ -96,7 +125,6 @@ windowcontrols button:hover,
 windowcontrols button:active,
 windowcontrols button:checked,
 windowcontrols button:focus,
-windowcontrols button:hover:not(:active),
 headerbar button.titlebutton,
 headerbar button.titlebutton:hover,
 headerbar button.titlebutton:active,
@@ -105,20 +133,16 @@ headerbar windowcontrols button,
 headerbar windowcontrols button:hover,
 headerbar windowcontrols button:active,
 headerbar windowcontrols button:focus {
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    outline: none !important;
-    min-width: 14px !important;
-    min-height: 14px !important;
-    width: 14px !important;
-    height: 14px !important;
-    max-width: 14px !important;
-    max-height: 14px !important;
-    padding: 0 !important;
-    margin: 0 3px !important;
-    border-radius: 50% !important;
-    -gtk-icon-shadow: none !important;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    outline-style: none;
+    min-width: 14px;
+    min-height: 14px;
+    padding: 0;
+    margin: 0 3px;
+    border-radius: 9999px;
+    -gtk-icon-shadow: none;
 }
 """
 
@@ -160,6 +184,8 @@ def apply_global_theme(theme_key):
     theme_info = THEMES[theme_key]
     theme_name = theme_info["theme_name"]
     color_scheme = theme_info["color_scheme"]
+    icon_theme = theme_info.get("icon_theme", "MacTahoe-purple-dark")
+    cursor_theme = theme_info.get("cursor_theme", "MacTahoe-dark")
     is_dark = theme_info["is_dark"]
     source_dir = os.path.join(THEMES_DIR, theme_name)
 
@@ -169,7 +195,9 @@ def apply_global_theme(theme_key):
     try:
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "gtk-theme", theme_name], check=True)
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", color_scheme], check=True)
-        log.append(f"Set GNOME interface gtk-theme to '{theme_name}' and color-scheme to '{color_scheme}'.")
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", icon_theme], check=True)
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "cursor-theme", cursor_theme], check=True)
+        log.append(f"Set GNOME interface gtk-theme to '{theme_name}', color-scheme to '{color_scheme}', icon-theme to '{icon_theme}', and cursor to '{cursor_theme}'.")
     except Exception as e:
         log.append(f"Error setting GNOME interface: {e}")
 
@@ -184,7 +212,9 @@ def apply_global_theme(theme_key):
     try:
         os.makedirs(GTK4_CONFIG, exist_ok=True)
         src_gtk4 = os.path.join(source_dir, "gtk-4.0")
-        palette_override = GRAPHITE_PALETTE_OVERRIDE if theme_key == "dark" else (AMOLED_PALETTE_OVERRIDE if theme_key == "amoled" else "")
+        palette_override = GRAPHITE_PALETTE_OVERRIDE if theme_key == "dark" else (
+            AMOLED_PALETTE_OVERRIDE if theme_key == "amoled" else LIGHT_PALETTE_OVERRIDE
+        )
 
         if os.path.exists(src_gtk4):
             # Copy gtk.css and gtk-dark.css, appending clean traffic light overrides and exact palette
@@ -210,7 +240,13 @@ def apply_global_theme(theme_key):
             # settings.ini
             gtk4_ini = os.path.join(GTK4_CONFIG, "settings.ini")
             with open(gtk4_ini, "w", encoding="utf-8") as f:
-                f.write(f"[Settings]\ngtk-application-prefer-dark-theme={1 if is_dark else 0}\ngtk-theme-name={theme_name}\n")
+                f.write(
+                    f"[Settings]\n"
+                    f"gtk-application-prefer-dark-theme={1 if is_dark else 0}\n"
+                    f"gtk-theme-name={theme_name}\n"
+                    f"gtk-icon-theme-name={icon_theme}\n"
+                    f"gtk-cursor-theme-name={cursor_theme}\n"
+                )
 
             log.append("Synchronized GTK 4 / Libadwaita configuration and assets.")
     except Exception as e:
@@ -221,13 +257,14 @@ def apply_global_theme(theme_key):
         os.makedirs(GTK3_CONFIG, exist_ok=True)
         src_gtk3 = os.path.join(source_dir, "gtk-3.0")
         if os.path.exists(src_gtk3):
-            src_css = os.path.join(src_gtk3, "gtk.css")
-            dst_css = os.path.join(GTK3_CONFIG, "gtk.css")
-            if os.path.exists(src_css):
-                shutil.copyfile(src_css, dst_css)
-                with open(dst_css, "a", encoding="utf-8") as f:
-                    f.write(palette_override)
-                    f.write(TRAFFIC_LIGHTS_OVERRIDE)
+            for css_file in ["gtk.css", "gtk-dark.css"]:
+                src_css = os.path.join(src_gtk3, css_file)
+                dst_css = os.path.join(GTK3_CONFIG, css_file)
+                if os.path.exists(src_css):
+                    shutil.copyfile(src_css, dst_css)
+                    with open(dst_css, "a", encoding="utf-8") as f:
+                        f.write(palette_override)
+                        f.write(TRAFFIC_LIGHTS_OVERRIDE)
 
             # Update symlinks for assets and windows-assets for GTK 3
             for asset_folder in ["assets", "windows-assets"]:
@@ -249,6 +286,8 @@ def apply_global_theme(theme_key):
         new_lines = []
         has_theme = False
         has_dark = False
+        has_icon = False
+        has_cursor = False
         for line in lines:
             if line.startswith("gtk-theme-name="):
                 new_lines.append(f"gtk-theme-name={theme_name}\n")
@@ -256,6 +295,12 @@ def apply_global_theme(theme_key):
             elif line.startswith("gtk-application-prefer-dark-theme="):
                 new_lines.append(f"gtk-application-prefer-dark-theme={1 if is_dark else 0}\n")
                 has_dark = True
+            elif line.startswith("gtk-icon-theme-name="):
+                new_lines.append(f"gtk-icon-theme-name={icon_theme}\n")
+                has_icon = True
+            elif line.startswith("gtk-cursor-theme-name="):
+                new_lines.append(f"gtk-cursor-theme-name={cursor_theme}\n")
+                has_cursor = True
             else:
                 new_lines.append(line)
 
@@ -263,11 +308,15 @@ def apply_global_theme(theme_key):
             new_lines.append(f"gtk-theme-name={theme_name}\n")
         if not has_dark:
             new_lines.append(f"gtk-application-prefer-dark-theme={1 if is_dark else 0}\n")
+        if not has_icon:
+            new_lines.append(f"gtk-icon-theme-name={icon_theme}\n")
+        if not has_cursor:
+            new_lines.append(f"gtk-cursor-theme-name={cursor_theme}\n")
 
         with open(gtk3_ini, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
 
-        log.append("Synchronized GTK 3 settings.ini and stylesheet.")
+        log.append("Synchronized GTK 3 settings.ini and stylesheets.")
     except Exception as e:
         log.append(f"Error syncing GTK 3: {e}")
 
@@ -283,6 +332,16 @@ def apply_global_theme(theme_key):
             gtk2_content = re.sub(r'gtk-theme-name\s*=\s*".*?"', f'gtk-theme-name="{theme_name}"', gtk2_content)
         else:
             gtk2_content = f'gtk-theme-name="{theme_name}"\n' + gtk2_content
+
+        if re.search(r'gtk-icon-theme-name\s*=\s*".*?"', gtk2_content):
+            gtk2_content = re.sub(r'gtk-icon-theme-name\s*=\s*".*?"', f'gtk-icon-theme-name="{icon_theme}"', gtk2_content)
+        else:
+            gtk2_content += f'\ngtk-icon-theme-name="{icon_theme}"\n'
+
+        if re.search(r'gtk-cursor-theme-name\s*=\s*".*?"', gtk2_content):
+            gtk2_content = re.sub(r'gtk-cursor-theme-name\s*=\s*".*?"', f'gtk-cursor-theme-name="{cursor_theme}"', gtk2_content)
+        else:
+            gtk2_content += f'\ngtk-cursor-theme-name="{cursor_theme}"\n'
 
         with open(GTK2_RC, "w", encoding="utf-8") as f:
             f.write(gtk2_content)

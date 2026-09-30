@@ -2,6 +2,7 @@
 // Mak Top Bar Module: Apple Menu, Active App Title, Media Pill, Bluetooth Battery, and Glass Panel Styling
 
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -54,12 +55,14 @@ export class TopBarModule {
     constructor(extension) {
         this._extension = extension;
         this._settings = extension.getSettings('org.gnome.shell.extensions.mak');
+        this._interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
         this._appleMenu = null;
         this._appTitle = null;
         this._btBattery = null;
         this._musicController = null;
         this._panelBlurEffect = null;
         this._settingsChangedId = 0;
+        this._interfaceChangedId = 0;
     }
 
     enable() {
@@ -110,6 +113,12 @@ export class TopBarModule {
                 if (this._settings.get_boolean('topbar-blur')) this._applyPanelBlur();
                 else this._removePanelBlur();
             } else if (key === 'topbar-transparency' || key === 'global-opacity') {
+                this._applyPanelTransparency();
+            }
+        });
+
+        this._interfaceChangedId = this._interfaceSettings.connect('changed', (s, key) => {
+            if (key === 'gtk-theme' || key === 'color-scheme') {
                 this._applyPanelTransparency();
             }
         });
@@ -205,15 +214,26 @@ export class TopBarModule {
         // Read transparency from settings.
         // global-opacity acts as a master override when it differs from the default (0.5);
         // otherwise topbar-transparency is used.
-        // When blur is active BMS adds 'transparent-panel' class which makes the
-        // actual blurred surface show — the inline style provides the tint colour on top.
         try {
             let alpha = this._settings.get_double('topbar-transparency');
-            // Parse the panel colour from the stylesheet and apply alpha override
-            // Base colour: rgba(22, 22, 28, <alpha>)
-            const r = 22, g = 22, b = 28;
-            const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)});`;
-            Main.panel.set_style(style);
+            const colorScheme = this._interfaceSettings ? this._interfaceSettings.get_string('color-scheme') : '';
+            const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
+            const isLight = (colorScheme === 'prefer-light') || gtkTheme.toLowerCase().includes('light');
+            const isAmoled = gtkTheme.toLowerCase().includes('amoled');
+
+            if (isLight) {
+                Main.panel.add_style_class_name('light-mode');
+                const r = 255, g = 255, b = 255;
+                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)});`;
+                Main.panel.set_style(style);
+            } else {
+                Main.panel.remove_style_class_name('light-mode');
+                const r = isAmoled ? 0 : 22;
+                const g = isAmoled ? 0 : 22;
+                const b = isAmoled ? 0 : 28;
+                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)});`;
+                Main.panel.set_style(style);
+            }
         } catch (e) {
             console.warn('[Mak TopBar] Could not apply panel transparency:', e.message);
         }
@@ -229,9 +249,16 @@ export class TopBarModule {
             this._settingsChangedId = 0;
         }
 
+        if (this._interfaceChangedId) {
+            try { this._interfaceSettings.disconnect(this._interfaceChangedId); } catch (e) {}
+            this._interfaceChangedId = 0;
+        }
+        this._interfaceSettings = null;
+
         this._removePanelBlur();
         this._removePanelTransparency();
         Main.panel.remove_style_class_name('mak-panel');
+        Main.panel.remove_style_class_name('light-mode');
 
         this._disableMediaPill();
         this._disableBluetoothBattery();

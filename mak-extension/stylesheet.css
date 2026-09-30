@@ -98,6 +98,51 @@
     color: #f2f2f7 !important;
 }
 
+/* ── macOS Light Mode Top Bar Styling ─────────────────────────────────────── */
+#panel.mak-panel.light-mode,
+.mak-panel.light-mode {
+    background-color: rgba(255, 255, 255, 0.42) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+#panel.mak-panel.light-mode.transparent-panel,
+.mak-panel.light-mode.transparent-panel {
+    background-color: transparent !important;
+    border-bottom-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+.mak-panel.light-mode .mak-app-title-label {
+    color: #1d1d1f !important;
+}
+
+.mak-panel.light-mode .menu-button {
+    color: #1d1d1f !important;
+}
+
+.mak-panel.light-mode .panel-button {
+    color: #1d1d1f !important;
+}
+
+.mak-panel.light-mode .panel-button:hover {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    color: #000000 !important;
+}
+
+.mak-panel.light-mode .panel-button:active,
+.mak-panel.light-mode .panel-button:checked {
+    background-color: rgba(0, 0, 0, 0.15) !important;
+    color: #000000 !important;
+}
+
+.mak-panel.light-mode .clock-display {
+    color: #1d1d1f !important;
+}
+
+.mak-panel.light-mode .system-status-icon {
+    color: #1d1d1f !important;
+}
+
 /* AquaDockPro — stylesheet.
  *
  * The pill background colour/radius/border is set inline from the cached config
