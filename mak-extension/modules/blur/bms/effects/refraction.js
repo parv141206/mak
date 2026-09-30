@@ -239,6 +239,7 @@ const RefractionEffectClass = utils.IS_IN_PREFERENCES ? null : class RefractionE
                 webcam_gloss: _webcam_gloss,
                 webcam_device: _webcam_device,
                 tint_color: _tint_color,
+                clip: _clip_init,
                 ...parent_params
             } = params;
             super({ ...parent_params });
