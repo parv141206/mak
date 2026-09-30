@@ -59,6 +59,9 @@ function computeConfig(s, mak = null) {
     const pillColor = mak ? mak.get_string('pill-color') : s.get_string('pill-color');
     const borderColor = mak ? mak.get_string('border-color') : s.get_string('border-color');
     const borderWidth = mak ? mak.get_int('border-width') : s.get_int('border-width');
+    const liquidGlass = mak ? mak.get_boolean('blur-liquid-glass') : false;
+    const refractionStrength = mak ? mak.get_double('blur-refraction-strength') : 0.42;
+    const chromaticDispersion = mak ? mak.get_double('blur-chromatic-dispersion') : 0.08;
 
     return {
         // ── Sizing / geometry ──
@@ -96,6 +99,9 @@ function computeConfig(s, mak = null) {
         pillColor,
         borderColor,
         borderWidth,
+        liquidGlass,
+        refractionStrength,
+        chromaticDispersion,
 
         // ── Sections / behaviour ──
         showApps: s.get_boolean('show-apps-button'),
@@ -273,6 +279,15 @@ export class SettingsManager {
             this._config.position = this._makSettings.get_string('dock-position');
             this._pendingKeys.add('dock-position');
             this._pendingStructural = true;
+        } else if (key === 'blur-liquid-glass') {
+            this._config.liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
+            this._pendingKeys.add('blur-liquid-glass');
+        } else if (key === 'blur-refraction-strength') {
+            this._config.refractionStrength = this._makSettings.get_double('blur-refraction-strength');
+            this._pendingKeys.add('blur-refraction-strength');
+        } else if (key === 'blur-chromatic-dispersion') {
+            this._config.chromaticDispersion = this._makSettings.get_double('blur-chromatic-dispersion');
+            this._pendingKeys.add('blur-chromatic-dispersion');
         } else {
             return;
         }
