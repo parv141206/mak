@@ -58,21 +58,20 @@ export class GlassBlurPipeline {
         try {
             if (this._isDynamic) {
                 // ── 1. DYNAMIC BLUR (gnome-rounded-blur available) ──
+                // Apply blur effect DIRECTLY to the pill actor (_bg).
+                // BlurMode.BACKGROUND blurs compositor content behind the actor;
+                // the actor's own semi-transparent CSS background-color tints on top.
+                // Avoids the z-order bug where a separate blur widget (index 0)
+                // was fully occluded by _bg (index 1) with its solid background.
                 console.log('[Mak GlassBlur] Using dynamic stage blur with native corner radius:', this._cornerRadius);
-                this._blurActor = new St.Widget({
-                    name: 'aqua-dock-blurred-widget',
-                    reactive: false,
-                    style: 'background-color: rgba(255, 255, 255, 0.001);',
-                });
-                // Insert directly into the container at index 0 (behind dock pill bg and items)
-                this._container.insert_child_at_index(this._blurActor, 0);
-
                 this._blurEffect = new NativeDynamicBlurEffect({
                     unscaled_radius: this._radius,
                     brightness: this._brightness,
                     unscaled_corner_radius: this._cornerRadius,
                 });
-                this._blurActor.add_effect(this._blurEffect);
+                this._actor.add_effect(this._blurEffect);
+                // _blurActor kept null — effect is on _actor which is owned externally
+                this._blurActor = null;
             } else {
                 // ── 2. ZERO-KORNERS STATIC BLUR (wallpaper blit + corner.glsl) ──
                 console.log('[Mak GlassBlur] Using zero-korner static wallpaper blur pipeline.');
@@ -182,6 +181,15 @@ export class GlassBlurPipeline {
     }
 
     _syncVisibility() {
+        if (this._isDynamic) {
+            // In dynamic mode the blur effect is on _actor, which the dock manages.
+            // Just toggle effect enabled state to match.
+            if (this._blurEffect) {
+                const on = Boolean((this._enabled ?? true) && this._actor?.visible);
+                this._blurEffect.enabled = on;
+            }
+            return;
+        }
         const targetActor = this._blurActor || this._bgGroup;
         if (!targetActor || !this._actor) return;
         const visible = Boolean((this._enabled ?? true) && this._actor.visible && (this._container ? this._container.visible : true));
@@ -213,7 +221,9 @@ export class GlassBlurPipeline {
     }
 
     syncClip(overrideW = null, overrideH = null, overrideX = null, overrideY = null) {
-        if (!this._blurActor || !this._container || !this._actor) return;
+        if (!this._container || !this._actor) return;
+        // Static mode also needs _blurActor; early-out only if static and no blurActor
+        if (!this._isDynamic && !this._blurActor) return;
 
         const stage = this._container.get_stage();
         if (!stage || !this._container.has_allocation()) {
@@ -237,9 +247,8 @@ export class GlassBlurPipeline {
         }
 
         if (this._isDynamic) {
-            // Dynamic blur actor directly matches pill rect
-            this._blurActor.set_position(pillX, pillY);
-            this._blurActor.set_size(pillW, pillH);
+            // Blur effect is applied directly to _actor — no separate actor to position.
+            // Just ensure effect parameters are current.
             if (this._blurEffect) {
                 this._blurEffect.unscaled_corner_radius = this._cornerRadius;
                 this._blurEffect.unscaled_radius = this._radius;
@@ -335,23 +344,34 @@ export class GlassBlurPipeline {
             this._bgManager = null;
         }
 
-        if (this._blurEffect && this._blurActor) {
-            try { this._blurActor.remove_effect(this._blurEffect); } catch (e) {}
+        if (this._isDynamic) {
+            // Dynamic: effect was applied directly to _actor — just remove it.
+            // Do NOT destroy _actor; it is _bg, owned by the dock.
+            if (this._blurEffect && this._actor) {
+                try { this._actor.remove_effect(this._blurEffect); } catch (e) {}
+            }
             this._blurEffect = null;
-        }
-        if (this._cornerEffect && this._blurActor) {
-            try { this._blurActor.remove_effect(this._cornerEffect); } catch (e) {}
-            this._cornerEffect = null;
-        }
-
-        if (this._blurActor) {
-            try {
-                if (this._container && this._container.contains(this._blurActor)) {
-                    this._container.remove_child(this._blurActor);
-                }
-                this._blurActor.destroy();
-            } catch (e) {}
             this._blurActor = null;
+        } else {
+            // Static: effects are on a separate _blurActor widget we created.
+            if (this._blurEffect && this._blurActor) {
+                try { this._blurActor.remove_effect(this._blurEffect); } catch (e) {}
+                this._blurEffect = null;
+            }
+            if (this._cornerEffect && this._blurActor) {
+                try { this._blurActor.remove_effect(this._cornerEffect); } catch (e) {}
+                this._cornerEffect = null;
+            }
+
+            if (this._blurActor) {
+                try {
+                    if (this._container && this._container.contains(this._blurActor)) {
+                        this._container.remove_child(this._blurActor);
+                    }
+                    this._blurActor.destroy();
+                } catch (e) {}
+                this._blurActor = null;
+            }
         }
 
         if (this._bgGroup) {

@@ -180,21 +180,16 @@ export class TopBarModule {
     }
 
     _applyPanelBlur() {
-        if (this._panelBlurEffect || Main.panel.get_effects().some(e => e instanceof Shell.BlurEffect)) return;
-        try {
-            const radius = this._settings.get_int('topbar-blur-radius') || 28;
-            this._panelBlurEffect = new Shell.BlurEffect({
-                mode: Shell.BlurMode.BACKGROUND,
-                radius: radius,
-                brightness: 0.85,
-            });
-            Main.panel.add_effect(this._panelBlurEffect);
-        } catch (err) {
-            console.warn('[Mak TopBar] Could not apply panel blur:', err);
-        }
+        // Panel blur is handled entirely by Blur-My-Shell (BlurModule) which uses
+        // gnome-rounded-blur's dynamic background blur via DummyPipeline.
+        // We do NOT add a second Shell.BlurEffect here — stacking two blur effects
+        // causes double-blur, wrong brightness, and z-order artifacts.
+        // BMS reads topbar-blur and blur-panel from mak settings and enables/disables
+        // its own panel blur accordingly.
     }
 
     _removePanelBlur() {
+        // Clean up any previously added direct effect (from older extension versions)
         if (this._panelBlurEffect) {
             try { Main.panel.remove_effect(this._panelBlurEffect); } catch (e) {}
             this._panelBlurEffect = null;

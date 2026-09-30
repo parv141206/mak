@@ -27,6 +27,16 @@
     transition: background-color 200ms ease;
 }
 
+/* When Blur-My-Shell applies transparent-panel, allow the blur to show through.
+   Double-class selector (.mak-panel.transparent-panel) has higher specificity (120)
+   than single-class (.mak-panel = 110), so it wins the !important cascade. */
+#panel.mak-panel.transparent-panel,
+.mak-panel.transparent-panel {
+    background-color: transparent !important;
+    border-bottom-color: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: none !important;
+}
+
 #panel.mak-panel:overview,
 .mak-panel:overview {
     background-color: transparent !important;
