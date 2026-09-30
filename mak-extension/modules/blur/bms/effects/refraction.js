@@ -221,16 +221,6 @@ const REFRACTION_EFFECT_META = {
                 0.0, Number.MAX_SAFE_INTEGER,
                 0.0,
             ),
-            // See corner.js: this is backed by an array setter, but represented
-            // as a dummy property so pipeline parameter assignment can reach it.
-            'clip': GObject.ParamSpec.double(
-                `clip`,
-                `Clip`,
-                `Clip`,
-                GObject.ParamFlags.READWRITE,
-                0.0, Number.MAX_SAFE_INTEGER,
-                0.0,
-            ),
             'opacity_factor': GObject.ParamSpec.double(
                 `opacity_factor`,
                 `Opacity factor`,

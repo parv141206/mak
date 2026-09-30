@@ -176,6 +176,7 @@ export class DockChrome {
         const clipY = monitor.y - container.y;
         const clipW = monitor.width;
         const clipH = monitor.height;
+        if (isNaN(clipX) || isNaN(clipY) || isNaN(clipW) || isNaN(clipH)) return;
         const clipKey = `${clipX}:${clipY}:${clipW}:${clipH}`;
         if (clipKey === this._containerClipCache) return;
         container.set_clip(clipX, clipY, clipW, clipH);
@@ -240,10 +241,12 @@ export class DockChrome {
         const clip = handle.clip;
         const clipKey = clip ? `${clip.x}:${clip.y}:${clip.w}:${clip.h}` : '';
         if (clipKey === this._handleClipCache) return;
-        if (clip)
-            this._autohideHandle.set_clip(clip.x, clip.y, clip.w, clip.h);
-        else
+        if (clip) {
+            if (!isNaN(clip.x) && !isNaN(clip.y) && !isNaN(clip.w) && !isNaN(clip.h))
+                this._autohideHandle.set_clip(clip.x, clip.y, clip.w, clip.h);
+        } else {
             this._autohideHandle.remove_clip();
+        }
         this._handleClipCache = clipKey;
     }
 

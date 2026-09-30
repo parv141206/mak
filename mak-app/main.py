@@ -16,9 +16,11 @@ from settings_bridge import MakSettingsBridge
 import theme_manager
 
 def create_spin_row(title, subtitle, lower, upper, step, val, digits=0, on_change=None):
-    """Creates a bulletproof Adw.SpinRow with proper digits, step, page increment, and snapping."""
+    """Creates a smooth, reliable Adw.SpinRow with proper digits, step, page increment, and instant updates."""
+    clean_val = round(float(val), digits) if digits > 0 else float(int(round(float(val))))
+    clean_val = max(float(lower), min(float(upper), clean_val))
     adj = Gtk.Adjustment(
-        value=float(val),
+        value=clean_val,
         lower=float(lower),
         upper=float(upper),
         step_increment=float(step),
@@ -28,13 +30,17 @@ def create_spin_row(title, subtitle, lower, upper, step, val, digits=0, on_chang
     row = Adw.SpinRow(title=title, subtitle=subtitle, adjustment=adj)
     row.set_digits(digits)
     row.set_numeric(True)
-    row.set_snap_to_ticks(True)
-    row.set_value(float(val))
+    row.set_snap_to_ticks(False)
+    row.set_update_policy(Gtk.SpinButtonUpdatePolicy.ALWAYS)
+    row.set_value(clean_val)
     if on_change:
-        if digits == 0:
-            row.connect("notify::value", lambda r, p: on_change(int(round(r.get_value()))))
-        else:
-            row.connect("notify::value", lambda r, p: on_change(round(r.get_value(), digits)))
+        def _on_val_changed(r, _pspec):
+            v = r.get_value()
+            if digits == 0:
+                on_change(int(round(v)))
+            else:
+                on_change(round(v, digits))
+        row.connect("notify::value", _on_val_changed)
     return row
 
 class MakAppWindow(Adw.ApplicationWindow):
