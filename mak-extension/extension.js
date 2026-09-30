@@ -9,6 +9,7 @@ import { SpotlightModule } from './modules/spotlight/spotlightModule.js';
 import { WindowGapModule } from './modules/window-gaps/gapModule.js';
 import { WindowCornersModule } from './modules/window-corners/cornersModule.js';
 import { BlurModule } from './modules/blur/blurModule.js';
+import { MenuStyleController } from './modules/appearance/menuStyleController.js';
 
 export default class MakExtension extends Extension {
     enable() {
@@ -21,10 +22,14 @@ export default class MakExtension extends Extension {
         this._windowGaps = new WindowGapModule(this);
         this._windowCorners = new WindowCornersModule(this);
         this._blur = new BlurModule(this);
+        this._menuStyle = new MenuStyleController(this);
 
         this._settingsChangedId = this._settings.connect('changed', (settings, key) => {
             this._onSettingChanged(key);
         });
+
+        // Always enable unified menu & shell appearance
+        this._menuStyle.enable();
 
         // Enable configured features
         if (this._settings.get_boolean('dock-enabled')) {
@@ -95,6 +100,7 @@ export default class MakExtension extends Extension {
         try { this._windowGaps?.disable(); } catch (e) {}
         try { this._windowCorners?.disable(); } catch (e) {}
         try { this._blur?.disable(); } catch (e) {}
+        try { this._menuStyle?.disable(); } catch (e) {}
 
         this._dock = null;
         this._topbar = null;
@@ -102,6 +108,7 @@ export default class MakExtension extends Extension {
         this._windowGaps = null;
         this._windowCorners = null;
         this._blur = null;
+        this._menuStyle = null;
         this._settings = null;
 
         console.log('[Mak] Unified macOS Experience Suite Disabled.');
