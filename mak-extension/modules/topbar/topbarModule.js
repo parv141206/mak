@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Mak Top Bar Module: Apple Menu, Active App Title, Media Pill, Bluetooth Battery, and Glass Panel Styling
+// Mak Top Bar Module: Authentic macOS Menu Bar Experience
+// Apple Menu, Bold App Title, Media Pill, User Switcher, Status Extras, Spotlight, Control Center, Far-Right Clock
 
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import St from 'gi://St';
@@ -12,6 +14,7 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import { KiwiMenu } from './kiwimenu.js';
 import { BluetoothBatteryButton } from './bluetoothBattery.js';
 import { MusicController } from './dynamic-music-pill/controller.js';
+import { UserSwitcherController } from './userSwitcher.js';
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: 'MakAppTitleButton' },
@@ -51,6 +54,68 @@ const AppTitleButton = GObject.registerClass(
     }
 );
 
+const SpotlightButton = GObject.registerClass(
+    { GTypeName: 'MakSpotlightButton' },
+    class SpotlightButton extends PanelMenu.Button {
+        _init(extension) {
+            super._init(0.5, 'MakSpotlight', false);
+            this._extension = extension;
+            this.add_style_class_name('mak-spotlight-button');
+
+            const icon = new St.Icon({
+                icon_name: 'edit-find-symbolic',
+                style_class: 'system-status-icon',
+                y_align: Clutter.ActorAlign.CENTER,
+            });
+            this.add_child(icon);
+
+            const toggle = () => {
+                if (this._extension._spotlight) {
+                    this._extension._spotlight.toggle();
+                } else {
+                    Main.overview.show();
+                }
+            };
+
+            this.connect('clicked', () => toggle());
+            this.connect('button-press-event', () => {
+                toggle();
+                return Clutter.EVENT_STOP;
+            });
+        }
+    }
+);
+
+const ControlCenterButton = GObject.registerClass(
+    { GTypeName: 'MakControlCenterButton' },
+    class ControlCenterButton extends PanelMenu.Button {
+        _init(extension) {
+            super._init(0.5, 'MakControlCenter', false);
+            this._extension = extension;
+            this.add_style_class_name('mak-control-center-button');
+
+            const iconPath = extension.path + '/icons/control-center-symbolic.svg';
+            const gicon = Gio.icon_new_for_string(iconPath);
+            const icon = new St.Icon({
+                gicon: gicon,
+                style_class: 'system-status-icon',
+                y_align: Clutter.ActorAlign.CENTER,
+            });
+            this.add_child(icon);
+
+            const toggle = () => {
+                Main.panel.statusArea.quickSettings?.menu?.toggle();
+            };
+
+            this.connect('clicked', () => toggle());
+            this.connect('button-press-event', () => {
+                toggle();
+                return Clutter.EVENT_STOP;
+            });
+        }
+    }
+);
+
 export class TopBarModule {
     constructor(extension) {
         this._extension = extension;
@@ -58,44 +123,80 @@ export class TopBarModule {
         this._interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
         this._appleMenu = null;
         this._appTitle = null;
+        this._userSwitcher = null;
         this._btBattery = null;
         this._musicController = null;
+        this._spotlightBtn = null;
+        this._controlCenterBtn = null;
         this._panelBlurEffect = null;
+        this._clockMoved = false;
+        this._origBannerAlignment = null;
+        this._activitiesHidden = false;
+        this._rightBoxActorAddedId = 0;
+        this._reorderTimeoutId = 0;
         this._settingsChangedId = 0;
         this._interfaceChangedId = 0;
     }
 
     enable() {
-        // 1. Add Apple Menu
+        // 1. Hide default GNOME Activities / Workspace Indicator
+        this._hideActivities(true);
+
+        // 2. Add Apple Menu
         if (this._settings.get_boolean('topbar-apple-menu')) {
             this._enableAppleMenu();
         }
 
-        // 2. Add Active App Title
+        // 3. Add Active App Title in bold
         if (this._settings.get_boolean('topbar-app-title')) {
             this._enableAppTitle();
         }
 
-        // 3. Add Bluetooth Battery Indicator
-        if (this._settings.get_boolean('topbar-bluetooth-battery')) {
-            this._enableBluetoothBattery();
-        }
-
-        // 4. Add Dynamic Media Pill
+        // 4. Dynamic Media Pill in Center
         if (this._settings.get_boolean('topbar-media-pill')) {
             this._enableMediaPill();
         }
 
-        // 5. Apply Glass Blur & Styling to Top Bar
+        // 5. User Switcher Button ("Ankur Thakur")
+        if (this._settings.get_boolean('topbar-user-switcher')) {
+            this._enableUserSwitcher();
+        }
+
+        // 6. Bluetooth Battery Indicator
+        if (this._settings.get_boolean('topbar-bluetooth-battery')) {
+            this._enableBluetoothBattery();
+        }
+
+        // 7. Spotlight Button (Magnifying Glass)
+        if (this._settings.get_boolean('topbar-spotlight-button')) {
+            this._enableSpotlightButton();
+        }
+
+        // 8. Control Center Button (Dual Sliders ⚎)
+        if (this._settings.get_boolean('topbar-control-center')) {
+            this._enableControlCenterButton();
+        }
+
+        // 9. Move Clock to Far Right (macOS position)
+        if (this._settings.get_boolean('topbar-clock-right')) {
+            this._moveClockToRight();
+        }
+
+        // 10. Apply exact macOS Right Box sequence & monitor dynamic indicators
+        this._applyRightBoxOrder();
+        this._listenRightBoxChanges();
+
+        // 11. Apply Glass Blur & Styling to Top Bar
         if (this._settings.get_boolean('topbar-blur')) {
             this._applyPanelBlur();
         }
 
-        // 6. Apply panel transparency from settings
+        // 12. Apply panel transparency
         this._applyPanelTransparency();
 
         Main.panel.add_style_class_name('mak-panel');
 
+        // Settings Listeners
         this._settingsChangedId = this._settings.connect('changed', (s, key) => {
             if (key === 'topbar-apple-menu') {
                 if (this._settings.get_boolean('topbar-apple-menu')) this._enableAppleMenu();
@@ -103,15 +204,31 @@ export class TopBarModule {
             } else if (key === 'topbar-app-title') {
                 if (this._settings.get_boolean('topbar-app-title')) this._enableAppTitle();
                 else this._disableAppTitle();
+            } else if (key === 'topbar-user-switcher') {
+                if (this._settings.get_boolean('topbar-user-switcher')) this._enableUserSwitcher();
+                else this._disableUserSwitcher();
+                this._queueReorderRightBox();
             } else if (key === 'topbar-bluetooth-battery') {
                 if (this._settings.get_boolean('topbar-bluetooth-battery')) this._enableBluetoothBattery();
                 else this._disableBluetoothBattery();
+                this._queueReorderRightBox();
+            } else if (key === 'topbar-spotlight-button') {
+                if (this._settings.get_boolean('topbar-spotlight-button')) this._enableSpotlightButton();
+                else this._disableSpotlightButton();
+                this._queueReorderRightBox();
+            } else if (key === 'topbar-control-center') {
+                if (this._settings.get_boolean('topbar-control-center')) this._enableControlCenterButton();
+                else this._disableControlCenterButton();
+                this._queueReorderRightBox();
+            } else if (key === 'topbar-clock-right') {
+                if (this._settings.get_boolean('topbar-clock-right')) this._moveClockToRight();
+                else this._restoreClock();
+                this._queueReorderRightBox();
+            } else if (key === 'topbar-hide-activities') {
+                this._hideActivities(this._settings.get_boolean('topbar-hide-activities'));
             } else if (key === 'topbar-media-pill') {
                 if (this._settings.get_boolean('topbar-media-pill')) this._enableMediaPill();
                 else this._disableMediaPill();
-            } else if (key === 'topbar-blur') {
-                if (this._settings.get_boolean('topbar-blur')) this._applyPanelBlur();
-                else this._removePanelBlur();
             } else if (key === 'topbar-transparency' || key === 'global-opacity') {
                 this._applyPanelTransparency();
             }
@@ -122,6 +239,21 @@ export class TopBarModule {
                 this._applyPanelTransparency();
             }
         });
+    }
+
+    _hideActivities(hide) {
+        const activities = Main.panel.statusArea.activities;
+        if (activities) {
+            if (hide) {
+                activities.hide();
+                activities.container?.hide();
+                this._activitiesHidden = true;
+            } else {
+                activities.show();
+                activities.container?.show();
+                this._activitiesHidden = false;
+            }
+        }
     }
 
     _enableAppleMenu() {
@@ -137,7 +269,7 @@ export class TopBarModule {
 
     _disableAppleMenu() {
         if (this._appleMenu) {
-            this._appleMenu.destroy();
+            try { this._appleMenu.destroy(); } catch (e) {}
             this._appleMenu = null;
         }
     }
@@ -154,8 +286,24 @@ export class TopBarModule {
 
     _disableAppTitle() {
         if (this._appTitle) {
-            this._appTitle.destroy();
+            try { this._appTitle.destroy(); } catch (e) {}
             this._appTitle = null;
+        }
+    }
+
+    _enableUserSwitcher() {
+        if (this._userSwitcher) return;
+        try {
+            this._userSwitcher = new UserSwitcherController(this._extension);
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not enable User Switcher:', err);
+        }
+    }
+
+    _disableUserSwitcher() {
+        if (this._userSwitcher) {
+            try { this._userSwitcher.destroy(); } catch (e) {}
+            this._userSwitcher = null;
         }
     }
 
@@ -163,7 +311,7 @@ export class TopBarModule {
         if (this._btBattery) return;
         try {
             this._btBattery = new BluetoothBatteryButton(this._extension);
-            Main.panel.addToStatusArea('MakBluetoothBattery', this._btBattery, 1, 'right');
+            Main.panel.addToStatusArea('MakBluetoothBattery', this._btBattery, 3, 'right');
         } catch (err) {
             console.warn('[Mak TopBar] Could not add Bluetooth Battery indicator:', err);
         }
@@ -174,6 +322,144 @@ export class TopBarModule {
             try { this._btBattery.destroy(); } catch (e) {}
             this._btBattery = null;
         }
+    }
+
+    _enableSpotlightButton() {
+        if (this._spotlightBtn) return;
+        try {
+            this._spotlightBtn = new SpotlightButton(this._extension);
+            Main.panel.addToStatusArea('MakSpotlight', this._spotlightBtn, 5, 'right');
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Spotlight button:', err);
+        }
+    }
+
+    _disableSpotlightButton() {
+        if (this._spotlightBtn) {
+            try { this._spotlightBtn.destroy(); } catch (e) {}
+            this._spotlightBtn = null;
+        }
+    }
+
+    _enableControlCenterButton() {
+        if (this._controlCenterBtn) return;
+        try {
+            this._controlCenterBtn = new ControlCenterButton(this._extension);
+            Main.panel.addToStatusArea('MakControlCenter', this._controlCenterBtn, 6, 'right');
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Control Center button:', err);
+        }
+    }
+
+    _disableControlCenterButton() {
+        if (this._controlCenterBtn) {
+            try { this._controlCenterBtn.destroy(); } catch (e) {}
+            this._controlCenterBtn = null;
+        }
+    }
+
+    _moveClockToRight() {
+        const dateMenu = Main.panel.statusArea.dateMenu;
+        if (!dateMenu || !dateMenu.container) return;
+
+        const currentParent = dateMenu.container.get_parent();
+        if (currentParent === Main.panel._rightBox) {
+            this._clockMoved = true;
+            return;
+        }
+
+        if (currentParent) {
+            currentParent.remove_child(dateMenu.container);
+        }
+
+        Main.panel._rightBox.add_child(dateMenu.container);
+        dateMenu.container.add_style_class_name('mak-clock-button');
+        if (typeof dateMenu.menu?.setSourceAlignment === 'function') {
+            dateMenu.menu.setSourceAlignment(1.0);
+        }
+
+        this._origBannerAlignment = Main.messageTray?.bannerAlignment;
+        if (Main.messageTray) {
+            Main.messageTray.bannerAlignment = Clutter.ActorAlign.END;
+        }
+        this._clockMoved = true;
+    }
+
+    _restoreClock() {
+        const dateMenu = Main.panel.statusArea.dateMenu;
+        if (!dateMenu || !dateMenu.container || !this._clockMoved) return;
+
+        const currentParent = dateMenu.container.get_parent();
+        if (currentParent) {
+            currentParent.remove_child(dateMenu.container);
+        }
+
+        Main.panel._centerBox.add_child(dateMenu.container);
+        dateMenu.container.remove_style_class_name('mak-clock-button');
+        if (typeof dateMenu.menu?.setSourceAlignment === 'function') {
+            dateMenu.menu.setSourceAlignment(0.5);
+        }
+
+        if (Main.messageTray) {
+            Main.messageTray.bannerAlignment = this._origBannerAlignment ?? Clutter.ActorAlign.CENTER;
+        }
+        this._clockMoved = false;
+    }
+
+    _listenRightBoxChanges() {
+        const rightBox = Main.panel._rightBox;
+        if (!rightBox) return;
+
+        try {
+            this._rightBoxActorAddedId = rightBox.connect('child-added', () => {
+                this._queueReorderRightBox();
+            });
+        } catch (e) {
+            console.warn('[Mak TopBar] Could not connect child-added on rightBox:', e);
+        }
+    }
+
+    _queueReorderRightBox() {
+        if (this._reorderTimeoutId) {
+            GLib.Source.remove(this._reorderTimeoutId);
+        }
+        this._reorderTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 80, () => {
+            this._reorderTimeoutId = 0;
+            this._applyRightBoxOrder();
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    _applyRightBoxOrder() {
+        const rightBox = Main.panel._rightBox;
+        if (!rightBox) return;
+
+        // Visual order in macOS (from left to right):
+        // 1. User Switcher ("Ankur Thakur")
+        // 2. Keyboard layout (Input Source)
+        // 3. Bluetooth Battery indicator
+        // 4. Quick Settings (Wi-Fi, Battery %, etc.)
+        // 5. Spotlight Search (🔍)
+        // 6. Control Center (⚎)
+        // 7. Date & Time (Far Right Corner)
+        const order = [
+            'MakUserSwitcher',
+            'keyboard',
+            'MakBluetoothBattery',
+            'quickSettings',
+            'MakSpotlight',
+            'MakControlCenter',
+            'dateMenu',
+        ];
+
+        order.forEach(role => {
+            const item = Main.panel.statusArea[role];
+            const container = item?.container;
+            if (container && container.get_parent() === rightBox) {
+                rightBox.remove_child(container);
+                rightBox.add_child(container);
+            }
+        });
     }
 
     _enableMediaPill() {
@@ -194,16 +480,10 @@ export class TopBarModule {
     }
 
     _applyPanelBlur() {
-        // Panel blur is handled entirely by Blur-My-Shell (BlurModule) which uses
-        // gnome-rounded-blur's dynamic background blur via DummyPipeline.
-        // We do NOT add a second Shell.BlurEffect here — stacking two blur effects
-        // causes double-blur, wrong brightness, and z-order artifacts.
-        // BMS reads topbar-blur and blur-panel from mak settings and enables/disables
-        // its own panel blur accordingly.
+        // Panel blur is handled by Blur-My-Shell (BlurModule) using gnome-rounded-blur
     }
 
     _removePanelBlur() {
-        // Clean up any previously added direct effect (from older extension versions)
         if (this._panelBlurEffect) {
             try { Main.panel.remove_effect(this._panelBlurEffect); } catch (e) {}
             this._panelBlurEffect = null;
@@ -211,9 +491,6 @@ export class TopBarModule {
     }
 
     _applyPanelTransparency() {
-        // Read transparency from settings.
-        // global-opacity acts as a master override when it differs from the default (0.5);
-        // otherwise topbar-transparency is used.
         try {
             let alpha = this._settings.get_double('topbar-transparency');
             const colorScheme = this._interfaceSettings ? this._interfaceSettings.get_string('color-scheme') : '';
@@ -255,14 +532,30 @@ export class TopBarModule {
         }
         this._interfaceSettings = null;
 
+        if (this._rightBoxActorAddedId && Main.panel._rightBox) {
+            try { Main.panel._rightBox.disconnect(this._rightBoxActorAddedId); } catch (e) {}
+            this._rightBoxActorAddedId = 0;
+        }
+
+        if (this._reorderTimeoutId) {
+            GLib.Source.remove(this._reorderTimeoutId);
+            this._reorderTimeoutId = 0;
+        }
+
+        this._restoreClock();
+        this._hideActivities(false);
+
+        this._disableControlCenterButton();
+        this._disableSpotlightButton();
+        this._disableBluetoothBattery();
+        this._disableUserSwitcher();
+        this._disableMediaPill();
+        this._disableAppTitle();
+        this._disableAppleMenu();
+
         this._removePanelBlur();
         this._removePanelTransparency();
         Main.panel.remove_style_class_name('mak-panel');
         Main.panel.remove_style_class_name('light-mode');
-
-        this._disableMediaPill();
-        this._disableBluetoothBattery();
-        this._disableAppTitle();
-        this._disableAppleMenu();
     }
 }

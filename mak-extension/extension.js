@@ -12,12 +12,18 @@ import { BlurModule } from './modules/blur/blurModule.js';
 import { MenuStyleController } from './modules/appearance/menuStyleController.js';
 
 export default class MakExtension extends Extension {
-    enable() {
+    async enable() {
         this._settings = this.getSettings('org.gnome.shell.extensions.mak');
 
         // Submodules
         this._dock = new DockModule(this);
-        this._topbar = new TopBarModule(this);
+        try {
+            const { TopBarModule: DynamicTopBar } = await import(`./modules/topbar/topbarModule.js?v=${Date.now()}`);
+            this._topbar = new DynamicTopBar(this);
+        } catch (err) {
+            console.warn('[Mak] Dynamic TopBar import fallback:', err);
+            this._topbar = new TopBarModule(this);
+        }
         this._spotlight = new SpotlightModule(this);
         this._windowGaps = new WindowGapModule(this);
         this._windowCorners = new WindowCornersModule(this);
@@ -33,22 +39,23 @@ export default class MakExtension extends Extension {
 
         // Enable configured features
         if (this._settings.get_boolean('dock-enabled')) {
-            this._dock.enable();
+            try { this._dock.enable(); } catch (e) { console.error('[Mak Dock] Enable error:', e); }
         }
+        console.log('[Mak] topbar-enabled setting is:', this._settings.get_boolean('topbar-enabled'));
         if (this._settings.get_boolean('topbar-enabled')) {
-            this._topbar.enable();
+            try { this._topbar.enable(); } catch (e) { console.error('[Mak TopBar] Enable error:', e); }
         }
         if (this._settings.get_boolean('spotlight-enabled')) {
-            this._spotlight.enable();
+            try { this._spotlight.enable(); } catch (e) { console.error('[Mak Spotlight] Enable error:', e); }
         }
         if (this._settings.get_boolean('gaps-enabled')) {
-            this._windowGaps.enable();
+            try { this._windowGaps.enable(); } catch (e) { console.error('[Mak WindowGaps] Enable error:', e); }
         }
         if (this._settings.get_boolean('corners-enabled')) {
-            this._windowCorners.enable();
+            try { this._windowCorners.enable(); } catch (e) { console.error('[Mak WindowCorners] Enable error:', e); }
         }
         if (this._settings.get_boolean('blur-enabled')) {
-            this._blur.enable();
+            try { this._blur.enable(); } catch (e) { console.error('[Mak Blur] Enable error:', e); }
         }
 
         console.log('[Mak] Unified macOS Experience Suite Enabled successfully.');
