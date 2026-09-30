@@ -30,6 +30,7 @@ export class GlassBlurPipeline {
         this._radius = options.radius ?? 32;
         this._brightness = options.brightness ?? 0.75;
         this._cornerRadius = options.cornerRadius ?? 24;
+        this._enabled = options.enabled ?? true;
 
         this._bgGroup = null;
         this._blurActor = null;
@@ -183,7 +184,7 @@ export class GlassBlurPipeline {
 
     _syncVisibility() {
         if (!this._bgGroup || !this._actor) return;
-        const visible = Boolean(this._actor.visible && (this._container ? this._container.visible : true));
+        const visible = Boolean((this._enabled ?? true) && this._actor.visible && (this._container ? this._container.visible : true));
         this._bgGroup.visible = visible;
         this._bgGroup.opacity = this._actor.opacity;
     }
@@ -277,7 +278,10 @@ export class GlassBlurPipeline {
         );
     }
 
-    setParameters({ radius, brightness, cornerRadius }) {
+    setParameters({ radius, brightness, cornerRadius, enabled }) {
+        if (enabled !== undefined) {
+            this._enabled = Boolean(enabled);
+        }
         if (radius !== undefined) {
             this._radius = radius;
             if (this._blurEffect) this._blurEffect.unscaled_radius = radius;
@@ -295,6 +299,13 @@ export class GlassBlurPipeline {
                 this._blurEffect.unscaled_corner_radius = cornerRadius;
             }
         }
+        if (this._blurEffect && typeof this._blurEffect.queue_repaint === 'function') {
+            this._blurEffect.queue_repaint();
+        }
+        if (this._cornerEffect && typeof this._cornerEffect.queue_repaint === 'function') {
+            this._cornerEffect.queue_repaint();
+        }
+        this._syncVisibility();
         this.syncClip();
     }
 

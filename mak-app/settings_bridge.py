@@ -48,6 +48,8 @@ class MakSettingsBridge:
         self.spotlight = load_settings("org.gnome.shell.extensions.superbar", "superbar@Furkan-rgb.github.io")
         self.topbar = load_settings("org.gnome.shell.extensions.kiwimenu", "kiwi-menu")
         self.blur = load_settings("org.gnome.shell.extensions.blur-my-shell", "blur-my-shell")
+        self.bms_panel = load_settings("org.gnome.shell.extensions.blur-my-shell.panel")
+        self.bms_popup = load_settings("org.gnome.shell.extensions.blur-my-shell.popup")
 
     # ── Safe Getter / Setter Utilities ─────────────────────────────────────
     def _set_b(self, mak_key, comp_settings, comp_key, val):
@@ -632,10 +634,24 @@ class MakSettingsBridge:
     def set_blur_enabled(self, v): self._set_b("blur-enabled", None, None, v)
 
     def get_blur_sigma(self): return self._get_i("blur-sigma", self.blur, "sigma", 30)
-    def set_blur_sigma(self, v): self._set_i("blur-sigma", self.blur, "sigma", v)
+    def set_blur_sigma(self, v):
+        self._set_i("blur-sigma", self.blur, "sigma", v)
+        if self.bms_panel:
+            try: self.bms_panel.set_int("sigma", int(v))
+            except Exception: pass
+        if self.bms_popup:
+            try: self.bms_popup.set_int("sigma", int(v))
+            except Exception: pass
 
     def get_blur_brightness(self): return self._get_d("blur-brightness", self.blur, "brightness", 0.65)
-    def set_blur_brightness(self, v): self._set_d("blur-brightness", self.blur, "brightness", v)
+    def set_blur_brightness(self, v):
+        self._set_d("blur-brightness", self.blur, "brightness", v)
+        if self.bms_panel:
+            try: self.bms_panel.set_double("brightness", float(v))
+            except Exception: pass
+        if self.bms_popup:
+            try: self.bms_popup.set_double("brightness", float(v))
+            except Exception: pass
 
     def get_blur_noise_amount(self): return self._get_d("blur-noise-amount", self.blur, "noise-amount", 0.0)
     def set_blur_noise_amount(self, v): self._set_d("blur-noise-amount", self.blur, "noise-amount", v)
@@ -643,8 +659,12 @@ class MakSettingsBridge:
     def get_blur_panel(self): return self._get_b("blur-panel", None, None, True)
     def set_blur_panel(self, v): self._set_b("blur-panel", None, None, v)
 
-    def get_blur_dock(self): return self._get_b("blur-dock", None, None, True)
-    def set_blur_dock(self, v): self._set_b("blur-dock", None, None, v)
+    def get_blur_dock(self): return self._get_b("blur-dock", self.dock, "dock-blur", True)
+    def set_blur_dock(self, v):
+        self._set_b("blur-dock", self.dock, "dock-blur", v)
+        if self.mak:
+            try: self.mak.set_boolean("dock-blur", bool(v))
+            except Exception: pass
 
     def get_blur_overview(self): return self._get_b("blur-overview", None, None, True)
     def set_blur_overview(self, v): self._set_b("blur-overview", None, None, v)
@@ -707,14 +727,12 @@ class MakSettingsBridge:
         self.set_hover_lift(20)
         self.set_bounce_height(70)
         self.set_bounce_decay(0.70)
-        self.set_dock_corner_radius(26)
-        self.set_dock_background_opacity(0.28)
+        self.set_dock_radius(25)
+        self.set_dock_opacity(0.25)
         self.set_dock_border_width(1)
-        self.set_dock_border_opacity(0.22)
-        self.set_dock_glass_thickness(1.4)
-        self.set_dock_blur(True)
-        self.set_dock_autohide(False)
-        self.set_dock_intellihide(True)
+        self.set_dock_border_color("rgba(255, 255, 255, 0.22)")
+        self.set_autohide_mode("dodge")
+        self.set_blur_dock(True)
         self.set_genie_duration(320)
 
         # Top Bar

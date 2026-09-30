@@ -199,6 +199,8 @@ export class DockChrome {
             this._glassPipeline.setParameters({
                 cornerRadius: cfg.dockRadius ?? 24,
                 radius: cfg.blurRadius ?? 32,
+                brightness: cfg.blurBrightness ?? 0.75,
+                enabled: cfg.dockBlur ?? true,
             });
         }
     }

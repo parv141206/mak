@@ -412,13 +412,15 @@ export const MusicPill = GObject.registerClass(
             if (this._artDebounceTimer) { GLib.Source.remove(this._artDebounceTimer); this._artDebounceTimer = null; }
             if (this._hideGraceTimer) { GLib.Source.remove(this._hideGraceTimer); this._hideGraceTimer = null; }
             
-            if (this._settings.get_boolean('immersive-music-theme')) {
-                let ext = Main.extensionManager.lookup('bar-enhanced@mrvanguardia');
-                if (ext && ext.stateObj) {
-                    ext.stateObj.immersiveColorOverride = null;
-                    try { ext.stateObj.reloadStylesheet(); } catch(e) {}
+            try {
+                if (this._settings?.settings_schema?.has_key('immersive-music-theme') && this._settings.get_boolean('immersive-music-theme')) {
+                    let ext = Main.extensionManager.lookup('bar-enhanced@mrvanguardia');
+                    if (ext && ext.stateObj) {
+                        ext.stateObj.immersiveColorOverride = null;
+                        try { ext.stateObj.reloadStylesheet(); } catch(e) {}
+                    }
                 }
-            }
+            } catch (e) {}
 
             if (this._hoverTimeout) { GLib.Source.remove(this._hoverTimeout); this._hoverTimeout = null; }
             if (this._singleClickTimerId) { GLib.Source.remove(this._singleClickTimerId); this._singleClickTimerId = null; }

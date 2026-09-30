@@ -17,10 +17,18 @@ export function applyAlpha(colorStr, factor) {
 // The cached CSS for the background pill.
 export function pillStyle(cfg) {
     const bw = cfg.highContrast ? Math.max(2, cfg.borderWidth ?? 1) : (cfg.borderWidth ?? 1);
-    const bc = cfg.highContrast ? '#ffffff' : (cfg.borderColor ?? 'rgba(255,255,255,0.16)');
+    const bc = cfg.highContrast ? '#ffffff' : (cfg.borderColor ?? 'rgba(255, 255, 255, 0.22)');
     const border = bw > 0 ? `${bw}px solid ${bc}` : 'none';
     const fill = cfg.highContrast ? 'rgba(0,0,0,0.96)'
-        : applyAlpha(cfg.pillColor ?? 'rgba(28,28,32,0.78)', clamp(cfg.bgOpacity, 0.1, 1.0));
+        : (function() {
+            const m = (cfg.pillColor || '').match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)/);
+            const r = m ? m[1] : '36';
+            const g = m ? m[2] : '36';
+            const b = m ? m[3] : '44';
+            const rawOp = cfg.bgOpacity !== undefined ? cfg.bgOpacity : 0.25;
+            const alpha = clamp(rawOp, 0.02, 0.95).toFixed(3);
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        })();
     return `border-radius: ${cfg.dockRadius}px; border: ${border}; background-color: ${fill};`;
 }
 
