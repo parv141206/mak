@@ -123,8 +123,10 @@ export class UserSwitcherController {
   }
 }
 
+const _uid = Math.floor(Math.random() * 10000000);
+
 export const UserSwitcherButton = GObject.registerClass(
-  { GTypeName: 'MakUserSwitcherButton' },
+  { GTypeName: `MakUserSwitcherButton_${_uid}` },
   class UserSwitcherButton extends PanelMenu.Button {
     _init(extension) {
       super._init(1.0, 'MakUserSwitcher');
@@ -144,7 +146,7 @@ export const UserSwitcherButton = GObject.registerClass(
       });
 
       this._nameLabel = new St.Label({
-        text: 'Ankur Thakur',
+        text: 'parv@arch',
         style_class: 'mak-user-switcher-label',
         y_align: Clutter.ActorAlign.CENTER,
       });
@@ -241,7 +243,7 @@ export const UserSwitcherButton = GObject.registerClass(
       }
 
       if (users.length === 0) {
-        const displayName = this._nameLabel?.get_text() || 'Ankur Thakur';
+        const displayName = this._nameLabel?.get_text() || 'parv@arch';
         const userItem = new PopupMenu.PopupMenuItem(displayName);
         userItem.setSensitive(false);
         this.menu.addMenuItem(userItem);
@@ -659,17 +661,17 @@ export const UserSwitcherButton = GObject.registerClass(
     }
 
     _updatePanelIcon(users, currentUserName) {
-      let displayName = 'Ankur Thakur';
+      let displayName = 'parv@arch';
       const currentUser = users?.find?.((u) => u.get_user_name() === currentUserName);
       if (currentUser) {
-        displayName = currentUser.get_real_name() || currentUser.get_user_name() || 'Ankur Thakur';
+        displayName = currentUser.get_real_name() || currentUser.get_user_name() || 'parv@arch';
       }
       const settings = this._extension?.getSettings?.('org.gnome.shell.extensions.mak');
       const customName = settings?.get_string?.('topbar-user-name');
-      if (customName && customName.trim().length > 0) {
+      if (customName && customName.trim().length > 0 && customName.trim() !== 'Ankur Thakur') {
         displayName = customName.trim();
-      } else if (displayName === 'parv') {
-        displayName = 'Ankur Thakur';
+      } else {
+        displayName = 'parv@arch';
       }
       if (this._nameLabel) {
         this._nameLabel.set_text(displayName);

@@ -50,8 +50,10 @@ async function loadFileTextAsync(file, cancellable) {
  * A submenu item that shows recent files in a popup menu.
  * Manages hover state, timeouts, and pointer tracking for smooth UX.
  */
+const _uid = Math.floor(Math.random() * 10000000);
+
 export const RecentItemsSubmenu = GObject.registerClass(
-  { GTypeName: 'MakRecentItemsSubmenu' },
+  { GTypeName: `MakRecentItemsSubmenu_${_uid}` },
   class RecentItemsSubmenu extends PopupMenu.PopupBaseMenuItem {
     _init(title, parentMenu, recentMenuManager, extension, iconName) {
       super._init({

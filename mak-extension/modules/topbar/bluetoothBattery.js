@@ -17,8 +17,10 @@ try {
     console.warn('[Mak BluetoothBattery] Could not import GnomeBluetooth 3.0:', e.message);
 }
 
+const _uid = Math.floor(Math.random() * 10000000);
+
 export const BluetoothBatteryButton = GObject.registerClass(
-    { GTypeName: 'MakBluetoothBatteryButton' },
+    { GTypeName: `MakBluetoothBatteryButton_${_uid}` },
     class BluetoothBatteryButton extends PanelMenu.Button {
         _init(extension) {
             super._init(0.5, 'Mak Bluetooth Battery', false);

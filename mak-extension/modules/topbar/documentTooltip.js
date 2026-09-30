@@ -12,8 +12,10 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 const TOOLTIP_DELAY_MS = 1000;
 
+const _uid = Math.floor(Math.random() * 10000000);
+
 export const DocumentTooltip = GObject.registerClass(
-  { GTypeName: 'MakDocumentTooltip' },
+  { GTypeName: `MakDocumentTooltip_${_uid}` },
   class DocumentTooltip extends St.Label {
     _init(targetActor, text, delayMs = TOOLTIP_DELAY_MS) {
       super._init({

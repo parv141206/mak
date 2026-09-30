@@ -11,13 +11,15 @@ import St from 'gi://St';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
-import { KiwiMenu } from './kiwimenu.js';
-import { BluetoothBatteryButton } from './bluetoothBattery.js';
 import { MusicController } from './dynamic-music-pill/controller.js';
-import { UserSwitcherController } from './userSwitcher.js';
+
+const _uid = Math.floor(Math.random() * 10000000);
+const { KiwiMenu } = await import(`./kiwimenu.js?v=${_uid}`);
+const { BluetoothBatteryButton } = await import(`./bluetoothBattery.js?v=${_uid}`);
+const { UserSwitcherController } = await import(`./userSwitcher.js?v=${_uid}`);
 
 const AppTitleButton = GObject.registerClass(
-    { GTypeName: 'MakAppTitleButton' },
+    { GTypeName: `MakAppTitleButton_${_uid}` },
     class AppTitleButton extends PanelMenu.Button {
         _init() {
             super._init(0.0, 'MakAppTitle', false);
@@ -55,10 +57,10 @@ const AppTitleButton = GObject.registerClass(
 );
 
 const SpotlightButton = GObject.registerClass(
-    { GTypeName: 'MakSpotlightButton' },
+    { GTypeName: `MakSpotlightButton_${_uid}` },
     class SpotlightButton extends PanelMenu.Button {
         _init(extension) {
-            super._init(0.5, 'MakSpotlight', false);
+            super._init(0.5, 'MakSpotlight', true);
             this._extension = extension;
             this.add_style_class_name('mak-spotlight-button');
 
@@ -70,27 +72,25 @@ const SpotlightButton = GObject.registerClass(
             this.add_child(icon);
 
             const toggle = () => {
-                if (this._extension._spotlight) {
+                if (this._extension?._spotlight) {
                     this._extension._spotlight.toggle();
                 } else {
                     Main.overview.show();
                 }
             };
 
-            this.connect('clicked', () => toggle());
-            this.connect('button-press-event', () => {
-                toggle();
-                return Clutter.EVENT_STOP;
-            });
+            const clickGesture = new Clutter.ClickGesture();
+            clickGesture.connect('recognize', () => toggle());
+            this.add_action(clickGesture);
         }
     }
 );
 
 const ControlCenterButton = GObject.registerClass(
-    { GTypeName: 'MakControlCenterButton' },
+    { GTypeName: `MakControlCenterButton_${_uid}` },
     class ControlCenterButton extends PanelMenu.Button {
         _init(extension) {
-            super._init(0.5, 'MakControlCenter', false);
+            super._init(0.5, 'MakControlCenter', true);
             this._extension = extension;
             this.add_style_class_name('mak-control-center-button');
 
@@ -107,11 +107,9 @@ const ControlCenterButton = GObject.registerClass(
                 Main.panel.statusArea.quickSettings?.menu?.toggle();
             };
 
-            this.connect('clicked', () => toggle());
-            this.connect('button-press-event', () => {
-                toggle();
-                return Clutter.EVENT_STOP;
-            });
+            const clickGesture = new Clutter.ClickGesture();
+            clickGesture.connect('recognize', () => toggle());
+            this.add_action(clickGesture);
         }
     }
 );
@@ -132,8 +130,6 @@ export class TopBarModule {
         this._clockMoved = false;
         this._origBannerAlignment = null;
         this._activitiesHidden = false;
-        this._rightBoxActorAddedId = 0;
-        this._reorderTimeoutId = 0;
         this._settingsChangedId = 0;
         this._interfaceChangedId = 0;
     }
@@ -157,7 +153,7 @@ export class TopBarModule {
             this._enableMediaPill();
         }
 
-        // 5. User Switcher Button ("Ankur Thakur")
+        // 5. User Switcher Button ("parv@arch")
         if (this._settings.get_boolean('topbar-user-switcher')) {
             this._enableUserSwitcher();
         }
@@ -182,9 +178,8 @@ export class TopBarModule {
             this._moveClockToRight();
         }
 
-        // 10. Apply exact macOS Right Box sequence & monitor dynamic indicators
+        // 10. Apply exact macOS Right Box sequence
         this._applyRightBoxOrder();
-        this._listenRightBoxChanges();
 
         // 11. Apply Glass Blur & Styling to Top Bar
         if (this._settings.get_boolean('topbar-blur')) {
@@ -406,36 +401,12 @@ export class TopBarModule {
         this._clockMoved = false;
     }
 
-    _listenRightBoxChanges() {
-        const rightBox = Main.panel._rightBox;
-        if (!rightBox) return;
-
-        try {
-            this._rightBoxActorAddedId = rightBox.connect('child-added', () => {
-                this._queueReorderRightBox();
-            });
-        } catch (e) {
-            console.warn('[Mak TopBar] Could not connect child-added on rightBox:', e);
-        }
-    }
-
-    _queueReorderRightBox() {
-        if (this._reorderTimeoutId) {
-            GLib.Source.remove(this._reorderTimeoutId);
-        }
-        this._reorderTimeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 80, () => {
-            this._reorderTimeoutId = 0;
-            this._applyRightBoxOrder();
-            return GLib.SOURCE_REMOVE;
-        });
-    }
-
     _applyRightBoxOrder() {
         const rightBox = Main.panel._rightBox;
         if (!rightBox) return;
 
         // Visual order in macOS (from left to right):
-        // 1. User Switcher ("Ankur Thakur")
+        // 1. User Switcher ("parv@arch")
         // 2. Keyboard layout (Input Source)
         // 3. Bluetooth Battery indicator
         // 4. Quick Settings (Wi-Fi, Battery %, etc.)
@@ -456,10 +427,14 @@ export class TopBarModule {
             const item = Main.panel.statusArea[role];
             const container = item?.container;
             if (container && container.get_parent() === rightBox) {
-                rightBox.remove_child(container);
-                rightBox.add_child(container);
+                const children = rightBox.get_children();
+                if (children.length > 0 && children[children.length - 1] !== container) {
+                    rightBox.remove_child(container);
+                    rightBox.add_child(container);
+                }
             }
         });
+        console.log('[Mak TopBar] RightBox order applied cleanly. UserSwitcher label:', this._userSwitcher?._userSwitcher?._nameLabel?.get_text());
     }
 
     _enableMediaPill() {
@@ -531,16 +506,6 @@ export class TopBarModule {
             this._interfaceChangedId = 0;
         }
         this._interfaceSettings = null;
-
-        if (this._rightBoxActorAddedId && Main.panel._rightBox) {
-            try { Main.panel._rightBox.disconnect(this._rightBoxActorAddedId); } catch (e) {}
-            this._rightBoxActorAddedId = 0;
-        }
-
-        if (this._reorderTimeoutId) {
-            GLib.Source.remove(this._reorderTimeoutId);
-            this._reorderTimeoutId = 0;
-        }
 
         this._restoreClock();
         this._hideActivities(false);
