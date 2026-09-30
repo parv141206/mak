@@ -44,39 +44,67 @@
     box-shadow: none !important;
 }
 
+/* Screen Edge Margins: authentic macOS indentation */
+#panel.mak-panel #panelLeft,
+.mak-panel #panelLeft {
+    margin-left: 10px !important;
+    spacing: 2px !important;
+}
+
+#panel.mak-panel #panelRight,
+.mak-panel #panelRight {
+    margin-right: 10px !important;
+    spacing: 2px !important;
+}
+
+#panel.mak-panel #panelCenter,
+.mak-panel #panelCenter {
+    spacing: 4px !important;
+}
+
 .mak-app-title-label {
     font-weight: 700 !important;
     font-size: 13px !important;
     color: #ffffff !important;
-    padding-left: 6px !important;
-    padding-right: 12px !important;
+    padding: 0 4px !important;
+    margin: 0 !important;
     letter-spacing: -0.2px;
 }
 
 /* Apple Menu icon in top bar */
+#panel.mak-panel .menu-button,
 .mak-panel .menu-button {
     icon-size: 16px !important;
     color: #ffffff !important;
-    padding: 0 4px !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-/* macOS panel buttons: compact, rounded hover highlights */
+/* macOS panel buttons: compact, rounded hover highlights with consistent gaps */
+#panel.mak-panel .panel-button,
 .mak-panel .panel-button {
     font-size: 13px !important;
     font-weight: 500 !important;
     color: #f2f2f5 !important;
-    border-radius: 6px !important;
+    border-radius: 5px !important;
     padding: 0 6px !important;
-    margin: 2px 1px !important;
+    margin: 2px 2px !important;
     height: 24px !important;
+    -natural-hpadding: 0px !important;
+    -minimum-hpadding: 0px !important;
+    border: none !important;
+    box-shadow: none !important;
     transition-duration: 100ms !important;
 }
 
+#panel.mak-panel .panel-button:hover,
 .mak-panel .panel-button:hover {
     background-color: rgba(255, 255, 255, 0.16) !important;
     color: #ffffff !important;
 }
 
+#panel.mak-panel .panel-button:active,
+#panel.mak-panel .panel-button:checked,
 .mak-panel .panel-button:active,
 .mak-panel .panel-button:checked {
     background-color: rgba(255, 255, 255, 0.28) !important;
@@ -84,6 +112,7 @@
 }
 
 /* macOS clock typography */
+#panel.mak-panel .clock-display,
 .mak-panel .clock-display {
     font-size: 13px !important;
     font-weight: 500 !important;
@@ -91,10 +120,14 @@
     letter-spacing: -0.1px;
 }
 
-/* macOS system status icons */
-.mak-panel .system-status-icon {
+/* macOS system status icons across all widgets */
+#panel.mak-panel .system-status-icon,
+.mak-panel .system-status-icon,
+#panel.mak-panel .panel-button .system-status-icon,
+.mak-panel .panel-button .system-status-icon {
     icon-size: 16px !important;
-    margin: 0 1px !important;
+    padding: 0 !important;
+    margin: 0 2px !important;
     color: #f2f2f7 !important;
 }
 
@@ -174,18 +207,28 @@
     border: none !important;
 }
 
-/* Fast User Switching Button */
+/* Fast User Switching Button ("parv@arch") */
+#panel.mak-panel .mak-user-switcher-button,
+.mak-panel .mak-user-switcher-button,
 .mak-user-switcher-button {
-    margin: 2px 1px !important;
+    margin: 2px 2px !important;
     padding: 0 6px !important;
     border-radius: 5px !important;
+    -natural-hpadding: 0px !important;
+    -minimum-hpadding: 0px !important;
+}
+
+.mak-user-switcher-container {
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .mak-user-switcher-label {
     font-size: 13px !important;
     font-weight: 500 !important;
     color: #f2f2f5 !important;
-    padding: 0 2px !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .mak-panel.light-mode .mak-user-switcher-label {
@@ -193,29 +236,76 @@
 }
 
 /* macOS Spotlight & Control Center Buttons */
+#panel.mak-panel .mak-spotlight-button,
+.mak-panel .mak-spotlight-button,
+#panel.mak-panel .mak-control-center-button,
+.mak-panel .mak-control-center-button,
 .mak-spotlight-button,
 .mak-control-center-button {
-    margin: 2px 1px !important;
-    padding: 0 4px !important;
+    margin: 2px 2px !important;
+    padding: 0 5px !important;
     border-radius: 5px !important;
+    -natural-hpadding: 0px !important;
+    -minimum-hpadding: 0px !important;
 }
 
 /* Far-Right macOS Clock */
-.mak-clock-button {
-    margin: 2px 0 2px 1px !important;
-    padding: 0 8px 0 4px !important;
+#panel.mak-panel .mak-clock-button,
+.mak-panel .mak-clock-button,
+#panel.mak-panel .clock-display,
+.mak-panel .clock-display {
+    margin: 2px 2px !important;
+    padding: 0 6px !important;
     border-radius: 5px !important;
+    -natural-hpadding: 0px !important;
+    -minimum-hpadding: 0px !important;
 }
 
-/* macOS Discrete Quick Settings Icons (clean without capsule background) */
+#panel.mak-panel .clock-display-box,
+.mak-panel .clock-display-box {
+    spacing: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+#panel.mak-panel .clock-display-box .clock,
+.mak-panel .clock-display-box .clock,
+#panel.mak-panel .clock,
+.mak-panel .clock {
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #f5f5f7 !important;
+    letter-spacing: -0.1px;
+}
+
+.mak-panel.light-mode .clock-display-box .clock,
+.mak-panel.light-mode .clock,
+.mak-panel.light-mode .clock-display {
+    color: #1d1d1f !important;
+}
+
+/* macOS Discrete Quick Settings Icons */
+#panel.mak-panel .quick-settings,
 .mak-panel .quick-settings,
+#panel.mak-panel #panelRight .quick-settings,
 .mak-panel #panelRight .quick-settings {
     background-color: transparent !important;
     border: none !important;
     box-shadow: none !important;
     padding: 0 4px !important;
-    margin: 2px 1px !important;
+    margin: 2px 2px !important;
     border-radius: 5px !important;
+    -natural-hpadding: 0px !important;
+    -minimum-hpadding: 0px !important;
+}
+
+#panel.mak-panel .panel-status-indicators-box,
+.mak-panel .panel-status-indicators-box {
+    spacing: 4px !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .mak-panel .quick-settings:hover,

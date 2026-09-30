@@ -202,23 +202,23 @@ export class TopBarModule {
             } else if (key === 'topbar-user-switcher') {
                 if (this._settings.get_boolean('topbar-user-switcher')) this._enableUserSwitcher();
                 else this._disableUserSwitcher();
-                this._queueReorderRightBox();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-bluetooth-battery') {
                 if (this._settings.get_boolean('topbar-bluetooth-battery')) this._enableBluetoothBattery();
                 else this._disableBluetoothBattery();
-                this._queueReorderRightBox();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-spotlight-button') {
                 if (this._settings.get_boolean('topbar-spotlight-button')) this._enableSpotlightButton();
                 else this._disableSpotlightButton();
-                this._queueReorderRightBox();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-control-center') {
                 if (this._settings.get_boolean('topbar-control-center')) this._enableControlCenterButton();
                 else this._disableControlCenterButton();
-                this._queueReorderRightBox();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-clock-right') {
                 if (this._settings.get_boolean('topbar-clock-right')) this._moveClockToRight();
                 else this._restoreClock();
-                this._queueReorderRightBox();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-hide-activities') {
                 this._hideActivities(this._settings.get_boolean('topbar-hide-activities'));
             } else if (key === 'topbar-media-pill') {
