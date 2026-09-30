@@ -7,6 +7,7 @@ import Gio from 'gi://Gio';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import BlurMyShell from './bms/extension.js';
 import { NativeDynamicBlurEffect } from './bms/effects/native_dynamic_gaussian_blur.js';
+import { unpack_pipelines, pack_pipelines } from './bms/conveniences/pipeline_settings.js';
 
 export class BlurModule {
     constructor(extension) {
@@ -114,9 +115,56 @@ export class BlurModule {
             const sigma = this._makSettings.get_int('blur-sigma');
             const brightness = this._makSettings.get_double('blur-brightness');
             const noise = this._makSettings.get_double('blur-noise-amount');
+            const refractionStrength = this._makSettings.get_double('blur-refraction-strength');
+            const chromaticDispersion = this._makSettings.get_double('blur-chromatic-dispersion');
+
             bmsSettings.set_int('sigma', sigma);
             bmsSettings.set_double('brightness', brightness);
             bmsSettings.set_double('noise-amount', noise);
+
+            // Update live pipeline parameters so shader updates instantly
+            try {
+                const pipelinesVal = bmsSettings.get_value('pipelines');
+                if (pipelinesVal) {
+                    const pipelines = unpack_pipelines(pipelinesVal);
+                    let changed = false;
+
+                    if (pipelines['pipeline_default']) {
+                        for (const eff of pipelines['pipeline_default'].effects) {
+                            if (eff.type.includes('blur')) {
+                                eff.params.radius = sigma;
+                                eff.params.brightness = brightness;
+                                changed = true;
+                            }
+                        }
+                    }
+                    if (pipelines['pipeline_default_rounded']) {
+                        for (const eff of pipelines['pipeline_default_rounded'].effects) {
+                            if (eff.type.includes('blur')) {
+                                eff.params.radius = sigma;
+                                eff.params.brightness = brightness;
+                                changed = true;
+                            }
+                        }
+                    }
+                    if (pipelines['pipeline_liquid_glass']) {
+                        for (const eff of pipelines['pipeline_liquid_glass'].effects) {
+                            if (eff.type === 'refraction') {
+                                eff.params.strength = refractionStrength;
+                                eff.params.rgb_fringing = chromaticDispersion;
+                                eff.params.blur_radius = Math.max(2.0, sigma / 2.5);
+                                changed = true;
+                            }
+                        }
+                    }
+
+                    if (changed) {
+                        bmsSettings.set_value('pipelines', pack_pipelines(pipelines));
+                    }
+                }
+            } catch (pErr) {
+                console.warn('[Mak Blur] Error updating pipelines parameters:', pErr.message);
+            }
         } catch (err) {
             console.warn('[Mak Blur] Error syncing settings to BMS:', err);
         }

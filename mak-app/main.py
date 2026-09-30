@@ -1,21 +1,41 @@
-#!/usr/bin/env python3
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Mak Control Center: Unified GTK 4 + Libadwaita Application for macOS Desktop Suite
+# Mak Control Center: Unified macOS Experience Manager for GNOME
+# Built with GTK 4, Libadwaita, and direct Gio/GSettings integration.
 
-import sys
 import os
+import sys
+import subprocess
 import gi
 
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 gi.require_version('Gio', '2.0')
-gi.require_version('GLib', '2.0')
-
 from gi.repository import Gtk, Adw, Gio, GLib
 
-import theme_manager
-import autostart_manager
 from settings_bridge import MakSettingsBridge
+import theme_manager
+
+def create_spin_row(title, subtitle, lower, upper, step, val, digits=0, on_change=None):
+    """Creates a bulletproof Adw.SpinRow with proper digits, step, page increment, and snapping."""
+    adj = Gtk.Adjustment(
+        value=float(val),
+        lower=float(lower),
+        upper=float(upper),
+        step_increment=float(step),
+        page_increment=float(step * 5),
+        page_size=0.0
+    )
+    row = Adw.SpinRow(title=title, subtitle=subtitle, adjustment=adj)
+    row.set_digits(digits)
+    row.set_numeric(True)
+    row.set_snap_to_ticks(True)
+    row.set_value(float(val))
+    if on_change:
+        if digits == 0:
+            row.connect("notify::value", lambda r, p: on_change(int(round(r.get_value()))))
+        else:
+            row.connect("notify::value", lambda r, p: on_change(round(r.get_value(), digits)))
+    return row
 
 class MakAppWindow(Adw.ApplicationWindow):
     def __init__(self, *args, **kwargs):
@@ -27,12 +47,23 @@ class MakAppWindow(Adw.ApplicationWindow):
         self._build_ui()
 
     def _build_ui(self):
+        self.toast_overlay = Adw.ToastOverlay()
+        self.set_content(self.toast_overlay)
+
         toolbar_view = Adw.ToolbarView()
-        self.set_content(toolbar_view)
+        self.toast_overlay.set_child(toolbar_view)
 
         header = Adw.HeaderBar()
         title = Adw.WindowTitle(title="Mak", subtitle="macOS Desktop Suite")
         header.set_title_widget(title)
+
+        reset_btn = Gtk.Button(label="Reset to Defaults")
+        reset_btn.set_icon_name("edit-undo-symbolic")
+        reset_btn.set_tooltip_text("Reset all settings across Mak to curated macOS authentic defaults")
+        reset_btn.add_css_class("flat")
+        reset_btn.connect("clicked", lambda *a: self._on_reset_to_defaults())
+        header.pack_end(reset_btn)
+
         toolbar_view.add_top_bar(header)
 
         split_view = Adw.NavigationSplitView()
@@ -61,6 +92,14 @@ class MakAppWindow(Adw.ApplicationWindow):
         split_view.set_content(content_page)
 
         # Build Comprehensive Settings Pages
+        self._build_all_pages()
+
+        self.nav_list.connect("row-selected", self._on_nav_selected)
+        first_row = self.nav_list.get_row_at_index(0)
+        if first_row:
+            self.nav_list.select_row(first_row)
+
+    def _build_all_pages(self):
         self._build_overview_page()
         self._build_dock_page()
         self._build_topbar_page()
@@ -70,10 +109,29 @@ class MakAppWindow(Adw.ApplicationWindow):
         self._build_theme_page()
         self._build_system_page()
 
-        self.nav_list.connect("row-selected", self._on_nav_selected)
-        first_row = self.nav_list.get_row_at_index(0)
-        if first_row:
-            self.nav_list.select_row(first_row)
+    def _reload_all_pages(self):
+        cur_tag = self.stack.get_visible_child_name()
+        while child := self.stack.get_first_child():
+            self.stack.remove(child)
+        while row := self.nav_list.get_first_child():
+            self.nav_list.remove(row)
+
+        self._build_all_pages()
+
+        if cur_tag:
+            self.stack.set_visible_child_name(cur_tag)
+            for i in range(8):
+                row = self.nav_list.get_row_at_index(i)
+                if row and getattr(row, "tag", None) == cur_tag:
+                    self.nav_list.select_row(row)
+                    break
+
+    def _on_reset_to_defaults(self):
+        self.bridge.reset_to_macos_defaults()
+        self._reload_all_pages()
+        toast = Adw.Toast.new("Restored authentic macOS recommended defaults across all systems!")
+        toast.set_timeout(3)
+        self.toast_overlay.add_toast(toast)
 
     def _add_nav_item(self, tag, title, icon_name):
         row = Adw.ActionRow(title=title)
@@ -107,93 +165,68 @@ class MakAppWindow(Adw.ApplicationWindow):
         status_group.add(master_switch)
 
         presets_group = Adw.PreferencesGroup(
-            title="Quick Presets",
+            title="Curated macOS Presets",
             description="Apply curated macOS desktop configurations in one click:"
         )
         page.add(presets_group)
 
         p1_row = Adw.ActionRow(
-            title="macOS Sonoma Experience",
-            subtitle="Floating bottom dock with 2.6x zoom, frosted menu bar, 12px window gaps, 16px squircle corners"
+            title="Restore macOS Defaults",
+            subtitle="Reset Dock, Menu Bar, Spotlight, Corners, Gaps, Liquid Glass, and Sonoma Graphite theme to optimal defaults"
         )
-        btn1 = Gtk.Button(label="Apply Preset")
+        btn1 = Gtk.Button(label="Reset Everything")
+        btn1.add_css_class("suggested-action")
         btn1.add_css_class("pill")
-        btn1.connect("clicked", lambda *a: self._apply_preset_sonoma())
+        btn1.connect("clicked", lambda *a: self._on_reset_to_defaults())
         p1_row.add_suffix(btn1)
         presets_group.add(p1_row)
 
-        p2_row = Adw.ActionRow(
-            title="Compact Productivity",
-            subtitle="Smaller 48px auto-hiding dock, 6px clean window gaps, snappier animation physics"
-        )
-        btn2 = Gtk.Button(label="Apply Preset")
-        btn2.add_css_class("pill")
-        btn2.connect("clicked", lambda *a: self._apply_preset_compact())
-        p2_row.add_suffix(btn2)
-        presets_group.add(p2_row)
+        comp_group = Adw.PreferencesGroup(title="Integrated Engines Status")
+        page.add(comp_group)
 
-        summary_group = Adw.PreferencesGroup(title="Active Mak Features")
-        page.add(summary_group)
+        modules = [
+            ("AquaDockPro Engine", "Dynamic spring magnification, genie minimization, fan stacks", self.bridge.get_dock_enabled, self.bridge.set_dock_enabled),
+            ("Top Menu Bar and Island", "Apple menu, active app title, Bluetooth battery, and media pill", self.bridge.get_topbar_enabled, self.bridge.set_topbar_enabled),
+            ("Spotlight Command Bar", "Fuzzy search, app indexing, math evaluations, and file queries", self.bridge.get_spotlight_enabled, self.bridge.set_spotlight_enabled),
+            ("Window Management Gaps", "Dynamic outer screen padding on tiled and maximized windows", self.bridge.get_gaps_enabled, self.bridge.set_gaps_enabled),
+            ("Continuous Rounded Corners", "GPU squircle anti-aliasing and depth shadows", self.bridge.get_corners_enabled, self.bridge.set_corners_enabled),
+            ("Liquid Glass Blur Engine", "GPU-accelerated Snell-law refraction, dispersion, and Gaussian blur", self.bridge.get_blur_enabled, self.bridge.set_blur_enabled),
+        ]
 
-        for feat, desc in [
-            ("Floating Glass Dock", "Hardware-accelerated dynamic Gaussian blur, magnification zoom, downloads fan stack"),
-            ("Top Bar and Apple Menu", "Native Apple logo menu, active app title, macOS accelerators, frosted panel blur"),
-            ("Spotlight Search", "Keyboard-driven modal search (Super+Space) with calculator, files, and web fallback"),
-            ("Window Management", "Anti-aliased squircle corners, outer screen margins, maximized gap retention, drop shadows"),
-            ("AMOLED Dark Theme", "Pure midnight palette (#0c0d12) synchronized across GTK 2, 3, 4, Shell, and Flatpak")
-        ]:
-            r = Adw.ActionRow(title=feat, subtitle=desc)
-            badge = Gtk.Label(label="Integrated")
-            badge.add_css_class("pill")
-            r.add_suffix(badge)
-            summary_group.add(r)
-
-    def _apply_preset_sonoma(self):
-        self.bridge.set_icon_size(60)
-        self.bridge.set_magnification(2.6)
-        self.bridge.set_autohide_mode("dodge")
-        self.bridge.set_gap_size(12)
-        self.bridge.set_corner_radius(16)
-        self.bridge.set_corner_smoothing(0.8)
-        self.bridge.set_corner_border_width(1)
-
-    def _apply_preset_compact(self):
-        self.bridge.set_icon_size(46)
-        self.bridge.set_magnification(2.0)
-        self.bridge.set_autohide_mode("always")
-        self.bridge.set_gap_size(6)
-        self.bridge.set_corner_radius(12)
-        self.bridge.set_corner_smoothing(0.6)
-        self.bridge.set_corner_border_width(1)
+        for title, sub, getter, setter in modules:
+            sw = Adw.SwitchRow(title=title, subtitle=sub)
+            sw.set_active(getter())
+            sw.connect("notify::active", lambda s, p, fn=setter: fn(s.get_active()))
+            comp_group.add(sw)
 
     # ── 2. DOCK SETTINGS ──────────────────────────────────────────────────
     def _build_dock_page(self):
         page = Adw.PreferencesPage()
-        self.stack.add_titled_with_icon(page, "dock", "Dock", "view-app-grid-symbolic")
-        self._add_nav_item("dock", "Dock", "view-app-grid-symbolic")
+        self.stack.add_titled_with_icon(page, "dock", "Dock", "user-desktop-symbolic")
+        self._add_nav_item("dock", "Dock", "user-desktop-symbolic")
 
-        # Master Switch
-        top_group = Adw.PreferencesGroup(title="macOS Floating Glass Dock")
+        # Group: Master Switch
+        top_group = Adw.PreferencesGroup(title="macOS Aqua Dock")
         page.add(top_group)
 
-        dock_en = Adw.SwitchRow(title="Enable Dock", subtitle="Show macOS-style floating dock")
+        dock_en = Adw.SwitchRow(title="Enable Aqua Dock", subtitle="Activate macOS-style floating dock")
         dock_en.set_active(self.bridge.get_dock_enabled())
         dock_en.connect("notify::active", lambda s, p: self.bridge.set_dock_enabled(s.get_active()))
         top_group.add(dock_en)
 
-        # Group: Layout & Alignment
-        geom_group = Adw.PreferencesGroup(title="Layout and Geometry")
+        # Group: Geometry & Alignment
+        geom_group = Adw.PreferencesGroup(title="Dock Geometry and Layout")
         page.add(geom_group)
 
-        pos_row = Adw.ComboRow(title="Screen Position")
-        pos_row.set_model(Gtk.StringList.new(["Bottom", "Left", "Right"]))
+        pos_row = Adw.ComboRow(title="Screen Edge Position")
+        pos_row.set_model(Gtk.StringList.new(["Bottom", "Left", "Right", "Top"]))
         cur_pos = self.bridge.get_dock_position()
-        pos_idx = 0 if cur_pos == "bottom" else (1 if cur_pos == "left" else 2)
-        pos_row.set_selected(pos_idx)
-        pos_row.connect("notify::selected", lambda r, p: self.bridge.set_dock_position(["bottom", "left", "right"][r.get_selected()]))
+        pos_map = {"bottom": 0, "left": 1, "right": 2, "top": 3}
+        pos_row.set_selected(pos_map.get(cur_pos, 0))
+        pos_row.connect("notify::selected", lambda r, p: self.bridge.set_dock_position(["bottom", "left", "right", "top"][r.get_selected()]))
         geom_group.add(pos_row)
 
-        align_row = Adw.ComboRow(title="Dock Alignment")
+        align_row = Adw.ComboRow(title="Alignment along Edge")
         align_row.set_model(Gtk.StringList.new(["Center", "Start", "End"]))
         cur_align = self.bridge.get_dock_alignment()
         align_idx = 0 if cur_align == "center" else (1 if cur_align == "start" else 2)
@@ -201,37 +234,10 @@ class MakAppWindow(Adw.ApplicationWindow):
         align_row.connect("notify::selected", lambda r, p: self.bridge.set_dock_alignment(["center", "start", "end"][r.get_selected()]))
         geom_group.add(align_row)
 
-        size_row = Adw.SpinRow(
-            title="Resting Icon Size",
-            subtitle="Base icon diameter in pixels",
-            adjustment=Gtk.Adjustment(lower=24, upper=128, step_increment=4, value=self.bridge.get_icon_size())
-        )
-        size_row.connect("notify::value", lambda r, p: self.bridge.set_icon_size(int(r.get_value())))
-        geom_group.add(size_row)
-
-        spacing_row = Adw.SpinRow(
-            title="Icon Spacing",
-            subtitle="Horizontal gap between neighboring icons",
-            adjustment=Gtk.Adjustment(lower=0, upper=48, step_increment=2, value=self.bridge.get_icon_spacing())
-        )
-        spacing_row.connect("notify::value", lambda r, p: self.bridge.set_icon_spacing(int(r.get_value())))
-        geom_group.add(spacing_row)
-
-        margin_row = Adw.SpinRow(
-            title="Edge Floating Margin",
-            subtitle="Floating gap between dock and monitor edge",
-            adjustment=Gtk.Adjustment(lower=0, upper=24, step_increment=1, value=self.bridge.get_edge_margin())
-        )
-        margin_row.connect("notify::value", lambda r, p: self.bridge.set_edge_margin(int(r.get_value())))
-        geom_group.add(margin_row)
-
-        scale_row = Adw.SpinRow(
-            title="Overall Dock Scale",
-            subtitle="Scale multiplier for icons, padding, and pill",
-            adjustment=Gtk.Adjustment(lower=0.5, upper=2.0, step_increment=0.05, value=self.bridge.get_dock_scale())
-        )
-        scale_row.connect("notify::value", lambda r, p: self.bridge.set_dock_scale(r.get_value()))
-        geom_group.add(scale_row)
+        geom_group.add(create_spin_row("Resting Icon Size", "Base icon diameter in pixels", 24, 128, 4, self.bridge.get_icon_size(), digits=0, on_change=self.bridge.set_icon_size))
+        geom_group.add(create_spin_row("Icon Spacing", "Horizontal gap between neighboring icons", 0, 48, 2, self.bridge.get_icon_spacing(), digits=0, on_change=self.bridge.set_icon_spacing))
+        geom_group.add(create_spin_row("Edge Floating Margin", "Floating gap between dock and monitor edge", 0, 24, 1, self.bridge.get_edge_margin(), digits=0, on_change=self.bridge.set_edge_margin))
+        geom_group.add(create_spin_row("Overall Dock Scale", "Scale multiplier for icons, padding, and pill", 0.5, 2.0, 0.05, self.bridge.get_dock_scale(), digits=2, on_change=self.bridge.set_dock_scale))
 
         shrink_row = Adw.SwitchRow(title="Auto Shrink to Fit", subtitle="Automatically downscale when dock would overflow display")
         shrink_row.set_active(self.bridge.get_auto_shrink())
@@ -257,110 +263,29 @@ class MakAppWindow(Adw.ApplicationWindow):
         phys_group = Adw.PreferencesGroup(title="Magnification and Physics Engine")
         page.add(phys_group)
 
-        mag_row = Adw.SpinRow(
-            title="Peak Magnification Multiplier",
-            subtitle="Peak magnification factor directly under cursor (e.g. 2.6x)",
-            adjustment=Gtk.Adjustment(lower=1.0, upper=3.5, step_increment=0.1, value=self.bridge.get_magnification())
-        )
-        mag_row.connect("notify::value", lambda r, p: self.bridge.set_magnification(r.get_value()))
-        phys_group.add(mag_row)
-
-        zoom_range = Adw.SpinRow(
-            title="Magnification Spread Radius",
-            subtitle="Gaussian zoom propagation distance in pixels",
-            adjustment=Gtk.Adjustment(lower=40, upper=500, step_increment=10, value=self.bridge.get_zoom_range())
-        )
-        zoom_range.connect("notify::value", lambda r, p: self.bridge.set_zoom_range(int(r.get_value())))
-        phys_group.add(zoom_range)
-
-        curve_row = Adw.SpinRow(
-            title="Magnification Curve Shape",
-            subtitle="Sharpness of zoom falloff curve (higher = sharper peak)",
-            adjustment=Gtk.Adjustment(lower=0.5, upper=5.0, step_increment=0.1, value=self.bridge.get_magnification_curve())
-        )
-        curve_row.connect("notify::value", lambda r, p: self.bridge.set_magnification_curve(r.get_value()))
-        phys_group.add(curve_row)
-
-        spring_tens = Adw.SpinRow(
-            title="Spring Tension",
-            subtitle="Physics stiffness for magnification and bounce animations",
-            adjustment=Gtk.Adjustment(lower=0.1, upper=1.0, step_increment=0.05, value=self.bridge.get_spring_tension())
-        )
-        spring_tens.connect("notify::value", lambda r, p: self.bridge.set_spring_tension(r.get_value()))
-        phys_group.add(spring_tens)
-
-        spring_damp = Adw.SpinRow(
-            title="Spring Damping",
-            subtitle="Physics damping factor (1.0 = critically damped without overshoot)",
-            adjustment=Gtk.Adjustment(lower=0.2, upper=1.0, step_increment=0.05, value=self.bridge.get_spring_damping())
-        )
-        spring_damp.connect("notify::value", lambda r, p: self.bridge.set_spring_damping(r.get_value()))
-        phys_group.add(spring_damp)
-
-        lift_row = Adw.SpinRow(
-            title="Hover Icon Lift",
-            subtitle="Vertical displacement in pixels when hovered",
-            adjustment=Gtk.Adjustment(lower=0, upper=24, step_increment=2, value=self.bridge.get_hover_lift())
-        )
-        lift_row.connect("notify::value", lambda r, p: self.bridge.set_hover_lift(int(r.get_value())))
-        phys_group.add(lift_row)
-
-        bounce_h = Adw.SpinRow(
-            title="App Launch Bounce Height",
-            subtitle="Peak launch bounce elevation in pixels (0 disables bounce)",
-            adjustment=Gtk.Adjustment(lower=0, upper=80, step_increment=5, value=self.bridge.get_bounce_height())
-        )
-        bounce_h.connect("notify::value", lambda r, p: self.bridge.set_bounce_height(int(r.get_value())))
-        phys_group.add(bounce_h)
-
-        bounce_dec = Adw.SpinRow(
-            title="Bounce Decay Factor",
-            subtitle="Energy retention per hop (higher = gentler, longer bounces)",
-            adjustment=Gtk.Adjustment(lower=0.30, upper=0.95, step_increment=0.05, value=self.bridge.get_bounce_decay())
-        )
-        bounce_dec.connect("notify::value", lambda r, p: self.bridge.set_bounce_decay(r.get_value()))
-        phys_group.add(bounce_dec)
+        phys_group.add(create_spin_row("Peak Magnification Multiplier", "Peak magnification factor directly under cursor (e.g. 2.6x)", 1.0, 3.5, 0.1, self.bridge.get_magnification(), digits=1, on_change=self.bridge.set_magnification))
+        phys_group.add(create_spin_row("Magnification Spread Radius", "Gaussian zoom propagation distance in pixels", 40, 500, 10, self.bridge.get_zoom_range(), digits=0, on_change=self.bridge.set_zoom_range))
+        phys_group.add(create_spin_row("Magnification Curve Shape", "Sharpness of zoom falloff curve (higher = sharper peak)", 0.5, 5.0, 0.1, self.bridge.get_magnification_curve(), digits=1, on_change=self.bridge.set_magnification_curve))
+        phys_group.add(create_spin_row("Spring Tension", "Physics stiffness for magnification and bounce animations", 0.1, 1.0, 0.05, self.bridge.get_spring_tension(), digits=2, on_change=self.bridge.set_spring_tension))
+        phys_group.add(create_spin_row("Spring Damping", "Physics damping factor (1.0 = critically damped without overshoot)", 0.2, 1.0, 0.05, self.bridge.get_spring_damping(), digits=2, on_change=self.bridge.set_spring_damping))
+        phys_group.add(create_spin_row("Hover Icon Lift", "Vertical displacement in pixels when hovered", 0, 24, 2, self.bridge.get_hover_lift(), digits=0, on_change=self.bridge.set_hover_lift))
+        phys_group.add(create_spin_row("App Launch Bounce Height", "Peak launch bounce elevation in pixels (0 disables bounce)", 0, 80, 5, self.bridge.get_bounce_height(), digits=0, on_change=self.bridge.set_bounce_height))
+        phys_group.add(create_spin_row("Bounce Decay Factor", "Energy retention per hop (higher = gentler, longer bounces)", 0.30, 0.95, 0.05, self.bridge.get_bounce_decay(), digits=2, on_change=self.bridge.set_bounce_decay))
 
         # Group: Glass Pill & Appearance
         pill_group = Adw.PreferencesGroup(title="Glass Pill and Surface Appearance")
         page.add(pill_group)
 
-        radius_row = Adw.SpinRow(
-            title="Dock Pill Corner Radius",
-            subtitle="Curvature rounding radius for dock background",
-            adjustment=Gtk.Adjustment(lower=0, upper=40, step_increment=1, value=self.bridge.get_dock_radius())
-        )
-        radius_row.connect("notify::value", lambda r, p: self.bridge.set_dock_radius(int(r.get_value())))
-        pill_group.add(radius_row)
-
-        opac_row = Adw.SpinRow(
-            title="Glass Pill Opacity",
-            subtitle="Background translucency factor",
-            adjustment=Gtk.Adjustment(lower=0.05, upper=1.0, step_increment=0.05, value=self.bridge.get_dock_opacity())
-        )
-        opac_row.connect("notify::value", lambda r, p: self.bridge.set_dock_opacity(r.get_value()))
-        pill_group.add(opac_row)
-
-        border_w = Adw.SpinRow(
-            title="Pill Border Outline Width",
-            subtitle="Glass border stroke thickness in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=6, step_increment=1, value=self.bridge.get_dock_border_width())
-        )
-        border_w.connect("notify::value", lambda r, p: self.bridge.set_dock_border_width(int(r.get_value())))
-        pill_group.add(border_w)
+        pill_group.add(create_spin_row("Dock Pill Corner Radius", "Curvature rounding radius for dock background", 0, 40, 1, self.bridge.get_dock_radius(), digits=0, on_change=self.bridge.set_dock_radius))
+        pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor", 0.05, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
+        pill_group.add(create_spin_row("Pill Border Outline Width", "Glass border stroke thickness in pixels", 0, 6, 1, self.bridge.get_dock_border_width(), digits=0, on_change=self.bridge.set_dock_border_width))
 
         thick_auto = Adw.SwitchRow(title="Auto Pill Thickness", subtitle="Scale pill height automatically with resting icon size")
         thick_auto.set_active(self.bridge.get_pill_thickness_auto())
         thick_auto.connect("notify::active", lambda s, p: self.bridge.set_pill_thickness_auto(s.get_active()))
         pill_group.add(thick_auto)
 
-        thick_row = Adw.SpinRow(
-            title="Custom Pill Thickness",
-            subtitle="Explicit dock pill depth when auto thickness is disabled",
-            adjustment=Gtk.Adjustment(lower=36, upper=120, step_increment=4, value=self.bridge.get_pill_thickness())
-        )
-        thick_row.connect("notify::value", lambda r, p: self.bridge.set_pill_thickness(int(r.get_value())))
-        pill_group.add(thick_row)
+        pill_group.add(create_spin_row("Custom Pill Thickness", "Explicit dock pill depth when auto thickness is disabled", 36, 120, 4, self.bridge.get_pill_thickness(), digits=0, on_change=self.bridge.set_pill_thickness))
 
         # Group: Autohide & Pressure
         hide_group = Adw.PreferencesGroup(title="Autohide and Screen Edge Pressure")
@@ -374,21 +299,8 @@ class MakAppWindow(Adw.ApplicationWindow):
         hide_row.connect("notify::selected", lambda r, p: self.bridge.set_autohide_mode(["never", "dodge", "always"][r.get_selected()]))
         hide_group.add(hide_row)
 
-        delay_row = Adw.SpinRow(
-            title="Autohide Delay",
-            subtitle="Milliseconds before dock hides after pointer leaves",
-            adjustment=Gtk.Adjustment(lower=0, upper=2000, step_increment=50, value=self.bridge.get_hide_delay())
-        )
-        delay_row.connect("notify::value", lambda r, p: self.bridge.set_hide_delay(int(r.get_value())))
-        hide_group.add(delay_row)
-
-        press_row = Adw.SpinRow(
-            title="Edge Reveal Pressure",
-            subtitle="Pressure barrier threshold in ms (0 = instant appearance)",
-            adjustment=Gtk.Adjustment(lower=0, upper=1000, step_increment=25, value=self.bridge.get_reveal_pressure())
-        )
-        press_row.connect("notify::value", lambda r, p: self.bridge.set_reveal_pressure(int(r.get_value())))
-        hide_group.add(press_row)
+        hide_group.add(create_spin_row("Autohide Delay", "Milliseconds before dock hides after pointer leaves", 0, 2000, 50, self.bridge.get_hide_delay(), digits=0, on_change=self.bridge.set_hide_delay))
+        hide_group.add(create_spin_row("Edge Reveal Pressure", "Pressure barrier threshold in ms (0 = instant appearance)", 0, 1000, 25, self.bridge.get_reveal_pressure(), digits=0, on_change=self.bridge.set_reveal_pressure))
 
         handle_row = Adw.SwitchRow(title="Show Autohide Edge Handle", subtitle="Keep subtle dock glass border visible when hidden")
         handle_row.set_active(self.bridge.get_autohide_handle())
@@ -399,10 +311,6 @@ class MakAppWindow(Adw.ApplicationWindow):
         dwell_row.set_active(self.bridge.get_pressure_sense())
         dwell_row.connect("notify::active", lambda s, p: self.bridge.set_pressure_sense(s.get_active()))
         hide_group.add(dwell_row)
-
-        lock_row = Adw.SwitchRow(title="Lock Dock Layout", subtitle="Prevent pinned icons from being dragged or rearranged")
-        lock_row.set_active(self.bridge.get_dock_settings() if hasattr(self.bridge, "get_dock_settings") else False)
-        hide_group.add(lock_row)
 
         # Group: Click Actions
         click_group = Adw.PreferencesGroup(title="Click and Interaction Actions")
@@ -454,13 +362,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         ind_style.connect("notify::selected", lambda r, p: self.bridge.set_indicator_style(["glow-dots", "glow", "dot", "dots", "line", "pill"][r.get_selected()]))
         ind_group.add(ind_style)
 
-        ind_size = Adw.SpinRow(
-            title="Indicator Dot Size",
-            subtitle="Diameter in pixels",
-            adjustment=Gtk.Adjustment(lower=3, upper=14, step_increment=1, value=self.bridge.get_indicator_size())
-        )
-        ind_size.connect("notify::value", lambda r, p: self.bridge.set_indicator_size(int(r.get_value())))
-        ind_group.add(ind_size)
+        ind_group.add(create_spin_row("Indicator Dot Size", "Diameter in pixels", 3, 14, 1, self.bridge.get_indicator_size(), digits=0, on_change=self.bridge.set_indicator_size))
 
         win_cnt = Adw.SwitchRow(title="Show Multiple Window Dots", subtitle="Display multiple indicator dots when multiple windows are open")
         win_cnt.set_active(self.bridge.get_show_window_count())
@@ -498,21 +400,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         down_view.connect("notify::selected", lambda r, p: self.bridge.set_downloads_view(["fan", "grid", "list"][r.get_selected()]))
         item_group.add(down_view)
 
-        down_max = Adw.SpinRow(
-            title="Downloads Max Files",
-            subtitle="Maximum files displayed in stack view",
-            adjustment=Gtk.Adjustment(lower=3, upper=11, step_increment=1, value=self.bridge.get_downloads_max_files())
-        )
-        down_max.connect("notify::value", lambda r, p: self.bridge.set_downloads_max_files(int(r.get_value())))
-        item_group.add(down_max)
-
-        down_sort = Adw.ComboRow(title="Downloads Sort Order")
-        down_sort.set_model(Gtk.StringList.new(["Newest First", "By Name", "By File Type"]))
-        cur_sort = self.bridge.get_downloads_sort()
-        sort_map = {"newest": 0, "name": 1, "type": 2}
-        down_sort.set_selected(sort_map.get(cur_sort, 0))
-        down_sort.connect("notify::selected", lambda r, p: self.bridge.set_downloads_sort(["newest", "name", "type"][r.get_selected()]))
-        item_group.add(down_sort)
+        item_group.add(create_spin_row("Downloads Max Files", "Maximum files displayed in stack view", 3, 20, 1, self.bridge.get_downloads_max_files(), digits=0, on_change=self.bridge.set_downloads_max_files))
 
         mount_btn = Adw.SwitchRow(title="Show Mounted Drives", subtitle="Display mounted disks and disk images")
         mount_btn.set_active(self.bridge.get_show_mounted_devices())
@@ -524,11 +412,6 @@ class MakAppWindow(Adw.ApplicationWindow):
         remov_btn.connect("notify::active", lambda s, p: self.bridge.set_show_removable_devices(s.get_active()))
         item_group.add(remov_btn)
 
-        net_btn = Adw.SwitchRow(title="Show Network Locations", subtitle="Display mounted network shares and servers")
-        net_btn.set_active(self.bridge.get_show_network_devices())
-        net_btn.connect("notify::active", lambda s, p: self.bridge.set_show_network_devices(s.get_active()))
-        item_group.add(net_btn)
-
         # Group: Window Previews & Tooltips
         prev_group = Adw.PreferencesGroup(title="Window Previews and Tooltips")
         page.add(prev_group)
@@ -538,52 +421,22 @@ class MakAppWindow(Adw.ApplicationWindow):
         prev_en.connect("notify::active", lambda s, p: self.bridge.set_show_previews(s.get_active()))
         prev_group.add(prev_en)
 
-        prev_delay = Adw.SpinRow(
-            title="Preview Delay",
-            subtitle="Hover delay in ms before showing thumbnail",
-            adjustment=Gtk.Adjustment(lower=100, upper=3000, step_increment=50, value=self.bridge.get_preview_delay())
-        )
-        prev_delay.connect("notify::value", lambda r, p: self.bridge.set_preview_delay(int(r.get_value())))
-        prev_group.add(prev_delay)
-
-        prev_size = Adw.SpinRow(
-            title="Preview Max Size",
-            subtitle="Maximum thumbnail width in pixels",
-            adjustment=Gtk.Adjustment(lower=80, upper=400, step_increment=10, value=self.bridge.get_preview_size())
-        )
-        prev_size.connect("notify::value", lambda r, p: self.bridge.set_preview_size(int(r.get_value())))
-        prev_group.add(prev_size)
-
-        prev_close = Adw.SwitchRow(title="Close Button on Previews", subtitle="Show close button on top right of each thumbnail")
-        prev_close.set_active(self.bridge.get_preview_close_buttons())
-        prev_close.connect("notify::active", lambda s, p: self.bridge.set_preview_close_buttons(s.get_active()))
-        prev_group.add(prev_close)
+        prev_group.add(create_spin_row("Preview Delay", "Hover delay in ms before showing thumbnail", 100, 3000, 50, self.bridge.get_preview_delay(), digits=0, on_change=self.bridge.set_preview_delay))
+        prev_group.add(create_spin_row("Preview Max Size", "Maximum thumbnail width in pixels", 80, 400, 10, self.bridge.get_preview_size(), digits=0, on_change=self.bridge.set_preview_size))
 
         tip_en = Adw.SwitchRow(title="Show Tooltips", subtitle="Show application title tooltip when hovering")
         tip_en.set_active(self.bridge.get_show_tooltip())
         tip_en.connect("notify::active", lambda s, p: self.bridge.set_show_tooltip(s.get_active()))
         prev_group.add(tip_en)
 
-        tip_delay = Adw.SpinRow(
-            title="Tooltip Delay",
-            subtitle="Milliseconds before tooltip appears",
-            adjustment=Gtk.Adjustment(lower=0, upper=2000, step_increment=25, value=self.bridge.get_tooltip_delay())
-        )
-        tip_delay.connect("notify::value", lambda r, p: self.bridge.set_tooltip_delay(int(r.get_value())))
-        prev_group.add(tip_delay)
+        prev_group.add(create_spin_row("Tooltip Delay", "Milliseconds before tooltip appears", 0, 2000, 25, self.bridge.get_tooltip_delay(), digits=0, on_change=self.bridge.set_tooltip_delay))
 
         genie_en = Adw.SwitchRow(title="Genie (Magic Lamp) Minimize Effect", subtitle="macOS magic lamp fluid minimize and restore animation")
         genie_en.set_active(self.bridge.get_enable_genie())
         genie_en.connect("notify::active", lambda s, p: self.bridge.set_enable_genie(s.get_active()))
         prev_group.add(genie_en)
 
-        genie_dur = Adw.SpinRow(
-            title="Genie Duration",
-            subtitle="Magic lamp animation duration in ms",
-            adjustment=Gtk.Adjustment(lower=50, upper=1000, step_increment=25, value=self.bridge.get_genie_duration())
-        )
-        genie_dur.connect("notify::value", lambda r, p: self.bridge.set_genie_duration(int(r.get_value())))
-        prev_group.add(genie_dur)
+        prev_group.add(create_spin_row("Genie Duration", "Magic lamp animation duration in ms", 50, 1000, 25, self.bridge.get_genie_duration(), digits=0, on_change=self.bridge.set_genie_duration))
 
     # ── 3. TOP BAR & MENU ─────────────────────────────────────────────────
     def _build_topbar_page(self):
@@ -665,21 +518,8 @@ class MakAppWindow(Adw.ApplicationWindow):
         blur_en.connect("notify::active", lambda s, p: self.bridge.set_topbar_blur(s.get_active()))
         pan_group.add(blur_en)
 
-        blur_rad = Adw.SpinRow(
-            title="Blur Radius",
-            subtitle="Frosted glass blur radius in pixels",
-            adjustment=Gtk.Adjustment(lower=5, upper=100, step_increment=5, value=self.bridge.get_topbar_blur_radius())
-        )
-        blur_rad.connect("notify::value", lambda r, p: self.bridge.set_topbar_blur_radius(int(r.get_value())))
-        pan_group.add(blur_rad)
-
-        transp_row = Adw.SpinRow(
-            title="Panel Transparency",
-            subtitle="Background translucency factor",
-            adjustment=Gtk.Adjustment(lower=0.0, upper=1.0, step_increment=0.05, value=self.bridge.get_topbar_transparency())
-        )
-        transp_row.connect("notify::value", lambda r, p: self.bridge.set_topbar_transparency(r.get_value()))
-        pan_group.add(transp_row)
+        pan_group.add(create_spin_row("Blur Radius", "Frosted glass blur radius in pixels", 5, 100, 5, self.bridge.get_topbar_blur_radius(), digits=0, on_change=self.bridge.set_topbar_blur_radius))
+        pan_group.add(create_spin_row("Panel Transparency", "Background translucency factor", 0.0, 1.0, 0.05, self.bridge.get_topbar_transparency(), digits=2, on_change=self.bridge.set_topbar_transparency))
 
         pill_style = Adw.SwitchRow(title="macOS Pill Button Style", subtitle="Format top bar indicator buttons as smooth pills")
         pill_style.set_active(self.bridge.get_topbar_pill_style())
@@ -725,17 +565,10 @@ class MakAppWindow(Adw.ApplicationWindow):
         key_row.add_suffix(key_badge)
         top_group.add(key_row)
 
-        # Modal Layout & Geometry
         mod_group = Adw.PreferencesGroup(title="Modal Geometry and Ranking")
         page.add(mod_group)
 
-        w_row = Adw.SpinRow(
-            title="Search Bar Width",
-            subtitle="Modal window width in pixels",
-            adjustment=Gtk.Adjustment(lower=400, upper=1200, step_increment=20, value=self.bridge.get_spotlight_width())
-        )
-        w_row.connect("notify::value", lambda r, p: self.bridge.set_spotlight_width(int(r.get_value())))
-        mod_group.add(w_row)
+        mod_group.add(create_spin_row("Search Bar Width", "Modal window width in pixels", 400, 1200, 20, self.bridge.get_spotlight_width(), digits=0, on_change=self.bridge.set_spotlight_width))
 
         pos_row = Adw.ComboRow(title="Vertical Placement")
         pos_row.set_model(Gtk.StringList.new(["Center", "Top", "Bottom"]))
@@ -745,57 +578,33 @@ class MakAppWindow(Adw.ApplicationWindow):
         pos_row.connect("notify::selected", lambda r, p: self.bridge.set_spotlight_position(["center", "top", "bottom"][r.get_selected()]))
         mod_group.add(pos_row)
 
-        opac_row = Adw.SpinRow(
-            title="Background Glass Opacity",
-            subtitle="Modal glass surface opacity percentage",
-            adjustment=Gtk.Adjustment(lower=65, upper=100, step_increment=5, value=self.bridge.get_spotlight_opacity())
-        )
-        opac_row.connect("notify::value", lambda r, p: self.bridge.set_spotlight_opacity(int(r.get_value())))
-        mod_group.add(opac_row)
+        mod_group.add(create_spin_row("Background Glass Opacity", "Modal glass surface opacity percentage", 65, 100, 5, self.bridge.get_spotlight_opacity(), digits=0, on_change=self.bridge.set_spotlight_opacity))
+        mod_group.add(create_spin_row("Maximum Search Results", "Number of results displayed simultaneously", 3, 20, 1, self.bridge.get_spotlight_max_results(), digits=0, on_change=self.bridge.set_spotlight_max_results))
 
-        res_row = Adw.SpinRow(
-            title="Maximum Search Results",
-            subtitle="Number of results displayed simultaneously",
-            adjustment=Gtk.Adjustment(lower=3, upper=20, step_increment=1, value=self.bridge.get_spotlight_max_results())
-        )
-        res_row.connect("notify::value", lambda r, p: self.bridge.set_spotlight_max_results(int(r.get_value())))
-        mod_group.add(res_row)
+        adapt_row = Adw.SwitchRow(title="Adaptive Ranking", subtitle="Learn and prioritize frequently opened applications")
+        adapt_row.set_active(self.bridge.get_spotlight_adaptive_ranking())
+        adapt_row.connect("notify::active", lambda s, p: self.bridge.set_spotlight_adaptive_ranking(s.get_active()))
+        mod_group.add(adapt_row)
 
-        rank_row = Adw.SwitchRow(title="Adaptive Ranking", subtitle="Learn and prioritize frequently selected applications")
-        rank_row.set_active(self.bridge.get_spotlight_adaptive_ranking())
-        rank_row.connect("notify::active", lambda s, p: self.bridge.set_spotlight_adaptive_ranking(s.get_active()))
-        mod_group.add(rank_row)
-
-        # Search Providers
-        prov_group = Adw.PreferencesGroup(title="Search Providers and Fallbacks")
+        prov_group = Adw.PreferencesGroup(title="Active Search Providers")
         page.add(prov_group)
 
-        engine_row = Adw.ComboRow(title="Default Web Search Engine")
-        engine_row.set_model(Gtk.StringList.new(["Google", "DuckDuckGo", "Bing", "Brave", "Ecosia", "Kagi"]))
-        cur_e = self.bridge.get_spotlight_search_engine()
-        e_map = {"google": 0, "duckduckgo": 1, "bing": 2, "brave": 3, "ecosia": 4, "kagi": 5}
-        engine_row.set_selected(e_map.get(cur_e, 0))
-        engine_row.connect("notify::selected", lambda r, p: self.bridge.set_spotlight_search_engine(["google", "duckduckgo", "bing", "brave", "ecosia", "kagi"][r.get_selected()]))
-        prov_group.add(engine_row)
+        providers = [
+            ("Applications", "Launch installed desktop apps", self.bridge.get_spotlight_search_apps, self.bridge.set_spotlight_search_apps),
+            ("Open Windows", "Switch to existing running windows", self.bridge.get_spotlight_search_windows, self.bridge.set_spotlight_search_windows),
+            ("Files and Documents", "Find recent and indexed user files", self.bridge.get_spotlight_search_files, self.bridge.set_spotlight_search_files),
+            ("Clipboard History", "Search and paste recent clipboard items", self.bridge.get_spotlight_search_clipboard, self.bridge.set_spotlight_search_clipboard),
+            ("Calculator and Math", "Real-time mathematical and scientific evaluations", self.bridge.get_spotlight_search_calc, self.bridge.set_spotlight_search_calc),
+            ("Weather Forecast", "Instant weather condition reports", self.bridge.get_spotlight_search_weather, self.bridge.set_spotlight_search_weather),
+        ]
 
-        for title, sub, getter, setter in [
-            ("Search Applications", "Find and launch desktop apps", self.bridge.get_spotlight_search_apps, self.bridge.set_spotlight_search_apps),
-            ("Search Open Windows", "Switch directly to open windows across workspaces", self.bridge.get_spotlight_search_windows, self.bridge.set_spotlight_search_windows),
-            ("Search Files and Documents", "Query local files, downloads, and recent documents", self.bridge.get_spotlight_search_files, self.bridge.set_spotlight_search_files),
-            ("Search Clipboard History", "Find and paste previously copied text clips", self.bridge.get_spotlight_search_clipboard, self.bridge.set_spotlight_search_clipboard),
-            ("Inline Calculator", "Evaluate mathematical expressions directly in search bar", self.bridge.get_spotlight_search_calc, self.bridge.set_spotlight_search_calc),
-            ("Weather Forecast", "Instant weather forecast lookups via Open-Meteo", self.bridge.get_spotlight_search_weather, self.bridge.set_spotlight_search_weather),
-            ("Dictionary Definitions", "Look up definitions of English words inline", self.bridge.get_spotlight_search_dictionary, self.bridge.set_spotlight_search_dictionary),
-            ("Currency Conversions", "Live foreign currency exchange rates", self.bridge.get_spotlight_search_currency, self.bridge.set_spotlight_search_currency),
-            ("System Commands", "Trigger lock, sleep, restart, and power off commands", self.bridge.get_spotlight_search_actions, self.bridge.set_spotlight_search_actions),
-            ("GNOME Search Providers", "Include Contacts, Calendar, and GNOME Files results", self.bridge.get_spotlight_gnome_providers, self.bridge.set_spotlight_gnome_providers)
-        ]:
+        for title, sub, getter, setter in providers:
             sw = Adw.SwitchRow(title=title, subtitle=sub)
             sw.set_active(getter())
             sw.connect("notify::active", lambda s, p, fn=setter: fn(s.get_active()))
             prov_group.add(sw)
 
-    # ── 5. WINDOW MANAGEMENT ──────────────────────────────────────────────
+    # ── 5. WINDOW MANAGEMENT & CORNERS ────────────────────────────────────
     def _build_windows_page(self):
         page = Adw.PreferencesPage()
         self.stack.add_titled_with_icon(page, "windows", "Window Management", "preferences-desktop-display-symbolic")
@@ -815,50 +624,17 @@ class MakAppWindow(Adw.ApplicationWindow):
         uni_gap.connect("notify::active", lambda s, p: self.bridge.set_gap_uniform(s.get_active()))
         gaps_group.add(uni_gap)
 
-        gap_sz = Adw.SpinRow(
-            title="Uniform Gap Size",
-            subtitle="Margin in pixels applied to all edges",
-            adjustment=Gtk.Adjustment(lower=0, upper=200, step_increment=2, value=self.bridge.get_gap_size())
-        )
-        gap_sz.connect("notify::value", lambda r, p: self.bridge.set_gap_size(int(r.get_value())))
-        gaps_group.add(gap_sz)
+        gaps_group.add(create_spin_row("Uniform Gap Size", "Margin in pixels applied to all edges", 0, 200, 2, self.bridge.get_gap_size(), digits=0, on_change=self.bridge.set_gap_size))
 
         max_gaps = Adw.SwitchRow(title="Retain Gaps on Maximized Windows", subtitle="Preserve outer padding even when window is maximized")
         max_gaps.set_active(self.bridge.get_gaps_maximized())
         max_gaps.connect("notify::active", lambda s, p: self.bridge.set_gaps_maximized(s.get_active()))
         gaps_group.add(max_gaps)
 
-        t_gap = Adw.SpinRow(
-            title="Custom Top Margin",
-            subtitle="Top edge gap in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=200, step_increment=2, value=self.bridge.get_gap_top())
-        )
-        t_gap.connect("notify::value", lambda r, p: self.bridge.set_gap_top(int(r.get_value())))
-        gaps_group.add(t_gap)
-
-        b_gap = Adw.SpinRow(
-            title="Custom Bottom Margin",
-            subtitle="Bottom edge gap in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=200, step_increment=2, value=self.bridge.get_gap_bottom())
-        )
-        b_gap.connect("notify::value", lambda r, p: self.bridge.set_gap_bottom(int(r.get_value())))
-        gaps_group.add(b_gap)
-
-        l_gap = Adw.SpinRow(
-            title="Custom Left Margin",
-            subtitle="Left edge gap in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=200, step_increment=2, value=self.bridge.get_gap_left())
-        )
-        l_gap.connect("notify::value", lambda r, p: self.bridge.set_gap_left(int(r.get_value())))
-        gaps_group.add(l_gap)
-
-        r_gap = Adw.SpinRow(
-            title="Custom Right Margin",
-            subtitle="Right edge gap in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=200, step_increment=2, value=self.bridge.get_gap_right())
-        )
-        r_gap.connect("notify::value", lambda r, p: self.bridge.set_gap_right(int(r.get_value())))
-        gaps_group.add(r_gap)
+        gaps_group.add(create_spin_row("Custom Top Margin", "Top edge gap in pixels", 0, 200, 2, self.bridge.get_gap_top(), digits=0, on_change=self.bridge.set_gap_top))
+        gaps_group.add(create_spin_row("Custom Bottom Margin", "Bottom edge gap in pixels", 0, 200, 2, self.bridge.get_gap_bottom(), digits=0, on_change=self.bridge.set_gap_bottom))
+        gaps_group.add(create_spin_row("Custom Left Margin", "Left edge gap in pixels", 0, 200, 2, self.bridge.get_gap_left(), digits=0, on_change=self.bridge.set_gap_left))
+        gaps_group.add(create_spin_row("Custom Right Margin", "Right edge gap in pixels", 0, 200, 2, self.bridge.get_gap_right(), digits=0, on_change=self.bridge.set_gap_right))
 
         # Rounded Corners & Borders
         corn_group = Adw.PreferencesGroup(title="Rounded Corners and Window Borders")
@@ -869,29 +645,9 @@ class MakAppWindow(Adw.ApplicationWindow):
         corn_en.connect("notify::active", lambda s, p: self.bridge.set_corners_enabled(s.get_active()))
         corn_group.add(corn_en)
 
-        rad_row = Adw.SpinRow(
-            title="Window Corner Radius",
-            subtitle="Corner curvature radius in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=40, step_increment=1, value=self.bridge.get_corner_radius())
-        )
-        rad_row.connect("notify::value", lambda r, p: self.bridge.set_corner_radius(int(r.get_value())))
-        corn_group.add(rad_row)
-
-        smooth_row = Adw.SpinRow(
-            title="Apple Squircle Smoothing",
-            subtitle="Curvature exponent for super-ellipse squircle corners (0.8 = authentic Apple curvature)",
-            adjustment=Gtk.Adjustment(lower=0.0, upper=1.0, step_increment=0.05, value=self.bridge.get_corner_smoothing())
-        )
-        smooth_row.connect("notify::value", lambda r, p: self.bridge.set_corner_smoothing(r.get_value()))
-        corn_group.add(smooth_row)
-
-        border_w = Adw.SpinRow(
-            title="Window Border Stroke Width",
-            subtitle="Subtle macOS window border in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=10, step_increment=1, value=self.bridge.get_corner_border_width())
-        )
-        border_w.connect("notify::value", lambda r, p: self.bridge.set_corner_border_width(int(r.get_value())))
-        corn_group.add(border_w)
+        corn_group.add(create_spin_row("Window Corner Radius", "Corner curvature radius in pixels", 0, 40, 1, self.bridge.get_corner_radius(), digits=0, on_change=self.bridge.set_corner_radius))
+        corn_group.add(create_spin_row("Apple Squircle Smoothing", "Curvature exponent for super-ellipse squircle corners (0.8 = authentic Apple curvature)", 0.0, 1.0, 0.05, self.bridge.get_corner_smoothing(), digits=2, on_change=self.bridge.set_corner_smoothing))
+        corn_group.add(create_spin_row("Window Border Stroke Width", "Subtle macOS window border in pixels", 0, 10, 1, self.bridge.get_corner_border_width(), digits=0, on_change=self.bridge.set_corner_border_width))
 
         unround_max = Adw.SwitchRow(title="Square Off Maximized Windows", subtitle="Disable rounded corners when a window is maximized")
         unround_max.set_active(self.bridge.get_unround_maximized())
@@ -912,55 +668,14 @@ class MakAppWindow(Adw.ApplicationWindow):
         shad_en.connect("notify::active", lambda s, p: self.bridge.set_shadow_enabled(s.get_active()))
         shad_group.add(shad_en)
 
-        f_v = Adw.SpinRow(
-            title="Focused Window Vertical Offset",
-            subtitle="Vertical downward elevation in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=40, step_increment=1, value=self.bridge.get_focused_shadow_v_offset())
-        )
-        f_v.connect("notify::value", lambda r, p: self.bridge.set_focused_shadow_v_offset(int(r.get_value())))
-        shad_group.add(f_v)
+        shad_group.add(create_spin_row("Focused Window Vertical Offset", "Vertical downward elevation in pixels", 0, 40, 1, self.bridge.get_focused_shadow_v_offset(), digits=0, on_change=self.bridge.set_focused_shadow_v_offset))
+        shad_group.add(create_spin_row("Focused Shadow Blur Radius", "Gaussian shadow softness for active window", 0, 80, 2, self.bridge.get_focused_shadow_blur(), digits=0, on_change=self.bridge.set_focused_shadow_blur))
+        shad_group.add(create_spin_row("Focused Shadow Opacity", "Shadow darkness percentage", 0, 100, 5, self.bridge.get_focused_shadow_opacity(), digits=0, on_change=self.bridge.set_focused_shadow_opacity))
+        shad_group.add(create_spin_row("Background Window Vertical Offset", "Downward elevation for inactive windows", 0, 40, 1, self.bridge.get_unfocused_shadow_v_offset(), digits=0, on_change=self.bridge.set_unfocused_shadow_v_offset))
+        shad_group.add(create_spin_row("Background Shadow Blur Radius", "Shadow softness for inactive windows", 0, 80, 2, self.bridge.get_unfocused_shadow_blur(), digits=0, on_change=self.bridge.set_unfocused_shadow_blur))
+        shad_group.add(create_spin_row("Background Shadow Opacity", "Shadow darkness for inactive windows", 0, 100, 5, self.bridge.get_unfocused_shadow_opacity(), digits=0, on_change=self.bridge.set_unfocused_shadow_opacity))
 
-        f_blur = Adw.SpinRow(
-            title="Focused Shadow Blur Radius",
-            subtitle="Gaussian shadow softness for active window",
-            adjustment=Gtk.Adjustment(lower=0, upper=80, step_increment=2, value=self.bridge.get_focused_shadow_blur())
-        )
-        f_blur.connect("notify::value", lambda r, p: self.bridge.set_focused_shadow_blur(int(r.get_value())))
-        shad_group.add(f_blur)
-
-        f_opac = Adw.SpinRow(
-            title="Focused Shadow Opacity",
-            subtitle="Shadow darkness percentage",
-            adjustment=Gtk.Adjustment(lower=0, upper=100, step_increment=5, value=self.bridge.get_focused_shadow_opacity())
-        )
-        f_opac.connect("notify::value", lambda r, p: self.bridge.set_focused_shadow_opacity(int(r.get_value())))
-        shad_group.add(f_opac)
-
-        u_v = Adw.SpinRow(
-            title="Background Window Vertical Offset",
-            subtitle="Downward elevation for inactive windows",
-            adjustment=Gtk.Adjustment(lower=0, upper=40, step_increment=1, value=self.bridge.get_unfocused_shadow_v_offset())
-        )
-        u_v.connect("notify::value", lambda r, p: self.bridge.set_unfocused_shadow_v_offset(int(r.get_value())))
-        shad_group.add(u_v)
-
-        u_blur = Adw.SpinRow(
-            title="Background Shadow Blur Radius",
-            subtitle="Shadow softness for inactive windows",
-            adjustment=Gtk.Adjustment(lower=0, upper=80, step_increment=2, value=self.bridge.get_unfocused_shadow_blur())
-        )
-        u_blur.connect("notify::value", lambda r, p: self.bridge.set_unfocused_shadow_blur(int(r.get_value())))
-        shad_group.add(u_blur)
-
-        u_opac = Adw.SpinRow(
-            title="Background Shadow Opacity",
-            subtitle="Shadow darkness for inactive windows",
-            adjustment=Gtk.Adjustment(lower=0, upper=100, step_increment=5, value=self.bridge.get_unfocused_shadow_opacity())
-        )
-        u_opac.connect("notify::value", lambda r, p: self.bridge.set_unfocused_shadow_opacity(int(r.get_value())))
-        shad_group.add(u_opac)
-
-    # ── 6. GLASS BLUR ENGINE ──────────────────────────────────────────────
+    # ── 6. BLUR ENGINE & LIQUID GLASS ─────────────────────────────────────
     def _build_blur_page(self):
         page = Adw.PreferencesPage()
         self.stack.add_titled_with_icon(page, "blur", "Glass Blur Engine", "view-reveal-symbolic")
@@ -973,7 +688,6 @@ class MakAppWindow(Adw.ApplicationWindow):
         )
         page.add(comm_group)
 
-        import shutil
         is_rounded_blur_installed = os.path.exists("/usr/lib/girepository-1.0/Blur-1.0.typelib") or subprocess.run(["pacman", "-Q", "gnome-rounded-blur"], capture_output=True).returncode == 0
 
         if is_rounded_blur_installed:
@@ -1015,29 +729,9 @@ class MakAppWindow(Adw.ApplicationWindow):
         tune_group = Adw.PreferencesGroup(title="Gaussian Kernel and Surface Tuning")
         page.add(tune_group)
 
-        sigma_row = Adw.SpinRow(
-            title="Blur Sigma Radius",
-            subtitle="Gaussian blur spread intensity",
-            adjustment=Gtk.Adjustment(lower=10, upper=80, step_increment=2, value=self.bridge.get_blur_sigma())
-        )
-        sigma_row.connect("notify::value", lambda r, p: self.bridge.set_blur_sigma(int(r.get_value())))
-        tune_group.add(sigma_row)
-
-        bright_row = Adw.SpinRow(
-            title="Glass Brightness Multiplier",
-            subtitle="Luminance factor behind glass surfaces",
-            adjustment=Gtk.Adjustment(lower=0.2, upper=1.0, step_increment=0.05, value=self.bridge.get_blur_brightness())
-        )
-        bright_row.connect("notify::value", lambda r, p: self.bridge.set_blur_brightness(r.get_value()))
-        tune_group.add(bright_row)
-
-        noise_row = Adw.SpinRow(
-            title="Film Grain and Noise",
-            subtitle="Subtle analog texture on glass surfaces",
-            adjustment=Gtk.Adjustment(lower=0.0, upper=0.5, step_increment=0.02, value=self.bridge.get_blur_noise_amount())
-        )
-        noise_row.connect("notify::value", lambda r, p: self.bridge.set_blur_noise_amount(r.get_value()))
-        tune_group.add(noise_row)
+        tune_group.add(create_spin_row("Blur Sigma Radius", "Gaussian blur spread intensity", 10, 80, 2, self.bridge.get_blur_sigma(), digits=0, on_change=self.bridge.set_blur_sigma))
+        tune_group.add(create_spin_row("Glass Brightness Multiplier", "Luminance factor behind glass surfaces", 0.2, 1.0, 0.05, self.bridge.get_blur_brightness(), digits=2, on_change=self.bridge.set_blur_brightness))
+        tune_group.add(create_spin_row("Film Grain and Noise", "Subtle analog texture on glass surfaces", 0.0, 0.5, 0.02, self.bridge.get_blur_noise_amount(), digits=2, on_change=self.bridge.set_blur_noise_amount))
 
         surf_group = Adw.PreferencesGroup(title="Target Desktop Surfaces")
         page.add(surf_group)
@@ -1068,21 +762,8 @@ class MakAppWindow(Adw.ApplicationWindow):
         liq_en.connect("notify::active", lambda s, p: self.bridge.set_blur_liquid_glass(s.get_active()))
         liq_group.add(liq_en)
 
-        refr_str = Adw.SpinRow(
-            title="Refraction Strength",
-            subtitle="Optical bending scale along curved edges",
-            adjustment=Gtk.Adjustment(lower=0.0, upper=1.0, step_increment=0.02, value=self.bridge.get_blur_refraction_strength())
-        )
-        refr_str.connect("notify::value", lambda r, p: self.bridge.set_blur_refraction_strength(r.get_value()))
-        liq_group.add(refr_str)
-
-        disp_row = Adw.SpinRow(
-            title="Chromatic Color Dispersion",
-            subtitle="Prism RGB channel wavelength splitting on glass bevels",
-            adjustment=Gtk.Adjustment(lower=0.0, upper=0.5, step_increment=0.01, value=self.bridge.get_blur_chromatic_dispersion())
-        )
-        disp_row.connect("notify::value", lambda r, p: self.bridge.set_blur_chromatic_dispersion(r.get_value()))
-        liq_group.add(disp_row)
+        liq_group.add(create_spin_row("Refraction Strength", "Optical bending scale along curved edges", 0.0, 1.0, 0.02, self.bridge.get_blur_refraction_strength(), digits=2, on_change=self.bridge.set_blur_refraction_strength))
+        liq_group.add(create_spin_row("Chromatic Color Dispersion", "Prism RGB channel wavelength splitting on glass bevels", 0.0, 0.5, 0.01, self.bridge.get_blur_chromatic_dispersion(), digits=2, on_change=self.bridge.set_blur_chromatic_dispersion))
 
     # ── 7. APPEARANCE & THEMES ────────────────────────────────────────────
     def _build_theme_page(self):
@@ -1137,29 +818,9 @@ class MakAppWindow(Adw.ApplicationWindow):
         )
         page.add(menu_group)
 
-        m_rad = Adw.SpinRow(
-            title="Menu Corner Radius",
-            subtitle="Curvature radius in pixels for context menus, Kiwi menu, and popups",
-            adjustment=Gtk.Adjustment(lower=6, upper=32, step_increment=1, value=self.bridge.get_menu_corner_radius())
-        )
-        m_rad.connect("notify::value", lambda r, p: self.bridge.set_menu_corner_radius(int(r.get_value())))
-        menu_group.add(m_rad)
-
-        m_bw = Adw.SpinRow(
-            title="Menu Border Width",
-            subtitle="Hairline stroke width in pixels",
-            adjustment=Gtk.Adjustment(lower=0, upper=4, step_increment=1, value=self.bridge.get_menu_border_width())
-        )
-        m_bw.connect("notify::value", lambda r, p: self.bridge.set_menu_border_width(int(r.get_value())))
-        menu_group.add(m_bw)
-
-        m_bopac = Adw.SpinRow(
-            title="Menu Border Opacity",
-            subtitle="Edge stroke alpha transparency factor",
-            adjustment=Gtk.Adjustment(lower=0.0, upper=1.0, step_increment=0.02, value=self.bridge.get_menu_border_opacity())
-        )
-        m_bopac.connect("notify::value", lambda r, p: self.bridge.set_menu_border_opacity(r.get_value()))
-        menu_group.add(m_bopac)
+        menu_group.add(create_spin_row("Menu Corner Radius", "Curvature radius in pixels for context menus, Kiwi menu, and popups", 6, 32, 1, self.bridge.get_menu_corner_radius(), digits=0, on_change=self.bridge.set_menu_corner_radius))
+        menu_group.add(create_spin_row("Menu Border Width", "Hairline stroke width in pixels", 0, 4, 1, self.bridge.get_menu_border_width(), digits=0, on_change=self.bridge.set_menu_border_width))
+        menu_group.add(create_spin_row("Menu Border Opacity", "Edge stroke alpha transparency factor", 0.0, 1.0, 0.02, self.bridge.get_menu_border_opacity(), digits=2, on_change=self.bridge.set_menu_border_opacity))
 
         m_spec = Adw.SwitchRow(
             title="Top Specular Highlight Rim",
@@ -1169,29 +830,9 @@ class MakAppWindow(Adw.ApplicationWindow):
         m_spec.connect("notify::active", lambda s, p: self.bridge.set_menu_specular_highlight(s.get_active()))
         menu_group.add(m_spec)
 
-        m_bgopac = Adw.SpinRow(
-            title="Menu Glass Translucency",
-            subtitle="Background glass opacity for menus and dropdowns",
-            adjustment=Gtk.Adjustment(lower=0.2, upper=1.0, step_increment=0.05, value=self.bridge.get_menu_bg_opacity())
-        )
-        m_bgopac.connect("notify::value", lambda r, p: self.bridge.set_menu_bg_opacity(r.get_value()))
-        menu_group.add(m_bgopac)
-
-        qs_rad = Adw.SpinRow(
-            title="Control Center Corner Radius",
-            subtitle="Curvature radius for Quick Settings popup card",
-            adjustment=Gtk.Adjustment(lower=12, upper=40, step_increment=2, value=self.bridge.get_quick_settings_radius())
-        )
-        qs_rad.connect("notify::value", lambda r, p: self.bridge.set_quick_settings_radius(int(r.get_value())))
-        menu_group.add(qs_rad)
-
-        notif_rad = Adw.SpinRow(
-            title="Notification Banner Corner Radius",
-            subtitle="Curvature radius for desktop notification cards",
-            adjustment=Gtk.Adjustment(lower=8, upper=32, step_increment=1, value=self.bridge.get_notification_radius())
-        )
-        notif_rad.connect("notify::value", lambda r, p: self.bridge.set_notification_radius(int(r.get_value())))
-        menu_group.add(notif_rad)
+        menu_group.add(create_spin_row("Menu Glass Translucency", "Background darkness and glass opacity of menus", 0.2, 1.0, 0.05, self.bridge.get_menu_bg_opacity(), digits=2, on_change=self.bridge.set_menu_bg_opacity))
+        menu_group.add(create_spin_row("Control Center Corner Radius", "Curvature radius for Quick Settings popup card", 12, 40, 2, self.bridge.get_quick_settings_radius(), digits=0, on_change=self.bridge.set_quick_settings_radius))
+        menu_group.add(create_spin_row("Notification Banner Corner Radius", "Curvature radius for desktop notification cards", 8, 32, 1, self.bridge.get_notification_radius(), digits=0, on_change=self.bridge.set_notification_radius))
 
     def _on_theme_selected(self, btn, key):
         if btn.get_active():
@@ -1208,60 +849,62 @@ class MakAppWindow(Adw.ApplicationWindow):
     # ── 8. SYSTEM & INTEGRATION ───────────────────────────────────────────
     def _build_system_page(self):
         page = Adw.PreferencesPage()
-        self.stack.add_titled_with_icon(page, "system", "System and Integration", "emblem-system-symbolic")
-        self._add_nav_item("system", "System and Integration", "emblem-system-symbolic")
+        self.stack.add_titled_with_icon(page, "system", "System", "preferences-system-details-symbolic")
+        self._add_nav_item("system", "System", "preferences-system-details-symbolic")
 
-        sys_group = Adw.PreferencesGroup(title="Session and Autostart")
+        sys_group = Adw.PreferencesGroup(title="GNOME Shell Runtime Integration")
         page.add(sys_group)
 
-        autostart_row = Adw.SwitchRow(
-            title="Launch Mak at Login",
-            subtitle="Start Mak Control Center silently in background when you sign in"
+        ext_state = Adw.ActionRow(title="Mak Master Extension", subtitle="Unified GJS runtime handling all macOS subsystems")
+        state_badge = Gtk.Label(label="Active")
+        state_badge.add_css_class("pill")
+        state_badge.add_css_class("success")
+        ext_state.add_suffix(state_badge)
+        sys_group.add(ext_state)
+
+        rst_row = Adw.ActionRow(title="Reload GNOME Shell Extension", subtitle="Trigger live reload of Mak GJS modules")
+        rst_btn = Gtk.Button(label="Reload Extension")
+        rst_btn.add_css_class("pill")
+        rst_btn.connect("clicked", lambda *a: self._reload_extension())
+        rst_row.add_suffix(rst_btn)
+        sys_group.add(rst_row)
+
+        reset_all_row = Adw.ActionRow(
+            title="Reset All Settings to Defaults",
+            subtitle="Restore all Dock, Top Bar, Corners, Gaps, Blur, and Themes to authentic macOS defaults"
         )
-        autostart_row.set_active(autostart_manager.is_autostart_enabled())
-        autostart_row.connect("notify::active", lambda s, p: autostart_manager.set_autostart_enabled(s.get_active()))
-        sys_group.add(autostart_row)
+        reset_all_btn = Gtk.Button(label="Reset Defaults")
+        reset_all_btn.add_css_class("destructive-action")
+        reset_all_btn.add_css_class("pill")
+        reset_all_btn.connect("clicked", lambda *a: self._on_reset_to_defaults())
+        reset_all_row.add_suffix(reset_all_btn)
+        sys_group.add(reset_all_row)
 
-        reset_row = Adw.ActionRow(
-            title="Reset to macOS Defaults",
-            subtitle="Restore all dock, top bar, spotlight, corners, and gaps settings to factory defaults"
-        )
-        reset_btn = Gtk.Button(label="Restore Defaults")
-        reset_btn.add_css_class("destructive-action")
-        reset_btn.add_css_class("pill")
-        reset_btn.connect("clicked", lambda *a: self._reset_defaults())
-        reset_row.add_suffix(reset_btn)
-        sys_group.add(reset_row)
-
-        about_group = Adw.PreferencesGroup(title="About Mak macOS Suite")
-        page.add(about_group)
-
-        ver_row = Adw.ActionRow(title="Mak Suite Version", subtitle="Version 1.0 (Sonoma and Sequoia unified edition)")
-        badge = Gtk.Label(label="Unified Architecture")
-        badge.add_css_class("pill")
-        ver_row.add_suffix(badge)
-        about_group.add(ver_row)
+    def _reload_extension(self):
+        try:
+            subprocess.run(["gnome-extensions", "disable", "mak@local"], check=True)
+            subprocess.run(["gnome-extensions", "enable", "mak@local"], check=True)
+            toast = Adw.Toast.new("Mak extension reloaded successfully!")
+            self.toast_overlay.add_toast(toast)
+        except Exception as e:
+            toast = Adw.Toast.new(f"Failed to reload extension: {e}")
+            self.toast_overlay.add_toast(toast)
 
     def _install_rounded_blur(self):
-        import shutil, subprocess
-        cmd = "echo '==> Installing gnome-rounded-blur for macOS Liquid Dynamic Blur...'; yay -S --needed gnome-rounded-blur; echo ''; echo 'Installation complete! Please log out and back in to load the new blur library.'; echo 'Press Enter to close...'; read"
-        for term in ["gnome-terminal", "kgx", "kitty", "xterm", "foot"]:
-            if shutil.which(term):
-                if term == "gnome-terminal":
-                    subprocess.Popen([term, "--", "bash", "-c", cmd])
-                else:
-                    subprocess.Popen([term, "-e", f"bash -c \"{cmd}\""])
-                return
-
-    def _reset_defaults(self):
-        self._apply_preset_sonoma()
+        cmd = "yay -S --noconfirm gnome-rounded-blur || paru -S --noconfirm gnome-rounded-blur"
+        try:
+            subprocess.Popen(["kgx", "-e", f"bash -c '{cmd}; echo Done. Press enter to exit; read'"])
+        except Exception:
+            try:
+                subprocess.Popen(["gnome-terminal", "--", "bash", "-c", f"{cmd}; echo Done. Press enter to exit; read"])
+            except Exception as e:
+                toast = Adw.Toast.new(f"Could not open terminal: {e}")
+                self.toast_overlay.add_toast(toast)
 
 class MakApplication(Adw.Application):
     def __init__(self):
-        super().__init__(
-            application_id="org.gnome.shell.extensions.mak.app",
-            flags=Gio.ApplicationFlags.FLAGS_NONE
-        )
+        super().__init__(application_id="org.gnome.shell.extensions.mak.controlcenter",
+                         flags=Gio.ApplicationFlags.FLAGS_NONE)
 
     def do_activate(self):
         win = self.props.active_window
@@ -1269,6 +912,9 @@ class MakApplication(Adw.Application):
             win = MakAppWindow(application=self)
         win.present()
 
-if __name__ == "__main__":
+def main():
     app = MakApplication()
-    sys.exit(app.run(sys.argv))
+    return app.run(sys.argv)
+
+if __name__ == "__main__":
+    sys.exit(main())
