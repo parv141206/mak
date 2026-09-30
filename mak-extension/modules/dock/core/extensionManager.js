@@ -53,7 +53,8 @@ export class ExtensionManager {
         try {
             this._bus = new EventBus();
             const dockSettings = this._extension.getSettings('org.gnome.shell.extensions.aqua-dock-pro');
-            this._settings = new SettingsManager(dockSettings, this._bus);
+            this._makSettings = this._extension.getSettings('org.gnome.shell.extensions.mak');
+            this._settings = new SettingsManager(dockSettings, this._bus, this._makSettings);
             setReduceMotionOverride(this._settings.config.reduceMotion);
             clearNotificationCache();
 

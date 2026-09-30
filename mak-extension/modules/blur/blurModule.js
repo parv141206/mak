@@ -101,22 +101,21 @@ export class BlurModule {
             overviewSettings.set_boolean('blur', this._makSettings.get_boolean('blur-overview'));
             appfolderSettings.set_boolean('blur', this._makSettings.get_boolean('blur-appfolder'));
 
-            // Toggle Liquid Glass refraction pipeline vs default Gaussian pipeline
-            const liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
-            if (liquidGlass) {
-                panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
-                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
-            } else {
-                panelSettings.set_string('pipeline', 'pipeline_default');
-                popupSettings.set_string('pipeline', 'pipeline_default_rounded');
-            }
-
             // Sync global parameters
             const sigma = this._makSettings.get_int('blur-sigma');
             const brightness = this._makSettings.get_double('blur-brightness');
             const noise = this._makSettings.get_double('blur-noise-amount');
             const refractionStrength = this._makSettings.get_double('blur-refraction-strength');
             const chromaticDispersion = this._makSettings.get_double('blur-chromatic-dispersion');
+            const liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
+
+            // Apply sigma and brightness directly to individual component settings
+            panelSettings.set_int('sigma', sigma);
+            panelSettings.set_double('brightness', brightness);
+            popupSettings.set_int('sigma', sigma);
+            popupSettings.set_double('brightness', brightness);
+            appfolderSettings.set_int('sigma', sigma);
+            appfolderSettings.set_double('brightness', brightness);
 
             bmsSettings.set_int('sigma', sigma);
             bmsSettings.set_double('brightness', brightness);
@@ -125,45 +124,94 @@ export class BlurModule {
             // Update live pipeline parameters so shader updates instantly
             try {
                 const pipelinesVal = bmsSettings.get_value('pipelines');
-                if (pipelinesVal) {
-                    const pipelines = unpack_pipelines(pipelinesVal);
-                    let changed = false;
+                const pipelines = pipelinesVal ? unpack_pipelines(pipelinesVal) : {};
+                let changed = false;
 
-                    if (pipelines['pipeline_default']) {
-                        for (const eff of pipelines['pipeline_default'].effects) {
-                            if (eff.type.includes('blur')) {
-                                eff.params.radius = sigma;
-                                eff.params.brightness = brightness;
-                                changed = true;
-                            }
+                if (pipelines['pipeline_default']) {
+                    for (const eff of pipelines['pipeline_default'].effects) {
+                        if (eff.type.includes('blur')) {
+                            eff.params.radius = sigma;
+                            eff.params.brightness = brightness;
+                            changed = true;
                         }
                     }
-                    if (pipelines['pipeline_default_rounded']) {
-                        for (const eff of pipelines['pipeline_default_rounded'].effects) {
-                            if (eff.type.includes('blur')) {
-                                eff.params.radius = sigma;
-                                eff.params.brightness = brightness;
-                                changed = true;
-                            }
+                }
+                if (pipelines['pipeline_default_rounded']) {
+                    for (const eff of pipelines['pipeline_default_rounded'].effects) {
+                        if (eff.type.includes('blur')) {
+                            eff.params.radius = sigma;
+                            eff.params.brightness = brightness;
+                            changed = true;
                         }
                     }
-                    if (pipelines['pipeline_liquid_glass']) {
-                        for (const eff of pipelines['pipeline_liquid_glass'].effects) {
-                            if (eff.type === 'refraction') {
-                                eff.params.strength = refractionStrength;
-                                eff.params.rgb_fringing = chromaticDispersion;
-                                eff.params.blur_radius = Math.max(2.0, sigma / 2.5);
-                                changed = true;
-                            }
-                        }
-                    }
+                }
 
-                    if (changed) {
-                        bmsSettings.set_value('pipelines', pack_pipelines(pipelines));
+                // Calibrate blur radius behind refraction:
+                // Moderate blur (8-16px) allows physical Snell-law light bending and chromatic dispersion
+                // to be strikingly perceptible rather than washed out by excessive diffusion.
+                const glassBlurRadius = Math.max(3.0, Math.min(20.0, sigma * 0.35));
+
+                if (!pipelines['pipeline_liquid_glass']) {
+                    pipelines['pipeline_liquid_glass'] = {
+                        name: 'Liquid Glass',
+                        effects: [
+                            {
+                                type: 'refraction',
+                                id: 'effect_liquid_glass_01',
+                                params: {
+                                    strength: refractionStrength,
+                                    blur_radius: glassBlurRadius,
+                                    edge_size: 24.0,
+                                    falloff: 2.2,
+                                    corner_radius: 20.0,
+                                    rim_width: 4.8,
+                                    rgb_fringing: chromaticDispersion,
+                                    gloss: 0.60,
+                                    tint: 0.14,
+                                }
+                            }
+                        ]
+                    };
+                    changed = true;
+                } else {
+                    for (const eff of pipelines['pipeline_liquid_glass'].effects) {
+                        if (eff.type === 'refraction') {
+                            eff.params.strength = refractionStrength;
+                            eff.params.rgb_fringing = chromaticDispersion;
+                            eff.params.blur_radius = glassBlurRadius;
+                            eff.params.gloss = 0.60;
+                            eff.params.tint = 0.14;
+                            changed = true;
+                        }
                     }
+                }
+
+                if (changed) {
+                    bmsSettings.set_value('pipelines', pack_pipelines(pipelines));
                 }
             } catch (pErr) {
                 console.warn('[Mak Blur] Error updating pipelines parameters:', pErr.message);
+            }
+
+            // Toggle Liquid Glass refraction pipeline vs default Gaussian pipeline
+            const hasDynamicCornerSupport = Boolean(NativeDynamicBlurEffect.supports_corner_radius);
+            if (liquidGlass) {
+                panelSettings.set_boolean('static-blur', true);
+                panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
+                popupSettings.set_boolean('static-blur', true);
+                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
+            } else {
+                panelSettings.set_boolean('static-blur', false);
+                panelSettings.set_string('pipeline', 'pipeline_default');
+                popupSettings.set_boolean('static-blur', !hasDynamicCornerSupport);
+                popupSettings.set_string('pipeline', 'pipeline_default_rounded');
+            }
+
+            if (this._bms) {
+                try {
+                    this._bms._panel_blur?.reset();
+                    this._bms._popup?.reset();
+                } catch (e) {}
             }
         } catch (err) {
             console.warn('[Mak Blur] Error syncing settings to BMS:', err);

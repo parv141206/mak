@@ -20,13 +20,13 @@ function autoPillThickness(iconSize) {
 // Derive the full runtime configuration from raw settings. Pure function of the
 // settings object: same keys in, same snapshot out. Kept module-private so the
 // only supported way to read config is the cached `config` getter.
-function computeConfig(s) {
+function computeConfig(s, mak = null) {
     const scale = clamp(s.get_double('dock-scale'), 0.5, 2.0);
-    const iconSize = Math.round(s.get_int('icon-size') * scale);
+    const iconSize = Math.round((mak ? mak.get_int('icon-size') : s.get_int('icon-size')) * scale);
     const zoomMax = Math.max(1, s.get_double('magnification'));
     const renderSize = Math.round(iconSize * zoomMax);
     const pillThickness = s.get_boolean('pill-thickness-auto')
-        ? autoPillThickness(s.get_int('icon-size'))
+        ? autoPillThickness(iconSize)
         : s.get_int('pill-thickness');
     const dockH = Math.round(pillThickness * scale);
     const hoverLift = Math.round(s.get_int('hover-lift') * scale);
@@ -40,9 +40,18 @@ function computeConfig(s) {
     const cellPad = iconSpacing / 2;
     const iconTopAtRest = dockH - ICON_BOT - iconSize;
     const headroom = Math.max(0, renderSize - iconSize + hoverLift - iconTopAtRest) + 10;
-    const position = s.get_string('dock-position');
+    const position = mak ? mak.get_string('dock-position') : s.get_string('dock-position');
     const vertical = position === 'left' || position === 'right';
     const autoHideMode = s.get_string('auto-hide-mode');
+
+    const blurRadius = mak ? mak.get_int('blur-sigma') : 30;
+    const blurBrightness = mak ? mak.get_double('blur-brightness') : 0.75;
+    const dockBlur = mak ? (mak.get_boolean('dock-blur') && mak.get_boolean('blur-dock') && mak.get_boolean('blur-enabled')) : true;
+    const bgOpacity = mak ? mak.get_double('background-opacity') : s.get_double('background-opacity');
+    const dockRadius = mak ? mak.get_int('dock-radius') : s.get_int('dock-radius');
+    const pillColor = mak ? mak.get_string('pill-color') : s.get_string('pill-color');
+    const borderColor = mak ? mak.get_string('border-color') : s.get_string('border-color');
+    const borderWidth = mak ? mak.get_int('border-width') : s.get_int('border-width');
 
     return {
         // ── Sizing / geometry ──
@@ -69,14 +78,17 @@ function computeConfig(s) {
         zoomRange: Math.round(s.get_int('zoom-range') * scale),
         magnificationCurve: s.get_double('magnification-curve'),
         edgeMargin: s.get_int('edge-margin'),
-        dockRadius: s.get_int('dock-radius'),
+        dockRadius,
         hoverLift,
 
-        // ── Background / chrome ──
-        bgOpacity: s.get_double('background-opacity'),
-        pillColor: s.get_string('pill-color'),
-        borderColor: s.get_string('border-color'),
-        borderWidth: s.get_int('border-width'),
+        // ── Background / chrome & blur ──
+        blurRadius,
+        blurBrightness,
+        dockBlur,
+        bgOpacity,
+        pillColor,
+        borderColor,
+        borderWidth,
 
         // ── Sections / behaviour ──
         showApps: s.get_boolean('show-apps-button'),
@@ -184,11 +196,12 @@ function computeConfig(s) {
 }
 
 export class SettingsManager {
-    constructor(settings, bus) {
+    constructor(settings, bus, makSettings = null) {
         this._settings = settings;
+        this._makSettings = makSettings;
         this._bus = bus;
         migrateSettings(settings);
-        this._config = computeConfig(settings);
+        this._config = computeConfig(settings, makSettings);
 
         this._pendingStructural = false;
         this._pendingKeys = new Set();
@@ -197,6 +210,9 @@ export class SettingsManager {
         this._retryCount = 0;
 
         this._changedId = settings.connect('changed', (_s, key) => this._onChanged(key));
+        if (makSettings) {
+            this._makChangedId = makSettings.connect('changed', (_s, key) => this._onMakChanged(key));
+        }
     }
 
     // The cached, fully-derived snapshot. Stable reference between flushes.
@@ -208,6 +224,45 @@ export class SettingsManager {
     // setting. Prefer `config` everywhere else.
     get raw() {
         return this._settings;
+    }
+
+    _onMakChanged(key) {
+        if (key === 'blur-sigma') {
+            this._config.blurRadius = this._makSettings.get_int('blur-sigma');
+            this._pendingKeys.add('blur-sigma');
+            this._pendingKeys.add('blurRadius');
+        } else if (key === 'blur-brightness') {
+            this._config.blurBrightness = this._makSettings.get_double('blur-brightness');
+            this._pendingKeys.add('blur-brightness');
+            this._pendingKeys.add('blurBrightness');
+        } else if (key === 'blur-dock') {
+            this._config.dockBlur = this._makSettings.get_boolean('blur-dock') && this._makSettings.get_boolean('blur-enabled');
+            this._pendingKeys.add('blur-dock');
+            this._pendingKeys.add('dockBlur');
+        } else if (key === 'background-opacity') {
+            this._config.bgOpacity = this._makSettings.get_double('background-opacity');
+            this._pendingKeys.add('background-opacity');
+        } else if (key === 'dock-radius') {
+            this._config.dockRadius = this._makSettings.get_int('dock-radius');
+            this._pendingKeys.add('dock-radius');
+            this._pendingStructural = true;
+        } else if (key === 'border-width') {
+            this._config.borderWidth = this._makSettings.get_int('border-width');
+            this._pendingKeys.add('border-width');
+        } else if (key === 'border-color') {
+            this._config.borderColor = this._makSettings.get_string('border-color');
+            this._pendingKeys.add('border-color');
+        } else if (key === 'pill-color') {
+            this._config.pillColor = this._makSettings.get_string('pill-color');
+            this._pendingKeys.add('pill-color');
+        } else if (key === 'dock-position') {
+            this._config.position = this._makSettings.get_string('dock-position');
+            this._pendingKeys.add('dock-position');
+            this._pendingStructural = true;
+        } else {
+            return;
+        }
+        this._scheduleFlush(30);
     }
 
     _onChanged(key) {
@@ -230,7 +285,7 @@ export class SettingsManager {
         const structural = this._pendingStructural;
         const keys = new Set(this._pendingKeys);
         let nextConfig;
-        try { nextConfig = computeConfig(this._settings); }
+        try { nextConfig = computeConfig(this._settings, this._makSettings); }
         catch (e) {
             // Preserve the failed batch and retry transient GSettings/read
             // failures a few times with bounded backoff. Permanent failures do
@@ -263,9 +318,14 @@ export class SettingsManager {
             this._settings.disconnect(this._changedId);
             this._changedId = 0;
         }
+        if (this._makChangedId && this._makSettings) {
+            this._makSettings.disconnect(this._makChangedId);
+            this._makChangedId = 0;
+        }
         this._pendingKeys.clear();
         this._bus = null;
         this._settings = null;
+        this._makSettings = null;
         this._config = null;
     }
 }

@@ -78,6 +78,15 @@ export const STYLE_KEYS = Object.freeze(new Set([
     'background-opacity',
     'pill-color',
     'border-color',
+    'border-width',
+    'dock-radius',
+    'blur-sigma',
+    'blur-brightness',
+    'blur-dock',
+    'dock-blur',
+    'blurRadius',
+    'blurBrightness',
+    'dockBlur',
 ]));
 
 export const AUTOHIDE_KEYS = Object.freeze(new Set([
@@ -158,6 +167,15 @@ export const SETTING_CONFIG_PROPERTIES = Object.freeze({
     'background-opacity': ['bgOpacity'],
     'pill-color': ['pillColor'],
     'border-color': ['borderColor'],
+    'border-width': ['borderWidth'],
+    'dock-radius': ['dockRadius'],
+    'blur-sigma': ['blurRadius'],
+    'blur-brightness': ['blurBrightness'],
+    'blur-dock': ['dockBlur'],
+    'dock-blur': ['dockBlur'],
+    'blurRadius': ['blurRadius'],
+    'blurBrightness': ['blurBrightness'],
+    'dockBlur': ['dockBlur'],
 
     'hide-delay': ['hideDelay'],
     'reveal-pressure': ['revealPressure'],
