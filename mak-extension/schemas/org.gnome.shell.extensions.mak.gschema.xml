@@ -613,7 +613,7 @@
     </key>
 
     <key type="s" name="topbar-user-name">
-      <default>'Ankur Thakur'</default>
+      <default>'parv@arch'</default>
       <summary>User Display Name</summary>
       <description>Display name shown for user switcher in top bar.</description>
     </key>

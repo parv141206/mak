@@ -66,8 +66,10 @@ async function loadJsonFileAsync(basePath, segments, cancellable) {
   }
 }
 
+const _uid = Math.floor(Math.random() * 10000000);
+
 export const KiwiMenu = GObject.registerClass(
-  { GTypeName: 'MakKiwiMenuButton' },
+  { GTypeName: `MakKiwiMenuButton_${_uid}` },
   class KiwiMenu extends PanelMenu.Button {
     _init(settings, extensionPath, extension) {
       super._init(0.5, 'KiwiMenu');
