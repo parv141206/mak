@@ -195,17 +195,22 @@ export class BlurModule {
                 console.warn('[Mak Blur] Error updating pipelines parameters:', pErr.message);
             }
 
-            // ── Pipeline assignment: route surfaces to standard or liquid-glass pipeline ──
-            // When liquid glass is ON: panel and popups use the refraction pipeline
-            // When OFF: panel uses standard dynamic blur, popups use rounded dynamic blur
-            panelSettings.set_boolean('static-blur', false);
+            // ── Pipeline assignment ──
+            // Refraction only works via the static Pipeline path (which reads the pipeline
+            // setting and instantiates RefractionEffect). DummyPipeline (dynamic) is
+            // Gaussian-only and ignores pipeline string entirely.
             panelSettings.set_boolean('unblur-in-overview', true);
-            popupSettings.set_boolean('static-blur', false);
 
             if (liquidGlass) {
+                // Static-blur path: Pipeline reads pipeline_liquid_glass → RefractionEffect
+                panelSettings.set_boolean('static-blur', true);
+                popupSettings.set_boolean('static-blur', true);
                 panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
                 popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
             } else {
+                // Dynamic path: DummyPipeline → NativeDynamicBlurEffect (real-time)
+                panelSettings.set_boolean('static-blur', false);
+                popupSettings.set_boolean('static-blur', false);
                 panelSettings.set_string('pipeline', 'pipeline_default');
                 popupSettings.set_string('pipeline', 'pipeline_default_rounded');
             }

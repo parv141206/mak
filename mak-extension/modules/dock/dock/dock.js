@@ -202,6 +202,9 @@ export class DockChrome {
                 radius: cfg.blurRadius ?? 32,
                 brightness: cfg.blurBrightness ?? 0.75,
                 enabled: cfg.dockBlur ?? true,
+                liquidGlass: cfg.liquidGlass ?? false,
+                refractionStrength: cfg.refractionStrength ?? 0.42,
+                chromaticDispersion: cfg.chromaticDispersion ?? 0.08,
             });
         }
     }
