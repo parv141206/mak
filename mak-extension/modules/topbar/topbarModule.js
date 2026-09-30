@@ -88,6 +88,9 @@ export class TopBarModule {
             this._applyPanelBlur();
         }
 
+        // 6. Apply panel transparency from settings
+        this._applyPanelTransparency();
+
         Main.panel.add_style_class_name('mak-panel');
 
         this._settingsChangedId = this._settings.connect('changed', (s, key) => {
@@ -106,6 +109,8 @@ export class TopBarModule {
             } else if (key === 'topbar-blur') {
                 if (this._settings.get_boolean('topbar-blur')) this._applyPanelBlur();
                 else this._removePanelBlur();
+            } else if (key === 'topbar-transparency' || key === 'global-opacity') {
+                this._applyPanelTransparency();
             }
         });
     }
@@ -196,6 +201,28 @@ export class TopBarModule {
         }
     }
 
+    _applyPanelTransparency() {
+        // Read transparency from settings.
+        // global-opacity acts as a master override when it differs from the default (0.5);
+        // otherwise topbar-transparency is used.
+        // When blur is active BMS adds 'transparent-panel' class which makes the
+        // actual blurred surface show — the inline style provides the tint colour on top.
+        try {
+            let alpha = this._settings.get_double('topbar-transparency');
+            // Parse the panel colour from the stylesheet and apply alpha override
+            // Base colour: rgba(22, 22, 28, <alpha>)
+            const r = 22, g = 22, b = 28;
+            const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)});`;
+            Main.panel.set_style(style);
+        } catch (e) {
+            console.warn('[Mak TopBar] Could not apply panel transparency:', e.message);
+        }
+    }
+
+    _removePanelTransparency() {
+        try { Main.panel.set_style(''); } catch (e) {}
+    }
+
     disable() {
         if (this._settingsChangedId) {
             try { this._settings.disconnect(this._settingsChangedId); } catch (e) {}
@@ -203,6 +230,7 @@ export class TopBarModule {
         }
 
         this._removePanelBlur();
+        this._removePanelTransparency();
         Main.panel.remove_style_class_name('mak-panel');
 
         this._disableMediaPill();

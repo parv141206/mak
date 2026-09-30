@@ -283,7 +283,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         page.add(pill_group)
 
         pill_group.add(create_spin_row("Dock Pill Corner Radius", "Curvature rounding radius for dock background", 0, 40, 1, self.bridge.get_dock_radius(), digits=0, on_change=self.bridge.set_dock_radius))
-        pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor", 0.05, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
+        pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor (0 = fully transparent)", 0.0, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
         pill_group.add(create_spin_row("Pill Border Outline Width", "Glass border stroke thickness in pixels", 0, 6, 1, self.bridge.get_dock_border_width(), digits=0, on_change=self.bridge.set_dock_border_width))
 
         thick_auto = Adw.SwitchRow(title="Auto Pill Thickness", subtitle="Scale pill height automatically with resting icon size")
@@ -735,8 +735,9 @@ class MakAppWindow(Adw.ApplicationWindow):
         tune_group = Adw.PreferencesGroup(title="Gaussian Kernel and Surface Tuning")
         page.add(tune_group)
 
-        tune_group.add(create_spin_row("Blur Sigma Radius", "Gaussian blur spread intensity", 10, 80, 2, self.bridge.get_blur_sigma(), digits=0, on_change=self.bridge.set_blur_sigma))
-        tune_group.add(create_spin_row("Glass Brightness Multiplier", "Luminance factor behind glass surfaces", 0.2, 1.0, 0.05, self.bridge.get_blur_brightness(), digits=2, on_change=self.bridge.set_blur_brightness))
+        tune_group.add(create_spin_row("Global Glass Opacity", "Master opacity for all glass surfaces (dock, top bar, menus). Overrides per-surface opacity when not at default (0.5).", 0.0, 1.0, 0.05, self.bridge.get_global_opacity(), digits=2, on_change=self.bridge.set_global_opacity))
+        tune_group.add(create_spin_row("Blur Sigma Radius", "Gaussian blur spread intensity (0 = no blur)", 0, 80, 2, self.bridge.get_blur_sigma(), digits=0, on_change=self.bridge.set_blur_sigma))
+        tune_group.add(create_spin_row("Glass Brightness Multiplier", "Luminance factor behind glass surfaces (0 = fully dark)", 0.0, 1.0, 0.05, self.bridge.get_blur_brightness(), digits=2, on_change=self.bridge.set_blur_brightness))
         tune_group.add(create_spin_row("Film Grain and Noise", "Subtle analog texture on glass surfaces", 0.0, 0.5, 0.02, self.bridge.get_blur_noise_amount(), digits=2, on_change=self.bridge.set_blur_noise_amount))
 
         surf_group = Adw.PreferencesGroup(title="Target Desktop Surfaces")

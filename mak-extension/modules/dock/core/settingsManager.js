@@ -47,7 +47,14 @@ function computeConfig(s, mak = null) {
     const blurRadius = mak ? mak.get_int('blur-sigma') : 30;
     const blurBrightness = mak ? mak.get_double('blur-brightness') : 0.75;
     const dockBlur = mak ? (mak.get_boolean('dock-blur') && mak.get_boolean('blur-dock') && mak.get_boolean('blur-enabled')) : true;
-    const bgOpacity = mak ? mak.get_double('background-opacity') : s.get_double('background-opacity');
+    const _dockOpacity = mak ? mak.get_double('background-opacity') : s.get_double('background-opacity');
+    // global-opacity overrides per-surface opacity when the user has set it (default is -1 sentinel, absent from schema so we check a special value)
+    // We use global-opacity directly as the master multiplier if it's stored != 0.5 default OR always use it:
+    const globalOpacity = mak ? mak.get_double('global-opacity') : 0.5;
+    // global-opacity of 0.5 means "not overriding" (default). When changed from 0.5,
+    // map it 0→0 .. 1→1 and apply to all per-surface opacities.
+    // We always read global-opacity as a master; user can tune per-surface separately.
+    const bgOpacity = globalOpacity !== 0.5 ? globalOpacity : _dockOpacity;
     const dockRadius = mak ? mak.get_int('dock-radius') : s.get_int('dock-radius');
     const pillColor = mak ? mak.get_string('pill-color') : s.get_string('pill-color');
     const borderColor = mak ? mak.get_string('border-color') : s.get_string('border-color');
@@ -241,8 +248,14 @@ export class SettingsManager {
             this._pendingKeys.add('dock-blur');
             this._pendingKeys.add('dockBlur');
         } else if (key === 'background-opacity') {
-            this._config.bgOpacity = this._makSettings.get_double('background-opacity');
+            const globalOpacity = this._makSettings.get_double('global-opacity');
+            this._config.bgOpacity = globalOpacity !== 0.5 ? globalOpacity : this._makSettings.get_double('background-opacity');
             this._pendingKeys.add('background-opacity');
+        } else if (key === 'global-opacity') {
+            const globalOpacity = this._makSettings.get_double('global-opacity');
+            this._config.bgOpacity = globalOpacity !== 0.5 ? globalOpacity : this._makSettings.get_double('background-opacity');
+            this._pendingKeys.add('background-opacity');
+            this._pendingKeys.add('global-opacity');
         } else if (key === 'dock-radius') {
             this._config.dockRadius = this._makSettings.get_int('dock-radius');
             this._pendingKeys.add('dock-radius');
