@@ -328,9 +328,9 @@ class MakSettingsBridge:
     def set_apple_icon(self, v):
         self._set_s("topbar-apple-icon", None, None, v)
         if self.topbar:
-            # Map name to kiwi icon integer index: apple=0, arch=1, fedora=2, debian=3, ubuntu=4, linux=5
-            mapping = {"apple": 0, "arch": 1, "fedora": 2, "debian": 3, "ubuntu": 4, "linux": 5}
-            try: self.topbar.set_int("icon", mapping.get(v, 0))
+            # Map name to kiwi icon integer index: apple=10, arch=3, fedora=1, debian=2, ubuntu=8, linux=9
+            mapping = {"apple": 10, "arch": 3, "fedora": 1, "debian": 2, "ubuntu": 8, "linux": 9}
+            try: self.topbar.set_int("icon", mapping.get(v, 10))
             except Exception: pass
 
     def get_app_title_enabled(self): return self._get_b("topbar-app-title", None, None, True)
@@ -682,3 +682,112 @@ class MakSettingsBridge:
 
     def get_notification_radius(self): return self._get_i("notification-radius", None, None, 18)
     def set_notification_radius(self, v): self._set_i("notification-radius", None, None, v)
+
+    # ── 8. RESET TO MACOS PREFERRED DEFAULTS ───────────────────────────────
+    def reset_to_macos_defaults(self):
+        """Resets all settings across Dock, Top Bar, Spotlight, Window Gaps, Corners,
+        Blur Engine, and Themes to the curated authentic macOS defaults."""
+        import theme_manager
+
+        # Dock
+        self.set_dock_enabled(True)
+        self.set_dock_position("bottom")
+        self.set_dock_alignment("center")
+        self.set_icon_size(60)
+        self.set_icon_spacing(10)
+        self.set_edge_margin(4)
+        self.set_dock_scale(1.0)
+        self.set_auto_shrink(True)
+        self.set_magnification(2.6)
+        self.set_zoom_range(110)
+        self.set_magnification_curve(2.0)
+        self.set_animation_smoothness(50)
+        self.set_spring_tension(1.0)
+        self.set_spring_damping(0.50)
+        self.set_hover_lift(20)
+        self.set_bounce_height(70)
+        self.set_bounce_decay(0.70)
+        self.set_dock_corner_radius(26)
+        self.set_dock_background_opacity(0.28)
+        self.set_dock_border_width(1)
+        self.set_dock_border_opacity(0.22)
+        self.set_dock_glass_thickness(1.4)
+        self.set_dock_blur(True)
+        self.set_dock_autohide(False)
+        self.set_dock_intellihide(True)
+        self.set_genie_duration(320)
+
+        # Top Bar
+        self.set_topbar_enabled(True)
+        self.set_apple_menu_enabled(True)
+        self.set_apple_icon("apple")
+        self.set_app_title_enabled(True)
+        self.set_hide_activities(True)
+        self.set_macos_accelerators(True)
+        self.set_topbar_blur(True)
+        self.set_topbar_blur_radius(28)
+        self.set_topbar_transparency(0.30)
+        self.set_topbar_pill_style(True)
+        self.set_topbar_bluetooth_battery(True)
+        self.set_topbar_media_pill(True)
+
+        # Spotlight
+        self.set_spotlight_enabled(True)
+        self.set_spotlight_width(640)
+        self.set_spotlight_position("center")
+        self.set_spotlight_opacity(90)
+        self.set_spotlight_max_results(8)
+        self.set_spotlight_adaptive_ranking(True)
+        self.set_spotlight_search_apps(True)
+        self.set_spotlight_search_windows(True)
+        self.set_spotlight_search_files(True)
+        self.set_spotlight_search_calc(True)
+        self.set_spotlight_search_weather(True)
+
+        # Window Gaps
+        self.set_gaps_enabled(True)
+        self.set_gap_uniform(True)
+        self.set_gap_size(12)
+        self.set_gaps_maximized(True)
+
+        # Window Corners & Shadows
+        self.set_corners_enabled(True)
+        self.set_corner_radius(16)
+        self.set_corner_smoothing(0.8)
+        self.set_corner_border_width(1)
+        self.set_unround_maximized(False)
+        self.set_shadow_enabled(True)
+        self.set_focused_shadow_v_offset(6)
+        self.set_focused_shadow_blur(32)
+        self.set_focused_shadow_opacity(55)
+        self.set_unfocused_shadow_v_offset(3)
+        self.set_unfocused_shadow_blur(16)
+        self.set_unfocused_shadow_opacity(40)
+
+        # Blur & Liquid Glass Refraction
+        self.set_blur_enabled(True)
+        self.set_blur_sigma(30)
+        self.set_blur_brightness(0.70)
+        self.set_blur_noise_amount(0.0)
+        self.set_blur_panel(True)
+        self.set_blur_dock(True)
+        self.set_blur_overview(True)
+        self.set_blur_appfolder(True)
+        self.set_blur_liquid_glass(True)
+        self.set_blur_refraction_strength(0.42)
+        self.set_blur_chromatic_dispersion(0.08)
+
+        # UI & Menus
+        self.set_menu_corner_radius(14)
+        self.set_menu_border_width(1)
+        self.set_menu_border_opacity(0.18)
+        self.set_menu_specular_highlight(True)
+        self.set_menu_bg_opacity(0.72)
+        self.set_quick_settings_radius(24)
+        self.set_notification_radius(18)
+
+        # Apply Sonoma Graphite Theme
+        try:
+            theme_manager.apply_theme("dark")
+        except Exception as e:
+            print(f"[Bridge] Error resetting theme: {e}")

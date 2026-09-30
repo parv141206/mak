@@ -17,9 +17,13 @@
 /* ── Top Bar Panel & macOS Styling ────────────────────────────────────────── */
 #panel.mak-panel,
 .mak-panel {
-    background-color: rgba(22, 22, 28, 0.28);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+    height: 28px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Cantarell", sans-serif !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    background-color: rgba(22, 22, 28, 0.32) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08), 0 1px 4px rgba(0, 0, 0, 0.18) !important;
     transition: background-color 200ms ease;
 }
 
@@ -27,35 +31,61 @@
 .mak-panel:overview {
     background-color: transparent !important;
     border-bottom-color: transparent !important;
+    box-shadow: none !important;
 }
 
 .mak-app-title-label {
-    font-weight: 700;
-    font-size: 13.5px;
-    color: #f5f5f7;
-    padding-left: 6px;
-    padding-right: 8px;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    color: #ffffff !important;
+    padding-left: 6px !important;
+    padding-right: 12px !important;
     letter-spacing: -0.2px;
 }
 
-/* Panel pill buttons */
+/* Apple Menu icon in top bar */
+.mak-panel .menu-button {
+    icon-size: 16px !important;
+    color: #ffffff !important;
+    padding: 0 4px !important;
+}
+
+/* macOS panel buttons: compact, rounded hover highlights */
 .mak-panel .panel-button {
-    font-size: 12.5px;
-    font-weight: 500;
-    color: #f0f0f2;
-    border-radius: 12px;
-    padding: 0 8px;
-    margin: 2px 2px;
-    transition: background-color 150ms ease;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #f2f2f5 !important;
+    border-radius: 6px !important;
+    padding: 0 6px !important;
+    margin: 2px 1px !important;
+    height: 24px !important;
+    transition-duration: 100ms !important;
 }
 
 .mak-panel .panel-button:hover {
-    background-color: rgba(255, 255, 255, 0.14) !important;
-    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.16) !important;
+    color: #ffffff !important;
 }
 
-.mak-panel .panel-button:active {
-    background-color: rgba(255, 255, 255, 0.24) !important;
+.mak-panel .panel-button:active,
+.mak-panel .panel-button:checked {
+    background-color: rgba(255, 255, 255, 0.28) !important;
+    color: #ffffff !important;
+}
+
+/* macOS clock typography */
+.mak-panel .clock-display {
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: #f5f5f7 !important;
+    letter-spacing: -0.1px;
+}
+
+/* macOS system status icons */
+.mak-panel .system-status-icon {
+    icon-size: 16px !important;
+    margin: 0 1px !important;
+    color: #f2f2f7 !important;
 }
 
 /* AquaDockPro — stylesheet.
