@@ -1079,6 +1079,69 @@ class MakAppWindow(Adw.ApplicationWindow):
         self.theme_status_label.set_margin_top(8)
         sync_group.add(self.theme_status_label)
 
+        # ── Shell UI & Menu Styling (macOS Unified Design) ──
+        menu_group = Adw.PreferencesGroup(
+            title="macOS Shell UI and Menu Styling",
+            description="Fine-tune borders, corner curvature, and glass translucency across context menus, Kiwi menu, control center, and notifications:"
+        )
+        page.add(menu_group)
+
+        m_rad = Adw.SpinRow(
+            title="Menu Corner Radius",
+            subtitle="Curvature radius in pixels for context menus, Kiwi menu, and popups",
+            adjustment=Gtk.Adjustment(lower=6, upper=32, step_increment=1, value=self.bridge.get_menu_corner_radius())
+        )
+        m_rad.connect("notify::value", lambda r, p: self.bridge.set_menu_corner_radius(int(r.get_value())))
+        menu_group.add(m_rad)
+
+        m_bw = Adw.SpinRow(
+            title="Menu Border Width",
+            subtitle="Hairline stroke width in pixels",
+            adjustment=Gtk.Adjustment(lower=0, upper=4, step_increment=1, value=self.bridge.get_menu_border_width())
+        )
+        m_bw.connect("notify::value", lambda r, p: self.bridge.set_menu_border_width(int(r.get_value())))
+        menu_group.add(m_bw)
+
+        m_bopac = Adw.SpinRow(
+            title="Menu Border Opacity",
+            subtitle="Edge stroke alpha transparency factor",
+            adjustment=Gtk.Adjustment(lower=0.0, upper=1.0, step_increment=0.02, value=self.bridge.get_menu_border_opacity())
+        )
+        m_bopac.connect("notify::value", lambda r, p: self.bridge.set_menu_border_opacity(r.get_value()))
+        menu_group.add(m_bopac)
+
+        m_spec = Adw.SwitchRow(
+            title="Top Specular Highlight Rim",
+            subtitle="Render subtle 1px overhead light reflection along the upper glass bevel"
+        )
+        m_spec.set_active(self.bridge.get_menu_specular_highlight())
+        m_spec.connect("notify::active", lambda s, p: self.bridge.set_menu_specular_highlight(s.get_active()))
+        menu_group.add(m_spec)
+
+        m_bgopac = Adw.SpinRow(
+            title="Menu Glass Translucency",
+            subtitle="Background glass opacity for menus and dropdowns",
+            adjustment=Gtk.Adjustment(lower=0.2, upper=1.0, step_increment=0.05, value=self.bridge.get_menu_bg_opacity())
+        )
+        m_bgopac.connect("notify::value", lambda r, p: self.bridge.set_menu_bg_opacity(r.get_value()))
+        menu_group.add(m_bgopac)
+
+        qs_rad = Adw.SpinRow(
+            title="Control Center Corner Radius",
+            subtitle="Curvature radius for Quick Settings popup card",
+            adjustment=Gtk.Adjustment(lower=12, upper=40, step_increment=2, value=self.bridge.get_quick_settings_radius())
+        )
+        qs_rad.connect("notify::value", lambda r, p: self.bridge.set_quick_settings_radius(int(r.get_value())))
+        menu_group.add(qs_rad)
+
+        notif_rad = Adw.SpinRow(
+            title="Notification Banner Corner Radius",
+            subtitle="Curvature radius for desktop notification cards",
+            adjustment=Gtk.Adjustment(lower=8, upper=32, step_increment=1, value=self.bridge.get_notification_radius())
+        )
+        notif_rad.connect("notify::value", lambda r, p: self.bridge.set_notification_radius(int(r.get_value())))
+        menu_group.add(notif_rad)
+
     def _on_theme_selected(self, btn, key):
         if btn.get_active():
             self._selected_theme = key

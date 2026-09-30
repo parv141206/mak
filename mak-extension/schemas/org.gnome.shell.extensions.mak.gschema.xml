@@ -1023,5 +1023,48 @@
       <description>Update ~/.config/gtk-4.0 when theme changes.</description>
     </key>
 
+    <!-- ── 8. UI & MENU STYLING (macOS Unified Design) ───────────────────── -->
+    <key type="i" name="menu-corner-radius">
+      <default>16</default>
+      <summary>Menu Corner Radius</summary>
+      <description>Corner curvature radius in pixels for all context menus, popup menus, and kiwi menu.</description>
+    </key>
+
+    <key type="i" name="menu-border-width">
+      <default>1</default>
+      <summary>Menu Border Width</summary>
+      <description>Border stroke width in pixels for popup menus.</description>
+    </key>
+
+    <key type="d" name="menu-border-opacity">
+      <default>0.18</default>
+      <summary>Menu Border Opacity</summary>
+      <description>Border stroke opacity factor for popup menus.</description>
+    </key>
+
+    <key type="b" name="menu-specular-highlight">
+      <default>true</default>
+      <summary>Menu Specular Highlight</summary>
+      <description>Apply 1px inset specular highlight rim along top of menus.</description>
+    </key>
+
+    <key type="d" name="menu-bg-opacity">
+      <default>0.72</default>
+      <summary>Menu Background Opacity</summary>
+      <description>Background translucency factor for popup menus.</description>
+    </key>
+
+    <key type="i" name="quick-settings-radius">
+      <default>28</default>
+      <summary>Quick Settings Radius</summary>
+      <description>Corner radius in pixels for the Quick Settings control center.</description>
+    </key>
+
+    <key type="i" name="notification-radius">
+      <default>18</default>
+      <summary>Notification Corner Radius</summary>
+      <description>Corner radius in pixels for desktop notification banners.</description>
+    </key>
+
   </schema>
 </schemalist>

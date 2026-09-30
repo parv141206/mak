@@ -645,3 +645,25 @@ class MakSettingsBridge:
 
     def get_blur_appfolder(self): return self._get_b("blur-appfolder", None, None, True)
     def set_blur_appfolder(self, v): self._set_b("blur-appfolder", None, None, v)
+
+    # ── 7. UI & MENU STYLING (macOS Unified Design) ────────────────────────
+    def get_menu_corner_radius(self): return self._get_i("menu-corner-radius", None, None, 16)
+    def set_menu_corner_radius(self, v): self._set_i("menu-corner-radius", None, None, v)
+
+    def get_menu_border_width(self): return self._get_i("menu-border-width", None, None, 1)
+    def set_menu_border_width(self, v): self._set_i("menu-border-width", None, None, v)
+
+    def get_menu_border_opacity(self): return self._get_d("menu-border-opacity", None, None, 0.18)
+    def set_menu_border_opacity(self, v): self._set_d("menu-border-opacity", None, None, v)
+
+    def get_menu_specular_highlight(self): return self._get_b("menu-specular-highlight", None, None, True)
+    def set_menu_specular_highlight(self, v): self._set_b("menu-specular-highlight", None, None, v)
+
+    def get_menu_bg_opacity(self): return self._get_d("menu-bg-opacity", None, None, 0.72)
+    def set_menu_bg_opacity(self, v): self._set_d("menu-bg-opacity", None, None, v)
+
+    def get_quick_settings_radius(self): return self._get_i("quick-settings-radius", None, None, 28)
+    def set_quick_settings_radius(self, v): self._set_i("quick-settings-radius", None, None, v)
+
+    def get_notification_radius(self): return self._get_i("notification-radius", None, None, 18)
+    def set_notification_radius(self, v): self._set_i("notification-radius", None, None, v)
