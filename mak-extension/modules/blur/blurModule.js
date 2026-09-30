@@ -49,15 +49,15 @@ export class BlurModule {
             const hasDynamicCornerSupport = Boolean(NativeDynamicBlurEffect.supports_corner_radius);
             console.log('[Mak Blur] Dynamic corner blur support:', hasDynamicCornerSupport);
 
-            // Liquid glass blur across panel, popups, overview, app folders, and lockscreen
+            // Liquid glass dynamic stage blur across panel, popups, overview, app folders, and lockscreen
             panelSettings.set_boolean('blur', true);
             panelSettings.set_boolean('static-blur', false);
             panelSettings.set_boolean('override-background', true);
             panelSettings.set_int('style-panel', 0);
-            panelSettings.set_boolean('unblur-in-overview', false);
+            panelSettings.set_boolean('unblur-in-overview', true);
 
             popupSettings.set_boolean('blur', true);
-            popupSettings.set_boolean('static-blur', !hasDynamicCornerSupport);
+            popupSettings.set_boolean('static-blur', false);
             popupSettings.set_int('style-popup', 3);
             popupSettings.set_int('quick-settings-corner-radius', 28);
             popupSettings.set_int('menu-corner-radius', 18);
@@ -193,19 +193,13 @@ export class BlurModule {
                 console.warn('[Mak Blur] Error updating pipelines parameters:', pErr.message);
             }
 
-            // Toggle Liquid Glass refraction pipeline vs default Gaussian pipeline
-            const hasDynamicCornerSupport = Boolean(NativeDynamicBlurEffect.supports_corner_radius);
-            if (liquidGlass) {
-                panelSettings.set_boolean('static-blur', true);
-                panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
-                popupSettings.set_boolean('static-blur', true);
-                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
-            } else {
-                panelSettings.set_boolean('static-blur', false);
-                panelSettings.set_string('pipeline', 'pipeline_default');
-                popupSettings.set_boolean('static-blur', !hasDynamicCornerSupport);
-                popupSettings.set_string('pipeline', 'pipeline_default_rounded');
-            }
+            // Dynamic stage blur across panel and popups
+            // (blurring actual windows and applications dynamically beneath UI elements)
+            panelSettings.set_boolean('static-blur', false);
+            panelSettings.set_boolean('unblur-in-overview', true);
+            panelSettings.set_string('pipeline', 'pipeline_default');
+            popupSettings.set_boolean('static-blur', false);
+            popupSettings.set_string('pipeline', 'pipeline_default_rounded');
 
             if (this._bms) {
                 try {

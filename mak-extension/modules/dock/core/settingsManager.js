@@ -235,9 +235,10 @@ export class SettingsManager {
             this._config.blurBrightness = this._makSettings.get_double('blur-brightness');
             this._pendingKeys.add('blur-brightness');
             this._pendingKeys.add('blurBrightness');
-        } else if (key === 'blur-dock') {
-            this._config.dockBlur = this._makSettings.get_boolean('blur-dock') && this._makSettings.get_boolean('blur-enabled');
+        } else if (key === 'blur-dock' || key === 'dock-blur' || key === 'blur-enabled') {
+            this._config.dockBlur = this._makSettings.get_boolean('blur-dock') && this._makSettings.get_boolean('dock-blur') && this._makSettings.get_boolean('blur-enabled');
             this._pendingKeys.add('blur-dock');
+            this._pendingKeys.add('dock-blur');
             this._pendingKeys.add('dockBlur');
         } else if (key === 'background-opacity') {
             this._config.bgOpacity = this._makSettings.get_double('background-opacity');

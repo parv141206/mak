@@ -56,23 +56,16 @@ export class GlassBlurPipeline {
         this._container = container;
 
         try {
-            const monitor = this._getMonitor();
-            this._bgGroup = new Meta.BackgroundGroup({
-                name: 'aqua-dock-bg-group',
-                reactive: false,
-            });
-
-            // Insert background group directly into the container at index 0 (behind all items & pill)
-            this._container.insert_child_at_index(this._bgGroup, 0);
-
             if (this._isDynamic) {
                 // ── 1. DYNAMIC BLUR (gnome-rounded-blur available) ──
                 console.log('[Mak GlassBlur] Using dynamic stage blur with native corner radius:', this._cornerRadius);
                 this._blurActor = new St.Widget({
                     name: 'aqua-dock-blurred-widget',
                     reactive: false,
+                    style: 'background-color: rgba(255, 255, 255, 0.001);',
                 });
-                this._bgGroup.add_child(this._blurActor);
+                // Insert directly into the container at index 0 (behind dock pill bg and items)
+                this._container.insert_child_at_index(this._blurActor, 0);
 
                 this._blurEffect = new NativeDynamicBlurEffect({
                     unscaled_radius: this._radius,
@@ -85,6 +78,12 @@ export class GlassBlurPipeline {
                 console.log('[Mak GlassBlur] Using zero-korner static wallpaper blur pipeline.');
                 const monW = monitor ? Math.max(100, monitor.width) : 1920;
                 const monH = monitor ? Math.max(100, monitor.height) : 1080;
+
+                this._bgGroup = new Meta.BackgroundGroup({
+                    name: 'aqua-dock-bg-group',
+                    reactive: false,
+                });
+                this._container.insert_child_at_index(this._bgGroup, 0);
 
                 this._blurActor = new St.Widget({
                     name: 'aqua-dock-blurred-widget',
@@ -183,10 +182,15 @@ export class GlassBlurPipeline {
     }
 
     _syncVisibility() {
-        if (!this._bgGroup || !this._actor) return;
+        const targetActor = this._blurActor || this._bgGroup;
+        if (!targetActor || !this._actor) return;
         const visible = Boolean((this._enabled ?? true) && this._actor.visible && (this._container ? this._container.visible : true));
-        this._bgGroup.visible = visible;
-        this._bgGroup.opacity = this._actor.opacity;
+        targetActor.visible = visible;
+        targetActor.opacity = this._actor.opacity;
+        if (this._bgGroup && this._bgGroup !== targetActor) {
+            this._bgGroup.visible = visible;
+            this._bgGroup.opacity = this._actor.opacity;
+        }
     }
 
     _syncScale() {
@@ -238,6 +242,8 @@ export class GlassBlurPipeline {
             this._blurActor.set_size(pillW, pillH);
             if (this._blurEffect) {
                 this._blurEffect.unscaled_corner_radius = this._cornerRadius;
+                this._blurEffect.unscaled_radius = this._radius;
+                this._blurEffect.brightness = this._brightness;
             }
         } else {
             // Static wallpaper blur: calculate stage offsets for monitor alignment
@@ -339,7 +345,12 @@ export class GlassBlurPipeline {
         }
 
         if (this._blurActor) {
-            try { this._blurActor.destroy(); } catch (e) {}
+            try {
+                if (this._container && this._container.contains(this._blurActor)) {
+                    this._container.remove_child(this._blurActor);
+                }
+                this._blurActor.destroy();
+            } catch (e) {}
             this._blurActor = null;
         }
 
