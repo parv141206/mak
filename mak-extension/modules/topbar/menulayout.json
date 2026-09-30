@@ -1,0 +1,80 @@
+[
+  {
+    "type": "menu",
+    "title": "About This PC",
+    "cmds": ["about-this-pc"],
+    "icon": "computer-symbolic"
+  },
+  {
+    "type": "separator"
+  },
+  {
+    "type": "menu",
+    "title": "System Settings...",
+    "cmds": ["gnome-control-center"],
+    "icon": "preferences-system-symbolic",
+    "accelKey": "control-center"
+  },
+  {
+    "type": "menu",
+    "title": "App Store...",
+    "cmds": ["gnome-software"],
+    "commandSettingKey": "app-store-command",
+    "icon": "system-software-install-symbolic"
+  },
+  {
+    "type": "separator"
+  },
+  {
+    "type": "recent-items",
+    "title": "Recent Items",
+    "icon": "document-open-recent-symbolic"
+  },
+  {
+    "type": "separator"
+  },
+  {
+    "type": "menu",
+    "title": "Force Quit",
+    "cmds": ["force-quit"],
+    "icon": "process-stop-symbolic"
+  },
+  {
+    "type": "separator"
+  },
+  {
+    "type": "menu",
+    "title": "Sleep",
+    "cmds": ["suspend"],
+    "icon": "weather-clear-night-symbolic"
+  },
+  {
+    "type": "menu",
+    "title": "Restart...",
+    "cmds": ["restart"],
+    "icon": "system-reboot-symbolic"
+  },
+  {
+    "type": "menu",
+    "title": "Shut Down...",
+    "cmds": ["power-off"],
+    "icon": "system-shutdown-symbolic"
+  },
+  {
+    "type": "separator"
+  },
+  {
+    "type": "menu",
+    "title": "Lock Screen",
+    "cmds": ["lock-screen"],
+    "icon": "system-lock-screen-symbolic",
+    "accelKey": "screensaver"
+  },
+  {
+    "type": "menu",
+    "title": "Log Out...",
+    "cmds": ["logout"],
+    "icon": "system-log-out-symbolic",
+    "accelKey": "logout"
+  }
+]

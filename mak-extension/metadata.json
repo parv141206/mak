@@ -1,0 +1,9 @@
+{
+  "uuid": "mak@local",
+  "name": "Mak",
+  "description": "Unified macOS Experience Suite: Glass Dock with dynamic blur, Top Bar & Apple Menu, Spotlight Search, Window Gaps, and Rounded Corners.",
+  "shell-version": ["46", "47", "48", "49", "50", "51"],
+  "settings-schema": "org.gnome.shell.extensions.mak",
+  "url": "https://github.com/mak-desktop",
+  "version": 1
+}
