@@ -135,6 +135,126 @@ export class MenuStyleController {
     border: ${borderCss} !important;
     box-shadow: ${specularCss} 0 24px 56px rgba(0, 0, 0, 0.52) !important;
 }
+
+/* ── Bluetooth Battery Indicator ─────────────────────────────────────────── */
+.mak-bt-panel-box {
+    spacing: 4px;
+    padding: 0 4px;
+}
+.mak-bt-panel-label {
+    font-size: 0.85em;
+    font-weight: 600;
+    margin-right: 2px;
+}
+.mak-bt-panel-bar-bg {
+    height: 3px;
+    width: 16px;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    margin-top: 1px;
+}
+.mak-bt-panel-bar-fill {
+    height: 3px;
+    border-radius: 2px;
+}
+.mak-bt-fill-green { background-color: #34c759 !important; }
+.mak-bt-fill-orange { background-color: #ff9500 !important; }
+.mak-bt-fill-red { background-color: #ff3b30 !important; }
+.mak-bt-container {
+    spacing: 8px;
+    padding: 6px;
+    min-width: 250px;
+}
+.mak-bt-header {
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.mak-bt-header-label {
+    font-weight: 700;
+    font-size: 1.05em;
+}
+.mak-bt-devices {
+    spacing: 6px;
+    padding-top: 4px;
+}
+.mak-bt-empty {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    text-align: center;
+    padding: 12px;
+}
+.mak-bt-device-item {
+    spacing: 10px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition-duration: 100ms;
+}
+.mak-bt-device-item:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+}
+.mak-bt-device-icon { icon-size: 16px; }
+.mak-bt-device-label { font-size: 0.95em; }
+.mak-bt-battery-box { spacing: 6px; }
+.mak-bt-progress-bg {
+    height: 6px;
+    width: 55px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+.mak-bt-progress-fill {
+    height: 6px;
+    background-color: #34c759;
+    border-radius: 3px;
+}
+.mak-bt-battery-text {
+    font-size: 0.85em;
+    color: rgba(255, 255, 255, 0.8);
+    width: 35px;
+    text-align: right;
+}
+
+/* ── Dynamic Media / Music Pill ───────────────────────────────────────────── */
+.music-pill-container {
+    background: transparent !important;
+    margin: 0 8px;
+}
+.pill-body {
+    background-color: rgba(28, 28, 34, ${bgOpacity.toFixed(2)}) !important;
+    border: ${borderCss} !important;
+    border-radius: 20px !important;
+    box-shadow: ${specularCss} 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease, transform 0.3s ease;
+}
+.pill-body:hover {
+    transform: translateY(-1px) scale(1.02);
+}
+.music-pill-expanded {
+    background-color: rgba(36, 36, 42, ${bgOpacity.toFixed(2)}) !important;
+    border: ${borderCss} !important;
+    border-radius: ${radius}px !important;
+    padding: 16px;
+    box-shadow: ${specularCss} 0 20px 48px rgba(0, 0, 0, 0.48) !important;
+    min-width: 300px;
+}
+
+/* ── macOS Recording & Screen Sharing Glowing Status Badges ───────────────── */
+.screen-recording-indicator,
+.screen-sharing-indicator {
+    background-color: rgba(255, 69, 58, 0.28) !important;
+    border: 1px solid rgba(255, 69, 58, 0.6) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 10px rgba(255, 69, 58, 0.5) !important;
+    margin: 2px 4px !important;
+    padding: 0 8px !important;
+    color: #ff453a !important;
+}
+
+.screen-sharing-indicator {
+    background-color: rgba(10, 132, 255, 0.28) !important;
+    border-color: rgba(10, 132, 255, 0.6) !important;
+    box-shadow: 0 0 10px rgba(10, 132, 255, 0.5) !important;
+    color: #0a84ff !important;
+}
 `;
 
         try {

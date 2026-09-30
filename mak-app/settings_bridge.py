@@ -372,6 +372,12 @@ class MakSettingsBridge:
     def get_topbar_pill_style(self): return self._get_b("topbar-pill-style", None, None, True)
     def set_topbar_pill_style(self, v): self._set_b("topbar-pill-style", None, None, v)
 
+    def get_topbar_bluetooth_battery(self): return self._get_b("topbar-bluetooth-battery", None, None, True)
+    def set_topbar_bluetooth_battery(self, v): self._set_b("topbar-bluetooth-battery", None, None, v)
+
+    def get_topbar_media_pill(self): return self._get_b("topbar-media-pill", None, None, True)
+    def set_topbar_media_pill(self, v): self._set_b("topbar-media-pill", None, None, v)
+
 
     # ── 3. SPOTLIGHT SEARCH SETTINGS ───────────────────────────────────────
     def get_spotlight_enabled(self): return self._get_b("spotlight-enabled", None, None, True)
@@ -645,6 +651,15 @@ class MakSettingsBridge:
 
     def get_blur_appfolder(self): return self._get_b("blur-appfolder", None, None, True)
     def set_blur_appfolder(self, v): self._set_b("blur-appfolder", None, None, v)
+
+    def get_blur_liquid_glass(self): return self._get_b("blur-liquid-glass", None, None, True)
+    def set_blur_liquid_glass(self, v): self._set_b("blur-liquid-glass", None, None, v)
+
+    def get_blur_refraction_strength(self): return self._get_d("blur-refraction-strength", None, None, 0.42)
+    def set_blur_refraction_strength(self, v): self._set_d("blur-refraction-strength", None, None, v)
+
+    def get_blur_chromatic_dispersion(self): return self._get_d("blur-chromatic-dispersion", None, None, 0.08)
+    def set_blur_chromatic_dispersion(self, v): self._set_d("blur-chromatic-dispersion", None, None, v)
 
     # ── 7. UI & MENU STYLING (macOS Unified Design) ────────────────────────
     def get_menu_corner_radius(self): return self._get_i("menu-corner-radius", None, None, 16)

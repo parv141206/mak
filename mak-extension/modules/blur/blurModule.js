@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Mak Unified Shell Blur Module
 // Applies authentic macOS frosted glass blur across Top Bar, Overview, Popups/Quick Settings, Folders, and Lock Screen.
+// Supports Liquid Glass refraction shader with chromatic dispersion and Snell-law light bending.
 
 import Gio from 'gi://Gio';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -49,14 +50,12 @@ export class BlurModule {
 
             // Liquid glass blur across panel, popups, overview, app folders, and lockscreen
             panelSettings.set_boolean('blur', true);
-            // Panel is full-screen rectangular bar; dynamic stage blur works with ZERO corner artifacts!
             panelSettings.set_boolean('static-blur', false);
             panelSettings.set_boolean('override-background', true);
-            panelSettings.set_int('style-panel', 0); // Transparent panel so blurred windows shine through
+            panelSettings.set_int('style-panel', 0);
             panelSettings.set_boolean('unblur-in-overview', false);
 
-            popupSettings.set_boolean('blur', true); // Enables blur on Quick Settings / Control Center, Menus, Dialogs
-            // If gnome-rounded-blur is installed, use true dynamic blur with corner-radius; otherwise use zero-korner static actor
+            popupSettings.set_boolean('blur', true);
             popupSettings.set_boolean('static-blur', !hasDynamicCornerSupport);
             popupSettings.set_int('style-popup', 3);
             popupSettings.set_int('quick-settings-corner-radius', 28);
@@ -91,14 +90,33 @@ export class BlurModule {
 
         try {
             const panelSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.panel' });
+            const popupSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.popup' });
+            const overviewSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.overview' });
+            const appfolderSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.appfolder' });
+            const bmsSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell' });
+
             const topbarBlur = this._makSettings.get_boolean('topbar-blur') || this._makSettings.get_boolean('blur-panel');
             panelSettings.set_boolean('blur', topbarBlur);
-
-            const overviewSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.overview' });
             overviewSettings.set_boolean('blur', this._makSettings.get_boolean('blur-overview'));
-
-            const appfolderSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.appfolder' });
             appfolderSettings.set_boolean('blur', this._makSettings.get_boolean('blur-appfolder'));
+
+            // Toggle Liquid Glass refraction pipeline vs default Gaussian pipeline
+            const liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
+            if (liquidGlass) {
+                panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
+                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
+            } else {
+                panelSettings.set_string('pipeline', 'pipeline_default');
+                popupSettings.set_string('pipeline', 'pipeline_default_rounded');
+            }
+
+            // Sync global parameters
+            const sigma = this._makSettings.get_int('blur-sigma');
+            const brightness = this._makSettings.get_double('blur-brightness');
+            const noise = this._makSettings.get_double('blur-noise-amount');
+            bmsSettings.set_int('sigma', sigma);
+            bmsSettings.set_double('brightness', brightness);
+            bmsSettings.set_double('noise-amount', noise);
         } catch (err) {
             console.warn('[Mak Blur] Error syncing settings to BMS:', err);
         }

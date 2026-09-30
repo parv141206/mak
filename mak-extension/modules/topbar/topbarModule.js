@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Mak Top Bar Module: Apple Menu, Active App Title, and Glass Panel Styling
+// Mak Top Bar Module: Apple Menu, Active App Title, Media Pill, Bluetooth Battery, and Glass Panel Styling
 
 import Clutter from 'gi://Clutter';
 import GObject from 'gi://GObject';
@@ -9,6 +9,8 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 
 import { KiwiMenu } from './kiwimenu.js';
+import { BluetoothBatteryButton } from './bluetoothBattery.js';
+import { MusicController } from './dynamic-music-pill/controller.js';
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: 'MakAppTitleButton' },
@@ -51,40 +53,130 @@ const AppTitleButton = GObject.registerClass(
 export class TopBarModule {
     constructor(extension) {
         this._extension = extension;
-        this._settings = extension.getSettings();
+        this._settings = extension.getSettings('org.gnome.shell.extensions.mak');
         this._appleMenu = null;
         this._appTitle = null;
+        this._btBattery = null;
+        this._musicController = null;
         this._panelBlurEffect = null;
+        this._settingsChangedId = 0;
     }
 
     enable() {
         // 1. Add Apple Menu
         if (this._settings.get_boolean('topbar-apple-menu')) {
-            try {
-                const kiwiSettings = this._extension.getSettings('org.gnome.shell.extensions.kiwimenu');
-                this._appleMenu = new KiwiMenu(kiwiSettings, this._extension.path, this._extension);
-                Main.panel.addToStatusArea('MakAppleMenu', this._appleMenu, 0, 'left');
-            } catch (err) {
-                console.warn('[Mak TopBar] Could not add Apple Menu:', err);
-            }
+            this._enableAppleMenu();
         }
 
         // 2. Add Active App Title
         if (this._settings.get_boolean('topbar-app-title')) {
-            try {
-                this._appTitle = new AppTitleButton();
-                Main.panel.addToStatusArea('MakAppTitle', this._appTitle, 1, 'left');
-            } catch (err) {
-                console.warn('[Mak TopBar] Could not add App Title:', err);
-            }
+            this._enableAppTitle();
         }
 
-        // 3. Apply Glass Blur & Styling to Top Bar
+        // 3. Add Bluetooth Battery Indicator
+        if (this._settings.get_boolean('topbar-bluetooth-battery')) {
+            this._enableBluetoothBattery();
+        }
+
+        // 4. Add Dynamic Media Pill
+        if (this._settings.get_boolean('topbar-media-pill')) {
+            this._enableMediaPill();
+        }
+
+        // 5. Apply Glass Blur & Styling to Top Bar
         if (this._settings.get_boolean('topbar-blur')) {
             this._applyPanelBlur();
         }
 
         Main.panel.add_style_class_name('mak-panel');
+
+        this._settingsChangedId = this._settings.connect('changed', (s, key) => {
+            if (key === 'topbar-apple-menu') {
+                if (this._settings.get_boolean('topbar-apple-menu')) this._enableAppleMenu();
+                else this._disableAppleMenu();
+            } else if (key === 'topbar-app-title') {
+                if (this._settings.get_boolean('topbar-app-title')) this._enableAppTitle();
+                else this._disableAppTitle();
+            } else if (key === 'topbar-bluetooth-battery') {
+                if (this._settings.get_boolean('topbar-bluetooth-battery')) this._enableBluetoothBattery();
+                else this._disableBluetoothBattery();
+            } else if (key === 'topbar-media-pill') {
+                if (this._settings.get_boolean('topbar-media-pill')) this._enableMediaPill();
+                else this._disableMediaPill();
+            } else if (key === 'topbar-blur') {
+                if (this._settings.get_boolean('topbar-blur')) this._applyPanelBlur();
+                else this._removePanelBlur();
+            }
+        });
+    }
+
+    _enableAppleMenu() {
+        if (this._appleMenu) return;
+        try {
+            const kiwiSettings = this._extension.getSettings('org.gnome.shell.extensions.kiwimenu');
+            this._appleMenu = new KiwiMenu(kiwiSettings, this._extension.path, this._extension);
+            Main.panel.addToStatusArea('MakAppleMenu', this._appleMenu, 0, 'left');
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Apple Menu:', err);
+        }
+    }
+
+    _disableAppleMenu() {
+        if (this._appleMenu) {
+            this._appleMenu.destroy();
+            this._appleMenu = null;
+        }
+    }
+
+    _enableAppTitle() {
+        if (this._appTitle) return;
+        try {
+            this._appTitle = new AppTitleButton();
+            Main.panel.addToStatusArea('MakAppTitle', this._appTitle, 1, 'left');
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add App Title:', err);
+        }
+    }
+
+    _disableAppTitle() {
+        if (this._appTitle) {
+            this._appTitle.destroy();
+            this._appTitle = null;
+        }
+    }
+
+    _enableBluetoothBattery() {
+        if (this._btBattery) return;
+        try {
+            this._btBattery = new BluetoothBatteryButton(this._extension);
+            Main.panel.addToStatusArea('MakBluetoothBattery', this._btBattery, 1, 'right');
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Bluetooth Battery indicator:', err);
+        }
+    }
+
+    _disableBluetoothBattery() {
+        if (this._btBattery) {
+            try { this._btBattery.destroy(); } catch (e) {}
+            this._btBattery = null;
+        }
+    }
+
+    _enableMediaPill() {
+        if (this._musicController) return;
+        try {
+            this._musicController = new MusicController(this._extension);
+            this._musicController.enable();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not enable Dynamic Music Pill:', err);
+        }
+    }
+
+    _disableMediaPill() {
+        if (this._musicController) {
+            try { this._musicController.disable(); } catch (e) {}
+            this._musicController = null;
+        }
     }
 
     _applyPanelBlur() {
@@ -102,22 +194,25 @@ export class TopBarModule {
         }
     }
 
-    disable() {
+    _removePanelBlur() {
         if (this._panelBlurEffect) {
             try { Main.panel.remove_effect(this._panelBlurEffect); } catch (e) {}
             this._panelBlurEffect = null;
         }
+    }
 
+    disable() {
+        if (this._settingsChangedId) {
+            try { this._settings.disconnect(this._settingsChangedId); } catch (e) {}
+            this._settingsChangedId = 0;
+        }
+
+        this._removePanelBlur();
         Main.panel.remove_style_class_name('mak-panel');
 
-        if (this._appTitle) {
-            this._appTitle.destroy();
-            this._appTitle = null;
-        }
-
-        if (this._appleMenu) {
-            this._appleMenu.destroy();
-            this._appleMenu = null;
-        }
+        this._disableMediaPill();
+        this._disableBluetoothBattery();
+        this._disableAppTitle();
+        this._disableAppleMenu();
     }
 }

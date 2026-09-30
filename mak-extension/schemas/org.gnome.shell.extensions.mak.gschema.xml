@@ -567,6 +567,18 @@
       <description>Dynamic frosted blur effect behind the top panel.</description>
     </key>
 
+    <key type="b" name="topbar-bluetooth-battery">
+      <default>true</default>
+      <summary>Bluetooth Battery Level</summary>
+      <description>Show connected Bluetooth device battery levels and status in the top bar.</description>
+    </key>
+
+    <key type="b" name="topbar-media-pill">
+      <default>true</default>
+      <summary>Dynamic Media Pill</summary>
+      <description>macOS Dynamic Island-style media playback pill in the top bar.</description>
+    </key>
+
     <key type="i" name="topbar-blur-radius">
       <default>28</default>
       <range min="5" max="100"/>
@@ -969,6 +981,26 @@
       <default>true</default>
       <summary>Blur App Folders</summary>
       <description>Blur background in app drawer folders.</description>
+    </key>
+
+    <key type="b" name="blur-liquid-glass">
+      <default>true</default>
+      <summary>Liquid Glass Refraction Shader</summary>
+      <description>Physical Snell-law light refraction, edge dispersion, and specular rim highlight.</description>
+    </key>
+
+    <key type="d" name="blur-refraction-strength">
+      <default>0.42</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Refraction Strength</summary>
+      <description>Strength of optical light bending at window edges.</description>
+    </key>
+
+    <key type="d" name="blur-chromatic-dispersion">
+      <default>0.08</default>
+      <range min="0.0" max="0.5"/>
+      <summary>Chromatic Dispersion</summary>
+      <description>RGB prism color splitting along curved glass borders.</description>
     </key>
 
 

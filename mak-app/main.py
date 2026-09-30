@@ -636,6 +636,26 @@ class MakAppWindow(Adw.ApplicationWindow):
         store_cmd.connect("changed", lambda e: self.bridge.set_app_store_cmd(e.get_text()))
         apple_group.add(store_cmd)
 
+        # macOS Indicators & Dynamic Island
+        ind_group = Adw.PreferencesGroup(title="macOS Indicators and Dynamic Island")
+        page.add(ind_group)
+
+        bt_bat = Adw.SwitchRow(
+            title="Bluetooth Device Battery Indicator",
+            subtitle="Show connected Bluetooth devices with battery percentage badges and status bars"
+        )
+        bt_bat.set_active(self.bridge.get_topbar_bluetooth_battery())
+        bt_bat.connect("notify::active", lambda s, p: self.bridge.set_topbar_bluetooth_battery(s.get_active()))
+        ind_group.add(bt_bat)
+
+        media_pill = Adw.SwitchRow(
+            title="Dynamic Media Island Pill",
+            subtitle="Live macOS Dynamic Island playback pill with album art, waveform visualizer, and controls"
+        )
+        media_pill.set_active(self.bridge.get_topbar_media_pill())
+        media_pill.connect("notify::active", lambda s, p: self.bridge.set_topbar_media_pill(s.get_active()))
+        ind_group.add(media_pill)
+
         # Panel Appearance
         pan_group = Adw.PreferencesGroup(title="Panel Styling and Frosted Blur")
         page.add(pan_group)
@@ -1032,6 +1052,37 @@ class MakAppWindow(Adw.ApplicationWindow):
             sw.set_active(getter())
             sw.connect("notify::active", lambda s, p, fn=setter: fn(s.get_active()))
             surf_group.add(sw)
+
+        # ── Liquid Glass Optical Refraction Shader ──
+        liq_group = Adw.PreferencesGroup(
+            title="Liquid Glass Refraction and Dispersion Shader",
+            description="Hardware-accelerated Snell-law optical refraction, specular rim highlights, and chromatic edge splitting."
+        )
+        page.add(liq_group)
+
+        liq_en = Adw.SwitchRow(
+            title="Enable Liquid Glass Refraction",
+            subtitle="Physics-based ray refraction that dynamically bends wallpaper and windows through glass edges"
+        )
+        liq_en.set_active(self.bridge.get_blur_liquid_glass())
+        liq_en.connect("notify::active", lambda s, p: self.bridge.set_blur_liquid_glass(s.get_active()))
+        liq_group.add(liq_en)
+
+        refr_str = Adw.SpinRow(
+            title="Refraction Strength",
+            subtitle="Optical bending scale along curved edges",
+            adjustment=Gtk.Adjustment(lower=0.0, upper=1.0, step_increment=0.02, value=self.bridge.get_blur_refraction_strength())
+        )
+        refr_str.connect("notify::value", lambda r, p: self.bridge.set_blur_refraction_strength(r.get_value()))
+        liq_group.add(refr_str)
+
+        disp_row = Adw.SpinRow(
+            title="Chromatic Color Dispersion",
+            subtitle="Prism RGB channel wavelength splitting on glass bevels",
+            adjustment=Gtk.Adjustment(lower=0.0, upper=0.5, step_increment=0.01, value=self.bridge.get_blur_chromatic_dispersion())
+        )
+        disp_row.connect("notify::value", lambda r, p: self.bridge.set_blur_chromatic_dispersion(r.get_value()))
+        liq_group.add(disp_row)
 
     # ── 7. APPEARANCE & THEMES ────────────────────────────────────────────
     def _build_theme_page(self):
