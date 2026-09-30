@@ -44,6 +44,26 @@
                                 }>
                             }>
                         ]>
+                    },
+                    'pipeline_liquid_glass': {
+                        'name': <'Liquid Glass'>,
+                        'effects': <[
+                            <{
+                                'type': <'refraction'>,
+                                'id': <'effect_liquid_glass_01'>,
+                                'params': <{
+                                    'strength': <0.42>,
+                                    'blur_radius': <12.0>,
+                                    'edge_size': <22.0>,
+                                    'falloff': <2.4>,
+                                    'corner_radius': <20.0>,
+                                    'rim_width': <4.8>,
+                                    'rgb_fringing': <0.08>,
+                                    'gloss': <0.55>,
+                                    'tint': <0.18>
+                                }>
+                            }>
+                        ]>
                     }
                 }
             ]]></default>
