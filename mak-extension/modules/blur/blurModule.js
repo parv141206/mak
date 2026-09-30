@@ -29,7 +29,9 @@ export class BlurModule {
         }
 
         this._settingsChangedId = this._makSettings.connect('changed', (s, key) => {
-            if (key.startsWith('blur-') || key.startsWith('topbar-blur')) {
+            if (key.startsWith('blur-') || key.startsWith('topbar-blur') ||
+                key === 'global-opacity' || key === 'background-opacity' ||
+                key === 'topbar-transparency') {
                 this._syncSettings();
             }
         });
@@ -193,13 +195,20 @@ export class BlurModule {
                 console.warn('[Mak Blur] Error updating pipelines parameters:', pErr.message);
             }
 
-            // Dynamic stage blur across panel and popups
-            // (blurring actual windows and applications dynamically beneath UI elements)
+            // ── Pipeline assignment: route surfaces to standard or liquid-glass pipeline ──
+            // When liquid glass is ON: panel and popups use the refraction pipeline
+            // When OFF: panel uses standard dynamic blur, popups use rounded dynamic blur
             panelSettings.set_boolean('static-blur', false);
             panelSettings.set_boolean('unblur-in-overview', true);
-            panelSettings.set_string('pipeline', 'pipeline_default');
             popupSettings.set_boolean('static-blur', false);
-            popupSettings.set_string('pipeline', 'pipeline_default_rounded');
+
+            if (liquidGlass) {
+                panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
+                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
+            } else {
+                panelSettings.set_string('pipeline', 'pipeline_default');
+                popupSettings.set_string('pipeline', 'pipeline_default_rounded');
+            }
 
             if (this._bms) {
                 try {

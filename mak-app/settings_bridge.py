@@ -191,6 +191,9 @@ class MakSettingsBridge:
     def get_dock_opacity(self): return self._get_d("background-opacity", self.dock, "background-opacity", 0.25)
     def set_dock_opacity(self, v): self._set_d("background-opacity", self.dock, "background-opacity", v)
 
+    def get_global_opacity(self): return self._get_d("global-opacity", None, None, 0.5)
+    def set_global_opacity(self, v): self._set_d("global-opacity", None, None, v)
+
     def get_pill_color(self): return self._get_s("pill-color", self.dock, "pill-color", "rgb(255,255,255)")
     def set_pill_color(self, v): self._set_s("pill-color", self.dock, "pill-color", v)
 

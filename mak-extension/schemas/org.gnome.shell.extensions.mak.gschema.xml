@@ -166,9 +166,16 @@
 
     <key type="d" name="background-opacity">
       <default>0.25</default>
-      <range min="0.05" max="1.0"/>
+      <range min="0.0" max="1.0"/>
       <summary>Background Opacity</summary>
       <description>Dock pill glass background opacity.</description>
+    </key>
+
+    <key type="d" name="global-opacity">
+      <default>0.5</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Global Glass Opacity</summary>
+      <description>Master opacity override for all glass surfaces (dock, top bar, popups). When set, overrides per-surface opacity values.</description>
     </key>
 
     <key type="s" name="pill-color">
@@ -940,16 +947,16 @@
 
     <key type="i" name="blur-sigma">
       <default>30</default>
-      <range min="10" max="80"/>
+      <range min="0" max="80"/>
       <summary>Blur Sigma Radius</summary>
-      <description>Gaussian blur intensity radius.</description>
+      <description>Gaussian blur intensity radius. 0 = no blur.</description>
     </key>
 
     <key type="d" name="blur-brightness">
       <default>0.65</default>
-      <range min="0.2" max="1.0"/>
+      <range min="0.0" max="1.0"/>
       <summary>Blur Brightness</summary>
-      <description>Brightness factor applied behind glass surfaces.</description>
+      <description>Brightness factor applied behind glass surfaces. 0 = fully dark, 1 = fully bright.</description>
     </key>
 
     <key type="d" name="blur-noise-amount">
