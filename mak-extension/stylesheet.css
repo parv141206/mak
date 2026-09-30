@@ -1102,3 +1102,44 @@
     border-color: rgba(255, 255, 255, 0.12);
     color: rgba(255, 255, 255, 0.62);
 }
+
+/* ── macOS Frosted Glass Popups, Submenus & Control Center Overrides ───────── */
+#uiGroup .popup-menu-boxpointer,
+#uiGroup .candidate-popup-boxpointer,
+.popup-menu-boxpointer,
+.candidate-popup-boxpointer {
+    -arrow-rise: 0px !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+}
+
+#uiGroup .popup-menu-content,
+#uiGroup .popup-sub-menu,
+#uiGroup .candidate-popup-content,
+#uiGroup .quick-settings,
+#uiGroup .quick-toggle-menu,
+#uiGroup .notification-banner,
+#uiGroup .modal-dialog,
+#uiGroup .pill-body,
+#uiGroup .music-pill-expanded,
+.popup-menu-content,
+.popup-sub-menu,
+.candidate-popup-content,
+.quick-settings,
+.quick-toggle-menu,
+.notification-banner,
+.modal-dialog,
+.pill-body,
+.music-pill-expanded {
+    box-shadow: none !important;
+}
+
+/* Ensure Quick Settings and Submenus have matching glass transparency */
+#uiGroup .quick-settings,
+#uiGroup .quick-toggle-menu,
+#uiGroup .kiwi-recent-menu .popup-menu-content {
+    background-color: rgba(36, 36, 42, 0.25) !important;
+}
+

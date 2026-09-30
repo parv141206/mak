@@ -13,6 +13,6 @@ export function boxShadowCss(shadow) {
     return `box-shadow: ${shadow.horizontalOffset}px
           ${shadow.verticalOffset}px
           ${shadow.blurOffset}px
-          ${shadow.spreadRadius}px
+          0px
           rgba(0,0,0, ${shadow.opacity / 100})`;
 }
