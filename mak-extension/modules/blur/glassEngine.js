@@ -14,7 +14,6 @@ import * as Background from 'resource:///org/gnome/shell/ui/background.js';
 import { NativeStaticBlurEffect } from './bms/effects/native_static_gaussian_blur.js';
 import { NativeDynamicBlurEffect } from './bms/effects/native_dynamic_gaussian_blur.js';
 import { CornerEffect } from './bms/effects/corner.js';
-import { RefractionEffect } from './bms/effects/refraction.js';
 
 export class GlassBlurPipeline {
     constructor(actor, containerOrOptions = {}, maybeOptions = {}) {
@@ -32,16 +31,12 @@ export class GlassBlurPipeline {
         this._brightness = options.brightness ?? 0.75;
         this._cornerRadius = options.cornerRadius ?? 24;
         this._enabled = options.enabled ?? true;
-        this._refractionStrength = options.refractionStrength ?? 0.42;
-        this._chromaticDispersion = options.chromaticDispersion ?? 0.08;
-        this._liquidGlass = options.liquidGlass ?? false;
 
         this._bgGroup = null;
         this._blurActor = null;
         this._bgManager = null;
         this._blurEffect = null;
         this._cornerEffect = null;
-        this._refractionEffect = null;
         this._pendingUpdateId = 0;
         this._isDynamic = Boolean(NativeDynamicBlurEffect.supports_corner_radius);
 
@@ -298,7 +293,7 @@ export class GlassBlurPipeline {
         );
     }
 
-    setParameters({ radius, brightness, cornerRadius, enabled, refractionStrength, chromaticDispersion, liquidGlass }) {
+    setParameters({ radius, brightness, cornerRadius, enabled }) {
         if (enabled !== undefined) {
             this._enabled = Boolean(enabled);
         }
@@ -319,15 +314,6 @@ export class GlassBlurPipeline {
                 this._blurEffect.unscaled_corner_radius = cornerRadius;
             }
         }
-        if (refractionStrength !== undefined) this._refractionStrength = refractionStrength;
-        if (chromaticDispersion !== undefined) this._chromaticDispersion = chromaticDispersion;
-        if (liquidGlass !== undefined) this.setLiquidGlass(liquidGlass);
-
-        if (this._refractionEffect) {
-            this._refractionEffect.strength = this._refractionStrength;
-            this._refractionEffect.rgb_fringing = this._chromaticDispersion;
-            this._refractionEffect.corner_radius = this._cornerRadius;
-        }
         if (this._blurEffect && typeof this._blurEffect.queue_repaint === 'function') {
             this._blurEffect.queue_repaint();
         }
@@ -336,38 +322,6 @@ export class GlassBlurPipeline {
         }
         this._syncVisibility();
         this.syncClip();
-    }
-
-    setLiquidGlass(enabled) {
-        this._liquidGlass = Boolean(enabled);
-        if (!this._actor) return;
-
-        if (this._liquidGlass) {
-            if (!this._refractionEffect) {
-                try {
-                    this._refractionEffect = new RefractionEffect({
-                        strength: this._refractionStrength,
-                        blur_radius: Math.max(3, Math.min(20, this._radius * 0.35)),
-                        edge_size: 24,
-                        falloff: 2.2,
-                        corner_radius: this._cornerRadius,
-                        rim_width: 4.8,
-                        rgb_fringing: this._chromaticDispersion,
-                        gloss: 0.60,
-                        tint: 0.14,
-                    });
-                    this._actor.add_effect(this._refractionEffect);
-                } catch (e) {
-                    console.warn('[Mak GlassBlur] Could not add RefractionEffect:', e.message);
-                    this._refractionEffect = null;
-                }
-            }
-        } else {
-            if (this._refractionEffect) {
-                try { this._actor.remove_effect(this._refractionEffect); } catch (e) {}
-                this._refractionEffect = null;
-            }
-        }
     }
 
     destroy() {
@@ -391,12 +345,8 @@ export class GlassBlurPipeline {
         }
 
         if (this._isDynamic) {
-            // Dynamic: effects applied directly to _actor — just remove them.
+            // Dynamic: effect was applied directly to _actor — just remove it.
             // Do NOT destroy _actor; it is _bg, owned by the dock.
-            if (this._refractionEffect && this._actor) {
-                try { this._actor.remove_effect(this._refractionEffect); } catch (e) {}
-            }
-            this._refractionEffect = null;
             if (this._blurEffect && this._actor) {
                 try { this._actor.remove_effect(this._blurEffect); } catch (e) {}
             }
