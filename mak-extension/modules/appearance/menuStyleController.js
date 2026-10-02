@@ -230,6 +230,197 @@ export class MenuStyleController {
     background-color: ${separatorColor} !important;
 }
 
+/* ── Calendar & DateMenu Styling (macOS Clock Dropdown) ───────────────────── */
+.datemenu-calendar-column {
+    spacing: 12px;
+}
+
+.datemenu-date-button {
+    color: ${textColor} !important;
+}
+
+.datemenu-date-button .day-label {
+    font-size: 1.4em !important;
+    font-weight: bold !important;
+    color: ${textColor} !important;
+}
+
+.datemenu-date-button .date-label {
+    font-size: 1.1em !important;
+    color: ${secondaryTextColor} !important;
+}
+
+.datemenu-today-button {
+    color: ${secondaryTextColor} !important;
+}
+
+.datemenu-today-button:hover {
+    color: ${itemHoverColor} !important;
+}
+
+/* Calendar month header and arrow buttons */
+.calendar-month-header {
+    color: ${textColor} !important;
+    font-weight: bold !important;
+}
+
+.calendar-month-header .calendar-month-label {
+    color: ${textColor} !important;
+    font-weight: bold !important;
+    font-size: 1.05em !important;
+}
+
+.calendar-change-month-back,
+.calendar-change-month-forward {
+    color: ${textColor} !important;
+    border-radius: 9999px !important;
+}
+
+.calendar-change-month-back:hover,
+.calendar-change-month-forward:hover {
+    background-color: ${itemHoverBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+/* Calendar Day Grid */
+.calendar-day-heading {
+    color: ${secondaryTextColor} !important;
+    font-weight: 600 !important;
+    font-size: 0.85em !important;
+    padding: 4px !important;
+}
+
+.calendar-day-base {
+    color: ${textColor} !important;
+    border-radius: 9999px !important;
+    font-weight: normal !important;
+    text-align: center;
+    margin: 2px !important;
+}
+
+.calendar-day-base:hover,
+.calendar-day-base:focus {
+    background-color: ${itemHoverBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.calendar-day-base:active {
+    background-color: ${itemActiveBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.calendar-day-base:selected {
+    background-color: #9A57A3 !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+/* Today circle */
+.calendar-day-base.calendar-today {
+    background-color: #9A57A3 !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+    border-radius: 9999px !important;
+}
+
+.calendar-non-work-day {
+    color: ${secondaryTextColor} !important;
+}
+
+.calendar-other-month-day {
+    color: ${secondaryTextColor} !important;
+    opacity: 0.45 !important;
+}
+
+.calendar-week-number {
+    color: ${secondaryTextColor} !important;
+    font-size: 0.8em !important;
+    opacity: 0.6 !important;
+}
+
+/* DateMenu Messages / Events / Weather / World Clocks */
+.message-list-section-title,
+.events-section-title,
+.world-clocks-header,
+.weather-header {
+    color: ${textColor} !important;
+    font-weight: bold !important;
+    font-size: 0.9em !important;
+    letter-spacing: 0.02em !important;
+}
+
+.message-list {
+    color: ${textColor} !important;
+}
+
+.message {
+    background-color: ${qsTileBg} !important;
+    border-radius: 14px !important;
+    color: ${textColor} !important;
+    padding: 8px 12px !important;
+}
+
+.message:hover {
+    background-color: ${qsTileHoverBg} !important;
+}
+
+.message-title {
+    color: ${textColor} !important;
+    font-weight: 600 !important;
+}
+
+.message-body {
+    color: ${secondaryTextColor} !important;
+}
+
+.message-secondary-timestamp {
+    color: ${secondaryTextColor} !important;
+    font-size: 0.8em !important;
+}
+
+.weather-box,
+.world-clocks-grid {
+    color: ${textColor} !important;
+}
+
+/* ── Fast User Switching Menu (parv@arch Dropdown) ────────────────────────── */
+.mak-user-menu-item {
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+}
+
+.mak-user-row-box {
+    spacing: 10px;
+}
+
+.mak-user-avatar-frame {
+    border-radius: 9999px !important;
+    background-color: ${itemHoverBg} !important;
+}
+
+.mak-user-text-box {
+    spacing: 2px;
+}
+
+.mak-user-name-label {
+    font-weight: 600 !important;
+    color: ${textColor} !important;
+    font-size: 0.95em !important;
+}
+
+.mak-user-sub-label {
+    color: ${secondaryTextColor} !important;
+    font-size: 0.82em !important;
+}
+
+.mak-user-current-check {
+    color: #9A57A3 !important;
+}
+
+.mak-user-menu-item:hover .mak-user-name-label {
+    color: ${itemHoverColor} !important;
+}
+
 /* ── Quick Settings Control Center ────────────────────────────────────────── */
 .quick-settings,
 .quick-toggle-menu {

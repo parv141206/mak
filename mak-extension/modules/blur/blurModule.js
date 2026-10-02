@@ -69,6 +69,16 @@ export class BlurModule {
             overviewSettings.set_boolean('blur', true);
             appfolderSettings.set_boolean('blur', true);
             lockscreenSettings.set_boolean('blur', true);
+
+            // Enable dynamic application window blur
+            const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
+            appSettings.set_boolean('blur', true);
+            appSettings.set_boolean('static-blur', false);
+            appSettings.set_boolean('enable-all', true);
+            appSettings.set_boolean('dynamic-opacity', false);
+            appSettings.set_int('opacity', 255);
+            appSettings.set_int('corner-radius', 12);
+            appSettings.set_boolean('corner-when-maximized', false);
         } catch (err) {
             console.warn('[Mak Blur] Could not initialize BMS settings:', err);
         }
@@ -118,6 +128,16 @@ export class BlurModule {
             popupSettings.set_double('brightness', brightness);
             appfolderSettings.set_int('sigma', sigma);
             appfolderSettings.set_double('brightness', brightness);
+
+            try {
+                const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
+                appSettings.set_int('sigma', sigma);
+                appSettings.set_double('brightness', brightness);
+                appSettings.set_boolean('blur', true);
+                appSettings.set_boolean('static-blur', false);
+                appSettings.set_boolean('enable-all', true);
+                appSettings.set_boolean('dynamic-opacity', false);
+            } catch (e) {}
 
             bmsSettings.set_int('sigma', sigma);
             bmsSettings.set_double('brightness', brightness);
