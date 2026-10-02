@@ -160,16 +160,19 @@ void main() {
             // Inner borders
             // Calculate if the point is located on the border itself
             float borderAlpha = clamp(abs(pointAlpha - borderedAreaAlpha), 0.0, 1.0);
+
+            // Mask border by window content alpha: never draw borders over empty/transparent
+            // gutters outside the window (fixes extra floating border in Chromium/Electron)
+            borderAlpha *= clamp(cogl_color_out.a * 10.0, 0.0, 1.0);
+
             // Mix the window color and the border color
             cogl_color_out = mix(cogl_color_out, vec4(borderColor.rgb, 1.0), borderAlpha * borderColor.a);
             // Antialias outer edge
             cogl_color_out *= pointAlpha;
         } else {
             // Outer borders
-
-            // If the point is within the bordered area, paint it with the
-            // border color
-            vec4 borderRect = vec4(borderColor.rgb, 1.0) * borderedAreaAlpha * borderColor.a;
+            float borderAlpha = borderedAreaAlpha * borderColor.a * clamp(cogl_color_out.a * 10.0, 0.0, 1.0);
+            vec4 borderRect = vec4(borderColor.rgb, 1.0) * borderAlpha;
             // Then, if the point is also inside of the actual window
             // (pointAlpha = 1), draw the correct window pixel on top
             cogl_color_out = mix(borderRect, cogl_color_out, pointAlpha);

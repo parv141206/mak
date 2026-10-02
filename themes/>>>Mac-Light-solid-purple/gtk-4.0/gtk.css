@@ -2687,7 +2687,7 @@ headerbar windowhandle box.linked > button:checked {
 }
 
 .tiled headerbar, .tiled headerbar:backdrop, .maximized headerbar, .maximized headerbar:backdrop {
-  border-radius: 24px 24px 0 0;
+  border-radius: 16px 16px 0 0;
   box-shadow: none;
 }
 
@@ -6135,7 +6135,7 @@ window {
 
 window.csd {
   transition: none;
-  border-radius: 24px;
+  border-radius: 16px;
   outline: 1px solid rgba(255, 255, 255, 0.15);
   outline-offset: -1px;
   box-shadow: 0 3px 6px RGB(0 0 0/15%), 0 7px 24px RGB(0 0 0/12%), 0 12px 32px RGB(0 0 0/8%), 0 0 0 2px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.12);
@@ -6148,12 +6148,16 @@ window.csd:backdrop {
 }
 
 window.csd.tiled, window.csd.tiled-top, window.csd.tiled-left, window.csd.tiled-right, window.csd.tiled-bottom {
-  border-radius: 0;
+  border-radius: 16px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+  outline-offset: -1px;
   outline: none;
 }
 
 window.csd.maximized, window.csd.fullscreen {
-  border-radius: 0;
+  border-radius: 16px;
+  outline: 1px solid rgba(255, 255, 255, 0.15);
+  outline-offset: -1px;
   outline: none;
   box-shadow: none;
   transition: none;
@@ -7775,7 +7779,7 @@ window.background.chromium:backdrop {
 window.background.chromium headerbar.header-bar.titlebar {
   padding: 0 12px;
   box-shadow: inset 0 1px rgba(255, 255, 255, 0.1);
-  border-radius: 24px 24px 0 0;
+  border-radius: 16px 16px 0 0;
 }
 
 .colorpad {
@@ -8972,7 +8976,7 @@ floating-sheet > dimming {
 }
 
 floating-sheet > sheet {
-  border-radius: 24px;
+  border-radius: 16px;
   outline: 1px solid rgba(255, 255, 255, 0.15);
   outline-offset: -1px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15), 0 7px 12px rgba(0, 0, 0, 0.15), 0 12px 20px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.12);
@@ -8983,7 +8987,7 @@ floating-sheet > sheet.background {
 }
 
 bottom-sheet > sheet {
-  border-radius: 24px 24px 0 0;
+  border-radius: 16px 16px 0 0;
 }
 
 bottom-sheet > sheet.background {
@@ -8991,7 +8995,7 @@ bottom-sheet > sheet.background {
 }
 
 bottom-sheet > sheet > outline {
-  border-radius: 24px 24px 0 0;
+  border-radius: 16px 16px 0 0;
   box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.12);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-bottom: none;

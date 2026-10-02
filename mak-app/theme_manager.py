@@ -311,6 +311,107 @@ headerbar windowcontrols button:focus {
 }
 """
 
+WINDOW_CORNERS_CSS_OVERRIDE = """
+/* ── Mak macOS Window Corner & Geometry Consistency (16px) ──────────────── */
+window,
+window.background,
+window.csd,
+window.background.csd,
+window.background.solid-csd,
+window.solid-csd {
+    border-radius: 16px;
+}
+
+window.csd.maximized,
+window.csd.tiled,
+window.csd.tiled-top,
+window.csd.tiled-bottom,
+window.csd.tiled-left,
+window.csd.tiled-right,
+window.background.maximized,
+window.background.maximized.csd,
+window.background.solid-csd.maximized,
+window.background.csd.maximized,
+window.maximized.csd,
+window.maximized.solid-csd,
+window.maximized,
+window.background.tiled,
+window.background.tiled-top,
+window.background.tiled-right,
+window.background.tiled-bottom,
+window.background.tiled-left,
+window.background.csd.tiled,
+window.tiled.csd,
+window.tiled {
+    border-radius: 16px;
+}
+
+headerbar,
+headerbar.default-decoration,
+.titlebar,
+window.csd > headerbar,
+window.background.csd > headerbar,
+.tiled headerbar,
+.maximized headerbar,
+window.background.maximized headerbar,
+window.background.maximized.csd headerbar,
+window.background.csd.maximized headerbar,
+window.maximized.csd headerbar,
+window.maximized headerbar,
+window.background.maximized .titlebar,
+window.background.maximized.csd .titlebar,
+window.background.csd.maximized .titlebar,
+window.maximized.csd .titlebar,
+window.maximized .titlebar,
+window.background.tiled headerbar,
+window.background.csd.tiled headerbar,
+window.tiled.csd headerbar,
+window.tiled headerbar,
+window.background.tiled .titlebar,
+window.tiled .titlebar {
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
+
+window.background.maximized > contents,
+window.background.maximized.csd > contents,
+window.background.csd.maximized > contents,
+window.maximized.csd > contents,
+window.maximized > contents,
+window.background.maximized > widget,
+window.maximized > widget,
+window.background.maximized > box,
+window.maximized > box {
+    border-radius: 16px;
+}
+
+window.background.chromium headerbar.header-bar.titlebar {
+    border-radius: 16px 16px 0 0;
+}
+
+/* True Fullscreen Only */
+window.fullscreen,
+window.csd.fullscreen,
+window.background.fullscreen,
+window.background.fullscreen.csd,
+window.background.csd.fullscreen,
+window.fullscreen.csd {
+    border-radius: 0;
+    outline: none;
+    box-shadow: none;
+    border: none;
+}
+
+window.fullscreen headerbar,
+window.fullscreen .titlebar,
+window.background.fullscreen headerbar,
+window.background.fullscreen.csd headerbar,
+window.background.csd.fullscreen headerbar,
+window.fullscreen.csd headerbar {
+    border-radius: 0;
+}
+"""
+
 def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy):
     try:
         with open(src_css_path, "r", encoding="utf-8") as f:
@@ -333,7 +434,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy):
             continue
         filtered.append(line)
 
-    rules_to_append = [TRAFFIC_LIGHTS_OVERRIDE]
+    rules_to_append = [TRAFFIC_LIGHTS_OVERRIDE, WINDOW_CORNERS_CSS_OVERRIDE]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 
@@ -581,12 +682,12 @@ def apply_global_theme(theme_key):
     # 8. Rounded Window Corners Border Highlight
     try:
         w_border = theme_info.get("window_border_color", "(1.0, 1.0, 1.0, 0.16)")
-        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 12>, 'smoothing': <0.0>, 'borderColor': <{w_border}>, 'enabled': <true>}}"
+        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 16>, 'smoothing': <0.8>, 'borderColor': <{w_border}>, 'enabled': <true>}}"
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "global-rounded-corner-settings", new_val], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "1"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libadwaita-app", "true"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libhandy-app", "true"], check=False)
-        log.append(f"Updated window corner settings (radius 12, smoothing 0, border {w_border}, skip-libadwaita true).")
+        log.append(f"Updated window corner settings (radius 16, smoothing 0.8, border {w_border}, skip-libadwaita true).")
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")
 

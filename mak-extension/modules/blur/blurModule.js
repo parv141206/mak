@@ -79,8 +79,8 @@ export class BlurModule {
             if (appSettings.get_int('opacity') >= 250) {
                 appSettings.set_int('opacity', 215);
             }
-            appSettings.set_int('corner-radius', 12);
-            appSettings.set_boolean('corner-when-maximized', false);
+            appSettings.set_int('corner-radius', 16);
+            appSettings.set_boolean('corner-when-maximized', true);
 
             // Whitelist Chrome, Brave, Antigravity, and Electron apps
             const targetWhitelist = [
@@ -159,6 +159,8 @@ export class BlurModule {
                 appSettings.set_boolean('static-blur', false);
                 appSettings.set_boolean('enable-all', true);
                 appSettings.set_boolean('dynamic-opacity', false);
+                appSettings.set_int('corner-radius', 16);
+                appSettings.set_boolean('corner-when-maximized', true);
                 if (appSettings.get_int('opacity') >= 250) {
                     appSettings.set_int('opacity', 215);
                 }

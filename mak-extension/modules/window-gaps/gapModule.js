@@ -2,6 +2,8 @@
 // Mak Window Gaps Module: Outer margins around windows, even in maximized view
 
 import Clutter from 'gi://Clutter';
+import GLib from 'gi://GLib';
+import Meta from 'gi://Meta';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 
 export class GapManager {
@@ -43,6 +45,23 @@ export class GapManager {
                 );
             }
         }
+
+        // Notify Mutter layout manager of strut updates and refresh running maximized windows
+        try {
+            Main.layoutManager._queueUpdateRegions();
+            GLib.idle_add(GLib.PRIORITY_DEFAULT_IDLE, () => {
+                try {
+                    for (const actor of global.get_window_actors()) {
+                        const win = actor.metaWindow;
+                        if (win && (win.maximized_horizontally || win.maximized_vertically)) {
+                            win.unmaximize(Meta.MaximizeFlags.BOTH);
+                            win.maximize(Meta.MaximizeFlags.BOTH);
+                        }
+                    }
+                } catch (e) {}
+                return GLib.SOURCE_REMOVE;
+            });
+        } catch (e) {}
     }
 
     destroy() {
@@ -51,6 +70,10 @@ export class GapManager {
     }
 
     _getMargins() {
+        if (!this._settings.get_boolean('gaps-enabled')) {
+            return { top: 0, bottom: 0, left: 0, right: 0 };
+        }
+
         if (this._settings.get_boolean('gap-uniform')) {
             const size = this._settings.get_int('gap-size');
             return { top: size, bottom: size, left: size, right: size };
@@ -87,6 +110,9 @@ export class GapManager {
             actor.destroy();
         }
         this._actors = [];
+        try {
+            Main.layoutManager._queueUpdateRegions();
+        } catch (e) {}
     }
 }
 
@@ -103,7 +129,7 @@ export class WindowGapModule {
         this._gapManager = new GapManager(this._settings);
 
         this._settingsId = this._settings.connect('changed', (s, key) => {
-            if (key.startsWith('gap'))
+            if (key.startsWith('gap') || key === 'gaps-enabled' || key === 'gaps-maximized')
                 this._gapManager.rebuild();
         });
 
@@ -112,6 +138,10 @@ export class WindowGapModule {
         });
 
         this._gapManager.rebuild();
+    }
+
+    rebuild() {
+        this._gapManager?.rebuild();
     }
 
     disable() {
