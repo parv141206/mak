@@ -702,6 +702,10 @@ class MakSettingsBridge:
         return self._get_b("blur-applications", self.bms_apps, "blur", True)
     def set_blur_applications(self, v):
         self._set_b("blur-applications", self.bms_apps, "blur", v)
+        if self.bms and self._has_key(self.bms, "hacks-level"):
+            try:
+                self.bms.set_int("hacks-level", 2)
+            except Exception: pass
 
     def get_app_opacity(self):
         if self.bms_apps:

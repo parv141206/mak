@@ -230,16 +230,37 @@ export const ApplicationsBlur = class ApplicationsBlur {
 
         this.check_blur(meta_window);
 
-        if (this.settings.applications.STATIC_BLUR && meta_window.get_client_type() === Meta.WindowClientType.X11) {
-            const window_actor = meta_window.get_compositor_private();
-            window_actor.connect('child-added', _ => {
-                if (!meta_window.blur_actor) {
-                    this._warn("can't move blur actor to back, it doesn't exist");
-                    return;
-                }
+        const window_actor = meta_window.get_compositor_private();
+        if (window_actor) {
+            this.connections.connect(
+                window_actor, 'child-added',
+                (_wa, child) => {
+                    if (!meta_window.blur_actor) return;
 
-                window_actor.set_child_below_sibling(meta_window.blur_actor, null);
-            });
+                    // Ensure blur actor stays behind all surfaces and subsurfaces
+                    try {
+                        window_actor.set_child_below_sibling(meta_window.blur_actor, null);
+                    } catch (e) {}
+
+                    // Ensure newly added Wayland surface/subsurface actor gets the transparent opacity
+                    const BLUR_ACTOR_NAMES = new Set(["blur-actor", "bms-application-blurred-widget"]);
+                    if (child && !BLUR_ACTOR_NAMES.has(child.name)) {
+                        const targetOpacity = this.settings.applications.OPACITY;
+                        if (child.opacity !== targetOpacity) {
+                            child.opacity = targetOpacity;
+                        }
+                    }
+
+                    // Update size in case buffer was attached after window creation
+                    this.update_size(pid);
+                }
+            );
+
+            // Keep blur actor dimensions in sync with window actor size changes
+            this.connections.connect(
+                window_actor, 'notify::size',
+                _ => this.update_size(pid)
+            );
         }
     }
 
@@ -554,12 +575,17 @@ export const ApplicationsBlur = class ApplicationsBlur {
         let frame = meta_window.get_frame_rect();
         let buffer = meta_window.get_buffer_rect();
 
-        return {
-            x: (frame.x - buffer.x) / scale,
-            y: (frame.y - buffer.y) / scale,
-            width: frame.width / scale,
-            height: frame.height / scale
-        };
+        let width = frame.width / scale;
+        let height = frame.height / scale;
+        let x = (frame.x - buffer.x) / scale;
+        let y = (frame.y - buffer.y) / scale;
+
+        if (width <= 0 && buffer.width > 0)
+            width = buffer.width / scale;
+        if (height <= 0 && buffer.height > 0)
+            height = buffer.height / scale;
+
+        return { x, y, width, height };
     }
 
     change_blur_type() {
