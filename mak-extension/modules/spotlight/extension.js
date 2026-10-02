@@ -22,6 +22,7 @@ import {
   getSurfaceAppearance,
   resolveColorSource,
 } from "./appearance.js";
+import { NativeDynamicBlurEffect } from "../blur/bms/effects/native_dynamic_gaussian_blur.js";
 import {
   buildAppSearchText,
   isSettingsPanelApp,
@@ -532,6 +533,20 @@ export default class SearchBar extends Extension {
       x_expand: true,
       y_expand: true,
     });
+
+    try {
+      if (NativeDynamicBlurEffect.supports_corner_radius) {
+        this._spotlightBlurEffect = new NativeDynamicBlurEffect({
+          unscaled_radius: 32,
+          brightness: 0.75,
+          unscaled_corner_radius: 28,
+        });
+        this._materialLayer.add_effect(this._spotlightBlurEffect);
+      }
+    } catch (e) {
+      console.warn('[Mak Spotlight] Could not attach blur effect:', e);
+    }
+
     this._contentLayer = new St.BoxLayout({
       style_class: "spotlight-content",
       vertical: true,

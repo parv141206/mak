@@ -248,37 +248,15 @@ export const UserSwitcherButton = GObject.registerClass(
         userItem.setSensitive(false);
         this.menu.addMenuItem(userItem);
       } else {
-        const gridSection = new PopupMenu.PopupMenuSection();
-        
-        const gridContainer = new St.BoxLayout({
-          vertical: true,
-          style_class: 'kiwi-user-grid',
-          x_expand: true,
+        users.forEach((user) => {
+          const userItem = this._createUserMenuItem(user, currentUserName, sessionInfo);
+          this.menu.addMenuItem(userItem);
         });
-
-        let currentRow = null;
-        users.forEach((user, index) => {
-          if (index % 3 === 0) {
-            currentRow = new St.BoxLayout({
-              vertical: false,
-              x_expand: true,
-            });
-            gridContainer.add_child(currentRow);
-          }
-
-          const userWidget = this._createUserWidget(user, currentUserName, sessionInfo);
-          userWidget.set_x_expand(true);
-          currentRow.add_child(userWidget);
-        });
-
-        gridSection.actor.add_child(gridContainer);
-        this.menu.addMenuItem(gridSection);
       }
 
       this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
       this._addActionItem(this._gettext('Login Window...'), () => this._gotoLoginWindow());
-      this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
       this._addActionItem(
         this._gettext('Users & Groups Settings...'),
         () => this._openUserSettings()
@@ -473,91 +451,89 @@ export const UserSwitcherButton = GObject.registerClass(
       return GLib.utf8_collate(aName, bName);
     }
 
-    _createUserWidget(user, currentUserName, sessionInfo) {
-      const displayName = user.get_real_name() || user.get_user_name() || '';
+    _createUserMenuItem(user, currentUserName, sessionInfo) {
+      const displayName = user.get_real_name() || user.get_user_name() || 'parv';
       const username = user.get_user_name() || '';
       const isCurrent = username === currentUserName;
-      const isSignedIn = sessionInfo.loggedInUsers.has(username);
+      const isSignedIn = sessionInfo?.loggedInUsers?.has(username);
 
-      const button = new St.Button({
-        style_class: 'kiwi-user-item',
+      const item = new PopupMenu.PopupBaseMenuItem({
         reactive: true,
         can_focus: true,
+        style_class: 'mak-user-menu-item' + (isCurrent ? ' current-user' : ''),
+      });
+
+      const box = new St.BoxLayout({
+        vertical: false,
+        y_align: Clutter.ActorAlign.CENTER,
         x_expand: true,
-        y_expand: true,
-      });
-      button.set_x_align(Clutter.ActorAlign.FILL);
-
-      if (isCurrent) {
-        button.add_style_class_name('current-user');
-      }
-
-      const content = new St.BoxLayout({
-        vertical: true,
-        style_class: 'kiwi-user-item-content',
-        x_align: Clutter.ActorAlign.CENTER,
-      });
-
-      // Container for avatar + badge overlay using Clutter.BinLayout for stacking
-      const avatarContainer = new St.Widget({
-        style_class: 'kiwi-user-avatar-container',
-        layout_manager: new Clutter.BinLayout(),
-        x_expand: false,
-        y_expand: false,
+        style_class: 'mak-user-row-box',
       });
 
       const avatarBin = new St.Bin({
-        style_class: 'kiwi-user-card-avatar-frame',
-        x_expand: true,
-        y_expand: true,
+        style_class: 'mak-user-avatar-frame',
+        x_expand: false,
+        y_expand: false,
+        width: 34,
+        height: 34,
       });
       avatarBin.clip_to_allocation = true;
 
-      if (isCurrent) {
-        avatarBin.add_style_class_name('current-user');
-      } else if (isSignedIn) {
-        avatarBin.add_style_class_name('logged-in');
-      }
-
       const avatar = new UserAvatar(user, {
-        styleClass: 'kiwi-user-card-avatar',
-        iconSize: AVATAR_ICON_SIZE,
+        styleClass: 'mak-user-avatar',
+        iconSize: 34,
         reactive: false,
       });
       avatar.update();
       avatarBin.set_child(avatar);
-      avatarContainer.add_child(avatarBin);
+      box.add_child(avatarBin);
 
-      // Add session badge for logged-in users
-      if (isCurrent || isSignedIn) {
-        const sessionBadge = new St.Icon({
-          style_class: isCurrent
-            ? 'kiwi-user-session-badge current-user'
-            : 'kiwi-user-session-badge',
-          icon_name: 'object-select-symbolic',
-          icon_size: 14,
-          x_expand: true,
-          y_expand: true,
-          x_align: Clutter.ActorAlign.END,
-          y_align: Clutter.ActorAlign.END,
-        });
-        avatarContainer.add_child(sessionBadge);
-      }
-
-      content.add_child(avatarContainer);
+      const textBox = new St.BoxLayout({
+        vertical: true,
+        y_align: Clutter.ActorAlign.CENTER,
+        x_expand: true,
+        style_class: 'mak-user-text-box',
+      });
 
       const nameLabel = new St.Label({
         text: displayName,
-        style_class: 'kiwi-user-card-name',
-        x_align: Clutter.ActorAlign.CENTER,
+        style_class: 'mak-user-name-label',
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      textBox.add_child(nameLabel);
+
+      const userTag = new St.Label({
+        text: username === 'parv' ? 'parv@arch' : username,
+        style_class: 'mak-user-sub-label',
+        y_align: Clutter.ActorAlign.CENTER,
+      });
+      textBox.add_child(userTag);
+
+      box.add_child(textBox);
+
+      if (isCurrent) {
+        const checkIcon = new St.Icon({
+          icon_name: 'object-select-symbolic',
+          icon_size: 16,
+          style_class: 'mak-user-current-check',
+          y_align: Clutter.ActorAlign.CENTER,
+        });
+        box.add_child(checkIcon);
+      } else if (isSignedIn) {
+        const dot = new St.Widget({
+          style_class: 'mak-user-signedin-dot',
+          y_align: Clutter.ActorAlign.CENTER,
+        });
+        box.add_child(dot);
+      }
+
+      item.add_child(box);
+
+      item.connect('activate', () => {
+        this._activateUser(user).catch(logError);
       });
 
-      content.add_child(nameLabel);
-      button.set_child(content);
-
-      button.connect('clicked', () => this._activateUser(user).catch(logError));
-
-      return button;
+      return item;
     }
 
     _addActionItem(label, callback) {

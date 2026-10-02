@@ -132,21 +132,6 @@ GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
 @define-color popover_bg_color rgba(40, 40, 46, 0.82);
 @define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
-
-window,
-window.background,
-.background {
-    background-color: @window_bg_color;
-}
-headerbar,
-.titlebar {
-    background-color: @headerbar_bg_color;
-}
-.sidebar,
-navigation-sidebar,
-.navigation-sidebar {
-    background-color: @sidebar_bg_color;
-}
 """
 
 AMOLED_PALETTE_OVERRIDE = """
@@ -189,21 +174,6 @@ AMOLED_GLASSY_PALETTE_OVERRIDE = """
 @define-color popover_bg_color rgba(14, 14, 16, 0.85);
 @define-color popover_fg_color #ffffff;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
-
-window,
-window.background,
-.background {
-    background-color: @window_bg_color;
-}
-headerbar,
-.titlebar {
-    background-color: @headerbar_bg_color;
-}
-.sidebar,
-navigation-sidebar,
-.navigation-sidebar {
-    background-color: @sidebar_bg_color;
-}
 """
 
 LIGHT_PALETTE_OVERRIDE = """
@@ -246,22 +216,65 @@ LIGHT_GLASSY_PALETTE_OVERRIDE = """
 @define-color popover_bg_color rgba(255, 255, 255, 0.85);
 @define-color popover_fg_color #1d1d1f;
 @define-color placeholder_text_color rgba(0, 0, 0, 0.45);
+"""
 
+GLASSY_CONTAINER_RULES = """
+/* ── Libadwaita & GTK4 Translucent Glass App Windows ──────────────────────── */
 window,
 window.background,
-.background {
-    background-color: @window_bg_color;
+.background,
+window.background.csd,
+window.background.csd > contents,
+window.background.csd > contents > *,
+window.background.csd > widget,
+window.background.csd > widget > *,
+window.background.csd > dialog-host,
+window.background.csd > dialog-host > *,
+window.background.csd > dialog-host > widget > widget > box > leaflet,
+window.background.csd > contents > leaflet.unfolded > box > stack > widget > box > widget,
+leaflet,
+leaflet.unfolded,
+navigation-view,
+navigation-page,
+split-view,
+.view,
+view,
+tab-view,
+.nautilus-window,
+.nautilus-window view,
+.nautilus-window .view,
+.nautilus-window scrolledwindow,
+.nautilus-window columnview,
+.nautilus-window listview,
+.calculator-window,
+.calculator-window view {
+    background-color: @window_bg_color !important;
 }
+
 headerbar,
-.titlebar {
-    background-color: @headerbar_bg_color;
+.titlebar,
+window.background.csd > contents > leaflet.unfolded > box > headerbar,
+window.background.csd > widget > leaflet.unfolded > box > headerbar,
+window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-left,
+window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-right {
+    background-color: @headerbar_bg_color !important;
+    background-image: none !important;
 }
+
 .sidebar,
 navigation-sidebar,
-.navigation-sidebar {
-    background-color: @sidebar_bg_color;
+.navigation-sidebar,
+placessidebar,
+leaflet list.navigation-sidebar,
+window.background.csd > dialog-host > widget > widget > box > leaflet list.navigation-sidebar {
+    background-color: @sidebar_bg_color !important;
+    background-image: none !important;
 }
 """
+
+GRAPHITE_GLASSY_PALETTE_OVERRIDE += GLASSY_CONTAINER_RULES
+AMOLED_GLASSY_PALETTE_OVERRIDE += GLASSY_CONTAINER_RULES
+LIGHT_GLASSY_PALETTE_OVERRIDE += GLASSY_CONTAINER_RULES
 
 TRAFFIC_LIGHTS_OVERRIDE = """
 /* ── Mak Clean macOS Traffic Light Button Controls ────────────────────────── */
