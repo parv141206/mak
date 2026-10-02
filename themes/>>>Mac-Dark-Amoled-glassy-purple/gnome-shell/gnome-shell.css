@@ -71,7 +71,7 @@ stage {
 .ripple-pointer-location {
   width: 48px;
   height: 48px;
-  border-radius: 24px;
+  border-radius: 16px;
   background-color: st-lighten(st-transparentize(-st-accent-color, 0.7), 30%);
   box-shadow: 0 0 2px 2px st-lighten(-st-accent-color, 20%);
 }
@@ -1735,7 +1735,7 @@ StEntry StLabel.hint-text {
   margin: 4px;
   padding: 0;
   border: 1px solid black;
-  border-radius: 24px;
+  border-radius: 16px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
   color: #d3d7df;
 }
@@ -1888,7 +1888,7 @@ StEntry StLabel.hint-text {
 #LookingGlassPropertyInspector {
   background: #373737;
   border: 1px solid black;
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 8px;
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.15);
   color: #d3d7df;
@@ -2079,7 +2079,7 @@ StEntry StLabel.hint-text {
 .workspace-switcher-container, .switcher-list, .resize-popup, .osd-window {
   color: #dedede;
   background-color: #242424;
-  border-radius: 24px;
+  border-radius: 16px;
   border: solid rgba(0, 0, 0, 0.75);
   border-width: 1px;
   box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.25);
@@ -4297,7 +4297,7 @@ StWidget.focused .app-grid-running-dot {
 
 .quick-slider {
   background-color: #242424;
-  border-radius: 24px;
+  border-radius: 16px;
   box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.18) !important;
   min-height: 40px;
   padding: 12px !important;

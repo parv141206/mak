@@ -366,14 +366,14 @@ export class MenuStyleController {
     color: ${textColor} !important;
 }
 
-.message {
+.message-list .message {
     background-color: ${qsTileBg} !important;
     border-radius: 14px !important;
     color: ${textColor} !important;
     padding: 8px 12px !important;
 }
 
-.message:hover {
+.message-list .message:hover {
     background-color: ${qsTileHoverBg} !important;
 }
 
@@ -558,7 +558,18 @@ export class MenuStyleController {
 }
 
 /* ── Notification Banners ─────────────────────────────────────────────────── */
-.notification-banner {
+.notification-banner,
+.notification-banner:hover,
+.notification-banner:focus,
+.notification-banner:active,
+.notification-banner.message,
+.notification-banner.message:hover,
+.notification-banner.message:focus,
+.notification-banner.message:active,
+.message.notification-banner,
+.message.notification-banner:hover,
+.message.notification-banner:focus,
+.message.notification-banner:active {
     border-radius: ${notifRadius}px !important;
     border: ${borderCss} !important;
     background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
@@ -566,7 +577,11 @@ export class MenuStyleController {
     color: ${textColor} !important;
 }
 
-.notification-banner StLabel {
+.notification-banner StLabel,
+.notification-banner:hover StLabel,
+.notification-banner .message-title,
+.notification-banner .message-body,
+.notification-banner .message-header-content {
     color: ${textColor} !important;
 }
 

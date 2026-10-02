@@ -4,7 +4,7 @@ import Meta from 'gi://Meta';
 import { boxShadowCss } from '../utils/box_shadow.js';
 import { APP_SHADOWS, ROUNDED_CORNERS_EFFECT, SHADOW_PADDING, } from '../utils/constants.js';
 import { readFile } from '../utils/file.js';
-import { logDebug } from '../utils/log.js';
+import { logDebug, logError } from '../utils/log.js';
 import { getPref } from '../utils/settings.js';
 /**
  * Get the actor that rounded corners should be applied to.
@@ -222,8 +222,23 @@ export async function isChromium(win) {
     // biome-ignore lint/suspicious/noEqualsToNull: matching both null and undefined is intended.
     if (win._isChromium != null)
         return win._isChromium;
+
+    const wmClass = (win.wmClass || '').toLowerCase();
+    const appId = (win.gtkApplicationId || '').toLowerCase();
+    const knownChromium = [
+        'google-chrome', 'chrome', 'chromium', 'brave-browser', 'brave',
+        'code', 'electron', 'microsoft-edge', 'edge', 'antigravity',
+        'slack', 'discord', 'spotify', 'obsidian', 'cursor'
+    ];
+    if (knownChromium.some(k => wmClass.includes(k) || appId.includes(k))) {
+        win._isChromium = true;
+        return true;
+    }
+
     return await withProcMaps(win, contents => {
-        const hasChromiumShm = contents.includes('/dev/shm/.org.chromium.Chromium');
+        const hasChromiumShm = contents.includes('/dev/shm/.org.chromium.Chromium') ||
+                               contents.includes('chrome-sandbox') ||
+                               contents.includes('libcef.so');
         win._isChromium = hasChromiumShm;
         logDebug(win.wmClass, 'chromium', hasChromiumShm);
         return hasChromiumShm;

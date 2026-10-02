@@ -110,6 +110,17 @@ export default class MakExtension extends Extension {
                 this._blur.enable();
             else
                 this._blur.disable();
+        } else if (key.startsWith('corner-') ||
+                   key === 'unround-maximized' ||
+                   key === 'skip-libadwaita-app' ||
+                   key === 'skip-libhandy-app' ||
+                   key.startsWith('focused-shadow') ||
+                   key.startsWith('unfocused-shadow') ||
+                   key === 'shadow-enabled' ||
+                   key === 'border-color') {
+            this._windowCorners?.sync();
+        } else if (key.startsWith('gap') || key === 'gaps-maximized') {
+            this._windowGaps?.rebuild();
         }
     }
 

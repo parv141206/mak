@@ -474,7 +474,7 @@ export const ApplicationsBlur = class ApplicationsBlur {
         const is_maximized = meta_window.maximized_horizontally || meta_window.maximized_vertically;
         const is_fullscreen = meta_window.fullscreen;
 
-        let use_0_radius = !this.settings.applications.CORNER_WHEN_MAXIMIZED && (is_maximized || is_fullscreen);
+        let use_0_radius = is_fullscreen || (!this.settings.applications.CORNER_WHEN_MAXIMIZED && is_maximized);
 
         if (this.settings.applications.STATIC_BLUR) {
             meta_window.bg_manager?._bms_pipeline?.effects.forEach(effect => {

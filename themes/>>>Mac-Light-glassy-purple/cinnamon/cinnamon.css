@@ -1105,7 +1105,7 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 }
 
 #notification {
-  border-radius: 24px;
+  border-radius: 16px;
   padding: 12px;
   spacing-rows: 10px;
   spacing-columns: 10px;
@@ -1246,7 +1246,7 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 
 .thumbnail-scroll-gradient-left {
   background-color: rgba(0, 0, 0, 0);
-  border-radius: 24px;
+  border-radius: 16px;
   border-radius-topright: 0px;
   border-radius-bottomright: 0px;
   width: 60px;
@@ -1254,7 +1254,7 @@ StScrollBar StButton#vhandle:active, StScrollBar StButton#hhandle:active {
 
 .thumbnail-scroll-gradient-right {
   background-color: rgba(0, 0, 0, 0);
-  border-radius: 24px;
+  border-radius: 16px;
   border-radius-topleft: 0px;
   border-radius-bottomleft: 0px;
   width: 60px;
