@@ -37,8 +37,38 @@
     box-shadow: none !important;
 }
 
+/* When Opaque Top Bar is enabled, enforce 100% solid opacity even if transparent-panel is applied */
+#panel.mak-panel.opaque-panel,
+.mak-panel.opaque-panel,
+#panel.mak-panel.opaque-panel.transparent-panel,
+.mak-panel.opaque-panel.transparent-panel {
+    background-color: rgba(32, 32, 36, 1.0) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important;
+}
+
+#panel.mak-panel.opaque-panel.light-mode,
+.mak-panel.opaque-panel.light-mode,
+#panel.mak-panel.opaque-panel.light-mode.transparent-panel,
+.mak-panel.opaque-panel.light-mode.transparent-panel {
+    background-color: rgba(246, 246, 248, 1.0) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+#panel.mak-panel.opaque-panel.amoled-mode,
+.mak-panel.opaque-panel.amoled-mode,
+#panel.mak-panel.opaque-panel.amoled-mode.transparent-panel,
+.mak-panel.opaque-panel.amoled-mode.transparent-panel {
+    background-color: #000000 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.40) !important;
+}
+
 #panel.mak-panel:overview,
-.mak-panel:overview {
+.mak-panel:overview,
+#panel.mak-panel.opaque-panel:overview,
+.mak-panel.opaque-panel:overview {
     background-color: transparent !important;
     border-bottom-color: transparent !important;
     box-shadow: none !important;

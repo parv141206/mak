@@ -221,6 +221,14 @@ export class TopBarModule {
 
         Main.panel.add_style_class_name('mak-panel');
 
+        // Re-apply panel transparency / opaqueness when returning from overview
+        this._overviewHidingId = Main.overview.connect('hiding', () => {
+            this._applyPanelTransparency();
+        });
+        this._overviewHiddenId = Main.overview.connect('hidden', () => {
+            this._applyPanelTransparency();
+        });
+
         // Settings Listeners
         this._settingsChangedId = this._settings.connect('changed', (s, key) => {
             if (key === 'topbar-apple-menu') {
@@ -504,6 +512,19 @@ export class TopBarModule {
             const isLight = (colorScheme === 'prefer-light') || gtkTheme.toLowerCase().includes('light');
             const isAmoled = gtkTheme.toLowerCase().includes('amoled');
 
+            if (isOpaque) {
+                Main.panel.add_style_class_name('opaque-panel');
+                Main.panel.remove_style_class_name('transparent-panel');
+            } else {
+                Main.panel.remove_style_class_name('opaque-panel');
+            }
+
+            if (isAmoled) {
+                Main.panel.add_style_class_name('amoled-mode');
+            } else {
+                Main.panel.remove_style_class_name('amoled-mode');
+            }
+
             if (isLight) {
                 Main.panel.add_style_class_name('light-mode');
                 const r = 246, g = 246, b = 248;
@@ -527,6 +548,16 @@ export class TopBarModule {
     }
 
     disable() {
+        if (this._overviewHidingId) {
+            try { Main.overview.disconnect(this._overviewHidingId); } catch (e) {}
+            this._overviewHidingId = 0;
+        }
+
+        if (this._overviewHiddenId) {
+            try { Main.overview.disconnect(this._overviewHiddenId); } catch (e) {}
+            this._overviewHiddenId = 0;
+        }
+
         if (this._settingsChangedId) {
             try { this._settings.disconnect(this._settingsChangedId); } catch (e) {}
             this._settingsChangedId = 0;
@@ -553,5 +584,7 @@ export class TopBarModule {
         this._removePanelTransparency();
         Main.panel.remove_style_class_name('mak-panel');
         Main.panel.remove_style_class_name('light-mode');
+        Main.panel.remove_style_class_name('opaque-panel');
+        Main.panel.remove_style_class_name('amoled-mode');
     }
 }
