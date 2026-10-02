@@ -175,11 +175,14 @@ export const OverviewBlur = class OverviewBlur {
         // add the container widget for the overview only to the overview group
         Main.layoutManager.overviewGroup.insert_child_at_index(this.overview_background_group, 0);
         // make sure it stays below
+        this._reordering_overview = false;
         this.connections.connect(Main.layoutManager.overviewGroup, "child-added", (_, child) => {
-            if (child !== this.overview_background_group) {
+            if (child !== this.overview_background_group && !this._reordering_overview) {
+                this._reordering_overview = true;
                 if (this.overview_background_group.get_parent())
                     Main.layoutManager.overviewGroup.remove_child(this.overview_background_group);
                 Main.layoutManager.overviewGroup.insert_child_at_index(this.overview_background_group, 0);
+                this._reordering_overview = false;
             }
         });
     }

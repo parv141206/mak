@@ -747,6 +747,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         tune_group.add(create_spin_row("Blur Sigma Radius", "Gaussian blur spread intensity (0 = no blur)", 0, 80, 2, self.bridge.get_blur_sigma(), digits=0, on_change=self.bridge.set_blur_sigma))
         tune_group.add(create_spin_row("Glass Brightness Multiplier", "Luminance factor behind glass surfaces (0 = fully dark)", 0.0, 1.0, 0.05, self.bridge.get_blur_brightness(), digits=2, on_change=self.bridge.set_blur_brightness))
         tune_group.add(create_spin_row("Film Grain and Noise", "Subtle analog texture on glass surfaces", 0.0, 0.5, 0.02, self.bridge.get_blur_noise_amount(), digits=2, on_change=self.bridge.set_blur_noise_amount))
+        tune_group.add(create_spin_row("Application Window Opacity", "Translucency factor for window surfaces (0.84 recommended for frosted glass)", 0.5, 1.0, 0.02, self.bridge.get_app_opacity(), digits=2, on_change=self.bridge.set_app_opacity))
 
         surf_group = Adw.PreferencesGroup(title="Target Desktop Surfaces")
         page.add(surf_group)
@@ -754,6 +755,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         for title, sub, getter, setter in [
             ("Top Menu Bar Blur", "Apply dynamic frosted blur behind the top panel", self.bridge.get_blur_panel, self.bridge.set_blur_panel),
             ("Dock Pill Blur", "Apply Gaussian glass blur behind dock pill", self.bridge.get_blur_dock, self.bridge.set_blur_dock),
+            ("Application Window Blur", "Apply dynamic frosted glass blur behind active application windows", self.bridge.get_blur_applications, self.bridge.set_blur_applications),
             ("Activities Overview Blur", "Blur desktop wallpaper during window overview", self.bridge.get_blur_overview, self.bridge.set_blur_overview),
             ("App Folder Modal Blur", "Blur background dialogs behind app drawer folders", self.bridge.get_blur_appfolder, self.bridge.set_blur_appfolder)
         ]:

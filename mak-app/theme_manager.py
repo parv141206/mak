@@ -248,7 +248,7 @@ tab-view,
 .nautilus-window listview,
 .calculator-window,
 .calculator-window view {
-    background-color: @window_bg_color !important;
+    background-color: @window_bg_color;
 }
 
 headerbar,
@@ -257,8 +257,8 @@ window.background.csd > contents > leaflet.unfolded > box > headerbar,
 window.background.csd > widget > leaflet.unfolded > box > headerbar,
 window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-left,
 window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-right {
-    background-color: @headerbar_bg_color !important;
-    background-image: none !important;
+    background-color: @headerbar_bg_color;
+    background-image: none;
 }
 
 .sidebar,
@@ -267,23 +267,19 @@ navigation-sidebar,
 placessidebar,
 leaflet list.navigation-sidebar,
 window.background.csd > dialog-host > widget > widget > box > leaflet list.navigation-sidebar {
-    background-color: @sidebar_bg_color !important;
-    background-image: none !important;
+    background-color: @sidebar_bg_color;
+    background-image: none;
 }
 """
-
-GRAPHITE_GLASSY_PALETTE_OVERRIDE += GLASSY_CONTAINER_RULES
-AMOLED_GLASSY_PALETTE_OVERRIDE += GLASSY_CONTAINER_RULES
-LIGHT_GLASSY_PALETTE_OVERRIDE += GLASSY_CONTAINER_RULES
 
 TRAFFIC_LIGHTS_OVERRIDE = """
 /* ── Mak Clean macOS Traffic Light Button Controls ────────────────────────── */
 windowcontrols,
 headerbar windowcontrols {
-    border: none !important;
-    background: none !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
+    border: none;
+    background: none;
+    background-color: transparent;
+    box-shadow: none;
 }
 
 windowcontrols button,
@@ -299,21 +295,52 @@ headerbar windowcontrols button,
 headerbar windowcontrols button:hover,
 headerbar windowcontrols button:active,
 headerbar windowcontrols button:focus {
-    background: none !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    border: none !important;
-    outline: none !important;
-    outline-style: none !important;
+    background: none;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    border: none;
+    outline: none;
+    outline-style: none;
     min-width: 14px;
     min-height: 14px;
     padding: 0;
     margin: 0 3px;
     border-radius: 9999px;
-    -gtk-icon-shadow: none !important;
+    -gtk-icon-shadow: none;
 }
 """
+
+def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy):
+    try:
+        with open(src_css_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except Exception:
+        content = ""
+
+    color_keys = [
+        "window_bg_color", "window_fg_color", "view_bg_color", "view_fg_color",
+        "headerbar_bg_color", "headerbar_fg_color", "headerbar_border_color",
+        "sidebar_bg_color", "sidebar_fg_color", "secondary_sidebar_bg_color",
+        "card_bg_color", "card_fg_color", "dialog_bg_color", "dialog_fg_color",
+        "popover_bg_color", "popover_fg_color", "placeholder_text_color"
+    ]
+    lines = content.splitlines()
+    filtered = []
+    for line in lines:
+        stripped = line.strip()
+        if any(stripped.startswith(f"@define-color {k} ") for k in color_keys):
+            continue
+        filtered.append(line)
+
+    rules_to_append = [TRAFFIC_LIGHTS_OVERRIDE]
+    if is_glassy:
+        rules_to_append.append(GLASSY_CONTAINER_RULES)
+
+    final_content = palette.strip() + "\n\n" + "\n".join(filtered) + "\n\n" + "\n\n".join(rules_to_append) + "\n"
+    with open(dst_css_path, "w", encoding="utf-8") as f:
+        f.write(final_content)
+
 
 HOME = os.path.expanduser("~")
 THEMES_DIR = os.path.join(HOME, ".themes")
@@ -396,16 +423,14 @@ def apply_global_theme(theme_key):
         }
         palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
 
+        is_glassy = theme_info["is_glassy"]
         if os.path.exists(src_gtk4):
-            # Copy gtk.css and gtk-dark.css, appending clean traffic light overrides and exact palette
+            # Generate gtk.css and gtk-dark.css with exact palette at top, no duplicate defines, and clean overrides
             for css_file in ["gtk.css", "gtk-dark.css"]:
                 src_css = os.path.join(src_gtk4, css_file)
                 dst_css = os.path.join(GTK4_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    shutil.copyfile(src_css, dst_css)
-                    with open(dst_css, "a", encoding="utf-8") as f:
-                        f.write(palette_override)
-                        f.write(TRAFFIC_LIGHTS_OVERRIDE)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy)
 
             # Update symlinks for assets and windows-assets
             for asset_folder in ["assets", "windows-assets"]:
@@ -441,10 +466,7 @@ def apply_global_theme(theme_key):
                 src_css = os.path.join(src_gtk3, css_file)
                 dst_css = os.path.join(GTK3_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    shutil.copyfile(src_css, dst_css)
-                    with open(dst_css, "a", encoding="utf-8") as f:
-                        f.write(palette_override)
-                        f.write(TRAFFIC_LIGHTS_OVERRIDE)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy)
 
             # Update symlinks for assets and windows-assets for GTK 3
             for asset_folder in ["assets", "windows-assets"]:

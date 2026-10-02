@@ -21,6 +21,12 @@ export class SpotlightModule {
                 'settings-schema': 'org.gnome.shell.extensions.superbar',
             });
             this._searchBar.getSettings = (schema) => this._extension.getSettings(schema || 'org.gnome.shell.extensions.superbar');
+            try {
+                const superSettings = this._searchBar.getSettings();
+                if (superSettings && superSettings.get_int('background-opacity') > 80) {
+                    superSettings.set_int('background-opacity', 75);
+                }
+            } catch (e) {}
             this._searchBar.enable();
         } catch (err) {
             console.warn('[Mak Spotlight] Failed to enable Spotlight:', err);

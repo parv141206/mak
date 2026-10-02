@@ -290,7 +290,9 @@ export class MenuStyleController {
     padding: 4px !important;
 }
 
-.calendar-day-base {
+.calendar-day-base,
+.calendar-day,
+.calendar .calendar-day {
     color: ${textColor} !important;
     border-radius: 9999px !important;
     font-weight: normal !important;
@@ -299,24 +301,35 @@ export class MenuStyleController {
 }
 
 .calendar-day-base:hover,
-.calendar-day-base:focus {
+.calendar-day-base:focus,
+.calendar-day:hover,
+.calendar-day:focus,
+.calendar .calendar-day:hover {
     background-color: ${itemHoverBg} !important;
     color: ${itemHoverColor} !important;
 }
 
-.calendar-day-base:active {
+.calendar-day-base:active,
+.calendar-day:active,
+.calendar .calendar-day:active {
     background-color: ${itemActiveBg} !important;
     color: ${itemHoverColor} !important;
 }
 
-.calendar-day-base:selected {
+.calendar-day-base:selected,
+.calendar-day:selected,
+.calendar-day:checked,
+.calendar .calendar-day:selected,
+.calendar .calendar-day:checked {
     background-color: #9A57A3 !important;
     color: #ffffff !important;
     font-weight: bold !important;
 }
 
 /* Today circle */
-.calendar-day-base.calendar-today {
+.calendar-day-base.calendar-today,
+.calendar-day.calendar-today,
+.calendar .calendar-day.calendar-today {
     background-color: #9A57A3 !important;
     color: #ffffff !important;
     font-weight: bold !important;

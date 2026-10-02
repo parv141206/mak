@@ -90,8 +90,12 @@ export const ApplicationsBlur = class ApplicationsBlur {
         this._log("blurring applications...");
 
         // export dbus service for preferences
-        this.service = new ApplicationsService;
-        this.service.export();
+        try {
+            this.service = new ApplicationsService;
+            this.service.export();
+        } catch (e) {
+            this._log("DBus service export skipped: " + e);
+        }
 
         this.mutter_gsettings = new Gio.Settings({ schema: 'org.gnome.mutter' });
 
@@ -310,11 +314,20 @@ export const ApplicationsBlur = class ApplicationsBlur {
             && ((enable_all && !matchesAnyPattern(window_wm_class, this._compiled_blacklist))
                 || (!enable_all && matchesAnyPattern(window_wm_class, this._compiled_whitelist))
             )
-            && [
-                Meta.FrameType.NORMAL,
-                Meta.FrameType.DIALOG,
-                Meta.FrameType.MODAL_DIALOG
-            ].includes(meta_window.get_frame_type())
+            && (
+                [
+                    Meta.FrameType.NORMAL,
+                    Meta.FrameType.DIALOG,
+                    Meta.FrameType.MODAL_DIALOG,
+                    Meta.FrameType.ATTACHED,
+                ].includes(meta_window.get_frame_type())
+                ||
+                [
+                    Meta.WindowType.NORMAL,
+                    Meta.WindowType.DIALOG,
+                    Meta.WindowType.MODAL_DIALOG,
+                ].includes(meta_window.get_window_type())
+            )
         ) {
             // only blur the window if it is not already done
             if (!meta_window.blur_actor)
