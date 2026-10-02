@@ -17,6 +17,9 @@ const _uid = Math.floor(Math.random() * 10000000);
 const { KiwiMenu } = await import(`./kiwimenu.js?v=${_uid}`);
 const { BluetoothBatteryButton } = await import(`./bluetoothBattery.js?v=${_uid}`);
 const { UserSwitcherController } = await import(`./userSwitcher.js?v=${_uid}`);
+const { MenuStyleController } = await import(`../appearance/menuStyleController.js?v=${_uid}`);
+const { WindowCornersModule } = await import(`../window-corners/cornersModule.js?v=${_uid}`);
+const { BlurModule } = await import(`../blur/blurModule.js?v=${_uid}`);
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: `MakAppTitleButton_${_uid}` },
@@ -135,6 +138,33 @@ export class TopBarModule {
     }
 
     enable() {
+        // Hot-reload dynamic styling, corners, and blur modules to ensure latest codebase runs
+        if (this._extension) {
+            try {
+                if (this._extension._menuStyle) this._extension._menuStyle.disable();
+                this._extension._menuStyle = new MenuStyleController(this._extension);
+                this._extension._menuStyle.enable();
+            } catch (err) {
+                console.warn('[Mak TopBar] Could not hot-reload MenuStyleController:', err);
+            }
+
+            try {
+                if (this._extension._windowCorners) this._extension._windowCorners.disable();
+                this._extension._windowCorners = new WindowCornersModule(this._extension);
+                this._extension._windowCorners.enable();
+            } catch (err) {
+                console.warn('[Mak TopBar] Could not hot-reload WindowCornersModule:', err);
+            }
+
+            try {
+                if (this._extension._blur) this._extension._blur.disable();
+                this._extension._blur = new BlurModule(this._extension);
+                this._extension._blur.enable();
+            } catch (err) {
+                console.warn('[Mak TopBar] Could not hot-reload BlurModule:', err);
+            }
+        }
+
         // 1. Hide default GNOME Activities / Workspace Indicator
         this._hideActivities(true);
 

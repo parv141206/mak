@@ -15,7 +15,7 @@ export default class MakExtension extends Extension {
     async enable() {
         this._settings = this.getSettings('org.gnome.shell.extensions.mak');
 
-        // Submodules
+        // Submodules with cache-busting dynamic imports
         this._dock = new DockModule(this);
         try {
             const { TopBarModule: DynamicTopBar } = await import(`./modules/topbar/topbarModule.js?v=${Date.now()}`);
@@ -26,9 +26,27 @@ export default class MakExtension extends Extension {
         }
         this._spotlight = new SpotlightModule(this);
         this._windowGaps = new WindowGapModule(this);
-        this._windowCorners = new WindowCornersModule(this);
-        this._blur = new BlurModule(this);
-        this._menuStyle = new MenuStyleController(this);
+
+        try {
+            const { WindowCornersModule: DynamicCorners } = await import(`./modules/window-corners/cornersModule.js?v=${Date.now()}`);
+            this._windowCorners = new DynamicCorners(this);
+        } catch (err) {
+            this._windowCorners = new WindowCornersModule(this);
+        }
+
+        try {
+            const { BlurModule: DynamicBlur } = await import(`./modules/blur/blurModule.js?v=${Date.now()}`);
+            this._blur = new DynamicBlur(this);
+        } catch (err) {
+            this._blur = new BlurModule(this);
+        }
+
+        try {
+            const { MenuStyleController: DynamicMenuStyle } = await import(`./modules/appearance/menuStyleController.js?v=${Date.now()}`);
+            this._menuStyle = new DynamicMenuStyle(this);
+        } catch (err) {
+            this._menuStyle = new MenuStyleController(this);
+        }
 
         this._settingsChangedId = this._settings.connect('changed', (settings, key) => {
             this._onSettingChanged(key);

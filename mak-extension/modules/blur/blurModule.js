@@ -60,11 +60,11 @@ export class BlurModule {
 
             popupSettings.set_boolean('blur', true);
             popupSettings.set_boolean('static-blur', false);
-            popupSettings.set_int('style-popup', 3);
-            popupSettings.set_int('quick-settings-corner-radius', 28);
-            popupSettings.set_int('menu-corner-radius', 18);
-            popupSettings.set_int('notification-corner-radius', 18);
-            popupSettings.set_int('dialog-corner-radius', 18);
+            popupSettings.set_int('style-popup', 0);
+            popupSettings.set_int('quick-settings-corner-radius', 16);
+            popupSettings.set_int('menu-corner-radius', 12);
+            popupSettings.set_int('notification-corner-radius', 16);
+            popupSettings.set_int('dialog-corner-radius', 16);
 
             overviewSettings.set_boolean('blur', true);
             appfolderSettings.set_boolean('blur', true);

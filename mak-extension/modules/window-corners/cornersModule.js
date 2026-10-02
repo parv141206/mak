@@ -29,12 +29,11 @@ export class WindowCornersModule {
                 }
             };
 
-            // Ensure essential defaults: do not skip libadwaita apps, ensure border width >= 1
+            // Ensure Libadwaita and Libhandy apps are skipped so their native 12px corners do not get double borders
             try {
                 const s = this._runner.getSettings();
-                if (s.get_boolean('skip-libadwaita-app')) {
-                    s.set_boolean('skip-libadwaita-app', false);
-                }
+                s.set_boolean('skip-libadwaita-app', true);
+                s.set_boolean('skip-libhandy-app', true);
                 if (s.get_int('border-width') === 0) {
                     s.set_int('border-width', 1);
                 }
