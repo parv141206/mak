@@ -31,7 +31,7 @@ export class BlurModule {
         this._settingsChangedId = this._makSettings.connect('changed', (s, key) => {
             if (key.startsWith('blur-') || key.startsWith('topbar-blur') ||
                 key === 'global-opacity' || key === 'background-opacity' ||
-                key === 'topbar-transparency') {
+                key === 'topbar-transparency' || key === 'topbar-opaque') {
                 this._syncSettings();
             }
         });
@@ -130,8 +130,10 @@ export class BlurModule {
             const appfolderSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.appfolder' });
             const bmsSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell' });
 
-            const topbarBlur = this._makSettings.get_boolean('topbar-blur') || this._makSettings.get_boolean('blur-panel');
+            const isTopBarOpaque = this._makSettings.get_boolean('topbar-opaque');
+            const topbarBlur = !isTopBarOpaque && (this._makSettings.get_boolean('topbar-blur') || this._makSettings.get_boolean('blur-panel'));
             panelSettings.set_boolean('blur', topbarBlur);
+            panelSettings.set_boolean('override-background', !isTopBarOpaque);
             overviewSettings.set_boolean('blur', this._makSettings.get_boolean('blur-overview'));
             appfolderSettings.set_boolean('blur', this._makSettings.get_boolean('blur-appfolder'));
 
