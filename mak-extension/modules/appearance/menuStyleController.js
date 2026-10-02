@@ -66,11 +66,6 @@ export class MenuStyleController {
     updateStyles() {
         const radius = this._settings.get_int('menu-corner-radius');
         const borderWidth = this._settings.get_int('menu-border-width');
-        const borderOpacity = this._settings.get_double('menu-border-opacity');
-        const specular = this._settings.get_boolean('menu-specular-highlight');
-        const globalOpacity = this._settings.get_double('global-opacity');
-        const configuredMenuOpacity = this._settings.get_double('menu-bg-opacity');
-        const bgOpacity = (globalOpacity !== 0.5) ? globalOpacity : configuredMenuOpacity;
         const qsRadius = this._settings.get_int('quick-settings-radius');
         const notifRadius = this._settings.get_int('notification-radius');
 
@@ -79,16 +74,19 @@ export class MenuStyleController {
         const isLight = (colorScheme === 'prefer-light') || gtkTheme.toLowerCase().includes('light');
         const isAmoled = gtkTheme.toLowerCase().includes('amoled');
 
-        let bgR = 36, bgG = 36, bgB = 42;
-        let textColor = '#f0f0f0';
-        let itemHoverBg = 'rgba(255, 255, 255, 0.14)';
-        let itemActiveBg = 'rgba(255, 255, 255, 0.24)';
-        let itemSelectedBg = 'rgba(255, 255, 255, 0.18)';
+        let bgR = 32, bgG = 32, bgB = 36;
+        let menuOpacity = 0.78;
+        let textColor = '#f5f5f7';
+        let secondaryTextColor = 'rgba(255, 255, 255, 0.55)';
+        let itemHoverBg = 'rgba(255, 255, 255, 0.12)';
+        let itemActiveBg = 'rgba(255, 255, 255, 0.22)';
+        let itemSelectedBg = 'rgba(255, 255, 255, 0.16)';
         let itemHoverColor = '#ffffff';
         let separatorColor = 'rgba(255, 255, 255, 0.10)';
-        let borderStrokeColor = `rgba(255, 255, 255, ${borderOpacity.toFixed(2)})`;
-        let topSpecularColor = `rgba(255, 255, 255, ${Math.min(1.0, borderOpacity + 0.18).toFixed(2)})`;
-        let pillBodyBg = `rgba(28, 28, 34, ${bgOpacity.toFixed(2)})`;
+        let borderStrokeColor = 'rgba(255, 255, 255, 0.14)';
+        let boxShadow = '0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.22)';
+        let qsBoxShadow = '0 16px 40px rgba(0, 0, 0, 0.55), 0 3px 10px rgba(0, 0, 0, 0.28)';
+        let pillBodyBg = `rgba(28, 28, 34, ${menuOpacity})`;
         let btHeaderBorder = 'rgba(255, 255, 255, 0.12)';
         let btEmptyText = 'rgba(255, 255, 255, 0.5)';
         let btHoverBg = 'rgba(255, 255, 255, 0.12)';
@@ -97,31 +95,37 @@ export class MenuStyleController {
 
         if (isLight) {
             bgR = 246; bgG = 246; bgB = 248;
+            menuOpacity = 0.84;
             textColor = '#1d1d1f';
-            itemHoverBg = 'rgba(0, 0, 0, 0.08)';
-            itemActiveBg = 'rgba(0, 0, 0, 0.15)';
-            itemSelectedBg = 'rgba(0, 0, 0, 0.12)';
+            secondaryTextColor = 'rgba(0, 0, 0, 0.55)';
+            itemHoverBg = 'rgba(0, 0, 0, 0.06)';
+            itemActiveBg = 'rgba(0, 0, 0, 0.12)';
+            itemSelectedBg = 'rgba(0, 0, 0, 0.09)';
             itemHoverColor = '#000000';
-            separatorColor = 'rgba(0, 0, 0, 0.10)';
-            borderStrokeColor = `rgba(0, 0, 0, ${Math.max(0.12, borderOpacity * 0.45).toFixed(2)})`;
-            topSpecularColor = 'rgba(255, 255, 255, 0.85)';
-            pillBodyBg = `rgba(255, 255, 255, ${bgOpacity.toFixed(2)})`;
+            separatorColor = 'rgba(0, 0, 0, 0.08)';
+            borderStrokeColor = 'rgba(0, 0, 0, 0.12)';
+            boxShadow = '0 10px 30px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08)';
+            qsBoxShadow = '0 14px 34px rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.08)';
+            pillBodyBg = `rgba(255, 255, 255, ${menuOpacity})`;
             btHeaderBorder = 'rgba(0, 0, 0, 0.10)';
             btEmptyText = 'rgba(0, 0, 0, 0.45)';
-            btHoverBg = 'rgba(0, 0, 0, 0.07)';
+            btHoverBg = 'rgba(0, 0, 0, 0.06)';
             btBarBg = 'rgba(0, 0, 0, 0.15)';
             btText = 'rgba(0, 0, 0, 0.75)';
         } else if (isAmoled) {
-            bgR = 0; bgG = 0; bgB = 0;
-            textColor = '#f0f0f0';
-            itemHoverBg = 'rgba(255, 255, 255, 0.16)';
-            itemActiveBg = 'rgba(255, 255, 255, 0.26)';
-            itemSelectedBg = 'rgba(255, 255, 255, 0.20)';
+            bgR = 10; bgG = 10; bgB = 12;
+            menuOpacity = 0.92;
+            textColor = '#ffffff';
+            secondaryTextColor = 'rgba(255, 255, 255, 0.60)';
+            itemHoverBg = 'rgba(255, 255, 255, 0.15)';
+            itemActiveBg = 'rgba(255, 255, 255, 0.25)';
+            itemSelectedBg = 'rgba(255, 255, 255, 0.18)';
             itemHoverColor = '#ffffff';
             separatorColor = 'rgba(255, 255, 255, 0.12)';
-            borderStrokeColor = `rgba(255, 255, 255, ${borderOpacity.toFixed(2)})`;
-            topSpecularColor = `rgba(255, 255, 255, ${Math.min(1.0, borderOpacity + 0.18).toFixed(2)})`;
-            pillBodyBg = `rgba(10, 10, 12, ${bgOpacity.toFixed(2)})`;
+            borderStrokeColor = 'rgba(255, 255, 255, 0.18)';
+            boxShadow = '0 14px 36px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.35)';
+            qsBoxShadow = '0 18px 44px rgba(0, 0, 0, 0.85), 0 4px 12px rgba(0, 0, 0, 0.45)';
+            pillBodyBg = `rgba(10, 10, 12, ${menuOpacity})`;
             btHeaderBorder = 'rgba(255, 255, 255, 0.14)';
             btEmptyText = 'rgba(255, 255, 255, 0.5)';
             btHoverBg = 'rgba(255, 255, 255, 0.14)';
@@ -131,17 +135,17 @@ export class MenuStyleController {
 
         const borderCss = borderWidth > 0
             ? `${borderWidth}px solid ${borderStrokeColor}`
-            : 'none';
-
-        const topHighlight = specular
-            ? `border-top: 1px solid ${topSpecularColor} !important;`
-            : '';
+            : `1px solid ${borderStrokeColor}`;
 
         const css = `/* Generated by Mak Appearance Controller */
 /* ── Unified macOS Popup Menus, Context Menus & Kiwi Menu ─────────────────── */
 .popup-menu-boxpointer,
 .candidate-popup-boxpointer {
     -arrow-rise: 0px !important;
+    -arrow-border-width: 0px !important;
+    -arrow-border-radius: 0px !important;
+    -arrow-background-color: transparent !important;
+    -arrow-border-color: transparent !important;
     box-shadow: none !important;
     background: transparent !important;
     background-color: transparent !important;
@@ -153,9 +157,8 @@ export class MenuStyleController {
 .candidate-popup-content {
     border-radius: ${radius}px !important;
     border: ${borderCss} !important;
-    ${topHighlight}
-    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${bgOpacity.toFixed(2)}) !important;
-    box-shadow: none !important;
+    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
+    box-shadow: ${boxShadow} !important;
     padding: 6px !important;
 }
 
@@ -168,9 +171,18 @@ export class MenuStyleController {
     color: ${textColor} !important;
 }
 
+.popup-menu-item StLabel {
+    color: ${textColor} !important;
+}
+
 .popup-menu-item:hover,
 .popup-menu-item:focus {
     background-color: ${itemHoverBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.popup-menu-item:hover StLabel,
+.popup-menu-item:focus StLabel {
     color: ${itemHoverColor} !important;
 }
 
@@ -179,9 +191,26 @@ export class MenuStyleController {
     color: ${itemHoverColor} !important;
 }
 
+.popup-menu-item:active StLabel {
+    color: ${itemHoverColor} !important;
+}
+
 .popup-menu-item.selected {
     background-color: ${itemSelectedBg} !important;
     color: ${itemHoverColor} !important;
+}
+
+.popup-menu-item.selected StLabel {
+    color: ${itemHoverColor} !important;
+}
+
+/* Submenu section headers (e.g. Kiwi recent items "Applications", "Documents") */
+.popup-menu-item.section-header,
+.popup-menu-item.section-header StLabel {
+    color: ${secondaryTextColor} !important;
+    font-weight: 600 !important;
+    font-size: 0.85em !important;
+    letter-spacing: 0.02em !important;
 }
 
 /* ── Separator ────────────────────────────────────────────────────────────── */
@@ -200,27 +229,40 @@ export class MenuStyleController {
 .quick-toggle-menu {
     border-radius: ${qsRadius}px !important;
     border: ${borderCss} !important;
-    ${topHighlight}
-    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${bgOpacity.toFixed(2)}) !important;
-    box-shadow: none !important;
+    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
+    box-shadow: ${qsBoxShadow} !important;
+    color: ${textColor} !important;
+}
+
+.quick-settings StLabel,
+.quick-toggle-menu StLabel {
+    color: ${textColor} !important;
 }
 
 /* ── Notification Banners ─────────────────────────────────────────────────── */
 .notification-banner {
     border-radius: ${notifRadius}px !important;
     border: ${borderCss} !important;
-    ${topHighlight}
-    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${bgOpacity.toFixed(2)}) !important;
-    box-shadow: none !important;
+    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
+    box-shadow: ${qsBoxShadow} !important;
+    color: ${textColor} !important;
+}
+
+.notification-banner StLabel {
+    color: ${textColor} !important;
 }
 
 /* ── Modal Dialogs ────────────────────────────────────────────────────────── */
 .modal-dialog {
     border-radius: ${Math.max(16, radius + 4)}px !important;
     border: ${borderCss} !important;
-    ${topHighlight}
-    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${bgOpacity.toFixed(2)}) !important;
-    box-shadow: none !important;
+    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
+    box-shadow: ${qsBoxShadow} !important;
+    color: ${textColor} !important;
+}
+
+.modal-dialog StLabel {
+    color: ${textColor} !important;
 }
 
 /* ── Bluetooth Battery Indicator ─────────────────────────────────────────── */
@@ -313,20 +355,18 @@ export class MenuStyleController {
     background-color: ${pillBodyBg} !important;
     border: ${borderCss} !important;
     border-radius: 20px !important;
-    ${topHighlight}
-    box-shadow: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     transition: width 0.3s ease, height 0.3s ease, border-radius 0.3s ease, transform 0.3s ease;
 }
 .pill-body:hover {
     transform: translateY(-1px) scale(1.02);
 }
 .music-pill-expanded {
-    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${bgOpacity.toFixed(2)}) !important;
+    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
     border: ${borderCss} !important;
     border-radius: ${radius}px !important;
-    ${topHighlight}
     padding: 16px;
-    box-shadow: none !important;
+    box-shadow: ${qsBoxShadow} !important;
     min-width: 300px;
 }
 

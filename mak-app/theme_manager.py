@@ -49,43 +49,43 @@ THEMES = {
 
 GRAPHITE_PALETTE_OVERRIDE = """
 /* ── Mak macOS Sonoma Graphite Frosted Palette ────────────────────────────── */
-@define-color window_bg_color #282828;
-@define-color window_fg_color #dadada;
-@define-color view_bg_color #202022;
-@define-color view_fg_color #dadada;
-@define-color headerbar_bg_color #303032;
-@define-color headerbar_fg_color #FDFDFD;
+@define-color window_bg_color #242426;
+@define-color window_fg_color #f5f5f7;
+@define-color view_bg_color #1e1e20;
+@define-color view_fg_color #f5f5f7;
+@define-color headerbar_bg_color #2c2c2e;
+@define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color #242426;
-@define-color sidebar_fg_color #dadada;
-@define-color secondary_sidebar_bg_color #202022;
-@define-color card_bg_color #343436;
-@define-color card_fg_color #dadada;
-@define-color dialog_bg_color #2c2c2e;
-@define-color dialog_fg_color #dadada;
-@define-color popover_bg_color #303032;
-@define-color popover_fg_color #dadada;
+@define-color sidebar_bg_color #1e1e20;
+@define-color sidebar_fg_color #f5f5f7;
+@define-color secondary_sidebar_bg_color #1a1a1c;
+@define-color card_bg_color #2c2c2e;
+@define-color card_fg_color #f5f5f7;
+@define-color dialog_bg_color #28282a;
+@define-color dialog_fg_color #f5f5f7;
+@define-color popover_bg_color #2c2c2e;
+@define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
 AMOLED_PALETTE_OVERRIDE = """
 /* ── Mak macOS AMOLED Pitch Black Obsidian Palette ────────────────────────── */
 @define-color window_bg_color #000000;
-@define-color window_fg_color #dadada;
+@define-color window_fg_color #ffffff;
 @define-color view_bg_color #000000;
-@define-color view_fg_color #dadada;
-@define-color headerbar_bg_color #050505;
-@define-color headerbar_fg_color #FDFDFD;
-@define-color headerbar_border_color rgba(255, 255, 255, 0.08);
+@define-color view_fg_color #ffffff;
+@define-color headerbar_bg_color #08080a;
+@define-color headerbar_fg_color #ffffff;
+@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
 @define-color sidebar_bg_color #000000;
-@define-color sidebar_fg_color #dadada;
+@define-color sidebar_fg_color #ffffff;
 @define-color secondary_sidebar_bg_color #000000;
-@define-color card_bg_color #111113;
-@define-color card_fg_color #dadada;
-@define-color dialog_bg_color #08080a;
-@define-color dialog_fg_color #dadada;
-@define-color popover_bg_color #0d0d0f;
-@define-color popover_fg_color #dadada;
+@define-color card_bg_color #121214;
+@define-color card_fg_color #ffffff;
+@define-color dialog_bg_color #0a0a0c;
+@define-color dialog_fg_color #ffffff;
+@define-color popover_bg_color #0e0e10;
+@define-color popover_fg_color #ffffff;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
@@ -114,10 +114,10 @@ TRAFFIC_LIGHTS_OVERRIDE = """
 /* ── Mak Clean macOS Traffic Light Button Controls ────────────────────────── */
 windowcontrols,
 headerbar windowcontrols {
-    border: none;
-    background: none;
-    background-color: transparent;
-    box-shadow: none;
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
 }
 
 windowcontrols button,
@@ -133,16 +133,19 @@ headerbar windowcontrols button,
 headerbar windowcontrols button:hover,
 headerbar windowcontrols button:active,
 headerbar windowcontrols button:focus {
-    background-color: transparent;
-    box-shadow: none;
-    border: none;
-    outline-style: none;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
+    outline-style: none !important;
     min-width: 14px;
     min-height: 14px;
     padding: 0;
     margin: 0 3px;
     border-radius: 9999px;
-    -gtk-icon-shadow: none;
+    -gtk-icon-shadow: none !important;
 }
 """
 
@@ -197,6 +200,10 @@ def apply_global_theme(theme_key):
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", color_scheme], check=True)
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", icon_theme], check=True)
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "cursor-theme", cursor_theme], check=True)
+        try:
+            subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", "purple"], check=True)
+        except Exception:
+            pass
         log.append(f"Set GNOME interface gtk-theme to '{theme_name}', color-scheme to '{color_scheme}', icon-theme to '{icon_theme}', and cursor to '{cursor_theme}'.")
     except Exception as e:
         log.append(f"Error setting GNOME interface: {e}")
@@ -379,10 +386,12 @@ def apply_global_theme(theme_key):
     # 8. Rounded Window Corners Border Highlight
     try:
         w_border = theme_info.get("window_border_color", "(1.0, 1.0, 1.0, 0.16)")
-        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 14>, 'smoothing': <0.0>, 'borderColor': <{w_border}>, 'enabled': <true>}}"
+        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 12>, 'smoothing': <0.0>, 'borderColor': <{w_border}>, 'enabled': <true>}}"
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "global-rounded-corner-settings", new_val], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "1"], check=False)
-        log.append(f"Updated window corner settings (radius 14, smoothing 0, border {w_border}).")
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libadwaita-app", "true"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libhandy-app", "true"], check=False)
+        log.append(f"Updated window corner settings (radius 12, smoothing 0, border {w_border}, skip-libadwaita true).")
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")
 
