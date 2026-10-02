@@ -87,10 +87,14 @@ export const ApplicationsService = class ApplicationsService {
     }
 
     export() {
-        this.DBusImpl.export(
-            Gio.DBus.session,
-            '/dev/aunetx/BlurMyShell'
-        );
+        try {
+            this.DBusImpl.export(
+                Gio.DBus.session,
+                '/dev/aunetx/BlurMyShell'
+            );
+        } catch (e) {
+            console.warn('[Mak BMS DBus] /dev/aunetx/BlurMyShell already exported or unavailable:', e);
+        }
     };
 
     unexport() {

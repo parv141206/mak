@@ -76,7 +76,9 @@ export class BlurModule {
             appSettings.set_boolean('static-blur', false);
             appSettings.set_boolean('enable-all', true);
             appSettings.set_boolean('dynamic-opacity', false);
-            appSettings.set_int('opacity', 255);
+            if (appSettings.get_int('opacity') >= 250) {
+                appSettings.set_int('opacity', 215);
+            }
             appSettings.set_int('corner-radius', 12);
             appSettings.set_boolean('corner-when-maximized', false);
         } catch (err) {
@@ -137,6 +139,9 @@ export class BlurModule {
                 appSettings.set_boolean('static-blur', false);
                 appSettings.set_boolean('enable-all', true);
                 appSettings.set_boolean('dynamic-opacity', false);
+                if (appSettings.get_int('opacity') >= 250) {
+                    appSettings.set_int('opacity', 215);
+                }
             } catch (e) {}
 
             bmsSettings.set_int('sigma', sigma);

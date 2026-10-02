@@ -50,72 +50,83 @@ class MakSettingsBridge:
         self.blur = load_settings("org.gnome.shell.extensions.blur-my-shell", "blur-my-shell")
         self.bms_panel = load_settings("org.gnome.shell.extensions.blur-my-shell.panel")
         self.bms_popup = load_settings("org.gnome.shell.extensions.blur-my-shell.popup")
+        self.bms_apps = load_settings("org.gnome.shell.extensions.blur-my-shell.applications")
 
     # ── Safe Getter / Setter Utilities ─────────────────────────────────────
+    @staticmethod
+    def _has_key(settings, key):
+        if not settings or not key:
+            return False
+        try:
+            schema = settings.props.settings_schema
+            return schema is not None and schema.has_key(key)
+        except Exception:
+            return False
+
     def _set_b(self, mak_key, comp_settings, comp_key, val):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: self.mak.set_boolean(mak_key, bool(val))
             except Exception as e: print(f"[Bridge] Error setting mak {mak_key}: {e}")
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: comp_settings.set_boolean(comp_key, bool(val))
             except Exception as e: print(f"[Bridge] Error setting comp {comp_key}: {e}")
 
     def _get_b(self, mak_key, comp_settings, comp_key, default=False):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: return self.mak.get_boolean(mak_key)
             except Exception: pass
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: return comp_settings.get_boolean(comp_key)
             except Exception: pass
         return default
 
     def _set_i(self, mak_key, comp_settings, comp_key, val):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: self.mak.set_int(mak_key, int(val))
             except Exception as e: print(f"[Bridge] Error setting mak {mak_key}: {e}")
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: comp_settings.set_int(comp_key, int(val))
             except Exception as e: print(f"[Bridge] Error setting comp {comp_key}: {e}")
 
     def _get_i(self, mak_key, comp_settings, comp_key, default=0):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: return self.mak.get_int(mak_key)
             except Exception: pass
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: return comp_settings.get_int(comp_key)
             except Exception: pass
         return default
 
     def _set_d(self, mak_key, comp_settings, comp_key, val):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: self.mak.set_double(mak_key, float(val))
             except Exception as e: print(f"[Bridge] Error setting mak {mak_key}: {e}")
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: comp_settings.set_double(comp_key, float(val))
             except Exception as e: print(f"[Bridge] Error setting comp {comp_key}: {e}")
 
     def _get_d(self, mak_key, comp_settings, comp_key, default=0.0):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: return self.mak.get_double(mak_key)
             except Exception: pass
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: return comp_settings.get_double(comp_key)
             except Exception: pass
         return default
 
     def _set_s(self, mak_key, comp_settings, comp_key, val):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: self.mak.set_string(mak_key, str(val))
             except Exception as e: print(f"[Bridge] Error setting mak {mak_key}: {e}")
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: comp_settings.set_string(comp_key, str(val))
             except Exception as e: print(f"[Bridge] Error setting comp {comp_key}: {e}")
 
     def _get_s(self, mak_key, comp_settings, comp_key, default=""):
-        if self.mak:
+        if self._has_key(self.mak, mak_key):
             try: return self.mak.get_string(mak_key)
             except Exception: pass
-        if comp_settings and comp_key:
+        if self._has_key(comp_settings, comp_key):
             try: return comp_settings.get_string(comp_key)
             except Exception: pass
         return default
@@ -686,6 +697,26 @@ class MakSettingsBridge:
 
     def get_blur_chromatic_dispersion(self): return self._get_d("blur-chromatic-dispersion", None, None, 0.08)
     def set_blur_chromatic_dispersion(self, v): self._set_d("blur-chromatic-dispersion", None, None, v)
+
+    def get_blur_applications(self):
+        return self._get_b("blur-applications", self.bms_apps, "blur", True)
+    def set_blur_applications(self, v):
+        self._set_b("blur-applications", self.bms_apps, "blur", v)
+
+    def get_app_opacity(self):
+        if self.bms_apps:
+            try:
+                raw = self.bms_apps.get_int("opacity")
+                return round(raw / 255.0, 2)
+            except Exception: pass
+        return 0.84
+
+    def set_app_opacity(self, v):
+        raw = int(round(float(v) * 255.0))
+        raw = max(50, min(255, raw))
+        if self.bms_apps:
+            try: self.bms_apps.set_int("opacity", raw)
+            except Exception as e: print(f"[Bridge] Error setting app opacity: {e}")
 
     # ── 7. UI & MENU STYLING (macOS Unified Design) ────────────────────────
     def get_menu_corner_radius(self): return self._get_i("menu-corner-radius", None, None, 16)
