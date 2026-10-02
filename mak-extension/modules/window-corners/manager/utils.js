@@ -15,8 +15,27 @@ import { getPref } from '../utils/settings.js';
  * @returns The correct actor that the effect should be applied to.
  */
 export function unwrapActor(actor) {
-    const type = actor.metaWindow.get_client_type();
-    return type === Meta.WindowClientType.X11 ? actor.get_first_child() : actor;
+    if (!actor) return null;
+    const BLUR_NAMES = new Set(['blur-actor', 'bms-application-blurred-widget']);
+
+    // Check direct children for the surface actor
+    if (typeof actor.get_children === 'function') {
+        const children = actor.get_children();
+        for (const child of children) {
+            if (!BLUR_NAMES.has(child.name) &&
+                (child.constructor?.name?.includes('SurfaceActor') || child.toString().includes('SurfaceActor'))) {
+                return child;
+            }
+        }
+        for (const child of children) {
+            if (!BLUR_NAMES.has(child.name)) {
+                return child;
+            }
+        }
+    }
+
+    const type = actor.metaWindow?.get_client_type?.();
+    return type === Meta.WindowClientType.X11 && actor.get_first_child ? actor.get_first_child() : actor;
 }
 /**
  * Get the correct rounded corner setting for a window (custom settings if a
@@ -43,12 +62,8 @@ export function getRoundedCornersCfg(win) {
  * @returns The corresponding Clutter.Effect object.
  */
 export function getRoundedCornersEffect(actor) {
-    const win = actor.metaWindow;
-    const name = ROUNDED_CORNERS_EFFECT;
-    const isXwayland = win.get_client_type() === Meta.WindowClientType.X11 && actor.firstChild;
-    return isXwayland
-        ? actor.firstChild.get_effect(name)
-        : actor.get_effect(name);
+    const target = unwrapActor(actor);
+    return target?.get_effect ? target.get_effect(ROUNDED_CORNERS_EFFECT) : null;
 }
 /** Compute outer bounds for rounded corners of a window
  *
@@ -56,11 +71,14 @@ export function getRoundedCornersEffect(actor) {
  * @param [x, y, width, height] - The content offsets of the window actor.
  */
 export function computeBounds(actor, [x, y, width, height]) {
+    const target = unwrapActor(actor) || actor;
+    const targetW = target.width || actor.width || 0;
+    const targetH = target.height || actor.height || 0;
     const bounds = {
         x1: x + 1,
         y1: y + 1,
-        x2: x + actor.width + width,
-        y2: y + actor.height + height,
+        x2: x + targetW + width,
+        y2: y + targetH + height,
     };
     // Kitty draws its window decoration by itself, so we need to manually
     // clip its shadow and recompute the outer bounds for it.

@@ -81,6 +81,26 @@ export class BlurModule {
             }
             appSettings.set_int('corner-radius', 12);
             appSettings.set_boolean('corner-when-maximized', false);
+
+            // Whitelist Chrome, Brave, Antigravity, and Electron apps
+            const targetWhitelist = [
+                'google-chrome*',
+                'brave*',
+                'antigravity*',
+                'code*',
+                'electron*',
+                'org.gnome.*',
+                'com.mattjakeman.ExtensionManager',
+                'io.github.*',
+                'com.github.*',
+            ];
+            const currentWhitelist = appSettings.get_strv('whitelist');
+            const mergedWhitelist = Array.from(new Set([...currentWhitelist, ...targetWhitelist]));
+            appSettings.set_strv('whitelist', mergedWhitelist);
+
+            // Set hacks-level 2 to disable clipped redraws so blur updates behind all windows
+            const bmsSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell' });
+            bmsSettings.set_int('hacks-level', 2);
         } catch (err) {
             console.warn('[Mak Blur] Could not initialize BMS settings:', err);
         }
@@ -147,6 +167,7 @@ export class BlurModule {
             bmsSettings.set_int('sigma', sigma);
             bmsSettings.set_double('brightness', brightness);
             bmsSettings.set_double('noise-amount', noise);
+            bmsSettings.set_int('hacks-level', 2);
 
             // Update live pipeline parameters so shader updates instantly
             try {
