@@ -562,6 +562,19 @@ class MakSettingsBridge:
     def get_corner_border_width(self): return self._get_i("corner-border-width", self.corners, "border-width", 1)
     def set_corner_border_width(self, v): self._set_i("corner-border-width", self.corners, "border-width", v)
 
+    def get_titlebar_button_size(self): return self._get_i("titlebar-button-size", None, None, 14)
+    def set_titlebar_button_size(self, v):
+        self._set_i("titlebar-button-size", None, None, v)
+        try:
+            from .theme_manager import update_titlebar_button_size
+            update_titlebar_button_size(v)
+        except Exception:
+            try:
+                import theme_manager
+                theme_manager.update_titlebar_button_size(v)
+            except Exception:
+                pass
+
     def get_unround_maximized(self): return self._get_b("unround-maximized", None, None, False)
     def set_unround_maximized(self, v):
         self._set_b("unround-maximized", None, None, v)

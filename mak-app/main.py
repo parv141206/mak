@@ -635,20 +635,46 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         uni_gap = Adw.SwitchRow(title="Uniform Gap on All Edges", subtitle="Use same padding size on top, bottom, left, and right")
         uni_gap.set_active(self.bridge.get_gap_uniform())
-        uni_gap.connect("notify::active", lambda s, p: self.bridge.set_gap_uniform(s.get_active()))
         gaps_group.add(uni_gap)
 
-        gaps_group.add(create_spin_row("Uniform Gap Size", "Margin in pixels applied to all edges", 0, 200, 2, self.bridge.get_gap_size(), digits=0, on_change=self.bridge.set_gap_size))
+        uni_size_row = create_spin_row("Uniform Gap Size", "Margin in pixels applied to all edges", 0, 200, 2, self.bridge.get_gap_size(), digits=0, on_change=self.bridge.set_gap_size)
+        gaps_group.add(uni_size_row)
 
         max_gaps = Adw.SwitchRow(title="Retain Gaps on Maximized Windows", subtitle="Preserve outer padding even when window is maximized")
         max_gaps.set_active(self.bridge.get_gaps_maximized())
         max_gaps.connect("notify::active", lambda s, p: self.bridge.set_gaps_maximized(s.get_active()))
         gaps_group.add(max_gaps)
 
-        gaps_group.add(create_spin_row("Custom Top Margin", "Top edge gap in pixels", 0, 200, 2, self.bridge.get_gap_top(), digits=0, on_change=self.bridge.set_gap_top))
-        gaps_group.add(create_spin_row("Custom Bottom Margin", "Bottom edge gap in pixels", 0, 200, 2, self.bridge.get_gap_bottom(), digits=0, on_change=self.bridge.set_gap_bottom))
-        gaps_group.add(create_spin_row("Custom Left Margin", "Left edge gap in pixels", 0, 200, 2, self.bridge.get_gap_left(), digits=0, on_change=self.bridge.set_gap_left))
-        gaps_group.add(create_spin_row("Custom Right Margin", "Right edge gap in pixels", 0, 200, 2, self.bridge.get_gap_right(), digits=0, on_change=self.bridge.set_gap_right))
+        def _on_custom_gap(setter, val):
+            if uni_gap.get_active():
+                uni_gap.set_active(False)
+            setter(val)
+
+        top_row = create_spin_row("Custom Top Margin", "Top edge gap in pixels", 0, 200, 2, self.bridge.get_gap_top(), digits=0, on_change=lambda v: _on_custom_gap(self.bridge.set_gap_top, v))
+        bottom_row = create_spin_row("Custom Bottom Margin", "Bottom edge gap in pixels", 0, 200, 2, self.bridge.get_gap_bottom(), digits=0, on_change=lambda v: _on_custom_gap(self.bridge.set_gap_bottom, v))
+        left_row = create_spin_row("Custom Left Margin", "Left edge gap in pixels", 0, 200, 2, self.bridge.get_gap_left(), digits=0, on_change=lambda v: _on_custom_gap(self.bridge.set_gap_left, v))
+        right_row = create_spin_row("Custom Right Margin", "Right edge gap in pixels", 0, 200, 2, self.bridge.get_gap_right(), digits=0, on_change=lambda v: _on_custom_gap(self.bridge.set_gap_right, v))
+
+        gaps_group.add(top_row)
+        gaps_group.add(bottom_row)
+        gaps_group.add(left_row)
+        gaps_group.add(right_row)
+
+        def _update_gap_ui(is_uniform):
+            uni_size_row.set_sensitive(is_uniform)
+            top_row.set_sensitive(not is_uniform)
+            bottom_row.set_sensitive(not is_uniform)
+            left_row.set_sensitive(not is_uniform)
+            right_row.set_sensitive(not is_uniform)
+
+        _update_gap_ui(uni_gap.get_active())
+
+        def _on_uni_toggled(s, _pspec):
+            active = s.get_active()
+            self.bridge.set_gap_uniform(active)
+            _update_gap_ui(active)
+
+        uni_gap.connect("notify::active", _on_uni_toggled)
 
         # Rounded Corners & Borders
         corn_group = Adw.PreferencesGroup(title="Rounded Corners and Window Borders")
@@ -662,6 +688,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         corn_group.add(create_spin_row("Window Corner Radius", "Corner curvature radius in pixels", 0, 40, 1, self.bridge.get_corner_radius(), digits=0, on_change=self.bridge.set_corner_radius))
         corn_group.add(create_spin_row("Apple Squircle Smoothing", "Curvature exponent for super-ellipse squircle corners (0.8 = authentic Apple curvature)", 0.0, 1.0, 0.05, self.bridge.get_corner_smoothing(), digits=2, on_change=self.bridge.set_corner_smoothing))
         corn_group.add(create_spin_row("Window Border Stroke Width", "Subtle macOS window border in pixels", 0, 10, 1, self.bridge.get_corner_border_width(), digits=0, on_change=self.bridge.set_corner_border_width))
+        corn_group.add(create_spin_row("Title Bar Button Size", "Diameter in pixels of macOS traffic light buttons (close, minimize, maximize)", 10, 22, 1, self.bridge.get_titlebar_button_size(), digits=0, on_change=self.bridge.set_titlebar_button_size))
 
         unround_max = Adw.SwitchRow(title="Square Off Maximized Windows", subtitle="Disable rounded corners when a window is maximized")
         unround_max.set_active(self.bridge.get_unround_maximized())

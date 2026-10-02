@@ -272,15 +272,18 @@ window.background.csd > dialog-host > widget > widget > box > leaflet list.navig
 }
 """
 
-TRAFFIC_LIGHTS_OVERRIDE = """
-/* ── Mak Clean macOS Traffic Light Button Controls ────────────────────────── */
+def generate_traffic_lights_override(button_size=14):
+    size = max(10, min(22, int(button_size)))
+    margin = 2 if size <= 12 else (3 if size <= 16 else 4)
+    return f"""
+/* ── Mak Clean macOS Traffic Light Button Controls ({size}px) ────────────────── */
 windowcontrols,
-headerbar windowcontrols {
+headerbar windowcontrols {{
     border: none;
     background: none;
     background-color: transparent;
     box-shadow: none;
-}
+}}
 
 windowcontrols button,
 windowcontrols button:hover,
@@ -294,7 +297,7 @@ headerbar button.titlebutton:focus,
 headerbar windowcontrols button,
 headerbar windowcontrols button:hover,
 headerbar windowcontrols button:active,
-headerbar windowcontrols button:focus {
+headerbar windowcontrols button:focus {{
     background: none;
     background-color: transparent;
     background-image: none;
@@ -302,14 +305,30 @@ headerbar windowcontrols button:focus {
     border: none;
     outline: none;
     outline-style: none;
-    min-width: 14px;
-    min-height: 14px;
+    min-width: {size}px;
+    min-height: {size}px;
     padding: 0;
-    margin: 0 3px;
+    margin: 0 {margin}px;
     border-radius: 9999px;
     -gtk-icon-shadow: none;
-}
+}}
+
+headerbar windowcontrols button.close,
+headerbar windowcontrols button.maximize,
+headerbar windowcontrols button.minimize,
+windowcontrols button.close,
+windowcontrols button.maximize,
+windowcontrols button.minimize,
+headerbar button.titlebutton.close,
+headerbar button.titlebutton.maximize,
+headerbar button.titlebutton.minimize {{
+    min-width: {size}px;
+    min-height: {size}px;
+    background-size: {size}px {size}px;
+}}
 """
+
+TRAFFIC_LIGHTS_OVERRIDE = generate_traffic_lights_override(14)
 
 WINDOW_CORNERS_CSS_OVERRIDE = """
 /* ── Mak macOS Window Corner & Geometry Consistency (16px) ──────────────── */
@@ -412,7 +431,7 @@ window.fullscreen.csd headerbar {
 }
 """
 
-def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy):
+def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14):
     try:
         with open(src_css_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -434,13 +453,51 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy):
             continue
         filtered.append(line)
 
-    rules_to_append = [TRAFFIC_LIGHTS_OVERRIDE, WINDOW_CORNERS_CSS_OVERRIDE]
+    traffic_override = generate_traffic_lights_override(button_size)
+    rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 
     final_content = palette.strip() + "\n\n" + "\n".join(filtered) + "\n\n" + "\n\n".join(rules_to_append) + "\n"
     with open(dst_css_path, "w", encoding="utf-8") as f:
         f.write(final_content)
+
+
+def update_titlebar_button_size(button_size):
+    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size."""
+    theme_key = get_current_theme()
+    theme_info = THEMES.get(theme_key, THEMES["dark"])
+    theme_name = theme_info["theme_name"]
+    source_dir = os.path.join(THEMES_DIR, theme_name)
+    is_glassy = theme_info.get("is_glassy", False)
+
+    palette_map = {
+        "dark": GRAPHITE_PALETTE_OVERRIDE,
+        "dark-glassy": GRAPHITE_GLASSY_PALETTE_OVERRIDE,
+        "amoled": AMOLED_PALETTE_OVERRIDE,
+        "amoled-glassy": AMOLED_GLASSY_PALETTE_OVERRIDE,
+        "light": LIGHT_PALETTE_OVERRIDE,
+        "light-glassy": LIGHT_GLASSY_PALETTE_OVERRIDE,
+    }
+    palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
+
+    # GTK 4
+    src_gtk4 = os.path.join(source_dir, "gtk-4.0")
+    if os.path.exists(src_gtk4):
+        for css_file in ["gtk.css", "gtk-dark.css"]:
+            src_css = os.path.join(src_gtk4, css_file)
+            dst_css = os.path.join(GTK4_CONFIG, css_file)
+            if os.path.exists(src_css):
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
+
+    # GTK 3
+    src_gtk3 = os.path.join(source_dir, "gtk-3.0")
+    if os.path.exists(src_gtk3):
+        for css_file in ["gtk.css", "gtk-dark.css"]:
+            src_css = os.path.join(src_gtk3, css_file)
+            dst_css = os.path.join(GTK3_CONFIG, css_file)
+            if os.path.exists(src_css):
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
 
 
 HOME = os.path.expanduser("~")
@@ -525,13 +582,20 @@ def apply_global_theme(theme_key):
         palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
 
         is_glassy = theme_info["is_glassy"]
+        try:
+            res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-size"],
+                                 capture_output=True, text=True)
+            button_size = int(res.stdout.strip())
+        except Exception:
+            button_size = 14
+
         if os.path.exists(src_gtk4):
             # Generate gtk.css and gtk-dark.css with exact palette at top, no duplicate defines, and clean overrides
             for css_file in ["gtk.css", "gtk-dark.css"]:
                 src_css = os.path.join(src_gtk4, css_file)
                 dst_css = os.path.join(GTK4_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
 
             # Update symlinks for assets and windows-assets
             for asset_folder in ["assets", "windows-assets"]:
@@ -567,7 +631,7 @@ def apply_global_theme(theme_key):
                 src_css = os.path.join(src_gtk3, css_file)
                 dst_css = os.path.join(GTK3_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
 
             # Update symlinks for assets and windows-assets for GTK 3
             for asset_folder in ["assets", "windows-assets"]:
