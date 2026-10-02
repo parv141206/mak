@@ -16,7 +16,12 @@ export default class MakExtension extends Extension {
         this._settings = this.getSettings('org.gnome.shell.extensions.mak');
 
         // Submodules with cache-busting dynamic imports
-        this._dock = new DockModule(this);
+        try {
+            const { DockModule: DynamicDock } = await import(`./modules/dock/dockModule.js?v=${Date.now()}`);
+            this._dock = new DynamicDock(this);
+        } catch (err) {
+            this._dock = new DockModule(this);
+        }
         try {
             const { TopBarModule: DynamicTopBar } = await import(`./modules/topbar/topbarModule.js?v=${Date.now()}`);
             this._topbar = new DynamicTopBar(this);

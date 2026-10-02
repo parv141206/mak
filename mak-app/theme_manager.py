@@ -272,63 +272,283 @@ window.background.csd > dialog-host > widget > widget > box > leaflet list.navig
 }
 """
 
-def generate_traffic_lights_override(button_size=14):
+def generate_traffic_lights_override(button_size=14, button_spacing=8):
     size = max(10, min(22, int(button_size)))
-    margin = 2 if size <= 12 else (3 if size <= 16 else 4)
+    spacing = max(0, min(24, int(button_spacing)))
+    margin = max(0, round(spacing / 2))
     return f"""
-/* ── Mak Clean macOS Traffic Light Button Controls ({size}px) ────────────────── */
+/* ── Mak Clean macOS Traffic Light Button Controls ({size}px, spacing {spacing}px) ── */
 windowcontrols,
-headerbar windowcontrols {{
+headerbar windowcontrols,
+.titlebar windowcontrols {{
     border: none;
     background: none;
     background-color: transparent;
     box-shadow: none;
+    border-spacing: {spacing}px !important;
 }}
 
+/* Universal anti-repetition & sizing rules across GTK3, GTK4, Libadwaita, Chromium, Chrome & Electron */
 windowcontrols button,
 windowcontrols button:hover,
 windowcontrols button:active,
-windowcontrols button:checked,
-windowcontrols button:focus,
-headerbar button.titlebutton,
-headerbar button.titlebutton:hover,
-headerbar button.titlebutton:active,
-headerbar button.titlebutton:focus,
+windowcontrols button:backdrop,
+windowcontrols button:backdrop:hover,
+windowcontrols button.close,
+windowcontrols button.close:hover,
+windowcontrols button.close:active,
+windowcontrols button.close:backdrop,
+windowcontrols button.close:backdrop:hover,
+windowcontrols button.maximize,
+windowcontrols button.maximize:hover,
+windowcontrols button.maximize:active,
+windowcontrols button.maximize:backdrop,
+windowcontrols button.maximize:backdrop:hover,
+windowcontrols button.minimize,
+windowcontrols button.minimize:hover,
+windowcontrols button.minimize:active,
+windowcontrols button.minimize:backdrop,
+windowcontrols button.minimize:backdrop:hover,
+windowcontrols button.titlebutton,
+windowcontrols button.titlebutton:hover,
+windowcontrols button.titlebutton:active,
+windowcontrols button.titlebutton:backdrop,
+windowcontrols button.titlebutton:backdrop:hover,
+windowcontrols button.titlebutton.close,
+windowcontrols button.titlebutton.close:hover,
+windowcontrols button.titlebutton.close:active,
+windowcontrols button.titlebutton.close:backdrop,
+windowcontrols button.titlebutton.close:backdrop:hover,
+windowcontrols button.titlebutton.maximize,
+windowcontrols button.titlebutton.maximize:hover,
+windowcontrols button.titlebutton.maximize:active,
+windowcontrols button.titlebutton.maximize:backdrop,
+windowcontrols button.titlebutton.maximize:backdrop:hover,
+windowcontrols button.titlebutton.minimize,
+windowcontrols button.titlebutton.minimize:hover,
+windowcontrols button.titlebutton.minimize:active,
+windowcontrols button.titlebutton.minimize:backdrop,
+windowcontrols button.titlebutton.minimize:backdrop:hover,
 headerbar windowcontrols button,
 headerbar windowcontrols button:hover,
 headerbar windowcontrols button:active,
-headerbar windowcontrols button:focus {{
-    background: none;
-    background-color: transparent;
-    background-image: none;
-    box-shadow: none;
-    border: none;
-    outline: none;
-    outline-style: none;
-    min-width: {size}px;
-    min-height: {size}px;
-    padding: 0;
-    margin: 0 {margin}px;
-    border-radius: 9999px;
-    -gtk-icon-shadow: none;
+headerbar windowcontrols button:backdrop,
+headerbar windowcontrols button:backdrop:hover,
+headerbar windowcontrols button.close,
+headerbar windowcontrols button.close:hover,
+headerbar windowcontrols button.close:active,
+headerbar windowcontrols button.close:backdrop,
+headerbar windowcontrols button.close:backdrop:hover,
+headerbar windowcontrols button.maximize,
+headerbar windowcontrols button.maximize:hover,
+headerbar windowcontrols button.maximize:active,
+headerbar windowcontrols button.maximize:backdrop,
+headerbar windowcontrols button.maximize:backdrop:hover,
+headerbar windowcontrols button.minimize,
+headerbar windowcontrols button.minimize:hover,
+headerbar windowcontrols button.minimize:active,
+headerbar windowcontrols button.minimize:backdrop,
+headerbar windowcontrols button.minimize:backdrop:hover,
+headerbar windowcontrols button.titlebutton,
+headerbar windowcontrols button.titlebutton:hover,
+headerbar windowcontrols button.titlebutton:active,
+headerbar windowcontrols button.titlebutton:backdrop,
+headerbar windowcontrols button.titlebutton:backdrop:hover,
+headerbar windowcontrols button.titlebutton.close,
+headerbar windowcontrols button.titlebutton.close:hover,
+headerbar windowcontrols button.titlebutton.close:active,
+headerbar windowcontrols button.titlebutton.close:backdrop,
+headerbar windowcontrols button.titlebutton.close:backdrop:hover,
+headerbar windowcontrols button.titlebutton.maximize,
+headerbar windowcontrols button.titlebutton.maximize:hover,
+headerbar windowcontrols button.titlebutton.maximize:active,
+headerbar windowcontrols button.titlebutton.maximize:backdrop,
+headerbar windowcontrols button.titlebutton.maximize:backdrop:hover,
+headerbar windowcontrols button.titlebutton.minimize,
+headerbar windowcontrols button.titlebutton.minimize:hover,
+headerbar windowcontrols button.titlebutton.minimize:active,
+headerbar windowcontrols button.titlebutton.minimize:backdrop,
+headerbar windowcontrols button.titlebutton.minimize:backdrop:hover,
+headerbar button.titlebutton,
+headerbar button.titlebutton:hover,
+headerbar button.titlebutton:active,
+headerbar button.titlebutton:backdrop,
+headerbar button.titlebutton:backdrop:hover,
+headerbar button.titlebutton.close,
+headerbar button.titlebutton.close:hover,
+headerbar button.titlebutton.close:active,
+headerbar button.titlebutton.close:backdrop,
+headerbar button.titlebutton.close:backdrop:hover,
+headerbar button.titlebutton.maximize,
+headerbar button.titlebutton.maximize:hover,
+headerbar button.titlebutton.maximize:active,
+headerbar button.titlebutton.maximize:backdrop,
+headerbar button.titlebutton.maximize:backdrop:hover,
+headerbar button.titlebutton.minimize,
+headerbar button.titlebutton.minimize:hover,
+headerbar button.titlebutton.minimize:active,
+headerbar button.titlebutton.minimize:backdrop,
+headerbar button.titlebutton.minimize:backdrop:hover,
+button.titlebutton,
+button.titlebutton:hover,
+button.titlebutton:active,
+button.titlebutton:backdrop,
+button.titlebutton:backdrop:hover,
+button.titlebutton.close,
+button.titlebutton.close:hover,
+button.titlebutton.close:active,
+button.titlebutton.close:backdrop,
+button.titlebutton.close:backdrop:hover,
+button.titlebutton.maximize,
+button.titlebutton.maximize:hover,
+button.titlebutton.maximize:active,
+button.titlebutton.maximize:backdrop,
+button.titlebutton.maximize:backdrop:hover,
+button.titlebutton.minimize,
+button.titlebutton.minimize:hover,
+button.titlebutton.minimize:active,
+button.titlebutton.minimize:backdrop,
+button.titlebutton.minimize:backdrop:hover,
+window.background.chromium button.titlebutton,
+window.background.chromium button.titlebutton:hover,
+window.background.chromium button.titlebutton:active,
+window.background.chromium button.titlebutton:backdrop,
+window.background.chromium button.titlebutton:backdrop:hover,
+window.background.chromium headerbar.titlebar button.titlebutton,
+window.background.chromium headerbar.titlebar button.titlebutton:hover,
+window.background.chromium headerbar.titlebar button.titlebutton:active,
+window.background.chromium headerbar.titlebar button.titlebutton:backdrop,
+window.background.chromium headerbar.titlebar button.titlebutton:backdrop:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.close,
+window.background.chromium headerbar.titlebar button.titlebutton.close:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.close:active,
+window.background.chromium headerbar.titlebar button.titlebutton.close:backdrop,
+window.background.chromium headerbar.titlebar button.titlebutton.close:backdrop:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize:active,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize:backdrop,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize:backdrop:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize:active,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize:backdrop,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:hover,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:active,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:backdrop,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar button.close,
+window.background.chromium headerbar.header-bar.titlebar button.close:hover,
+window.background.chromium headerbar.header-bar.titlebar button.close:active,
+window.background.chromium headerbar.header-bar.titlebar button.close:backdrop,
+window.background.chromium headerbar.header-bar.titlebar button.close:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton,
+window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:hover,
+window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:active,
+window.background.chromium headerbar.header-bar.titlebar button.maximize,
+window.background.chromium headerbar.header-bar.titlebar button.maximize:hover,
+window.background.chromium headerbar.header-bar.titlebar button.maximize:active,
+window.background.chromium headerbar.header-bar.titlebar button.maximize:backdrop,
+window.background.chromium headerbar.header-bar.titlebar button.maximize:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton,
+window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:hover,
+window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:active,
+window.background.chromium headerbar.header-bar.titlebar button.minimize,
+window.background.chromium headerbar.header-bar.titlebar button.minimize:hover,
+window.background.chromium headerbar.header-bar.titlebar button.minimize:active,
+window.background.chromium headerbar.header-bar.titlebar button.minimize:backdrop,
+window.background.chromium headerbar.header-bar.titlebar button.minimize:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton,
+window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:hover,
+window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:active,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:active,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:active,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:backdrop,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:backdrop:hover {{
+    min-width: {size}px !important;
+    min-height: {size}px !important;
+    max-width: {size}px !important;
+    max-height: {size}px !important;
+    width: {size}px !important;
+    height: {size}px !important;
+    padding: 0 !important;
+    margin: 0 {margin}px !important;
+    border-radius: 9999px !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: {size}px {size}px !important;
+    -gtk-icon-shadow: none !important;
+    -gtk-icon-size: {size}px !important;
 }}
 
-headerbar windowcontrols button.close,
-headerbar windowcontrols button.maximize,
-headerbar windowcontrols button.minimize,
-windowcontrols button.close,
-windowcontrols button.maximize,
-windowcontrols button.minimize,
-headerbar button.titlebutton.close,
-headerbar button.titlebutton.maximize,
-headerbar button.titlebutton.minimize {{
-    min-width: {size}px;
-    min-height: {size}px;
-    background-size: {size}px {size}px;
+/* Ensure button images/icons also do not repeat and stay centered */
+headerbar windowcontrols button > image,
+windowcontrols button > image,
+headerbar button.titlebutton > image,
+button.titlebutton > image,
+windowcontrols button:hover > image,
+headerbar button.titlebutton:hover > image,
+headerbar windowcontrols button:hover > image {{
+    min-width: {size}px !important;
+    min-height: {size}px !important;
+    max-width: {size}px !important;
+    max-height: {size}px !important;
+    width: {size}px !important;
+    height: {size}px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    -gtk-icon-size: {size}px !important;
 }}
 """
 
-TRAFFIC_LIGHTS_OVERRIDE = generate_traffic_lights_override(14)
+TRAFFIC_LIGHTS_OVERRIDE = generate_traffic_lights_override(14, 8)
 
 WINDOW_CORNERS_CSS_OVERRIDE = """
 /* ── Mak macOS Window Corner & Geometry Consistency (16px) ──────────────── */
@@ -431,7 +651,7 @@ window.fullscreen.csd headerbar {
 }
 """
 
-def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14):
+def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8):
     try:
         with open(src_css_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -453,7 +673,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
             continue
         filtered.append(line)
 
-    traffic_override = generate_traffic_lights_override(button_size)
+    traffic_override = generate_traffic_lights_override(button_size, button_spacing)
     rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
@@ -463,8 +683,24 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         f.write(final_content)
 
 
-def update_titlebar_button_size(button_size):
-    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size."""
+def update_titlebar_buttons(button_size=None, button_spacing=None):
+    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size and spacing."""
+    if button_size is None:
+        try:
+            res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-size"],
+                                 capture_output=True, text=True)
+            button_size = int(res.stdout.strip())
+        except Exception:
+            button_size = 14
+
+    if button_spacing is None:
+        try:
+            res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-spacing"],
+                                 capture_output=True, text=True)
+            button_spacing = int(res.stdout.strip())
+        except Exception:
+            button_spacing = 8
+
     theme_key = get_current_theme()
     theme_info = THEMES.get(theme_key, THEMES["dark"])
     theme_name = theme_info["theme_name"]
@@ -488,7 +724,7 @@ def update_titlebar_button_size(button_size):
             src_css = os.path.join(src_gtk4, css_file)
             dst_css = os.path.join(GTK4_CONFIG, css_file)
             if os.path.exists(src_css):
-                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
 
     # GTK 3
     src_gtk3 = os.path.join(source_dir, "gtk-3.0")
@@ -497,7 +733,9 @@ def update_titlebar_button_size(button_size):
             src_css = os.path.join(src_gtk3, css_file)
             dst_css = os.path.join(GTK3_CONFIG, css_file)
             if os.path.exists(src_css):
-                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
+
+update_titlebar_button_size = update_titlebar_buttons
 
 
 HOME = os.path.expanduser("~")
@@ -589,13 +827,20 @@ def apply_global_theme(theme_key):
         except Exception:
             button_size = 14
 
+        try:
+            res_sp = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-spacing"],
+                                    capture_output=True, text=True)
+            button_spacing = int(res_sp.stdout.strip())
+        except Exception:
+            button_spacing = 8
+
         if os.path.exists(src_gtk4):
             # Generate gtk.css and gtk-dark.css with exact palette at top, no duplicate defines, and clean overrides
             for css_file in ["gtk.css", "gtk-dark.css"]:
                 src_css = os.path.join(src_gtk4, css_file)
                 dst_css = os.path.join(GTK4_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
 
             # Update symlinks for assets and windows-assets
             for asset_folder in ["assets", "windows-assets"]:
@@ -631,7 +876,7 @@ def apply_global_theme(theme_key):
                 src_css = os.path.join(src_gtk3, css_file)
                 dst_css = os.path.join(GTK3_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
 
             # Update symlinks for assets and windows-assets for GTK 3
             for asset_folder in ["assets", "windows-assets"]:

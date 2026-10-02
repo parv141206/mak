@@ -689,6 +689,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         corn_group.add(create_spin_row("Apple Squircle Smoothing", "Curvature exponent for super-ellipse squircle corners (0.8 = authentic Apple curvature)", 0.0, 1.0, 0.05, self.bridge.get_corner_smoothing(), digits=2, on_change=self.bridge.set_corner_smoothing))
         corn_group.add(create_spin_row("Window Border Stroke Width", "Subtle macOS window border in pixels", 0, 10, 1, self.bridge.get_corner_border_width(), digits=0, on_change=self.bridge.set_corner_border_width))
         corn_group.add(create_spin_row("Title Bar Button Size", "Diameter in pixels of macOS traffic light buttons (close, minimize, maximize)", 10, 22, 1, self.bridge.get_titlebar_button_size(), digits=0, on_change=self.bridge.set_titlebar_button_size))
+        corn_group.add(create_spin_row("Title Bar Button Spacing", "Gap in pixels between traffic light buttons (closer or farther apart)", 0, 24, 1, self.bridge.get_titlebar_button_spacing(), digits=0, on_change=self.bridge.set_titlebar_button_spacing))
 
         unround_max = Adw.SwitchRow(title="Square Off Maximized Windows", subtitle="Disable rounded corners when a window is maximized")
         unround_max.set_active(self.bridge.get_unround_maximized())
