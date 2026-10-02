@@ -9,13 +9,19 @@ export class DockModule {
         this._manager = null;
     }
 
-    enable() {
+    async enable() {
         if (this._manager) return;
         try {
-            this._manager = new ExtensionManager(this._extension);
+            const { ExtensionManager: DynamicExtMgr } = await import(`./core/extensionManager.js?v=${Date.now()}`);
+            this._manager = new DynamicExtMgr(this._extension);
             this._manager.enable();
         } catch (err) {
-            console.warn('[Mak] Failed to enable Dock module:', err);
+            try {
+                this._manager = new ExtensionManager(this._extension);
+                this._manager.enable();
+            } catch (fallbackErr) {
+                console.warn('[Mak] Failed to enable Dock module:', fallbackErr);
+            }
         }
     }
 

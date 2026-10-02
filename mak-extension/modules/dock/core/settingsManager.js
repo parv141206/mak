@@ -5,6 +5,7 @@ import {
     ICON_BOT,
     SETTINGS_DEBOUNCE_MS,
     STRUCTURAL_KEYS,
+    GEOMETRY_KEYS,
 } from './constants.js';
 import { migrateSettings } from './settingsMigration.js';
 import { parseCustomItems } from '../services/customItems.js';
@@ -21,16 +22,16 @@ function autoPillThickness(iconSize) {
 // settings object: same keys in, same snapshot out. Kept module-private so the
 // only supported way to read config is the cached `config` getter.
 function computeConfig(s, mak = null) {
-    const scale = clamp(s.get_double('dock-scale'), 0.5, 2.0);
+    const scale = clamp((mak ? mak.get_double('dock-scale') : s.get_double('dock-scale')), 0.5, 2.0);
     const iconSize = Math.round((mak ? mak.get_int('icon-size') : s.get_int('icon-size')) * scale);
-    const zoomMax = Math.max(1, s.get_double('magnification'));
+    const zoomMax = Math.max(1, (mak ? mak.get_double('magnification') : s.get_double('magnification')));
     const renderSize = Math.round(iconSize * zoomMax);
     const pillThickness = s.get_boolean('pill-thickness-auto')
         ? autoPillThickness(iconSize)
         : s.get_int('pill-thickness');
     const dockH = Math.round(pillThickness * scale);
-    const hoverLift = Math.round(s.get_int('hover-lift') * scale);
-    const requestedSpacing = s.get_int('icon-spacing');
+    const hoverLift = Math.round((mak ? mak.get_int('hover-lift') : s.get_int('hover-lift')) * scale);
+    const requestedSpacing = mak ? mak.get_int('icon-spacing') : s.get_int('icon-spacing');
     // The original dock used two independently rounded 6px side paddings.
     // Preserve that exact geometry for the new 12px default at fractional
     // scales, while user-selected values retain exact single-pixel steps.
@@ -74,13 +75,13 @@ function computeConfig(s, mak = null) {
         invZoom: 1 / zoomMax,
         liftDenom: 1 / Math.max(0.001, zoomMax - 1),
         position,
-        alignment: s.get_string('dock-alignment'),
-        multiMonitor: s.get_boolean('multi-monitor'),
-        isolateMonitors: s.get_boolean('isolate-monitors'),
-        autoShrink: s.get_boolean('auto-shrink-to-fit'),
-        zoomRange: Math.round(s.get_int('zoom-range') * scale),
-        magnificationCurve: s.get_double('magnification-curve'),
-        edgeMargin: s.get_int('edge-margin'),
+        alignment: mak ? mak.get_string('dock-alignment') : s.get_string('dock-alignment'),
+        multiMonitor: mak ? mak.get_boolean('multi-monitor') : s.get_boolean('multi-monitor'),
+        isolateMonitors: mak ? mak.get_boolean('isolate-monitors') : s.get_boolean('isolate-monitors'),
+        autoShrink: mak ? mak.get_boolean('auto-shrink-to-fit') : s.get_boolean('auto-shrink-to-fit'),
+        zoomRange: Math.round((mak ? mak.get_int('zoom-range') : s.get_int('zoom-range')) * scale),
+        magnificationCurve: mak ? mak.get_double('magnification-curve') : s.get_double('magnification-curve'),
+        edgeMargin: mak ? mak.get_int('edge-margin') : s.get_int('edge-margin'),
         dockRadius,
         hoverLift,
 
@@ -233,57 +234,11 @@ export class SettingsManager {
     }
 
     _onMakChanged(key) {
-        if (key === 'blur-sigma') {
-            this._config.blurRadius = this._makSettings.get_int('blur-sigma');
-            this._pendingKeys.add('blur-sigma');
-            this._pendingKeys.add('blurRadius');
-        } else if (key === 'blur-brightness') {
-            this._config.blurBrightness = this._makSettings.get_double('blur-brightness');
-            this._pendingKeys.add('blur-brightness');
-            this._pendingKeys.add('blurBrightness');
-        } else if (key === 'blur-dock' || key === 'dock-blur' || key === 'blur-enabled') {
-            this._config.dockBlur = this._makSettings.get_boolean('blur-dock') && this._makSettings.get_boolean('dock-blur') && this._makSettings.get_boolean('blur-enabled');
-            this._pendingKeys.add('blur-dock');
-            this._pendingKeys.add('dock-blur');
-            this._pendingKeys.add('dockBlur');
-        } else if (key === 'background-opacity') {
-            this._config.bgOpacity = this._makSettings.get_double('background-opacity');
-            this._pendingKeys.add('background-opacity');
-            this._pendingKeys.add('bgOpacity');
-        } else if (key === 'global-opacity') {
-            this._config.bgOpacity = this._makSettings.get_double('background-opacity');
-            this._pendingKeys.add('background-opacity');
-            this._pendingKeys.add('bgOpacity');
-            this._pendingKeys.add('global-opacity');
-        } else if (key === 'dock-radius') {
-            this._config.dockRadius = this._makSettings.get_int('dock-radius');
-            this._pendingKeys.add('dock-radius');
+        this._pendingKeys.add(key);
+        if (STRUCTURAL_KEYS.has(key) || key === 'dock-position' || key === 'dock-alignment' || key === 'dock-radius' || key === 'multi-monitor' || key === 'auto-shrink-to-fit') {
             this._pendingStructural = true;
-        } else if (key === 'border-width') {
-            this._config.borderWidth = this._makSettings.get_int('border-width');
-            this._pendingKeys.add('border-width');
-        } else if (key === 'border-color') {
-            this._config.borderColor = this._makSettings.get_string('border-color');
-            this._pendingKeys.add('border-color');
-        } else if (key === 'pill-color') {
-            this._config.pillColor = this._makSettings.get_string('pill-color');
-            this._pendingKeys.add('pill-color');
-        } else if (key === 'dock-position') {
-            this._config.position = this._makSettings.get_string('dock-position');
-            this._pendingKeys.add('dock-position');
-            this._pendingStructural = true;
-        } else if (key === 'blur-liquid-glass') {
-            this._config.liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
-            this._pendingKeys.add('blur-liquid-glass');
-        } else if (key === 'blur-refraction-strength') {
-            this._config.refractionStrength = this._makSettings.get_double('blur-refraction-strength');
-            this._pendingKeys.add('blur-refraction-strength');
-        } else if (key === 'blur-chromatic-dispersion') {
-            this._config.chromaticDispersion = this._makSettings.get_double('blur-chromatic-dispersion');
-            this._pendingKeys.add('blur-chromatic-dispersion');
-        } else {
-            return;
         }
+        this._retryCount = 0;
         this._scheduleFlush(30);
     }
 

@@ -883,6 +883,13 @@
       <description>Size in pixels of macOS traffic light buttons in window titlebars.</description>
     </key>
 
+    <key type="i" name="titlebar-button-spacing">
+      <default>8</default>
+      <range min="0" max="24"/>
+      <summary>Title Bar Button Spacing</summary>
+      <description>Horizontal spacing in pixels between macOS traffic light buttons in window titlebars.</description>
+    </key>
+
     <key type="b" name="unround-maximized">
       <default>false</default>
       <summary>Unround Maximized</summary>

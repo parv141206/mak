@@ -4962,7 +4962,21 @@ headerbar > box.right {
   padding: 0 10px;
 }
 
-headerbar button.titlebutton.close, headerbar button.titlebutton.maximize, headerbar button.titlebutton.minimize {
+headerbar button.titlebutton.close,
+headerbar button.titlebutton.close:hover,
+headerbar button.titlebutton.close:active,
+headerbar button.titlebutton.close:backdrop,
+headerbar button.titlebutton.close:backdrop:hover,
+headerbar button.titlebutton.maximize,
+headerbar button.titlebutton.maximize:hover,
+headerbar button.titlebutton.maximize:active,
+headerbar button.titlebutton.maximize:backdrop,
+headerbar button.titlebutton.maximize:backdrop:hover,
+headerbar button.titlebutton.minimize,
+headerbar button.titlebutton.minimize:hover,
+headerbar button.titlebutton.minimize:active,
+headerbar button.titlebutton.minimize:backdrop,
+headerbar button.titlebutton.minimize:backdrop:hover {
   min-width: 16px;
   min-height: 16px;
   margin: 0 1px;
@@ -8045,6 +8059,8 @@ window.background.chromium headerbar.titlebar button.titlebutton {
   min-height: 16px;
   margin: 0;
   padding: 0;
+  background-position: center;
+  background-repeat: no-repeat;
   background-size: 16px 16px;
   color: transparent;
   border: none;

@@ -566,12 +566,25 @@ class MakSettingsBridge:
     def set_titlebar_button_size(self, v):
         self._set_i("titlebar-button-size", None, None, v)
         try:
-            from .theme_manager import update_titlebar_button_size
-            update_titlebar_button_size(v)
+            from .theme_manager import update_titlebar_buttons
+            update_titlebar_buttons(button_size=v)
         except Exception:
             try:
                 import theme_manager
-                theme_manager.update_titlebar_button_size(v)
+                theme_manager.update_titlebar_buttons(button_size=v)
+            except Exception:
+                pass
+
+    def get_titlebar_button_spacing(self): return self._get_i("titlebar-button-spacing", None, None, 8)
+    def set_titlebar_button_spacing(self, v):
+        self._set_i("titlebar-button-spacing", None, None, v)
+        try:
+            from .theme_manager import update_titlebar_buttons
+            update_titlebar_buttons(button_spacing=v)
+        except Exception:
+            try:
+                import theme_manager
+                theme_manager.update_titlebar_buttons(button_spacing=v)
             except Exception:
                 pass
 
