@@ -59,6 +59,44 @@ Previously, achieving a macOS experience required installing and managing 7 disp
   - GTK 2 (`~/.gtkrc-2.0`)
   - Flatpak sandbox overrides (`flatpak override --user`)
 
+## 🔬 Deep Dive: Engine Architecture & Shenanigans
+
+Achieving authentic macOS aesthetics on Wayland and GNOME Shell required solving deep compositor-level challenges involving Mutter actor hierarchies, Cogl GLSL shaders, and GTK 4/3 styling. Here is how each system works:
+
+### 1. Hardware-Accelerated Glass Blur Engine (`blur/`)
+- **BMS Application Pipeline**: Built upon Blur My Shell's applications component (`mak-extension/modules/blur/bms/components/applications.js`), the engine attaches Cogl pipeline effects directly to window actor container surfaces.
+- **Mutter Culling Bypass (`hacks-level: 2`)**: Modern Mutter/Clutter culls background rendering beneath opaque window actors. Setting `hacks-level` to `2` forces GNOME Shell to preserve compositor layers behind targeted windows, enabling real-time translucent frosted glass across native and third-party apps.
+- **Adaptive Opacity & Liquid Glass**: Dynamically modulates window background alpha while maintaining legible font contrast and hardware-accelerated Gaussian blur sigma (10–80).
+
+### 2. Chromium & Electron Shader Gutter Masking Fix (`window-corners/`)
+- **The Problem**: On Wayland, Chromium-based browsers, Electron apps (VS Code, Discord, Spotify), and certain XWayland clients allocate an invisible transparent gutter around the window for client-side resize handles and drop-shadow buffers. Standard corner shaders drew the rounded border around the outer boundary of this transparent buffer, creating an unsightly "floating outer border" or double border box separated from the actual web page content.
+- **The Shader Mask Solution**: In `mak-extension/modules/window-corners/effect/shader/rounded_corners.frag`:
+  ```glsl
+  // Mask border by window content alpha to prevent drawing borders around
+  // transparent resize gutters in Chromium, Electron, and Wayland apps
+  borderAlpha *= clamp(cogl_color_out.a * 10.0, 0.0, 1.0);
+  ```
+  By modulating `borderAlpha` with the sampled window pixel alpha (`cogl_color_out.a`), the shader only renders the 16px squircle border where actual window content exists, completely eliminating phantom borders while keeping pixel-perfect squircle anti-aliasing.
+- **Apple Squircle Formula**: Uses super-ellipse curvature exponent `n = 0.8` with smoothstep transitions, matching authentic macOS macOS Sonoma/Sequoia window geometry.
+
+### 3. Maximized Window Gaps & Corner Retention (`window-gaps/`)
+- **Built-in Struts Hook**: GNOME Mutter natively forces maximized windows to fill the entire monitor geometry minus top panel. `gapModule.js` hooks `Workspace.set_builtin_struts()` and `Main.layoutManager._queueUpdateRegions()`.
+- **Maximized Padding Mechanics**: When a window maximizes, Mak injects strut margins (top, bottom, left, right) directly into the workspace layout manager. The maximized window is constrained within the gap bounds, showing the desktop background around all sides.
+- **Uniform 16px Corner Radius**: By default GNOME and GTK themes unround corners (`border-radius: 0px`) when a window reaches maximized state (`:maximized` / `MetaWindow.maximized`). Mak overrides this:
+  - `unround-maximized: false` in `cornersModule.js` preserves the squircle shader on maximized actors.
+  - GTK 4/3 CSS overrides enforce `border-radius: 16px;` even with `window.maximized`, `window.tiled`, or `.maximized` classes.
+  - Floating and maximized windows share identical curvature and visual hierarchy.
+
+### 4. Notification & Menu Frosted Glass Persistence (`appearance/`)
+- **The Problem**: Default GNOME Shell themes re-apply opaque solid background colors on `:hover` and `:focus` states for notification banners and popup menus, stripping blur transparency and causing sudden jarring color shifts.
+- **The Fix**: `menuStyleController.js` injects high-priority CSS rules enforcing semi-translucent RGBA backgrounds (`rgba(255, 255, 255, 0.15)` for light, `rgba(20, 20, 20, 0.55)` for dark) and `backdrop-filter: blur(30px)` across default, `:hover`, and `:active` states.
+
+### 5. Unified 16px Radii & Traffic Light Styling Across All Themes
+- All 6 curated themes in `themes/` have been audited to strictly enforce 16px radii across GTK 3 (`gtk-3.0/gtk.css`), GTK 4 (`gtk-4.0/gtk.css`), and GNOME Shell:
+  - `>>>Mac-Light-solid-purple`, `>>>Mac-Dark-solid-purple`, `>>>Mac-Dark-Amoled-purple`
+  - `>>>Mac-Light-glassy-purple`, `>>>Mac-Dark-glassy-purple`, `>>>Mac-Dark-Amoled-glassy-purple`
+- `theme_manager.py` dynamically injects CSS overrides into `~/.config/gtk-4.0/gtk.css` and `gtk-dark.css` on theme switch to guarantee traffic lights and window corners stay pixel-perfect regardless of GTK application theme overrides.
+
 ---
 
 ## 🛠️ Launching the Control Center
@@ -77,3 +115,4 @@ Or open **Mak** from your application launcher / App Grid.
 cd /home/parv/projects/mak
 ./install.sh
 ```
+

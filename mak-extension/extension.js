@@ -25,7 +25,12 @@ export default class MakExtension extends Extension {
             this._topbar = new TopBarModule(this);
         }
         this._spotlight = new SpotlightModule(this);
-        this._windowGaps = new WindowGapModule(this);
+        try {
+            const { WindowGapModule: DynamicGaps } = await import(`./modules/window-gaps/gapModule.js?v=${Date.now()}`);
+            this._windowGaps = new DynamicGaps(this);
+        } catch (err) {
+            this._windowGaps = new WindowGapModule(this);
+        }
 
         try {
             const { WindowCornersModule: DynamicCorners } = await import(`./modules/window-corners/cornersModule.js?v=${Date.now()}`);

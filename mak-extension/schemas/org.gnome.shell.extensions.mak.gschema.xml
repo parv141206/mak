@@ -876,6 +876,13 @@
       <description>Window border color (CSS string).</description>
     </key>
 
+    <key type="i" name="titlebar-button-size">
+      <default>14</default>
+      <range min="10" max="22"/>
+      <summary>Title Bar Button Size</summary>
+      <description>Size in pixels of macOS traffic light buttons in window titlebars.</description>
+    </key>
+
     <key type="b" name="unround-maximized">
       <default>false</default>
       <summary>Unround Maximized</summary>
