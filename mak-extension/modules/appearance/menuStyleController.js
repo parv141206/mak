@@ -75,7 +75,7 @@ export class MenuStyleController {
         const isAmoled = gtkTheme.toLowerCase().includes('amoled');
 
         let bgR = 32, bgG = 32, bgB = 36;
-        let menuOpacity = 0.78;
+        let menuOpacity = 0.65;
         let textColor = '#f5f5f7';
         let secondaryTextColor = 'rgba(255, 255, 255, 0.55)';
         let itemHoverBg = 'rgba(255, 255, 255, 0.12)';
@@ -87,6 +87,8 @@ export class MenuStyleController {
         let boxShadow = '0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.22)';
         let qsBoxShadow = '0 16px 40px rgba(0, 0, 0, 0.55), 0 3px 10px rgba(0, 0, 0, 0.28)';
         let pillBodyBg = `rgba(28, 28, 34, ${menuOpacity})`;
+        let qsTileBg = 'rgba(255, 255, 255, 0.10)';
+        let qsTileHoverBg = 'rgba(255, 255, 255, 0.16)';
         let btHeaderBorder = 'rgba(255, 255, 255, 0.12)';
         let btEmptyText = 'rgba(255, 255, 255, 0.5)';
         let btHoverBg = 'rgba(255, 255, 255, 0.12)';
@@ -95,7 +97,7 @@ export class MenuStyleController {
 
         if (isLight) {
             bgR = 246; bgG = 246; bgB = 248;
-            menuOpacity = 0.84;
+            menuOpacity = 0.72;
             textColor = '#1d1d1f';
             secondaryTextColor = 'rgba(0, 0, 0, 0.55)';
             itemHoverBg = 'rgba(0, 0, 0, 0.06)';
@@ -107,6 +109,8 @@ export class MenuStyleController {
             boxShadow = '0 10px 30px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08)';
             qsBoxShadow = '0 14px 34px rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.08)';
             pillBodyBg = `rgba(255, 255, 255, ${menuOpacity})`;
+            qsTileBg = 'rgba(0, 0, 0, 0.05)';
+            qsTileHoverBg = 'rgba(0, 0, 0, 0.09)';
             btHeaderBorder = 'rgba(0, 0, 0, 0.10)';
             btEmptyText = 'rgba(0, 0, 0, 0.45)';
             btHoverBg = 'rgba(0, 0, 0, 0.06)';
@@ -114,7 +118,7 @@ export class MenuStyleController {
             btText = 'rgba(0, 0, 0, 0.75)';
         } else if (isAmoled) {
             bgR = 10; bgG = 10; bgB = 12;
-            menuOpacity = 0.92;
+            menuOpacity = 0.85;
             textColor = '#ffffff';
             secondaryTextColor = 'rgba(255, 255, 255, 0.60)';
             itemHoverBg = 'rgba(255, 255, 255, 0.15)';
@@ -126,6 +130,8 @@ export class MenuStyleController {
             boxShadow = '0 14px 36px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.35)';
             qsBoxShadow = '0 18px 44px rgba(0, 0, 0, 0.85), 0 4px 12px rgba(0, 0, 0, 0.45)';
             pillBodyBg = `rgba(10, 10, 12, ${menuOpacity})`;
+            qsTileBg = 'rgba(255, 255, 255, 0.12)';
+            qsTileHoverBg = 'rgba(255, 255, 255, 0.18)';
             btHeaderBorder = 'rgba(255, 255, 255, 0.14)';
             btEmptyText = 'rgba(255, 255, 255, 0.5)';
             btHoverBg = 'rgba(255, 255, 255, 0.14)';
@@ -236,6 +242,114 @@ export class MenuStyleController {
 
 .quick-settings StLabel,
 .quick-toggle-menu StLabel {
+    color: ${textColor} !important;
+}
+
+.quick-settings StIcon,
+.quick-toggle-menu StIcon {
+    color: ${textColor} !important;
+}
+
+/* Header Action Buttons (Screenshot, Settings, Lock, Power) */
+.quick-settings-system-item .icon-button,
+.quick-settings .icon-button,
+.quick-settings .button {
+    color: ${textColor} !important;
+    background-color: ${qsTileBg} !important;
+    border-radius: 9999px !important;
+}
+
+.quick-settings-system-item .icon-button StIcon,
+.quick-settings .icon-button StIcon,
+.quick-settings .button StIcon {
+    color: ${textColor} !important;
+}
+
+.quick-settings-system-item .icon-button:hover,
+.quick-settings .icon-button:hover,
+.quick-settings .button:hover {
+    background-color: ${qsTileHoverBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.quick-settings-system-item .icon-button:hover StIcon,
+.quick-settings .icon-button:hover StIcon,
+.quick-settings .button:hover StIcon {
+    color: ${itemHoverColor} !important;
+}
+
+/* Quick Slider (Volume, Brightness) */
+.quick-slider {
+    background-color: ${qsTileBg} !important;
+    border-radius: 24px !important;
+}
+
+.quick-slider StIcon,
+.quick-slider .icon-button StIcon {
+    color: ${textColor} !important;
+}
+
+/* Quick Toggles (Wi-Fi, Bluetooth, Dark Style, Night Light, etc.) */
+.quick-toggle,
+.quick-toggle-has-menu {
+    background-color: ${qsTileBg} !important;
+    border-radius: 9999px !important;
+}
+
+.quick-toggle:hover,
+.quick-toggle-has-menu:hover {
+    background-color: ${qsTileHoverBg} !important;
+}
+
+/* Unchecked Toggles: crisp contrast text and icons */
+.quick-toggle:not(:checked) StIcon,
+.quick-toggle:not(:checked) .quick-toggle-icon,
+.quick-toggle-has-menu:not(:checked) StIcon,
+.quick-toggle-has-menu:not(:checked) .quick-toggle-icon,
+.quick-toggle-has-menu:not(:checked) .quick-toggle-menu-button StIcon {
+    color: ${textColor} !important;
+}
+
+.quick-toggle:not(:checked) StLabel,
+.quick-toggle-has-menu:not(:checked) StLabel {
+    color: ${textColor} !important;
+}
+
+.quick-toggle-has-menu:not(:checked) .quick-toggle-menu-button {
+    color: ${secondaryTextColor} !important;
+}
+
+/* Checked / Active Toggles: purple accent with crisp WHITE text and icons */
+.quick-toggle:checked,
+.quick-toggle-has-menu:checked,
+.quick-toggle-has-menu .quick-toggle:checked {
+    background-color: #9A57A3 !important;
+    color: #ffffff !important;
+}
+
+.quick-toggle:checked StIcon,
+.quick-toggle:checked .quick-toggle-icon,
+.quick-toggle-has-menu:checked StIcon,
+.quick-toggle-has-menu:checked .quick-toggle-icon,
+.quick-toggle-has-menu:checked .quick-toggle-menu-button StIcon {
+    color: #ffffff !important;
+}
+
+.quick-toggle:checked StLabel,
+.quick-toggle-has-menu:checked StLabel,
+.quick-toggle-has-menu:checked .quick-toggle-title,
+.quick-toggle-has-menu:checked .quick-toggle-subtitle {
+    color: #ffffff !important;
+}
+
+.quick-toggle-has-menu:checked .quick-toggle-menu-button {
+    color: #ffffff !important;
+}
+
+/* Battery status in Quick Settings */
+.quick-settings .battery-bar,
+.quick-settings .battery-label,
+.quick-settings-system-item StLabel {
     color: ${textColor} !important;
 }
 

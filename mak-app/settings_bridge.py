@@ -374,6 +374,9 @@ class MakSettingsBridge:
     def get_topbar_transparency(self): return self._get_d("topbar-transparency", None, None, 0.35)
     def set_topbar_transparency(self, v): self._set_d("topbar-transparency", None, None, v)
 
+    def get_topbar_opaque(self): return self._get_b("topbar-opaque", None, None, False)
+    def set_topbar_opaque(self, v): self._set_b("topbar-opaque", None, None, v)
+
     def get_topbar_pill_style(self): return self._get_b("topbar-pill-style", None, None, True)
     def set_topbar_pill_style(self, v): self._set_b("topbar-pill-style", None, None, v)
 

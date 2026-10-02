@@ -8,42 +8,87 @@ import shutil
 THEMES = {
     "dark": {
         "id": "dark",
-        "name": "macOS Dark (Graphite)",
+        "name": "macOS Dark Solid (Graphite)",
         "theme_name": ">>>Mac-Dark-solid-purple",
         "color_scheme": "prefer-dark",
         "icon_theme": "MacTahoe-purple-dark",
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
+        "is_glassy": False,
         "dock_pill_color": "rgba(42, 42, 50, 0.40)",
         "dock_border_color": "rgba(255, 255, 255, 0.28)",
         "window_border_color": "(1.0, 1.0, 1.0, 0.18)",
-        "description": "Refined macOS dark mode with sleek Sonoma graphite windows (#282828) and purple accents."
+        "description": "Refined solid macOS dark mode with sleek Sonoma graphite windows (#242426) and purple accents."
+    },
+    "dark-glassy": {
+        "id": "dark-glassy",
+        "name": "macOS Dark Glass (Sonoma Frosted Glass)",
+        "theme_name": ">>>Mac-Dark-glassy-purple",
+        "color_scheme": "prefer-dark",
+        "icon_theme": "MacTahoe-purple-dark",
+        "cursor_theme": "MacTahoe-dark",
+        "is_dark": True,
+        "is_glassy": True,
+        "dock_pill_color": "rgba(32, 32, 40, 0.28)",
+        "dock_border_color": "rgba(255, 255, 255, 0.22)",
+        "window_border_color": "(1.0, 1.0, 1.0, 0.20)",
+        "description": "Translucent frosted glass dark mode with translucent windows and vibrant backdrop blur."
     },
     "amoled": {
         "id": "amoled",
-        "name": "macOS AMOLED Dark (Deep Midnight)",
+        "name": "macOS AMOLED Dark Solid (Pitch Black)",
         "theme_name": ">>>Mac-Dark-Amoled-purple",
         "color_scheme": "prefer-dark",
         "icon_theme": "MacTahoe-purple-dark",
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
+        "is_glassy": False,
         "dock_pill_color": "rgba(10, 10, 12, 0.60)",
         "dock_border_color": "rgba(255, 255, 255, 0.16)",
         "window_border_color": "(1.0, 1.0, 1.0, 0.14)",
-        "description": "True pitch black OLED Midnight (#000000) with ultra-high contrast and deep obsidian surfaces."
+        "description": "True pitch black solid OLED Midnight (#000000) with ultra-high contrast and obsidian surfaces."
+    },
+    "amoled-glassy": {
+        "id": "amoled-glassy",
+        "name": "macOS AMOLED Glass (Obsidian Translucent)",
+        "theme_name": ">>>Mac-Dark-Amoled-glassy-purple",
+        "color_scheme": "prefer-dark",
+        "icon_theme": "MacTahoe-purple-dark",
+        "cursor_theme": "MacTahoe-dark",
+        "is_dark": True,
+        "is_glassy": True,
+        "dock_pill_color": "rgba(0, 0, 0, 0.35)",
+        "dock_border_color": "rgba(255, 255, 255, 0.16)",
+        "window_border_color": "(1.0, 1.0, 1.0, 0.16)",
+        "description": "Translucent pitch black obsidian glass with deep backdrop blur and purple highlights."
     },
     "light": {
         "id": "light",
-        "name": "macOS Light (Crisp Apple)",
+        "name": "macOS Light Solid (Crisp Apple)",
         "theme_name": ">>>Mac-Light-solid-purple",
         "color_scheme": "prefer-light",
         "icon_theme": "MacTahoe-purple-light",
         "cursor_theme": "MacTahoe-light",
         "is_dark": False,
+        "is_glassy": False,
         "dock_pill_color": "rgba(255, 255, 255, 0.42)",
         "dock_border_color": "rgba(255, 255, 255, 0.65)",
         "window_border_color": "(0.0, 0.0, 0.0, 0.12)",
-        "description": "Clean, luminous macOS light mode with subtle borders and smooth hover states."
+        "description": "Clean, luminous solid macOS light mode with subtle borders and crisp typography."
+    },
+    "light-glassy": {
+        "id": "light-glassy",
+        "name": "macOS Light Glass (Apple Frosted Glass)",
+        "theme_name": ">>>Mac-Light-glassy-purple",
+        "color_scheme": "prefer-light",
+        "icon_theme": "MacTahoe-purple-light",
+        "cursor_theme": "MacTahoe-light",
+        "is_dark": False,
+        "is_glassy": True,
+        "dock_pill_color": "rgba(255, 255, 255, 0.30)",
+        "dock_border_color": "rgba(255, 255, 255, 0.55)",
+        "window_border_color": "(0.0, 0.0, 0.0, 0.14)",
+        "description": "Luminous frosted glass light mode with translucent app windows and rich backdrop blur."
     }
 }
 
@@ -68,6 +113,42 @@ GRAPHITE_PALETTE_OVERRIDE = """
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
+GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
+/* ── Mak macOS Sonoma Graphite Glass Frosted Translucent Palette ─────────── */
+@define-color window_bg_color rgba(36, 36, 40, 0.72);
+@define-color window_fg_color #f5f5f7;
+@define-color view_bg_color rgba(28, 28, 32, 0.68);
+@define-color view_fg_color #f5f5f7;
+@define-color headerbar_bg_color rgba(44, 44, 48, 0.75);
+@define-color headerbar_fg_color #ffffff;
+@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
+@define-color sidebar_bg_color rgba(30, 30, 34, 0.65);
+@define-color sidebar_fg_color #f5f5f7;
+@define-color secondary_sidebar_bg_color rgba(26, 26, 30, 0.60);
+@define-color card_bg_color rgba(48, 48, 54, 0.68);
+@define-color card_fg_color #f5f5f7;
+@define-color dialog_bg_color rgba(40, 40, 46, 0.82);
+@define-color dialog_fg_color #f5f5f7;
+@define-color popover_bg_color rgba(40, 40, 46, 0.82);
+@define-color popover_fg_color #f5f5f7;
+@define-color placeholder_text_color rgba(255, 255, 255, 0.45);
+
+window,
+window.background,
+.background {
+    background-color: @window_bg_color;
+}
+headerbar,
+.titlebar {
+    background-color: @headerbar_bg_color;
+}
+.sidebar,
+navigation-sidebar,
+.navigation-sidebar {
+    background-color: @sidebar_bg_color;
+}
+"""
+
 AMOLED_PALETTE_OVERRIDE = """
 /* ── Mak macOS AMOLED Pitch Black Obsidian Palette ────────────────────────── */
 @define-color window_bg_color #000000;
@@ -89,6 +170,42 @@ AMOLED_PALETTE_OVERRIDE = """
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
+AMOLED_GLASSY_PALETTE_OVERRIDE = """
+/* ── Mak macOS AMOLED Obsidian Glass Translucent Palette ─────────────────── */
+@define-color window_bg_color rgba(0, 0, 0, 0.75);
+@define-color window_fg_color #ffffff;
+@define-color view_bg_color rgba(0, 0, 0, 0.70);
+@define-color view_fg_color #ffffff;
+@define-color headerbar_bg_color rgba(12, 12, 14, 0.80);
+@define-color headerbar_fg_color #ffffff;
+@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
+@define-color sidebar_bg_color rgba(0, 0, 0, 0.68);
+@define-color sidebar_fg_color #ffffff;
+@define-color secondary_sidebar_bg_color rgba(0, 0, 0, 0.62);
+@define-color card_bg_color rgba(18, 18, 22, 0.70);
+@define-color card_fg_color #ffffff;
+@define-color dialog_bg_color rgba(12, 12, 14, 0.85);
+@define-color dialog_fg_color #ffffff;
+@define-color popover_bg_color rgba(14, 14, 16, 0.85);
+@define-color popover_fg_color #ffffff;
+@define-color placeholder_text_color rgba(255, 255, 255, 0.45);
+
+window,
+window.background,
+.background {
+    background-color: @window_bg_color;
+}
+headerbar,
+.titlebar {
+    background-color: @headerbar_bg_color;
+}
+.sidebar,
+navigation-sidebar,
+.navigation-sidebar {
+    background-color: @sidebar_bg_color;
+}
+"""
+
 LIGHT_PALETTE_OVERRIDE = """
 /* ── Mak macOS Crisp Apple Light Palette ─────────────────────────────────── */
 @define-color window_bg_color #f5f5f7;
@@ -108,6 +225,42 @@ LIGHT_PALETTE_OVERRIDE = """
 @define-color popover_bg_color #ffffff;
 @define-color popover_fg_color #1d1d1f;
 @define-color placeholder_text_color rgba(0, 0, 0, 0.45);
+"""
+
+LIGHT_GLASSY_PALETTE_OVERRIDE = """
+/* ── Mak macOS Crisp Apple Frosted Glass Translucent Palette ──────────────── */
+@define-color window_bg_color rgba(246, 246, 248, 0.75);
+@define-color window_fg_color #1d1d1f;
+@define-color view_bg_color rgba(255, 255, 255, 0.72);
+@define-color view_fg_color #1d1d1f;
+@define-color headerbar_bg_color rgba(235, 235, 239, 0.78);
+@define-color headerbar_fg_color #1d1d1f;
+@define-color headerbar_border_color rgba(0, 0, 0, 0.12);
+@define-color sidebar_bg_color rgba(232, 232, 237, 0.68);
+@define-color sidebar_fg_color #1d1d1f;
+@define-color secondary_sidebar_bg_color rgba(226, 226, 231, 0.62);
+@define-color card_bg_color rgba(255, 255, 255, 0.75);
+@define-color card_fg_color #1d1d1f;
+@define-color dialog_bg_color rgba(246, 246, 248, 0.85);
+@define-color dialog_fg_color #1d1d1f;
+@define-color popover_bg_color rgba(255, 255, 255, 0.85);
+@define-color popover_fg_color #1d1d1f;
+@define-color placeholder_text_color rgba(0, 0, 0, 0.45);
+
+window,
+window.background,
+.background {
+    background-color: @window_bg_color;
+}
+headerbar,
+.titlebar {
+    background-color: @headerbar_bg_color;
+}
+.sidebar,
+navigation-sidebar,
+.navigation-sidebar {
+    background-color: @sidebar_bg_color;
+}
 """
 
 TRAFFIC_LIGHTS_OVERRIDE = """
@@ -163,11 +316,12 @@ def get_current_theme():
         for key, val in THEMES.items():
             if val["theme_name"] == current:
                 return key
+        is_glassy = "glassy" in current.lower()
         if "amoled" in current.lower():
-            return "amoled"
+            return "amoled-glassy" if is_glassy else "amoled"
         if "light" in current.lower():
-            return "light"
-        return "dark"
+            return "light-glassy" if is_glassy else "light"
+        return "dark-glassy" if is_glassy else "dark"
     except Exception:
         return "dark"
 
@@ -219,9 +373,15 @@ def apply_global_theme(theme_key):
     try:
         os.makedirs(GTK4_CONFIG, exist_ok=True)
         src_gtk4 = os.path.join(source_dir, "gtk-4.0")
-        palette_override = GRAPHITE_PALETTE_OVERRIDE if theme_key == "dark" else (
-            AMOLED_PALETTE_OVERRIDE if theme_key == "amoled" else LIGHT_PALETTE_OVERRIDE
-        )
+        palette_map = {
+            "dark": GRAPHITE_PALETTE_OVERRIDE,
+            "dark-glassy": GRAPHITE_GLASSY_PALETTE_OVERRIDE,
+            "amoled": AMOLED_PALETTE_OVERRIDE,
+            "amoled-glassy": AMOLED_GLASSY_PALETTE_OVERRIDE,
+            "light": LIGHT_PALETTE_OVERRIDE,
+            "light-glassy": LIGHT_GLASSY_PALETTE_OVERRIDE,
+        }
+        palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
 
         if os.path.exists(src_gtk4):
             # Copy gtk.css and gtk-dark.css, appending clean traffic light overrides and exact palette

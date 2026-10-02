@@ -600,6 +600,12 @@
       <description>Background opacity for the top bar.</description>
     </key>
 
+    <key type="b" name="topbar-opaque">
+      <default>false</default>
+      <summary>Opaque Top Bar</summary>
+      <description>Make top bar specifically 100% solid and opaque while leaving dock, menus, and popups translucent and blurry.</description>
+    </key>
+
     <key type="b" name="topbar-pill-style">
       <default>true</default>
       <summary>Pill Button Style</summary>

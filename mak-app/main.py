@@ -527,6 +527,14 @@ class MakAppWindow(Adw.ApplicationWindow):
         pan_group.add(create_spin_row("Blur Radius", "Frosted glass blur radius in pixels", 5, 100, 5, self.bridge.get_topbar_blur_radius(), digits=0, on_change=self.bridge.set_topbar_blur_radius))
         pan_group.add(create_spin_row("Panel Transparency", "Background translucency factor", 0.0, 1.0, 0.05, self.bridge.get_topbar_transparency(), digits=2, on_change=self.bridge.set_topbar_transparency))
 
+        topbar_opaque = Adw.SwitchRow(
+            title="Opaque Top Bar",
+            subtitle="Specifically make top bar 100% solid and opaque while leaving dock, menus, and popups translucent & blurry"
+        )
+        topbar_opaque.set_active(self.bridge.get_topbar_opaque())
+        topbar_opaque.connect("notify::active", lambda s, p: self.bridge.set_topbar_opaque(s.get_active()))
+        pan_group.add(topbar_opaque)
+
         pill_style = Adw.SwitchRow(title="macOS Pill Button Style", subtitle="Format top bar indicator buttons as smooth pills")
         pill_style.set_active(self.bridge.get_topbar_pill_style())
         pill_style.connect("notify::active", lambda s, p: self.bridge.set_topbar_pill_style(s.get_active()))

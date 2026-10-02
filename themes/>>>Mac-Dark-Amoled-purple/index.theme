@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=>>>Mac-Dark-Amoled-purple
+Comment=A MacOS Tahoe AMOLED Dark theme with deep midnight black and purple accents
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=>>>Mac-Dark-Amoled-purple
+MetacityTheme=>>>Mac-Dark-Amoled-purple
+IconTheme=>>>Mac-Dark
+CursorTheme=MACTAHOE-cursors
+ButtonLayout=close,minimize,maximize:menu
