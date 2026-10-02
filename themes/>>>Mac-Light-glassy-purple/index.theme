@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=>>>Mac-Light-glassy-purple
+Comment=Translucent macOS Crisp Apple Frosted Glass theme with purple accents
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=>>>Mac-Light-glassy-purple
+MetacityTheme=>>>Mac-Light-glassy-purple
+IconTheme=MacTahoe-purple-light
+CursorTheme=MacTahoe-light
+ButtonLayout=close,minimize,maximize:menu

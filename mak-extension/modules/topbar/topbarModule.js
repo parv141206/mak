@@ -254,7 +254,7 @@ export class TopBarModule {
             } else if (key === 'topbar-media-pill') {
                 if (this._settings.get_boolean('topbar-media-pill')) this._enableMediaPill();
                 else this._disableMediaPill();
-            } else if (key === 'topbar-transparency' || key === 'global-opacity') {
+            } else if (key === 'topbar-transparency' || key === 'topbar-opaque' || key === 'global-opacity') {
                 this._applyPanelTransparency();
             }
         });
@@ -497,7 +497,8 @@ export class TopBarModule {
 
     _applyPanelTransparency() {
         try {
-            let alpha = this._settings.get_double('topbar-transparency');
+            const isOpaque = this._settings.get_boolean('topbar-opaque');
+            let alpha = isOpaque ? 1.0 : this._settings.get_double('topbar-transparency');
             const colorScheme = this._interfaceSettings ? this._interfaceSettings.get_string('color-scheme') : '';
             const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
             const isLight = (colorScheme === 'prefer-light') || gtkTheme.toLowerCase().includes('light');
@@ -505,15 +506,15 @@ export class TopBarModule {
 
             if (isLight) {
                 Main.panel.add_style_class_name('light-mode');
-                const r = 255, g = 255, b = 255;
-                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)});`;
+                const r = 246, g = 246, b = 248;
+                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)}) !important;`;
                 Main.panel.set_style(style);
             } else {
                 Main.panel.remove_style_class_name('light-mode');
-                const r = isAmoled ? 0 : 22;
-                const g = isAmoled ? 0 : 22;
-                const b = isAmoled ? 0 : 28;
-                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)});`;
+                const r = isAmoled ? 0 : 32;
+                const g = isAmoled ? 0 : 32;
+                const b = isAmoled ? 0 : 36;
+                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)}) !important;`;
                 Main.panel.set_style(style);
             }
         } catch (e) {

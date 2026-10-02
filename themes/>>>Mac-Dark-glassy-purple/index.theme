@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=>>>Mac-Dark-glassy-purple
+Comment=Translucent macOS Sonoma Frosted Glass theme with purple accents
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=>>>Mac-Dark-glassy-purple
+MetacityTheme=>>>Mac-Dark-glassy-purple
+IconTheme=MacTahoe-purple-dark
+CursorTheme=MacTahoe-dark
+ButtonLayout=close,minimize,maximize:menu

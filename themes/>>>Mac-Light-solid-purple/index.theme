@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=>>>Mac-Light-solid-purple
+Comment=A MacOS Tahoe like Gtk+ theme based on Elegant Design
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=>>>Mac-Light-solid-purple
+MetacityTheme=>>>Mac-Light-solid-purple
+IconTheme=>>>Mac
+CursorTheme=MACTAHOE-cursors
+ButtonLayout=close,minimize,maximize:menu
+

@@ -87,6 +87,7 @@ export default class MakPreferences extends ExtensionPreferences {
         addSwitch(topbarGroup, 'Apple Menu', 'Show system Apple menu on the far left', 'topbar-apple-menu');
         addSwitch(topbarGroup, 'Active App Title', 'Show current focused application title in the bar', 'topbar-app-title');
         addSwitch(topbarGroup, 'Frosted Glass Blur', 'Enable background blur on top panel', 'topbar-blur');
+        addSwitch(topbarGroup, 'Opaque Top Bar', 'Make top bar specifically solid opaque while keeping menus, dock, and popups translucent & blurry', 'topbar-opaque');
 
         // ── 4. Windows Page ───────────────────────────────────────────────
         const winPage = new Adw.PreferencesPage({
