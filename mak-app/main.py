@@ -515,6 +515,14 @@ class MakAppWindow(Adw.ApplicationWindow):
         media_pill.connect("notify::active", lambda s, p: self.bridge.set_topbar_media_pill(s.get_active()))
         ind_group.add(media_pill)
 
+        mak_widget = Adw.SwitchRow(
+            title="Mak Quick Settings Menu Bar Indicator",
+            subtitle="Compact macOS top bar widget for instant on-the-go theme switching and quick toggles"
+        )
+        mak_widget.set_active(self.bridge.get_topbar_mak_menu())
+        mak_widget.connect("notify::active", lambda s, p: self.bridge.set_topbar_mak_menu(s.get_active()))
+        ind_group.add(mak_widget)
+
         # Panel Appearance
         pan_group = Adw.PreferencesGroup(title="Panel Styling and Frosted Blur")
         page.add(pan_group)
@@ -855,6 +863,74 @@ class MakAppWindow(Adw.ApplicationWindow):
         self.theme_status_label.add_css_class("dim-label")
         self.theme_status_label.set_margin_top(8)
         sync_group.add(self.theme_status_label)
+
+        # ── Chromium & Brave Browser Topbar Accent ──
+        chrom_group = Adw.PreferencesGroup(
+            title="Chromium & Brave Browser Topbar Accent",
+            description="Customize top bar background frame color for Chrome, Brave, Chromium, and Electron while preserving native macOS traffic lights (ensure 'Use GTK' is active in browser appearance):"
+        )
+        page.add(chrom_group)
+
+        accent_model = Gtk.StringList()
+        accent_keys = list(theme_manager.CHROMIUM_ACCENT_PALETTES.keys())
+        for k in accent_keys:
+            info = theme_manager.CHROMIUM_ACCENT_PALETTES[k]
+            accent_model.append(info["name"])
+
+        chrom_row = Adw.ComboRow(
+            title="Browser Topbar Accent Color",
+            subtitle="Overrides browser topbar background frame color cleanly via GTK",
+            model=accent_model
+        )
+        curr_acc = self.bridge.get_chromium_topbar_accent()
+        if curr_acc in accent_keys:
+            chrom_row.set_selected(accent_keys.index(curr_acc))
+        else:
+            chrom_row.set_selected(0)
+
+        def _on_accent_selected(row, param):
+            idx = row.get_selected()
+            if 0 <= idx < len(accent_keys):
+                chosen_key = accent_keys[idx]
+                self.bridge.set_chromium_topbar_accent(chosen_key)
+
+        chrom_row.connect("notify::selected", _on_accent_selected)
+        chrom_group.add(chrom_row)
+
+        chips_row = Adw.ActionRow(
+            title="Quick Color Palette",
+            subtitle="Click any chip to immediately apply the topbar frame accent"
+        )
+        chips_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        chips_box.set_margin_top(6)
+        chips_box.set_margin_bottom(6)
+
+        for k in accent_keys:
+            info = theme_manager.CHROMIUM_ACCENT_PALETTES[k]
+            btn = Gtk.Button()
+            btn.set_tooltip_text(info["name"])
+            btn.add_css_class("circular")
+            btn.set_size_request(24, 24)
+            dot = Gtk.DrawingArea()
+            dot.set_size_request(16, 16)
+            color_hex = info["color"]
+            dot.set_draw_func(lambda da, cr, w, h, col=color_hex: (
+                cr.set_source_rgb(
+                    int(col[1:3], 16) / 255.0,
+                    int(col[3:5], 16) / 255.0,
+                    int(col[5:7], 16) / 255.0
+                ),
+                cr.arc(w / 2.0, h / 2.0, min(w, h) / 2.0 - 1, 0, 2 * 3.14159),
+                cr.fill()
+            ))
+            btn.set_child(dot)
+            btn.connect("clicked", lambda b, key=k: (
+                chrom_row.set_selected(accent_keys.index(key))
+            ))
+            chips_box.append(btn)
+
+        chips_row.add_suffix(chips_box)
+        chrom_group.add(chips_row)
 
         # ── Shell UI & Menu Styling (macOS Unified Design) ──
         menu_group = Adw.PreferencesGroup(

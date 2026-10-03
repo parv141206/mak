@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- macOS Computer display frame -->
+  <path fill="currentColor" fill-rule="evenodd" d="M2.5 1.5A1.5 1.5 0 0 0 1 3v7.5A1.5 1.5 0 0 0 2.5 12H7v1.5H5.25a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5H9V12h4.5a1.5 1.5 0 0 0 1.5-1.5V3a1.5 1.5 0 0 0-1.5-1.5h-11zm-.25 1.5a.25.25 0 0 1 .25-.25h11a.25.25 0 0 1 .25.25v7.5a.25.25 0 0 1-.25.25h-11a.25.25 0 0 1-.25-.25V3z"/>
+  <!-- Traffic Light Circles inside screen -->
+  <circle cx="3.8" cy="4.4" r="0.9" fill="currentColor"/>
+  <circle cx="6.0" cy="4.4" r="0.9" fill="currentColor"/>
+  <circle cx="8.2" cy="4.4" r="0.9" fill="currentColor"/>
+  <!-- macOS Dock bar line at bottom of screen -->
+  <rect x="5.2" y="9.2" width="5.6" height="0.8" rx="0.4" fill="currentColor"/>
+</svg>

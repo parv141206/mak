@@ -636,6 +636,12 @@
       <description>Show macOS dual-slider Control Center toggle button in top bar.</description>
     </key>
 
+    <key type="b" name="topbar-mak-menu">
+      <default>true</default>
+      <summary>Mak Quick Settings Widget</summary>
+      <description>Show compact Mak settings and theme switcher widget in top bar.</description>
+    </key>
+
     <key type="b" name="topbar-siri-button">
       <default>false</default>
       <summary>Siri Orb Button</summary>
@@ -1098,6 +1104,12 @@
       </choices>
       <summary>Accent Color</summary>
       <description>System-wide macOS accent color.</description>
+    </key>
+
+    <key type="s" name="chromium-topbar-accent">
+      <default>'default'</default>
+      <summary>Chromium Browser Topbar Accent</summary>
+      <description>Custom accent theme color for Chrome, Brave, and Chromium top bars while preserving macOS traffic lights.</description>
     </key>
 
     <key type="b" name="sync-flatpak">

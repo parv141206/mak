@@ -397,6 +397,9 @@ class MakSettingsBridge:
     def get_topbar_media_pill(self): return self._get_b("topbar-media-pill", None, None, True)
     def set_topbar_media_pill(self, v): self._set_b("topbar-media-pill", None, None, v)
 
+    def get_topbar_mak_menu(self): return self._get_b("topbar-mak-menu", None, None, True)
+    def set_topbar_mak_menu(self, v): self._set_b("topbar-mak-menu", None, None, v)
+
 
     # ── 3. SPOTLIGHT SEARCH SETTINGS ───────────────────────────────────────
     def get_spotlight_enabled(self): return self._get_b("spotlight-enabled", None, None, True)
@@ -585,6 +588,19 @@ class MakSettingsBridge:
             try:
                 import theme_manager
                 theme_manager.update_titlebar_buttons(button_spacing=v)
+            except Exception:
+                pass
+
+    def get_chromium_topbar_accent(self): return self._get_s("chromium-topbar-accent", None, None, "default")
+    def set_chromium_topbar_accent(self, v):
+        self._set_s("chromium-topbar-accent", None, None, v)
+        try:
+            from .theme_manager import update_titlebar_buttons
+            update_titlebar_buttons(chromium_accent=v)
+        except Exception:
+            try:
+                import theme_manager
+                theme_manager.update_titlebar_buttons(chromium_accent=v)
             except Exception:
                 pass
 
