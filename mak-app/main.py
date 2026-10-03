@@ -864,6 +864,94 @@ class MakAppWindow(Adw.ApplicationWindow):
         self.theme_status_label.set_margin_top(8)
         sync_group.add(self.theme_status_label)
 
+        # ── System Accent Color (GNOME & Libadwaita) ──
+        accent_group = Adw.PreferencesGroup(
+            title="System Accent Color",
+            description="System-wide macOS accent color for buttons, toggles, text selections, and Libadwaita apps:"
+        )
+        page.add(accent_group)
+
+        sys_accent_keys = ["blue", "teal", "green", "yellow", "orange", "red", "pink", "purple", "slate"]
+        sys_accent_names = {
+            "blue": "Ocean Blue (#3584e4)",
+            "teal": "Teal (#2190a4)",
+            "green": "Apple Green (#3a944a)",
+            "yellow": "Sunflower (#e5a50a)",
+            "orange": "Sunset Orange (#ed5b00)",
+            "red": "Apple Red (#e01b24)",
+            "pink": "Nordic Pink (#d56199)",
+            "purple": "Mac Tahoe Purple (#9141ac)",
+            "slate": "Slate Charcoal (#5e5c64)",
+        }
+        sys_accent_colors = {
+            "blue": "#3584e4",
+            "teal": "#2190a4",
+            "green": "#3a944a",
+            "yellow": "#e5a50a",
+            "orange": "#ed5b00",
+            "red": "#e01b24",
+            "pink": "#d56199",
+            "purple": "#9141ac",
+            "slate": "#5e5c64",
+        }
+
+        sys_accent_model = Gtk.StringList()
+        for k in sys_accent_keys:
+            sys_accent_model.append(sys_accent_names[k])
+
+        sys_accent_row = Adw.ComboRow(
+            title="Desktop Interface Accent Color",
+            subtitle="Standard GNOME Shell & GTK desktop accent color",
+            model=sys_accent_model
+        )
+        curr_sys_acc = self.bridge.get_system_accent_color()
+        if curr_sys_acc in sys_accent_keys:
+            sys_accent_row.set_selected(sys_accent_keys.index(curr_sys_acc))
+        else:
+            sys_accent_row.set_selected(sys_accent_keys.index("purple") if "purple" in sys_accent_keys else 0)
+
+        def _on_sys_accent_selected(row, param):
+            idx = row.get_selected()
+            if 0 <= idx < len(sys_accent_keys):
+                self.bridge.set_system_accent_color(sys_accent_keys[idx])
+
+        sys_accent_row.connect("notify::selected", _on_sys_accent_selected)
+        accent_group.add(sys_accent_row)
+
+        sys_chips_row = Adw.ActionRow(
+            title="Accent Swatches",
+            subtitle="Click to immediately set the system accent tint"
+        )
+        sys_chips_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+        sys_chips_box.set_margin_top(6)
+        sys_chips_box.set_margin_bottom(6)
+
+        for k in sys_accent_keys:
+            col = sys_accent_colors[k]
+            btn = Gtk.Button()
+            btn.set_tooltip_text(sys_accent_names[k])
+            btn.add_css_class("circular")
+            btn.set_size_request(24, 24)
+            dot = Gtk.DrawingArea()
+            dot.set_size_request(16, 16)
+            dot.set_draw_func(lambda da, cr, w, h, c=col: (
+                cr.set_source_rgb(
+                    int(c[1:3], 16) / 255.0,
+                    int(c[3:5], 16) / 255.0,
+                    int(c[5:7], 16) / 255.0
+                ),
+                cr.arc(w / 2.0, h / 2.0, min(w, h) / 2.0 - 1, 0, 2 * 3.14159),
+                cr.fill()
+            ))
+            btn.set_child(dot)
+            btn.connect("clicked", lambda b, key=k: (
+                sys_accent_row.set_selected(sys_accent_keys.index(key))
+            ))
+            sys_chips_box.append(btn)
+
+        sys_chips_row.add_suffix(sys_chips_box)
+        accent_group.add(sys_chips_row)
+
         # ── Chromium & Brave Browser Topbar Accent ──
         chrom_group = Adw.PreferencesGroup(
             title="Chromium & Brave Browser Topbar Accent",

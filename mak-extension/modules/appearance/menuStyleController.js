@@ -721,6 +721,70 @@ export class MenuStyleController {
     box-shadow: 0 0 10px rgba(10, 132, 255, 0.5) !important;
     color: #0a84ff !important;
 }
+
+/* ── Mak Quick Settings Dynamic Theming ─────────────────────────────────── */
+.mak-qs-menu {
+    border-radius: ${radius}px !important;
+    border: ${borderCss} !important;
+    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
+    box-shadow: ${boxShadow} !important;
+}
+
+.mak-qs-title {
+    color: ${textColor} !important;
+}
+
+.mak-qs-subtitle,
+.mak-qs-section-title {
+    color: ${secondaryTextColor} !important;
+}
+
+.mak-qs-toggle-label,
+.mak-qs-step-val {
+    color: ${textColor} !important;
+}
+
+.mak-qs-open-btn {
+    background-color: ${itemHoverBg} !important;
+    color: ${textColor} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+}
+
+.mak-qs-open-btn:hover {
+    background-color: ${itemActiveBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.mak-qs-divider {
+    background-color: ${separatorColor} !important;
+}
+
+.mak-qs-theme-btn {
+    background-color: ${itemHoverBg} !important;
+    color: ${textColor} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+}
+
+.mak-qs-theme-btn:hover {
+    background-color: ${itemActiveBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.mak-qs-step-btn {
+    background-color: ${itemHoverBg} !important;
+    color: ${textColor} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+}
+
+.mak-qs-step-btn:hover {
+    background-color: ${itemActiveBg} !important;
+}
+
+.mak-qs-switch-btn {
+    background-color: ${itemHoverBg} !important;
+    color: ${secondaryTextColor} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+}
 `;
 
         try {

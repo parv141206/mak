@@ -604,6 +604,18 @@ class MakSettingsBridge:
             except Exception:
                 pass
 
+    def get_system_accent_color(self):
+        try:
+            return Gio.Settings.new("org.gnome.desktop.interface").get_string("accent-color")
+        except Exception:
+            return "purple"
+
+    def set_system_accent_color(self, v):
+        try:
+            Gio.Settings.new("org.gnome.desktop.interface").set_string("accent-color", str(v))
+        except Exception as e:
+            print(f"[Bridge] Error setting system accent-color: {e}")
+
     def get_unround_maximized(self): return self._get_b("unround-maximized", None, None, False)
     def set_unround_maximized(self, v):
         self._set_b("unround-maximized", None, None, v)

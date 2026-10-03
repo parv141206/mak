@@ -678,8 +678,16 @@ window.background.chromium headerbar.header-bar.titlebar button.close,
 window.background.chromium headerbar.header-bar.titlebar button.titlebutton.close,
 window.background.chromium headerbar.titlebar button.titlebutton.close,
 window.background.chromium button.titlebutton.close,
-window.background.chromium windowcontrols button.close {{
-    margin: 8px 4px 8px 14px;
+window.background.chromium windowcontrols button.close,
+window.background.brave headerbar windowcontrols button.close,
+window.background.brave headerbar windowcontrols button.titlebutton.close,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.brave headerbar.header-bar.titlebar button.close,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.close,
+window.background.brave headerbar.titlebar button.titlebutton.close,
+window.background.brave button.titlebutton.close,
+window.background.brave windowcontrols button.close {{
+    margin: 10px 4px 10px 22px;
     color: transparent;
     -gtk-icon-source: none;
 }}
@@ -691,8 +699,16 @@ window.background.chromium headerbar.header-bar.titlebar button.minimize,
 window.background.chromium headerbar.header-bar.titlebar button.titlebutton.minimize,
 window.background.chromium headerbar.titlebar button.titlebutton.minimize,
 window.background.chromium button.titlebutton.minimize,
-window.background.chromium windowcontrols button.minimize {{
-    margin: 8px 4px 8px 4px;
+window.background.chromium windowcontrols button.minimize,
+window.background.brave headerbar windowcontrols button.minimize,
+window.background.brave headerbar windowcontrols button.titlebutton.minimize,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.brave headerbar.header-bar.titlebar button.minimize,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.minimize,
+window.background.brave headerbar.titlebar button.titlebutton.minimize,
+window.background.brave button.titlebutton.minimize,
+window.background.brave windowcontrols button.minimize {{
+    margin: 10px 4px 10px 4px;
     color: transparent;
     -gtk-icon-source: none;
 }}
@@ -704,8 +720,16 @@ window.background.chromium headerbar.header-bar.titlebar button.maximize,
 window.background.chromium headerbar.header-bar.titlebar button.titlebutton.maximize,
 window.background.chromium headerbar.titlebar button.titlebutton.maximize,
 window.background.chromium button.titlebutton.maximize,
-window.background.chromium windowcontrols button.maximize {{
-    margin: 8px 16px 8px 4px;
+window.background.chromium windowcontrols button.maximize,
+window.background.brave headerbar windowcontrols button.maximize,
+window.background.brave headerbar windowcontrols button.titlebutton.maximize,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.brave headerbar.header-bar.titlebar button.maximize,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.maximize,
+window.background.brave headerbar.titlebar button.titlebutton.maximize,
+window.background.brave button.titlebutton.maximize,
+window.background.brave windowcontrols button.maximize {{
+    margin: 10px 28px 10px 4px;
     color: transparent;
     -gtk-icon-source: none;
 }}
@@ -992,7 +1016,9 @@ def apply_global_theme(theme_key):
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", icon_theme], check=True)
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "cursor-theme", cursor_theme], check=True)
         try:
-            subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", "purple"], check=True)
+            curr_acc = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"], capture_output=True, text=True).stdout.strip().strip("'\"")
+            if not curr_acc:
+                subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", "purple"], check=False)
         except Exception:
             pass
         log.append(f"Set GNOME interface gtk-theme to '{theme_name}', color-scheme to '{color_scheme}', icon-theme to '{icon_theme}', and cursor to '{cursor_theme}'.")
