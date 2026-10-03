@@ -282,6 +282,7 @@ def generate_traffic_lights_override(button_size=14, button_spacing=8):
     size = max(10, min(22, int(button_size)))
     spacing = max(0, min(24, int(button_spacing)))
     margin = max(0, round(spacing / 2))
+    chrome_size = max(11, min(12, int(button_size) - 2))
     return f"""
 /* ── Mak Clean macOS Traffic Light Button Controls ({size}px, spacing {spacing}px) ── */
 windowcontrols,
@@ -552,6 +553,78 @@ headerbar windowcontrols button:hover > image {{
     margin: 0;
     background-repeat: no-repeat;
     background-position: center center;
+}}
+
+/* ── Dedicated Chrome, Chromium & Electron Traffic Lights Precision Sizing & Gaps ── */
+window.background.chromium headerbar windowcontrols button,
+window.background.chromium headerbar windowcontrols button:hover,
+window.background.chromium headerbar windowcontrols button:active,
+window.background.chromium headerbar windowcontrols button:backdrop,
+window.background.chromium headerbar windowcontrols button:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:active,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop:hover,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:hover,
+window.background.chromium headerbar.titlebar button.titlebutton,
+window.background.chromium headerbar.titlebar button.titlebutton:hover,
+window.background.chromium button.titlebutton,
+window.background.chromium button.titlebutton:hover,
+window.background.chromium windowcontrols button,
+window.background.chromium windowcontrols button:hover {{
+    min-width: {chrome_size}px;
+    min-height: {chrome_size}px;
+    background-size: {chrome_size}px {chrome_size}px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    border-radius: 9999px;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    color: transparent;
+    -gtk-icon-source: none;
+    -gtk-icon-shadow: none;
+}}
+
+window.background.chromium headerbar windowcontrols button.close,
+window.background.chromium headerbar windowcontrols button.titlebutton.close,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.chromium headerbar.header-bar.titlebar button.close,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.close,
+window.background.chromium headerbar.titlebar button.titlebutton.close,
+window.background.chromium button.titlebutton.close,
+window.background.chromium windowcontrols button.close {{
+    margin: 8px 4px 8px 14px;
+    color: transparent;
+    -gtk-icon-source: none;
+}}
+
+window.background.chromium headerbar windowcontrols button.minimize,
+window.background.chromium headerbar windowcontrols button.titlebutton.minimize,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.chromium headerbar.header-bar.titlebar button.minimize,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.minimize,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize,
+window.background.chromium button.titlebutton.minimize,
+window.background.chromium windowcontrols button.minimize {{
+    margin: 8px 4px 8px 4px;
+    color: transparent;
+    -gtk-icon-source: none;
+}}
+
+window.background.chromium headerbar windowcontrols button.maximize,
+window.background.chromium headerbar windowcontrols button.titlebutton.maximize,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.chromium headerbar.header-bar.titlebar button.maximize,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.maximize,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize,
+window.background.chromium button.titlebutton.maximize,
+window.background.chromium windowcontrols button.maximize {{
+    margin: 8px 16px 8px 4px;
+    color: transparent;
+    -gtk-icon-source: none;
 }}
 """
 
