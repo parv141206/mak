@@ -82,12 +82,15 @@ export class BlurModule {
             appSettings.set_int('corner-radius', 16);
             appSettings.set_boolean('corner-when-maximized', true);
 
-            // Blacklist Chrome, Chromium, Brave from whole-window translucency
-            // to keep web content completely solid, crisp, and bug-free
+            // Blacklist Chrome, Chromium, Brave, VS Code, and Electron apps from whole-window translucency
+            // to keep web and editor content completely solid, crisp, and bug-free
             const targetBlacklist = [
                 'google-chrome*',
                 'chromium*',
                 'brave*',
+                'code*',
+                'Code*',
+                'electron*',
                 'Plank',
                 'com.desktop.ding',
                 'Conky',
@@ -98,16 +101,20 @@ export class BlurModule {
 
             // Whitelist apps for window translucency
             const targetWhitelist = [
-                'antigravity*',
-                'code*',
-                'electron*',
                 'org.gnome.*',
                 'com.mattjakeman.ExtensionManager',
                 'io.github.*',
                 'com.github.*',
             ];
             const currentWhitelist = appSettings.get_strv('whitelist');
-            const filteredWhitelist = currentWhitelist.filter(x => !x.includes('chrome') && !x.includes('brave') && !x.includes('chromium'));
+            const filteredWhitelist = currentWhitelist.filter(x => 
+                !x.includes('chrome') && 
+                !x.includes('brave') && 
+                !x.includes('chromium') &&
+                !x.includes('code') &&
+                !x.includes('Code') &&
+                !x.includes('electron')
+            );
             const mergedWhitelist = Array.from(new Set([...filteredWhitelist, ...targetWhitelist]));
             appSettings.set_strv('whitelist', mergedWhitelist);
 
