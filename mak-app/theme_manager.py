@@ -376,9 +376,20 @@ headerbar windowcontrols,
 }}
 
 /* Universal Chrome, Chromium, Brave & Electron solid titlebar background */
+headerbar.header-bar.titlebar {{
+    padding-left: 14px;
+    padding-right: 18px;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0;
+    background-color: {chrom_bg};
+    background-image: none;
+    box-shadow: none;
+    border: none;
+}}
+
 window.background.chromium headerbar,
 window.background.chromium headerbar.titlebar,
-window.background.chromium headerbar.header-bar.titlebar,
 window.background.brave headerbar,
 window.background.brave headerbar.titlebar {{
     padding: 0;
@@ -564,53 +575,16 @@ window.background.chromium headerbar.header-bar.titlebar button.minimize:backdro
 window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton,
 window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:hover,
 window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:active,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button:hover,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button:active,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close:hover,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button:backdrop:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.close,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.close:backdrop:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize:backdrop:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize:backdrop:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close:backdrop:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize:backdrop:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:hover,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:active,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:backdrop,
-window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:backdrop:hover {{
+window.background.csd windowcontrols button,
+window.background.csd windowcontrols button:hover,
+window.background.csd windowcontrols button:active,
+window.background.csd windowcontrols button:backdrop,
+window.background.csd windowcontrols button:backdrop:hover,
+window.background.csd windowcontrols button.titlebutton,
+window.background.csd windowcontrols button.titlebutton:hover,
+window.background.csd windowcontrols button.titlebutton:active,
+window.background.csd windowcontrols button.titlebutton:backdrop,
+window.background.csd windowcontrols button.titlebutton:backdrop:hover {{
     min-width: {size}px;
     min-height: {size}px;
     padding: 0;
@@ -639,6 +613,20 @@ headerbar windowcontrols button:hover > image {{
 }}
 
 /* ── Dedicated Chrome, Chromium & Electron Traffic Lights Precision Sizing & Gaps ── */
+headerbar.header-bar.titlebar windowcontrols button,
+headerbar.header-bar.titlebar windowcontrols button:hover,
+headerbar.header-bar.titlebar windowcontrols button:active,
+headerbar.header-bar.titlebar windowcontrols button:backdrop,
+headerbar.header-bar.titlebar windowcontrols button:backdrop:hover,
+headerbar.header-bar.titlebar button.titlebutton,
+headerbar.header-bar.titlebar button.titlebutton:hover,
+headerbar.header-bar.titlebar button.titlebutton:active,
+headerbar.header-bar.titlebar button.titlebutton:backdrop,
+headerbar.header-bar.titlebar button.titlebutton:backdrop:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button:hover,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton:hover,
 window.background.chromium headerbar windowcontrols button,
 window.background.chromium headerbar windowcontrols button:hover,
 window.background.chromium headerbar windowcontrols button:active,
@@ -671,6 +659,23 @@ window.background.chromium windowcontrols button:hover {{
     -gtk-icon-shadow: none;
 }}
 
+/* Ensure no symbolic glyphs (like x, +, -) render on top of traffic lights in Chrome */
+headerbar.header-bar.titlebar windowcontrols button image,
+headerbar.header-bar.titlebar button.titlebutton image,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button image,
+window.background.chromium headerbar windowcontrols button image,
+window.background.brave headerbar windowcontrols button image {{
+    -gtk-icon-source: none;
+    color: transparent;
+    opacity: 0;
+}}
+
+headerbar.header-bar.titlebar windowcontrols button.close,
+headerbar.header-bar.titlebar windowcontrols button.titlebutton.close,
+headerbar.header-bar.titlebar button.close,
+headerbar.header-bar.titlebar button.titlebutton.close,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.close,
 window.background.chromium headerbar windowcontrols button.close,
 window.background.chromium headerbar windowcontrols button.titlebutton.close,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close,
@@ -687,11 +692,20 @@ window.background.brave headerbar.header-bar.titlebar button.titlebutton.close,
 window.background.brave headerbar.titlebar button.titlebutton.close,
 window.background.brave button.titlebutton.close,
 window.background.brave windowcontrols button.close {{
-    margin: 10px 4px 10px 22px;
+    margin-left: 8px;
+    margin-right: 1px;
+    margin-top: 0px;
+    margin-bottom: 0px;
     color: transparent;
     -gtk-icon-source: none;
 }}
 
+headerbar.header-bar.titlebar windowcontrols button.minimize,
+headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize,
+headerbar.header-bar.titlebar button.minimize,
+headerbar.header-bar.titlebar button.titlebutton.minimize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize,
 window.background.chromium headerbar windowcontrols button.minimize,
 window.background.chromium headerbar windowcontrols button.titlebutton.minimize,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize,
@@ -708,11 +722,20 @@ window.background.brave headerbar.header-bar.titlebar button.titlebutton.minimiz
 window.background.brave headerbar.titlebar button.titlebutton.minimize,
 window.background.brave button.titlebutton.minimize,
 window.background.brave windowcontrols button.minimize {{
-    margin: 10px 4px 10px 4px;
+    margin-left: 1px;
+    margin-right: 1px;
+    margin-top: 0px;
+    margin-bottom: 0px;
     color: transparent;
     -gtk-icon-source: none;
 }}
 
+headerbar.header-bar.titlebar windowcontrols button.maximize,
+headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize,
+headerbar.header-bar.titlebar button.maximize,
+headerbar.header-bar.titlebar button.titlebutton.maximize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.maximize,
 window.background.chromium headerbar windowcontrols button.maximize,
 window.background.chromium headerbar windowcontrols button.titlebutton.maximize,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize,
@@ -729,7 +752,10 @@ window.background.brave headerbar.header-bar.titlebar button.titlebutton.maximiz
 window.background.brave headerbar.titlebar button.titlebutton.maximize,
 window.background.brave button.titlebutton.maximize,
 window.background.brave windowcontrols button.maximize {{
-    margin: 10px 28px 10px 4px;
+    margin-left: 1px;
+    margin-right: 18px;
+    margin-top: 0px;
+    margin-bottom: 0px;
     color: transparent;
     -gtk-icon-source: none;
 }}
