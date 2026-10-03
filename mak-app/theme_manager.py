@@ -278,11 +278,92 @@ window.background.csd > dialog-host > widget > widget > box > leaflet list.navig
 }
 """
 
-def generate_traffic_lights_override(button_size=14, button_spacing=8):
+CHROMIUM_ACCENT_PALETTES = {
+    "default": {
+        "name": "System Default (Matches Mak Theme)",
+        "color": "#3c3c43",
+        "dark": "@headerbar_solid_bg",
+        "light": "@headerbar_solid_bg",
+    },
+    "slate": {
+        "name": "Slate Gray",
+        "color": "#475569",
+        "dark": "#2b303c",
+        "light": "#e2e8f0",
+    },
+    "blue": {
+        "name": "Ocean Blue",
+        "color": "#2563eb",
+        "dark": "#1a365d",
+        "light": "#dbeafe",
+    },
+    "navy": {
+        "name": "Deep Cobalt",
+        "color": "#1e40af",
+        "dark": "#0f172a",
+        "light": "#cbd5e1",
+    },
+    "teal": {
+        "name": "Teal Wave",
+        "color": "#0d9488",
+        "dark": "#0d403c",
+        "light": "#ccfbf1",
+    },
+    "mint": {
+        "name": "Mint Sage",
+        "color": "#10b981",
+        "dark": "#164e3f",
+        "light": "#dcfce7",
+    },
+    "purple": {
+        "name": "Mac Tahoe Purple",
+        "color": "#8b5cf6",
+        "dark": "#3b1e54",
+        "light": "#f3e8ff",
+    },
+    "rose": {
+        "name": "Nordic Rose",
+        "color": "#f43f5e",
+        "dark": "#4c1d32",
+        "light": "#ffe4e6",
+    },
+    "peach": {
+        "name": "Sunset Peach",
+        "color": "#f97316",
+        "dark": "#4a2417",
+        "light": "#ffedd5",
+    },
+    "amber": {
+        "name": "Warm Amber",
+        "color": "#f59e0b",
+        "dark": "#452d0a",
+        "light": "#fef3c7",
+    },
+    "midnight": {
+        "name": "Pitch Midnight",
+        "color": "#09090b",
+        "dark": "#08080a",
+        "light": "#1e1e24",
+    },
+}
+
+def generate_traffic_lights_override(button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
     size = max(10, min(22, int(button_size)))
     spacing = max(0, min(24, int(button_spacing)))
     margin = max(0, round(spacing / 2))
     chrome_size = max(11, min(12, int(button_size) - 2))
+
+    if chromium_accent is None:
+        try:
+            res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "chromium-topbar-accent"],
+                                 capture_output=True, text=True)
+            chromium_accent = res.stdout.strip().strip("'\"")
+        except Exception:
+            chromium_accent = "default"
+
+    accent_data = CHROMIUM_ACCENT_PALETTES.get(chromium_accent, CHROMIUM_ACCENT_PALETTES["default"])
+    chrom_bg = accent_data["dark"] if is_dark else accent_data["light"]
+
     return f"""
 /* ── Mak Clean macOS Traffic Light Button Controls ({size}px, spacing {spacing}px) ── */
 windowcontrols,
@@ -294,13 +375,15 @@ headerbar windowcontrols,
     box-shadow: none;
 }}
 
-/* Universal Chrome, Chromium & Electron solid titlebar background */
+/* Universal Chrome, Chromium, Brave & Electron solid titlebar background */
 window.background.chromium headerbar,
 window.background.chromium headerbar.titlebar,
-window.background.chromium headerbar.header-bar.titlebar {{
+window.background.chromium headerbar.header-bar.titlebar,
+window.background.brave headerbar,
+window.background.brave headerbar.titlebar {{
     padding: 0;
     margin: 0;
-    background-color: @headerbar_solid_bg;
+    background-color: {chrom_bg};
     background-image: none;
     box-shadow: none;
     border: none;
@@ -731,7 +814,7 @@ window.fullscreen.csd headerbar {
 }
 """
 
-def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8):
+def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
     try:
         with open(src_css_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -753,7 +836,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
             continue
         filtered.append(line)
 
-    traffic_override = generate_traffic_lights_override(button_size, button_spacing)
+    traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
     rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
@@ -763,8 +846,8 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         f.write(final_content)
 
 
-def update_titlebar_buttons(button_size=None, button_spacing=None):
-    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size and spacing."""
+def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_accent=None):
+    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size, spacing, and Chromium accent."""
     if button_size is None:
         try:
             res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-size"],
@@ -781,11 +864,20 @@ def update_titlebar_buttons(button_size=None, button_spacing=None):
         except Exception:
             button_spacing = 8
 
+    if chromium_accent is None:
+        try:
+            res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "chromium-topbar-accent"],
+                                 capture_output=True, text=True)
+            chromium_accent = res.stdout.strip().strip("'\"")
+        except Exception:
+            chromium_accent = "default"
+
     theme_key = get_current_theme()
     theme_info = THEMES.get(theme_key, THEMES["dark"])
     theme_name = theme_info["theme_name"]
     source_dir = os.path.join(THEMES_DIR, theme_name)
     is_glassy = theme_info.get("is_glassy", False)
+    is_dark = theme_info.get("is_dark", True)
 
     palette_map = {
         "dark": GRAPHITE_PALETTE_OVERRIDE,
@@ -804,7 +896,7 @@ def update_titlebar_buttons(button_size=None, button_spacing=None):
             src_css = os.path.join(src_gtk4, css_file)
             dst_css = os.path.join(GTK4_CONFIG, css_file)
             if os.path.exists(src_css):
-                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
     # GTK 3
     src_gtk3 = os.path.join(source_dir, "gtk-3.0")
@@ -813,7 +905,7 @@ def update_titlebar_buttons(button_size=None, button_spacing=None):
             src_css = os.path.join(src_gtk3, css_file)
             dst_css = os.path.join(GTK3_CONFIG, css_file)
             if os.path.exists(src_css):
-                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
     ensure_settings_ini_decoration_layout()
 
@@ -943,13 +1035,20 @@ def apply_global_theme(theme_key):
         except Exception:
             button_spacing = 8
 
+        try:
+            res_acc = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "chromium-topbar-accent"],
+                                     capture_output=True, text=True)
+            chromium_accent = res_acc.stdout.strip().strip("'\"")
+        except Exception:
+            chromium_accent = "default"
+
         if os.path.exists(src_gtk4):
             # Generate gtk.css and gtk-dark.css with exact palette at top, no duplicate defines, and clean overrides
             for css_file in ["gtk.css", "gtk-dark.css"]:
                 src_css = os.path.join(src_gtk4, css_file)
                 dst_css = os.path.join(GTK4_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
             # Update symlinks for assets and windows-assets
             for asset_folder in ["assets", "windows-assets"]:
@@ -986,7 +1085,7 @@ def apply_global_theme(theme_key):
                 src_css = os.path.join(src_gtk3, css_file)
                 dst_css = os.path.join(GTK3_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
             # Update symlinks for assets and windows-assets for GTK 3
             for asset_folder in ["assets", "windows-assets"]:
@@ -1124,6 +1223,19 @@ def apply_global_theme(theme_key):
 
 if __name__ == "__main__":
     import sys
-    t = sys.argv[1] if len(sys.argv) > 1 else "dark"
-    res = apply_global_theme(t)
-    print(res)
+    if len(sys.argv) > 1 and sys.argv[1] == "--accent":
+        acc = sys.argv[2] if len(sys.argv) > 2 else "default"
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "chromium-topbar-accent", acc], check=False)
+        update_titlebar_buttons(chromium_accent=acc)
+        print(f"Updated Chromium topbar accent to {acc}")
+    elif len(sys.argv) > 1 and sys.argv[1] == "--buttons":
+        bsize = int(sys.argv[2]) if len(sys.argv) > 2 else 14
+        bspacing = int(sys.argv[3]) if len(sys.argv) > 3 else 8
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "titlebar-button-size", str(bsize)], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "titlebar-button-spacing", str(bspacing)], check=False)
+        update_titlebar_buttons(button_size=bsize, button_spacing=bspacing)
+        print(f"Updated titlebar buttons to size={bsize}, spacing={bspacing}")
+    else:
+        t = sys.argv[1] if len(sys.argv) > 1 else "dark"
+        res = apply_global_theme(t)
+        print(res)

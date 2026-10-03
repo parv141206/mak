@@ -129,6 +129,7 @@ export class TopBarModule {
         this._musicController = null;
         this._spotlightBtn = null;
         this._controlCenterBtn = null;
+        this._makQuickSettingsBtn = null;
         this._panelBlurEffect = null;
         this._clockMoved = false;
         this._origBannerAlignment = null;
@@ -203,6 +204,11 @@ export class TopBarModule {
             this._enableControlCenterButton();
         }
 
+        // 8b. Mak Quick Settings Widget
+        if (this._settings.get_boolean('topbar-mak-menu')) {
+            this._enableMakQuickSettingsButton();
+        }
+
         // 9. Move Clock to Far Right (macOS position)
         if (this._settings.get_boolean('topbar-clock-right')) {
             this._moveClockToRight();
@@ -252,6 +258,10 @@ export class TopBarModule {
             } else if (key === 'topbar-control-center') {
                 if (this._settings.get_boolean('topbar-control-center')) this._enableControlCenterButton();
                 else this._disableControlCenterButton();
+                this._applyRightBoxOrder();
+            } else if (key === 'topbar-mak-menu') {
+                if (this._settings.get_boolean('topbar-mak-menu')) this._enableMakQuickSettingsButton();
+                else this._disableMakQuickSettingsButton();
                 this._applyRightBoxOrder();
             } else if (key === 'topbar-clock-right') {
                 if (this._settings.get_boolean('topbar-clock-right')) this._moveClockToRight();
@@ -391,6 +401,26 @@ export class TopBarModule {
         }
     }
 
+    async _enableMakQuickSettingsButton() {
+        if (this._makQuickSettingsBtn) return;
+        try {
+            const v = Date.now();
+            const { MakQuickSettingsButton } = await import(`./makQuickSettings.js?v=${v}`);
+            this._makQuickSettingsBtn = new MakQuickSettingsButton(this._extension);
+            Main.panel.addToStatusArea('MakQuickSettings', this._makQuickSettingsBtn, 7, 'right');
+            this._applyRightBoxOrder();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Mak Quick Settings button:', err);
+        }
+    }
+
+    _disableMakQuickSettingsButton() {
+        if (this._makQuickSettingsBtn) {
+            try { this._makQuickSettingsBtn.destroy(); } catch (e) {}
+            this._makQuickSettingsBtn = null;
+        }
+    }
+
     _moveClockToRight() {
         const dateMenu = Main.panel.statusArea.dateMenu;
         if (!dateMenu || !dateMenu.container) return;
@@ -450,7 +480,8 @@ export class TopBarModule {
         // 4. Quick Settings (Wi-Fi, Battery %, etc.)
         // 5. Spotlight Search (🔍)
         // 6. Control Center (⚎)
-        // 7. Date & Time (Far Right Corner)
+        // 7. Mak Quick Settings (⌘)
+        // 8. Date & Time (Far Right Corner)
         const order = [
             'MakUserSwitcher',
             'keyboard',
@@ -458,6 +489,7 @@ export class TopBarModule {
             'quickSettings',
             'MakSpotlight',
             'MakControlCenter',
+            'MakQuickSettings',
             'dateMenu',
         ];
 
@@ -573,6 +605,7 @@ export class TopBarModule {
         this._hideActivities(false);
 
         this._disableControlCenterButton();
+        this._disableMakQuickSettingsButton();
         this._disableSpotlightButton();
         this._disableBluetoothBattery();
         this._disableUserSwitcher();
