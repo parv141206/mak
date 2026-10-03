@@ -175,35 +175,34 @@
     border-bottom-color: rgba(0, 0, 0, 0.08) !important;
 }
 
-.mak-panel.light-mode .mak-app-title-label {
+#panel.mak-panel.light-mode,
+#panel.mak-panel.light-mode .mak-app-title-label,
+#panel.mak-panel.light-mode .menu-button,
+#panel.mak-panel.light-mode .panel-button,
+#panel.mak-panel.light-mode .panel-button StLabel,
+#panel.mak-panel.light-mode .panel-button StIcon,
+#panel.mak-panel.light-mode .clock-display,
+#panel.mak-panel.light-mode .clock-display-box .clock,
+#panel.mak-panel.light-mode .clock,
+#panel.mak-panel.light-mode .system-status-icon,
+#panel.mak-panel.light-mode .panel-button .system-status-icon,
+#panel.mak-panel.light-mode .mak-user-switcher-label,
+#panel.mak-panel.light-mode .mak-spotlight-button StIcon,
+#panel.mak-panel.light-mode .mak-control-center-button StIcon,
+#panel.mak-panel.light-mode .mak-qs-panel-icon {
     color: #1d1d1f !important;
 }
 
-.mak-panel.light-mode .menu-button {
-    color: #1d1d1f !important;
-}
-
-.mak-panel.light-mode .panel-button {
-    color: #1d1d1f !important;
-}
-
-.mak-panel.light-mode .panel-button:hover {
+#panel.mak-panel.light-mode .panel-button:hover,
+#panel.mak-panel.light-mode .panel-button:focus {
     background-color: rgba(0, 0, 0, 0.08) !important;
     color: #000000 !important;
 }
 
-.mak-panel.light-mode .panel-button:active,
-.mak-panel.light-mode .panel-button:checked {
+#panel.mak-panel.light-mode .panel-button:active,
+#panel.mak-panel.light-mode .panel-button:checked {
     background-color: rgba(0, 0, 0, 0.15) !important;
     color: #000000 !important;
-}
-
-.mak-panel.light-mode .clock-display {
-    color: #1d1d1f !important;
-}
-
-.mak-panel.light-mode .system-status-icon {
-    color: #1d1d1f !important;
 }
 
 /* Hide default GNOME Activities & Workspace Indicators completely */
@@ -1572,5 +1571,75 @@
     min-width: 42px;
     text-align: center;
 }
+
+/* ── Mak Quick Settings Light Mode Overrides ── */
+.light-mode .mak-qs-menu,
+.light-mode .mak-qs-container,
+.light-mode .mak-qs-title {
+    color: #1d1d1f !important;
+}
+
+.light-mode .mak-qs-subtitle,
+.light-mode .mak-qs-section-title {
+    color: rgba(0, 0, 0, 0.55) !important;
+}
+
+.light-mode .mak-qs-toggle-label,
+.light-mode .mak-qs-step-val {
+    color: #1d1d1f !important;
+}
+
+.light-mode .mak-qs-open-btn {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.14) !important;
+}
+
+.light-mode .mak-qs-open-btn:hover {
+    background-color: rgba(0, 0, 0, 0.14) !important;
+    color: #000000 !important;
+}
+
+.light-mode .mak-qs-divider {
+    background-color: rgba(0, 0, 0, 0.10) !important;
+}
+
+.light-mode .mak-qs-theme-btn {
+    background-color: rgba(0, 0, 0, 0.06) !important;
+    color: rgba(0, 0, 0, 0.85) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.light-mode .mak-qs-theme-btn:hover {
+    background-color: rgba(0, 0, 0, 0.12) !important;
+    color: #000000 !important;
+}
+
+.light-mode .mak-qs-theme-btn.active {
+    background-color: #8b5cf6 !important;
+    color: #ffffff !important;
+}
+
+.light-mode .mak-qs-step-btn {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    color: #1d1d1f !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.light-mode .mak-qs-step-btn:hover {
+    background-color: rgba(0, 0, 0, 0.14) !important;
+}
+
+.light-mode .mak-qs-switch-btn {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    color: rgba(0, 0, 0, 0.45) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.light-mode .mak-qs-switch-btn.active {
+    background-color: #10b981 !important;
+    color: #ffffff !important;
+}
+
 
 
