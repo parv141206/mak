@@ -285,7 +285,17 @@ headerbar windowcontrols,
     background: none;
     background-color: transparent;
     box-shadow: none;
-    border-spacing: {spacing}px !important;
+}}
+
+/* Universal Chrome, Chromium & GTK transparent titlebar background */
+window.background.chromium,
+window.background.chromium headerbar,
+window.background.chromium headerbar.titlebar,
+window.background.chromium headerbar.header-bar.titlebar {{
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    border: none;
 }}
 
 /* Universal anti-repetition & sizing rules across GTK3, GTK4, Libadwaita, Chromium, Chrome & Electron */
@@ -510,20 +520,17 @@ window.background.csd headerbar.header-bar.titlebar windowcontrols button.titleb
 window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:active,
 window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:backdrop,
 window.background.csd headerbar.header-bar.titlebar windowcontrols button.titlebutton.minimize:backdrop:hover {{
-    min-width: {size}px !important;
-    min-height: {size}px !important;
-    max-width: {size}px !important;
-    max-height: {size}px !important;
-    width: {size}px !important;
-    height: {size}px !important;
-    padding: 0 !important;
-    margin: 0 {margin}px !important;
-    border-radius: 9999px !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    background-size: {size}px {size}px !important;
-    -gtk-icon-shadow: none !important;
-    -gtk-icon-size: {size}px !important;
+    min-width: {size}px;
+    min-height: {size}px;
+    padding: 0;
+    margin: 0 {margin}px;
+    border-radius: 9999px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: {size}px {size}px;
+    -gtk-icon-shadow: none;
+    border: none;
+    box-shadow: none;
 }}
 
 /* Ensure button images/icons also do not repeat and stay centered */
@@ -534,17 +541,10 @@ button.titlebutton > image,
 windowcontrols button:hover > image,
 headerbar button.titlebutton:hover > image,
 headerbar windowcontrols button:hover > image {{
-    min-width: {size}px !important;
-    min-height: {size}px !important;
-    max-width: {size}px !important;
-    max-height: {size}px !important;
-    width: {size}px !important;
-    height: {size}px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    -gtk-icon-size: {size}px !important;
+    padding: 0;
+    margin: 0;
+    background-repeat: no-repeat;
+    background-position: center center;
 }}
 """
 
@@ -735,7 +735,36 @@ def update_titlebar_buttons(button_size=None, button_spacing=None):
             if os.path.exists(src_css):
                 inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing)
 
+    ensure_settings_ini_decoration_layout()
+
 update_titlebar_button_size = update_titlebar_buttons
+
+def ensure_settings_ini_decoration_layout():
+    """Ensures gtk-decoration-layout=close,minimize,maximize: is explicitly set in GTK3 and GTK4 settings.ini."""
+    for cfg_dir in [GTK3_CONFIG, GTK4_CONFIG]:
+        try:
+            os.makedirs(cfg_dir, exist_ok=True)
+            ini_path = os.path.join(cfg_dir, "settings.ini")
+            lines = []
+            if os.path.exists(ini_path):
+                with open(ini_path, "r", encoding="utf-8") as f:
+                    lines = f.readlines()
+            new_lines = []
+            has_layout = False
+            for line in lines:
+                if line.startswith("gtk-decoration-layout="):
+                    new_lines.append("gtk-decoration-layout=close,minimize,maximize:\n")
+                    has_layout = True
+                else:
+                    new_lines.append(line)
+            if not has_layout:
+                if not any(l.strip() == "[Settings]" for l in new_lines):
+                    new_lines.insert(0, "[Settings]\n")
+                new_lines.append("gtk-decoration-layout=close,minimize,maximize:\n")
+            with open(ini_path, "w", encoding="utf-8") as f:
+                f.writelines(new_lines)
+        except Exception:
+            pass
 
 
 HOME = os.path.expanduser("~")
@@ -861,6 +890,7 @@ def apply_global_theme(theme_key):
                     f"gtk-theme-name={theme_name}\n"
                     f"gtk-icon-theme-name={icon_theme}\n"
                     f"gtk-cursor-theme-name={cursor_theme}\n"
+                    f"gtk-decoration-layout=close,minimize,maximize:\n"
                 )
 
             log.append("Synchronized GTK 4 / Libadwaita configuration and assets.")
@@ -900,6 +930,7 @@ def apply_global_theme(theme_key):
         has_dark = False
         has_icon = False
         has_cursor = False
+        has_layout = False
         for line in lines:
             if line.startswith("gtk-theme-name="):
                 new_lines.append(f"gtk-theme-name={theme_name}\n")
@@ -913,6 +944,9 @@ def apply_global_theme(theme_key):
             elif line.startswith("gtk-cursor-theme-name="):
                 new_lines.append(f"gtk-cursor-theme-name={cursor_theme}\n")
                 has_cursor = True
+            elif line.startswith("gtk-decoration-layout="):
+                new_lines.append("gtk-decoration-layout=close,minimize,maximize:\n")
+                has_layout = True
             else:
                 new_lines.append(line)
 
@@ -924,6 +958,8 @@ def apply_global_theme(theme_key):
             new_lines.append(f"gtk-icon-theme-name={icon_theme}\n")
         if not has_cursor:
             new_lines.append(f"gtk-cursor-theme-name={cursor_theme}\n")
+        if not has_layout:
+            new_lines.append("gtk-decoration-layout=close,minimize,maximize:\n")
 
         with open(gtk3_ini, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
