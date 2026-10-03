@@ -45,9 +45,6 @@ uniform float exponent;
 // coordinates, but I'm not sure.
 uniform vec2 pixelStep;
 
-// Topbar opacity modulation: x = topbar_height (in pixels, 0.0 if disabled), y = opacity multiplier (e.g. 0.84)
-uniform vec2 topbarOpacity;
-
 // Calculate whether a point is within the rounded window when using regular
 // circular corner rounding.
 //
@@ -152,11 +149,6 @@ void main() {
 
     float pointAlpha = getPointOpacity(p, bounds, clipRadius, exponent);
 
-    float topbarAlpha = 1.0;
-    if (topbarOpacity.x > 0.0 && p.y < (bounds.y + topbarOpacity.x)) {
-        topbarAlpha = topbarOpacity.y;
-    }
-
     if (borderWidth > 0.9 || borderWidth < -0.9) {
         // If there is a border, we have to paint it.
 
@@ -175,19 +167,19 @@ void main() {
 
             // Mix the window color and the border color
             cogl_color_out = mix(cogl_color_out, vec4(borderColor.rgb, 1.0), borderAlpha * borderColor.a);
-            // Antialias outer edge and modulate topbar opacity
-            cogl_color_out *= (pointAlpha * topbarAlpha);
+            // Antialias outer edge
+            cogl_color_out *= pointAlpha;
         } else {
             // Outer borders
             float borderAlpha = borderedAreaAlpha * borderColor.a * clamp(cogl_color_out.a * 10.0, 0.0, 1.0);
             vec4 borderRect = vec4(borderColor.rgb, 1.0) * borderAlpha;
             // Then, if the point is also inside of the actual window
             // (pointAlpha = 1), draw the correct window pixel on top
-            cogl_color_out = mix(borderRect, cogl_color_out, pointAlpha * topbarAlpha);
+            cogl_color_out = mix(borderRect, cogl_color_out, pointAlpha);
         }
     } else {
         // If there's no border, just multiply the output color by the calculated
         // alpha value.
-        cogl_color_out *= (pointAlpha * topbarAlpha);
+        cogl_color_out *= pointAlpha;
     }
 }

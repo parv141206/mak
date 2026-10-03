@@ -82,10 +82,22 @@ export class BlurModule {
             appSettings.set_int('corner-radius', 16);
             appSettings.set_boolean('corner-when-maximized', true);
 
-            // Whitelist Chrome, Brave, Antigravity, and Electron apps
-            const targetWhitelist = [
+            // Blacklist Chrome, Chromium, Brave from whole-window translucency
+            // to keep web content completely solid, crisp, and bug-free
+            const targetBlacklist = [
                 'google-chrome*',
+                'chromium*',
                 'brave*',
+                'Plank',
+                'com.desktop.ding',
+                'Conky',
+            ];
+            const currentBlacklist = appSettings.get_strv('blacklist');
+            const mergedBlacklist = Array.from(new Set([...currentBlacklist, ...targetBlacklist]));
+            appSettings.set_strv('blacklist', mergedBlacklist);
+
+            // Whitelist apps for window translucency
+            const targetWhitelist = [
                 'antigravity*',
                 'code*',
                 'electron*',
@@ -95,7 +107,8 @@ export class BlurModule {
                 'com.github.*',
             ];
             const currentWhitelist = appSettings.get_strv('whitelist');
-            const mergedWhitelist = Array.from(new Set([...currentWhitelist, ...targetWhitelist]));
+            const filteredWhitelist = currentWhitelist.filter(x => !x.includes('chrome') && !x.includes('brave') && !x.includes('chromium'));
+            const mergedWhitelist = Array.from(new Set([...filteredWhitelist, ...targetWhitelist]));
             appSettings.set_strv('whitelist', mergedWhitelist);
 
             // Set hacks-level 2 to disable clipped redraws so blur updates behind all windows
