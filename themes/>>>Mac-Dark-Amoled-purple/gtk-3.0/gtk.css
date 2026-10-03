@@ -8034,7 +8034,7 @@ window.background.chromium {
 
 window.background.chromium headerbar.titlebar {
   padding: 0 12px;
-  background-color: #000000;
+  background-color: transparent;
   color: #dadada;
 }
 

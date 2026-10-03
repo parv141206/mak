@@ -252,7 +252,7 @@ function updateEffect(actor) {
     }
     const cfg = getRoundedCornersCfg(win);
     const windowContentOffset = computeWindowContentsOffset(win);
-    effect.updateUniforms(cfg, computeBounds(actor, windowContentOffset));
+    effect.updateUniforms(cfg, computeBounds(actor, windowContentOffset), win);
     const shadow = windowInfo.shadow;
     const offsets = computeShadowActorOffset(windowContentOffset);
     const constraints = shadow.get_constraints();

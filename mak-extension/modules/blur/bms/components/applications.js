@@ -245,7 +245,7 @@ export const ApplicationsBlur = class ApplicationsBlur {
                     // Ensure newly added Wayland surface/subsurface actor gets the transparent opacity
                     const BLUR_ACTOR_NAMES = new Set(["blur-actor", "bms-application-blurred-widget"]);
                     if (child && !BLUR_ACTOR_NAMES.has(child.name)) {
-                        const targetOpacity = this.settings.applications.OPACITY;
+                        const targetOpacity = this.is_chrome_window(meta_window) ? 255 : this.settings.applications.OPACITY;
                         if (child.opacity !== targetOpacity) {
                             child.opacity = targetOpacity;
                         }
@@ -295,14 +295,23 @@ export const ApplicationsBlur = class ApplicationsBlur {
                     blur_actor.x = monitor.x - buffer.x;
                     blur_actor.y = monitor.y - buffer.y;
 
+                    let clip_h = frame.height;
+                    if (this.is_chrome_window(meta_window)) {
+                        clip_h = Math.min(frame.height, this.get_chrome_topbar_height(meta_window));
+                    }
+
                     // set_clip(x-offset, y-offset, width, height)
-                    blur_actor.set_clip(frame.x - monitor.x, frame.y - monitor.y, frame.width, frame.height);
+                    blur_actor.set_clip(frame.x - monitor.x, frame.y - monitor.y, frame.width, clip_h);
                 } else {
                     const allocation = this.compute_allocation(meta_window);
                     blur_actor.x = allocation.x;
                     blur_actor.y = allocation.y;
                     blur_actor.width = allocation.width;
-                    blur_actor.height = allocation.height;
+                    if (this.is_chrome_window(meta_window)) {
+                        blur_actor.height = Math.min(allocation.height, this.get_chrome_topbar_height(meta_window));
+                    } else {
+                        blur_actor.height = allocation.height;
+                    }
                 }
             }
         } else
@@ -510,9 +519,15 @@ export const ApplicationsBlur = class ApplicationsBlur {
         else
             blur_actor.hide();
 
-        this.set_window_opacity(window_actor, show_blur
-            ? this.settings.applications.OPACITY
-            : 255);
+        if (this.is_chrome_window(meta_window)) {
+            // Chrome keeps surface at 255 so web page content is 100% solid & opaque;
+            // topbar translucency is rendered via shader on the topbar region only.
+            this.set_window_opacity(window_actor, 255);
+        } else {
+            this.set_window_opacity(window_actor, show_blur
+                ? this.settings.applications.OPACITY
+                : 255);
+        }
     }
 
     /// Update all corners, to use when the setting has been changed.
@@ -532,13 +547,33 @@ export const ApplicationsBlur = class ApplicationsBlur {
     set_window_opacity(window_actor, opacity) {
         // Define known blur actor names. This makes it easy to update if names change again.
         const BLUR_ACTOR_NAMES = new Set(["blur-actor", "bms-application-blurred-widget"]);
+        const meta_window = window_actor?.meta_window || window_actor?.get_meta_window?.();
+        const effectiveOpacity = this.is_chrome_window(meta_window) ? 255 : opacity;
 
         window_actor?.get_children().forEach(child => {
             // Check against the Set and the opacity
-            if (!BLUR_ACTOR_NAMES.has(child.name) && child.opacity != opacity) {
-                child.opacity = opacity;
+            if (!BLUR_ACTOR_NAMES.has(child.name) && child.opacity != effectiveOpacity) {
+                child.opacity = effectiveOpacity;
             }
         });
+    }
+
+    is_chrome_window(meta_window) {
+        if (!meta_window) return false;
+        const wm_class = (meta_window.get_wm_class?.() || meta_window.wmClass || '').toLowerCase();
+        const gtk_app_id = (meta_window.get_gtk_application_id?.() || meta_window.gtkApplicationId || '').toLowerCase();
+        return wm_class.includes('google-chrome') ||
+               wm_class.includes('chromium') ||
+               wm_class.includes('brave') ||
+               gtk_app_id.includes('google-chrome') ||
+               gtk_app_id.includes('chromium') ||
+               gtk_app_id.includes('brave');
+    }
+
+    get_chrome_topbar_height(meta_window) {
+        const scale = this.compute_scale(meta_window) || 1;
+        // Chrome tabstrip (~40px) + Omnibox bar (~46px) = ~86px
+        return Math.round(86 * scale);
     }
 
     /// Update the opacity of all window actors.
