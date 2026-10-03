@@ -99,6 +99,7 @@ GRAPHITE_PALETTE_OVERRIDE = """
 @define-color view_bg_color #1e1e20;
 @define-color view_fg_color #f5f5f7;
 @define-color headerbar_bg_color #2c2c2e;
+@define-color headerbar_solid_bg #2c2c2e;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
 @define-color sidebar_bg_color #1e1e20;
@@ -120,6 +121,7 @@ GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
 @define-color view_bg_color rgba(28, 28, 32, 0.68);
 @define-color view_fg_color #f5f5f7;
 @define-color headerbar_bg_color rgba(44, 44, 48, 0.75);
+@define-color headerbar_solid_bg #2c2c2e;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
 @define-color sidebar_bg_color rgba(30, 30, 34, 0.65);
@@ -141,6 +143,7 @@ AMOLED_PALETTE_OVERRIDE = """
 @define-color view_bg_color #000000;
 @define-color view_fg_color #ffffff;
 @define-color headerbar_bg_color #08080a;
+@define-color headerbar_solid_bg #08080a;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
 @define-color sidebar_bg_color #000000;
@@ -162,6 +165,7 @@ AMOLED_GLASSY_PALETTE_OVERRIDE = """
 @define-color view_bg_color rgba(0, 0, 0, 0.70);
 @define-color view_fg_color #ffffff;
 @define-color headerbar_bg_color rgba(12, 12, 14, 0.80);
+@define-color headerbar_solid_bg #08080a;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
 @define-color sidebar_bg_color rgba(0, 0, 0, 0.68);
@@ -183,6 +187,7 @@ LIGHT_PALETTE_OVERRIDE = """
 @define-color view_bg_color #ffffff;
 @define-color view_fg_color #1d1d1f;
 @define-color headerbar_bg_color #ebebef;
+@define-color headerbar_solid_bg #ebebef;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.12);
 @define-color sidebar_bg_color #e8e8ed;
@@ -204,6 +209,7 @@ LIGHT_GLASSY_PALETTE_OVERRIDE = """
 @define-color view_bg_color rgba(255, 255, 255, 0.72);
 @define-color view_fg_color #1d1d1f;
 @define-color headerbar_bg_color rgba(235, 235, 239, 0.78);
+@define-color headerbar_solid_bg #ebebef;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.12);
 @define-color sidebar_bg_color rgba(232, 232, 237, 0.68);
@@ -287,13 +293,13 @@ headerbar windowcontrols,
     box-shadow: none;
 }}
 
-/* Universal Chrome, Chromium & GTK transparent titlebar controls background */
+/* Universal Chrome, Chromium & Electron solid titlebar background */
 window.background.chromium headerbar,
 window.background.chromium headerbar.titlebar,
 window.background.chromium headerbar.header-bar.titlebar {{
     padding: 0;
     margin: 0;
-    background-color: transparent;
+    background-color: @headerbar_solid_bg;
     background-image: none;
     box-shadow: none;
     border: none;
@@ -661,7 +667,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
 
     color_keys = [
         "window_bg_color", "window_fg_color", "view_bg_color", "view_fg_color",
-        "headerbar_bg_color", "headerbar_fg_color", "headerbar_border_color",
+        "headerbar_bg_color", "headerbar_solid_bg", "headerbar_fg_color", "headerbar_border_color",
         "sidebar_bg_color", "sidebar_fg_color", "secondary_sidebar_bg_color",
         "card_bg_color", "card_fg_color", "dialog_bg_color", "dialog_fg_color",
         "popover_bg_color", "popover_fg_color", "placeholder_text_color"
