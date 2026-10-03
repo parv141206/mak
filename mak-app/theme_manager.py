@@ -287,11 +287,12 @@ headerbar windowcontrols,
     box-shadow: none;
 }}
 
-/* Universal Chrome, Chromium & GTK transparent titlebar background */
-window.background.chromium,
+/* Universal Chrome, Chromium & GTK transparent titlebar controls background */
 window.background.chromium headerbar,
 window.background.chromium headerbar.titlebar,
 window.background.chromium headerbar.header-bar.titlebar {{
+    padding: 0;
+    margin: 0;
     background-color: transparent;
     background-image: none;
     box-shadow: none;

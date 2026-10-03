@@ -1,7 +1,6 @@
 /** @file Binds the actual corner rounding shader to the windows. */
 var _a;
 import Cogl from 'gi://Cogl';
-import Gio from 'gi://Gio';
 import GObject from 'gi://GObject';
 import Shell from 'gi://Shell';
 import { readShader } from '../utils/file.js';
@@ -16,7 +15,6 @@ class Uniforms {
     borderedAreaClipRadius = 0;
     exponent = 0;
     pixelStep = 0;
-    topbarOpacity = 0;
 }
 export const RoundedCornersEffect = GObject.registerClass({
     GTypeName: 'MakRoundedCornersEffect',
@@ -45,7 +43,7 @@ export const RoundedCornersEffect = GObject.registerClass({
      * @param config - Rounded corners configuration
      * @param windowBounds - Bounds of the window without padding
      */
-    updateUniforms(config, windowBounds, win = null) {
+    updateUniforms(config, windowBounds) {
         const borderWidth = getPref('border-width');
         const borderColor = config.borderColor;
         const outerRadius = config.borderRadius;
@@ -81,36 +79,9 @@ export const RoundedCornersEffect = GObject.registerClass({
             radius = maxRadius;
         }
         borderedAreaRadius *= radius / outerRadius;
-
-        // Chrome/Chromium glassy topbar + opaque web page support
-        let topbarParam = [0.0, 1.0];
-        const wmClass = (win?.wmClass || win?.get_wm_class?.() || '').toLowerCase();
-        const gtkAppId = (win?.gtkApplicationId || win?.get_gtk_application_id?.() || '').toLowerCase();
-        const isChrome = wmClass.includes('google-chrome') ||
-                         wmClass.includes('chromium') ||
-                         wmClass.includes('brave') ||
-                         gtkAppId.includes('google-chrome') ||
-                         gtkAppId.includes('chromium') ||
-                         gtkAppId.includes('brave');
-
-        if (isChrome) {
-            let blurOpacity = 215;
-            try {
-                const bmsAppSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
-                if (bmsAppSettings.get_boolean('blur')) {
-                    blurOpacity = bmsAppSettings.get_int('opacity') || 215;
-                }
-            } catch (e) {}
-
-            const alphaMultiplier = Math.max(0.1, Math.min(1.0, blurOpacity / 255.0));
-            // Chrome header height: ~86px
-            const topbarH = 86.0;
-            topbarParam = [topbarH, alphaMultiplier];
-        }
-
-        this.#setUniforms(bounds, radius, borderWidth, borderColor, borderedAreaBounds, borderedAreaRadius, pixelStep, exponent, topbarParam);
+        this.#setUniforms(bounds, radius, borderWidth, borderColor, borderedAreaBounds, borderedAreaRadius, pixelStep, exponent);
     }
-    #setUniforms(bounds, radius, borderWidth, borderColor, borderedAreaBounds, borderedAreaRadius, pixelStep, exponent, topbarParam) {
+    #setUniforms(bounds, radius, borderWidth, borderColor, borderedAreaBounds, borderedAreaRadius, pixelStep, exponent) {
         const uniforms = Effect.uniforms;
         this.set_uniform_float(uniforms.bounds, 4, bounds);
         this.set_uniform_float(uniforms.clipRadius, 1, [radius]);
@@ -122,7 +93,6 @@ export const RoundedCornersEffect = GObject.registerClass({
         ]);
         this.set_uniform_float(uniforms.pixelStep, 2, pixelStep);
         this.set_uniform_float(uniforms.exponent, 1, [exponent]);
-        this.set_uniform_float(uniforms.topbarOpacity, 2, topbarParam);
         this.queue_repaint();
     }
 });
