@@ -786,11 +786,6 @@ window.background.brave windowcontrols button.maximize {{
 }}
 
 /* ── Authentic macOS Sonoma Traffic Light Backgrounds, Borders & Colors ── */
-headerbar windowcontrols button.close,
-headerbar button.titlebutton.close,
-windowcontrols button.close,
-windowcontrols button.titlebutton.close,
-button.titlebutton.close,
 window.background.chromium headerbar windowcontrols button.close,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close,
 window.background.chromium headerbar.header-bar.titlebar button.close,
@@ -811,11 +806,6 @@ window.background.brave windowcontrols button.close {{
     border: 1px solid rgba(0, 0, 0, 0.15);
 }}
 
-headerbar windowcontrols button.close:hover,
-headerbar button.titlebutton.close:hover,
-windowcontrols button.close:hover,
-windowcontrols button.titlebutton.close:hover,
-button.titlebutton.close:hover,
 window.background.chromium headerbar windowcontrols button.close:hover,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close:hover,
 window.background.chromium headerbar.header-bar.titlebar button.close:hover,
@@ -835,11 +825,6 @@ window.background.brave windowcontrols button.close:hover {{
     background-image: none;
 }}
 
-headerbar windowcontrols button.close:active,
-headerbar button.titlebutton.close:active,
-windowcontrols button.close:active,
-windowcontrols button.titlebutton.close:active,
-button.titlebutton.close:active,
 window.background.chromium headerbar windowcontrols button.close:active,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close:active,
 window.background.chromium headerbar.header-bar.titlebar button.close:active,
@@ -859,11 +844,6 @@ window.background.brave windowcontrols button.close:active {{
     background-image: none;
 }}
 
-headerbar windowcontrols button.minimize,
-headerbar button.titlebutton.minimize,
-windowcontrols button.minimize,
-windowcontrols button.titlebutton.minimize,
-button.titlebutton.minimize,
 window.background.chromium headerbar windowcontrols button.minimize,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize,
 window.background.chromium headerbar.header-bar.titlebar button.minimize,
@@ -884,11 +864,6 @@ window.background.brave windowcontrols button.minimize {{
     border: 1px solid rgba(0, 0, 0, 0.15);
 }}
 
-headerbar windowcontrols button.minimize:hover,
-headerbar button.titlebutton.minimize:hover,
-windowcontrols button.minimize:hover,
-windowcontrols button.titlebutton.minimize:hover,
-button.titlebutton.minimize:hover,
 window.background.chromium headerbar windowcontrols button.minimize:hover,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
 window.background.chromium headerbar.header-bar.titlebar button.minimize:hover,
@@ -908,11 +883,6 @@ window.background.brave windowcontrols button.minimize:hover {{
     background-image: none;
 }}
 
-headerbar windowcontrols button.minimize:active,
-headerbar button.titlebutton.minimize:active,
-windowcontrols button.minimize:active,
-windowcontrols button.titlebutton.minimize:active,
-button.titlebutton.minimize:active,
 window.background.chromium headerbar windowcontrols button.minimize:active,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize:active,
 window.background.chromium headerbar.header-bar.titlebar button.minimize:active,
@@ -932,11 +902,6 @@ window.background.brave windowcontrols button.minimize:active {{
     background-image: none;
 }}
 
-headerbar windowcontrols button.maximize,
-headerbar button.titlebutton.maximize,
-windowcontrols button.maximize,
-windowcontrols button.titlebutton.maximize,
-button.titlebutton.maximize,
 window.background.chromium headerbar windowcontrols button.maximize,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize,
 window.background.chromium headerbar.header-bar.titlebar button.maximize,
@@ -957,11 +922,6 @@ window.background.brave windowcontrols button.maximize {{
     border: 1px solid rgba(0, 0, 0, 0.15);
 }}
 
-headerbar windowcontrols button.maximize:hover,
-headerbar button.titlebutton.maximize:hover,
-windowcontrols button.maximize:hover,
-windowcontrols button.titlebutton.maximize:hover,
-button.titlebutton.maximize:hover,
 window.background.chromium headerbar windowcontrols button.maximize:hover,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
 window.background.chromium headerbar.header-bar.titlebar button.maximize:hover,
@@ -981,11 +941,6 @@ window.background.brave windowcontrols button.maximize:hover {{
     background-image: none;
 }}
 
-headerbar windowcontrols button.maximize:active,
-headerbar button.titlebutton.maximize:active,
-windowcontrols button.maximize:active,
-windowcontrols button.titlebutton.maximize:active,
-button.titlebutton.maximize:active,
 window.background.chromium headerbar windowcontrols button.maximize:active,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize:active,
 window.background.chromium headerbar.header-bar.titlebar button.maximize:active,
@@ -1006,11 +961,6 @@ window.background.brave windowcontrols button.maximize:active {{
 }}
 
 /* ── Inactive / Backdrop window traffic lights ── */
-headerbar windowcontrols button:backdrop,
-headerbar button.titlebutton:backdrop,
-windowcontrols button:backdrop,
-windowcontrols button.titlebutton:backdrop,
-button.titlebutton:backdrop,
 window.background.chromium headerbar windowcontrols button:backdrop,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop,
 window.background.chromium headerbar.header-bar.titlebar button:backdrop,
@@ -1031,25 +981,16 @@ window.background.brave windowcontrols button:backdrop {{
     border: 1px solid rgba(0, 0, 0, 0.10);
 }}
 
-headerbar windowcontrols button.close:backdrop:hover,
-windowcontrols button.close:backdrop:hover,
-button.titlebutton.close:backdrop:hover,
 window.background.chromium windowcontrols button.close:backdrop:hover,
 window.background.brave windowcontrols button.close:backdrop:hover {{
     background-color: #ff5f56;
 }}
 
-headerbar windowcontrols button.minimize:backdrop:hover,
-windowcontrols button.minimize:backdrop:hover,
-button.titlebutton.minimize:backdrop:hover,
 window.background.chromium windowcontrols button.minimize:backdrop:hover,
 window.background.brave windowcontrols button.minimize:backdrop:hover {{
     background-color: #ffbd2e;
 }}
 
-headerbar windowcontrols button.maximize:backdrop:hover,
-windowcontrols button.maximize:backdrop:hover,
-button.titlebutton.maximize:backdrop:hover,
 window.background.chromium windowcontrols button.maximize:backdrop:hover,
 window.background.brave windowcontrols button.maximize:backdrop:hover {{
     background-color: #27c93f;
