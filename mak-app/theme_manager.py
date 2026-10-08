@@ -11,27 +11,27 @@ THEMES = {
         "name": "macOS Dark Solid (Graphite)",
         "theme_name": ">>>Mac-Dark-solid-purple",
         "color_scheme": "prefer-dark",
-        "icon_theme": "MacTahoe-purple-dark",
+        "icon_theme": "MacTahoe-dark",
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "is_glassy": False,
         "dock_pill_color": "rgba(42, 42, 50, 0.40)",
         "dock_border_color": "rgba(255, 255, 255, 0.28)",
-        "window_border_color": "(1.0, 1.0, 1.0, 0.18)",
-        "description": "Refined solid macOS dark mode with sleek Sonoma graphite windows (#242426) and purple accents."
+        "window_border_color": "rgba(255, 255, 255, 0.18)",
+        "description": "Refined solid macOS dark mode with sleek Sonoma graphite windows (#242426) and native desktop accents."
     },
     "dark-glassy": {
         "id": "dark-glassy",
         "name": "macOS Dark Glass (Sonoma Frosted Glass)",
         "theme_name": ">>>Mac-Dark-glassy-purple",
         "color_scheme": "prefer-dark",
-        "icon_theme": "MacTahoe-purple-dark",
+        "icon_theme": "MacTahoe-dark",
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "is_glassy": True,
         "dock_pill_color": "rgba(32, 32, 40, 0.28)",
         "dock_border_color": "rgba(255, 255, 255, 0.22)",
-        "window_border_color": "(1.0, 1.0, 1.0, 0.20)",
+        "window_border_color": "rgba(255, 255, 255, 0.20)",
         "description": "Translucent frosted glass dark mode with translucent windows and vibrant backdrop blur."
     },
     "amoled": {
@@ -39,13 +39,13 @@ THEMES = {
         "name": "macOS AMOLED Dark Solid (Pitch Black)",
         "theme_name": ">>>Mac-Dark-Amoled-purple",
         "color_scheme": "prefer-dark",
-        "icon_theme": "MacTahoe-purple-dark",
+        "icon_theme": "MacTahoe-dark",
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "is_glassy": False,
         "dock_pill_color": "rgba(10, 10, 12, 0.60)",
         "dock_border_color": "rgba(255, 255, 255, 0.16)",
-        "window_border_color": "(1.0, 1.0, 1.0, 0.14)",
+        "window_border_color": "rgba(255, 255, 255, 0.14)",
         "description": "True pitch black solid OLED Midnight (#000000) with ultra-high contrast and obsidian surfaces."
     },
     "amoled-glassy": {
@@ -53,27 +53,27 @@ THEMES = {
         "name": "macOS AMOLED Glass (Obsidian Translucent)",
         "theme_name": ">>>Mac-Dark-Amoled-glassy-purple",
         "color_scheme": "prefer-dark",
-        "icon_theme": "MacTahoe-purple-dark",
+        "icon_theme": "MacTahoe-dark",
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "is_glassy": True,
         "dock_pill_color": "rgba(0, 0, 0, 0.35)",
         "dock_border_color": "rgba(255, 255, 255, 0.16)",
-        "window_border_color": "(1.0, 1.0, 1.0, 0.16)",
-        "description": "Translucent pitch black obsidian glass with deep backdrop blur and purple highlights."
+        "window_border_color": "rgba(255, 255, 255, 0.16)",
+        "description": "Translucent pitch black obsidian glass with deep backdrop blur and native desktop accents."
     },
     "light": {
         "id": "light",
         "name": "macOS Light Solid (Crisp Apple)",
         "theme_name": ">>>Mac-Light-solid-purple",
         "color_scheme": "prefer-light",
-        "icon_theme": "MacTahoe-purple-light",
+        "icon_theme": "MacTahoe-light",
         "cursor_theme": "MacTahoe-light",
         "is_dark": False,
         "is_glassy": False,
         "dock_pill_color": "rgba(255, 255, 255, 0.42)",
         "dock_border_color": "rgba(255, 255, 255, 0.65)",
-        "window_border_color": "(0.0, 0.0, 0.0, 0.12)",
+        "window_border_color": "rgba(0, 0, 0, 0.12)",
         "description": "Clean, luminous solid macOS light mode with subtle borders and crisp typography."
     },
     "light-glassy": {
@@ -81,13 +81,13 @@ THEMES = {
         "name": "macOS Light Glass (Apple Frosted Glass)",
         "theme_name": ">>>Mac-Light-glassy-purple",
         "color_scheme": "prefer-light",
-        "icon_theme": "MacTahoe-purple-light",
+        "icon_theme": "MacTahoe-light",
         "cursor_theme": "MacTahoe-light",
         "is_dark": False,
         "is_glassy": True,
         "dock_pill_color": "rgba(255, 255, 255, 0.30)",
         "dock_border_color": "rgba(255, 255, 255, 0.55)",
-        "window_border_color": "(0.0, 0.0, 0.0, 0.14)",
+        "window_border_color": "rgba(0, 0, 0, 0.14)",
         "description": "Luminous frosted glass light mode with translucent app windows and rich backdrop blur."
     }
 }
@@ -347,11 +347,36 @@ CHROMIUM_ACCENT_PALETTES = {
     },
 }
 
+GNOME_ACCENT_PALETTES = {
+    "blue": {"bg": "#3584e4", "fg": "#ffffff"},
+    "teal": {"bg": "#2190a4", "fg": "#ffffff"},
+    "green": {"bg": "#3a944a", "fg": "#ffffff"},
+    "yellow": {"bg": "#e5a50a", "fg": "rgba(0, 0, 0, 0.85)"},
+    "orange": {"bg": "#ed5b00", "fg": "#ffffff"},
+    "red": {"bg": "#e01b24", "fg": "#ffffff"},
+    "pink": {"bg": "#d56199", "fg": "#ffffff"},
+    "purple": {"bg": "#9141ac", "fg": "#ffffff"},
+    "slate": {"bg": "#5e5c64", "fg": "#ffffff"},
+}
+
+def get_icon_theme_for_accent(accent=None, is_dark=True):
+    if accent is None:
+        try:
+            res = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"],
+                                 capture_output=True, text=True)
+            accent = res.stdout.strip().strip("'\"")
+        except Exception:
+            accent = "blue"
+    if accent == "purple":
+        return "MacTahoe-purple-dark" if is_dark else "MacTahoe-purple-light"
+    return "MacTahoe-dark" if is_dark else "MacTahoe-light"
+
 def generate_traffic_lights_override(button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
     size = max(10, min(22, int(button_size)))
     spacing = max(0, min(24, int(button_spacing)))
     margin = max(0, round(spacing / 2))
     chrome_size = max(11, min(12, int(button_size) - 2))
+    backdrop_bg = "rgba(255, 255, 255, 0.22)" if is_dark else "rgba(0, 0, 0, 0.18)"
 
     if chromium_accent is None:
         try:
@@ -759,6 +784,276 @@ window.background.brave windowcontrols button.maximize {{
     color: transparent;
     -gtk-icon-source: none;
 }}
+
+/* ── Authentic macOS Sonoma Traffic Light Backgrounds, Borders & Colors ── */
+headerbar windowcontrols button.close,
+headerbar button.titlebutton.close,
+windowcontrols button.close,
+windowcontrols button.titlebutton.close,
+button.titlebutton.close,
+window.background.chromium headerbar windowcontrols button.close,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.chromium headerbar.header-bar.titlebar button.close,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.close,
+window.background.chromium headerbar.titlebar button.titlebutton.close,
+window.background.chromium headerbar button.titlebutton.close,
+window.background.chromium button.titlebutton.close,
+window.background.chromium windowcontrols button.close,
+window.background.brave headerbar windowcontrols button.close,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.close,
+window.background.brave headerbar.header-bar.titlebar button.close,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.close,
+window.background.brave headerbar.titlebar button.titlebutton.close,
+window.background.brave button.titlebutton.close,
+window.background.brave windowcontrols button.close {{
+    background-color: #ff5f56;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}}
+
+headerbar windowcontrols button.close:hover,
+headerbar button.titlebutton.close:hover,
+windowcontrols button.close:hover,
+windowcontrols button.titlebutton.close:hover,
+button.titlebutton.close:hover,
+window.background.chromium headerbar windowcontrols button.close:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close:hover,
+window.background.chromium headerbar.header-bar.titlebar button.close:hover,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.close:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.close:hover,
+window.background.chromium headerbar button.titlebutton.close:hover,
+window.background.chromium button.titlebutton.close:hover,
+window.background.chromium windowcontrols button.close:hover,
+window.background.brave headerbar windowcontrols button.close:hover,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.close:hover,
+window.background.brave headerbar.header-bar.titlebar button.close:hover,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.close:hover,
+window.background.brave headerbar.titlebar button.titlebutton.close:hover,
+window.background.brave button.titlebutton.close:hover,
+window.background.brave windowcontrols button.close:hover {{
+    background-color: #e0443e;
+    background-image: none;
+}}
+
+headerbar windowcontrols button.close:active,
+headerbar button.titlebutton.close:active,
+windowcontrols button.close:active,
+windowcontrols button.titlebutton.close:active,
+button.titlebutton.close:active,
+window.background.chromium headerbar windowcontrols button.close:active,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.close:active,
+window.background.chromium headerbar.header-bar.titlebar button.close:active,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.close:active,
+window.background.chromium headerbar.titlebar button.titlebutton.close:active,
+window.background.chromium headerbar button.titlebutton.close:active,
+window.background.chromium button.titlebutton.close:active,
+window.background.chromium windowcontrols button.close:active,
+window.background.brave headerbar windowcontrols button.close:active,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.close:active,
+window.background.brave headerbar.header-bar.titlebar button.close:active,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.close:active,
+window.background.brave headerbar.titlebar button.titlebutton.close:active,
+window.background.brave button.titlebutton.close:active,
+window.background.brave windowcontrols button.close:active {{
+    background-color: #bf302a;
+    background-image: none;
+}}
+
+headerbar windowcontrols button.minimize,
+headerbar button.titlebutton.minimize,
+windowcontrols button.minimize,
+windowcontrols button.titlebutton.minimize,
+button.titlebutton.minimize,
+window.background.chromium headerbar windowcontrols button.minimize,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.chromium headerbar.header-bar.titlebar button.minimize,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.minimize,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize,
+window.background.chromium headerbar button.titlebutton.minimize,
+window.background.chromium button.titlebutton.minimize,
+window.background.chromium windowcontrols button.minimize,
+window.background.brave headerbar windowcontrols button.minimize,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.minimize,
+window.background.brave headerbar.header-bar.titlebar button.minimize,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.minimize,
+window.background.brave headerbar.titlebar button.titlebutton.minimize,
+window.background.brave button.titlebutton.minimize,
+window.background.brave windowcontrols button.minimize {{
+    background-color: #ffbd2e;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}}
+
+headerbar windowcontrols button.minimize:hover,
+headerbar button.titlebutton.minimize:hover,
+windowcontrols button.minimize:hover,
+windowcontrols button.titlebutton.minimize:hover,
+button.titlebutton.minimize:hover,
+window.background.chromium headerbar windowcontrols button.minimize:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
+window.background.chromium headerbar.header-bar.titlebar button.minimize:hover,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.minimize:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize:hover,
+window.background.chromium headerbar button.titlebutton.minimize:hover,
+window.background.chromium button.titlebutton.minimize:hover,
+window.background.chromium windowcontrols button.minimize:hover,
+window.background.brave headerbar windowcontrols button.minimize:hover,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.minimize:hover,
+window.background.brave headerbar.header-bar.titlebar button.minimize:hover,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.minimize:hover,
+window.background.brave headerbar.titlebar button.titlebutton.minimize:hover,
+window.background.brave button.titlebutton.minimize:hover,
+window.background.brave windowcontrols button.minimize:hover {{
+    background-color: #dea123;
+    background-image: none;
+}}
+
+headerbar windowcontrols button.minimize:active,
+headerbar button.titlebutton.minimize:active,
+windowcontrols button.minimize:active,
+windowcontrols button.titlebutton.minimize:active,
+button.titlebutton.minimize:active,
+window.background.chromium headerbar windowcontrols button.minimize:active,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.minimize:active,
+window.background.chromium headerbar.header-bar.titlebar button.minimize:active,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.minimize:active,
+window.background.chromium headerbar.titlebar button.titlebutton.minimize:active,
+window.background.chromium headerbar button.titlebutton.minimize:active,
+window.background.chromium button.titlebutton.minimize:active,
+window.background.chromium windowcontrols button.minimize:active,
+window.background.brave headerbar windowcontrols button.minimize:active,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.minimize:active,
+window.background.brave headerbar.header-bar.titlebar button.minimize:active,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.minimize:active,
+window.background.brave headerbar.titlebar button.titlebutton.minimize:active,
+window.background.brave button.titlebutton.minimize:active,
+window.background.brave windowcontrols button.minimize:active {{
+    background-color: #c38c1a;
+    background-image: none;
+}}
+
+headerbar windowcontrols button.maximize,
+headerbar button.titlebutton.maximize,
+windowcontrols button.maximize,
+windowcontrols button.titlebutton.maximize,
+button.titlebutton.maximize,
+window.background.chromium headerbar windowcontrols button.maximize,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.chromium headerbar.header-bar.titlebar button.maximize,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.maximize,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize,
+window.background.chromium headerbar button.titlebutton.maximize,
+window.background.chromium button.titlebutton.maximize,
+window.background.chromium windowcontrols button.maximize,
+window.background.brave headerbar windowcontrols button.maximize,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.maximize,
+window.background.brave headerbar.header-bar.titlebar button.maximize,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.maximize,
+window.background.brave headerbar.titlebar button.titlebutton.maximize,
+window.background.brave button.titlebutton.maximize,
+window.background.brave windowcontrols button.maximize {{
+    background-color: #27c93f;
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}}
+
+headerbar windowcontrols button.maximize:hover,
+headerbar button.titlebutton.maximize:hover,
+windowcontrols button.maximize:hover,
+windowcontrols button.titlebutton.maximize:hover,
+button.titlebutton.maximize:hover,
+window.background.chromium headerbar windowcontrols button.maximize:hover,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
+window.background.chromium headerbar.header-bar.titlebar button.maximize:hover,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.maximize:hover,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize:hover,
+window.background.chromium headerbar button.titlebutton.maximize:hover,
+window.background.chromium button.titlebutton.maximize:hover,
+window.background.chromium windowcontrols button.maximize:hover,
+window.background.brave headerbar windowcontrols button.maximize:hover,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.maximize:hover,
+window.background.brave headerbar.header-bar.titlebar button.maximize:hover,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.maximize:hover,
+window.background.brave headerbar.titlebar button.titlebutton.maximize:hover,
+window.background.brave button.titlebutton.maximize:hover,
+window.background.brave windowcontrols button.maximize:hover {{
+    background-color: #1aab29;
+    background-image: none;
+}}
+
+headerbar windowcontrols button.maximize:active,
+headerbar button.titlebutton.maximize:active,
+windowcontrols button.maximize:active,
+windowcontrols button.titlebutton.maximize:active,
+button.titlebutton.maximize:active,
+window.background.chromium headerbar windowcontrols button.maximize:active,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button.maximize:active,
+window.background.chromium headerbar.header-bar.titlebar button.maximize:active,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton.maximize:active,
+window.background.chromium headerbar.titlebar button.titlebutton.maximize:active,
+window.background.chromium headerbar button.titlebutton.maximize:active,
+window.background.chromium button.titlebutton.maximize:active,
+window.background.chromium windowcontrols button.maximize:active,
+window.background.brave headerbar windowcontrols button.maximize:active,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button.maximize:active,
+window.background.brave headerbar.header-bar.titlebar button.maximize:active,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton.maximize:active,
+window.background.brave headerbar.titlebar button.titlebutton.maximize:active,
+window.background.brave button.titlebutton.maximize:active,
+window.background.brave windowcontrols button.maximize:active {{
+    background-color: #138f20;
+    background-image: none;
+}}
+
+/* ── Inactive / Backdrop window traffic lights ── */
+headerbar windowcontrols button:backdrop,
+headerbar button.titlebutton:backdrop,
+windowcontrols button:backdrop,
+windowcontrols button.titlebutton:backdrop,
+button.titlebutton:backdrop,
+window.background.chromium headerbar windowcontrols button:backdrop,
+window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop,
+window.background.chromium headerbar.header-bar.titlebar button:backdrop,
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:backdrop,
+window.background.chromium headerbar.titlebar button.titlebutton:backdrop,
+window.background.chromium headerbar button.titlebutton:backdrop,
+window.background.chromium button.titlebutton:backdrop,
+window.background.chromium windowcontrols button:backdrop,
+window.background.brave headerbar windowcontrols button:backdrop,
+window.background.brave headerbar.header-bar.titlebar windowcontrols button:backdrop,
+window.background.brave headerbar.header-bar.titlebar button:backdrop,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton:backdrop,
+window.background.brave headerbar.titlebar button.titlebutton:backdrop,
+window.background.brave button.titlebutton:backdrop,
+window.background.brave windowcontrols button:backdrop {{
+    background-color: {backdrop_bg};
+    background-image: none;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+}}
+
+headerbar windowcontrols button.close:backdrop:hover,
+windowcontrols button.close:backdrop:hover,
+button.titlebutton.close:backdrop:hover,
+window.background.chromium windowcontrols button.close:backdrop:hover,
+window.background.brave windowcontrols button.close:backdrop:hover {{
+    background-color: #ff5f56;
+}}
+
+headerbar windowcontrols button.minimize:backdrop:hover,
+windowcontrols button.minimize:backdrop:hover,
+button.titlebutton.minimize:backdrop:hover,
+window.background.chromium windowcontrols button.minimize:backdrop:hover,
+window.background.brave windowcontrols button.minimize:backdrop:hover {{
+    background-color: #ffbd2e;
+}}
+
+headerbar windowcontrols button.maximize:backdrop:hover,
+windowcontrols button.maximize:backdrop:hover,
+button.titlebutton.maximize:backdrop:hover,
+window.background.chromium windowcontrols button.maximize:backdrop:hover,
+window.background.brave windowcontrols button.maximize:backdrop:hover {{
+    background-color: #27c93f;
+}}
 """
 
 TRAFFIC_LIGHTS_OVERRIDE = generate_traffic_lights_override(14, 8)
@@ -876,7 +1171,9 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         "headerbar_bg_color", "headerbar_solid_bg", "headerbar_fg_color", "headerbar_border_color",
         "sidebar_bg_color", "sidebar_fg_color", "secondary_sidebar_bg_color",
         "card_bg_color", "card_fg_color", "dialog_bg_color", "dialog_fg_color",
-        "popover_bg_color", "popover_fg_color", "placeholder_text_color"
+        "popover_bg_color", "popover_fg_color", "placeholder_text_color",
+        "accent_bg_color", "accent_fg_color", "accent_color",
+        "theme_selected_bg_color", "selected_bg_color"
     ]
     lines = content.splitlines()
     filtered = []
@@ -884,14 +1181,37 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         stripped = line.strip()
         if any(stripped.startswith(f"@define-color {k} ") for k in color_keys):
             continue
+        if "#9A57A3" in line or "#9a57a3" in line:
+            line = line.replace("#9A57A3", "@accent_bg_color").replace("#9a57a3", "@accent_bg_color")
         filtered.append(line)
+
+    curr_acc = "blue"
+    try:
+        res = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"],
+                             capture_output=True, text=True)
+        curr_acc = res.stdout.strip().strip("'\"") or "blue"
+    except Exception:
+        curr_acc = "blue"
+
+    acc_info = GNOME_ACCENT_PALETTES.get(curr_acc, GNOME_ACCENT_PALETTES["blue"])
+    acc_bg = acc_info["bg"]
+    acc_fg = acc_info["fg"]
+
+    accent_css_override = f"""
+/* ── Dynamic GNOME Desktop Accent Synchronization ─────────────────────── */
+@define-color accent_color {acc_bg};
+@define-color accent_bg_color {acc_bg};
+@define-color accent_fg_color {acc_fg};
+@define-color theme_selected_bg_color {acc_bg};
+@define-color selected_bg_color {acc_bg};
+"""
 
     traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
     rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 
-    final_content = palette.strip() + "\n\n" + "\n".join(filtered) + "\n\n" + "\n\n".join(rules_to_append) + "\n"
+    final_content = palette.strip() + "\n\n" + accent_css_override.strip() + "\n\n" + "\n".join(filtered) + "\n\n" + "\n\n".join(rules_to_append) + "\n"
     with open(dst_css_path, "w", encoding="utf-8") as f:
         f.write(final_content)
 
@@ -910,7 +1230,7 @@ def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_acce
         try:
             res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-spacing"],
                                  capture_output=True, text=True)
-            button_spacing = int(res.stdout.strip())
+            button_spacing = int(res_spacing.stdout.strip()) if 'res_spacing' in locals() else int(res.stdout.strip())
         except Exception:
             button_spacing = 8
 
@@ -958,6 +1278,21 @@ def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_acce
                 inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
     ensure_settings_ini_decoration_layout()
+
+def update_desktop_accent(accent_name):
+    """Updates the desktop accent across GNOME interface, icon theme, and regenerated GTK stylesheets."""
+    if not accent_name:
+        return
+    theme_key = get_current_theme()
+    theme_info = THEMES.get(theme_key, THEMES["dark"])
+    is_dark = theme_info.get("is_dark", True)
+    icon_theme = get_icon_theme_for_accent(accent_name, is_dark)
+    try:
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", accent_name], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", icon_theme], check=False)
+    except Exception:
+        pass
+    update_titlebar_buttons()
 
 update_titlebar_button_size = update_titlebar_buttons
 
@@ -1028,9 +1363,16 @@ def apply_global_theme(theme_key):
     theme_info = THEMES[theme_key]
     theme_name = theme_info["theme_name"]
     color_scheme = theme_info["color_scheme"]
-    icon_theme = theme_info.get("icon_theme", "MacTahoe-purple-dark")
-    cursor_theme = theme_info.get("cursor_theme", "MacTahoe-dark")
     is_dark = theme_info["is_dark"]
+    curr_acc = "blue"
+    try:
+        res = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"],
+                             capture_output=True, text=True)
+        curr_acc = res.stdout.strip().strip("'\"") or "blue"
+    except Exception:
+        pass
+    icon_theme = get_icon_theme_for_accent(curr_acc, is_dark)
+    cursor_theme = theme_info.get("cursor_theme", "MacTahoe-dark")
     source_dir = os.path.join(THEMES_DIR, theme_name)
 
     log = []
@@ -1041,12 +1383,6 @@ def apply_global_theme(theme_key):
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", color_scheme], check=True)
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", icon_theme], check=True)
         subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "cursor-theme", cursor_theme], check=True)
-        try:
-            curr_acc = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"], capture_output=True, text=True).stdout.strip().strip("'\"")
-            if not curr_acc:
-                subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", "purple"], check=False)
-        except Exception:
-            pass
         log.append(f"Set GNOME interface gtk-theme to '{theme_name}', color-scheme to '{color_scheme}', icon-theme to '{icon_theme}', and cursor to '{cursor_theme}'.")
     except Exception as e:
         log.append(f"Error setting GNOME interface: {e}")
@@ -1257,12 +1593,23 @@ def apply_global_theme(theme_key):
 
     # 8. Rounded Window Corners Border Highlight
     try:
-        w_border = theme_info.get("window_border_color", "(1.0, 1.0, 1.0, 0.16)")
-        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 16>, 'smoothing': <0.8>, 'borderColor': <{w_border}>, 'enabled': <true>}}"
+        w_border = theme_info.get("window_border_color", "rgba(255, 255, 255, 0.16)")
+        m = re.match(r"rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\)", str(w_border))
+        if m:
+            r = round(float(m.group(1)) / 255.0, 3)
+            g = round(float(m.group(2)) / 255.0, 3)
+            b = round(float(m.group(3)) / 255.0, 3)
+            a = round(float(m.group(4)) if m.group(4) is not None else 1.0, 3)
+            tuple_str = f"({r}, {g}, {b}, {a})"
+        else:
+            tuple_str = "(1.0, 1.0, 1.0, 0.16)"
+
+        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 16>, 'smoothing': <0.8>, 'borderColor': <{tuple_str}>, 'enabled': <true>}}"
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "global-rounded-corner-settings", new_val], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "1"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libadwaita-app", "true"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libhandy-app", "true"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-border-color", w_border], check=False)
         log.append(f"Updated window corner settings (radius 16, smoothing 0.8, border {w_border}, skip-libadwaita true).")
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")

@@ -10,7 +10,7 @@ import gi
 gi.require_version('Gtk', '4.0')
 gi.require_version('Adw', '1')
 gi.require_version('Gio', '2.0')
-from gi.repository import Gtk, Adw, Gio, GLib
+from gi.repository import Gtk, Adw, Gio, GLib, Gdk
 
 from settings_bridge import MakSettingsBridge
 import theme_manager
@@ -41,6 +41,30 @@ def create_spin_row(title, subtitle, lower, upper, step, val, digits=0, on_chang
             else:
                 on_change(round(v, digits))
         row.connect("notify::value", _on_val_changed)
+    return row
+
+def create_color_row(title, subtitle, cur_rgba_str, on_change=None):
+    """Creates an Adw.ActionRow equipped with a native interactive Gtk.ColorDialogButton."""
+    row = Adw.ActionRow(title=title, subtitle=subtitle)
+    try:
+        dialog = Gtk.ColorDialog.new()
+        dialog.set_with_alpha(True)
+        btn = Gtk.ColorDialogButton.new(dialog)
+        btn.set_valign(Gtk.Align.CENTER)
+        rgba = Gdk.RGBA()
+        fallback = "rgba(255, 255, 255, 0.20)"
+        try:
+            if not rgba.parse(cur_rgba_str or fallback):
+                rgba.parse(fallback)
+        except Exception:
+            rgba.parse(fallback)
+        btn.set_rgba(rgba)
+        if on_change:
+            btn.connect("notify::rgba", lambda b, p: on_change(b.get_rgba().to_string()))
+        row.add_suffix(btn)
+        row.set_activatable_widget(btn)
+    except Exception as e:
+        print(f"[UI] Error creating color row: {e}")
     return row
 
 class MakAppWindow(Adw.ApplicationWindow):
@@ -285,6 +309,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         pill_group.add(create_spin_row("Dock Pill Corner Radius", "Curvature rounding radius for dock background", 0, 40, 1, self.bridge.get_dock_radius(), digits=0, on_change=self.bridge.set_dock_radius))
         pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor (0 = fully transparent)", 0.0, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
         pill_group.add(create_spin_row("Pill Border Outline Width", "Glass border stroke thickness in pixels", 0, 6, 1, self.bridge.get_dock_border_width(), digits=0, on_change=self.bridge.set_dock_border_width))
+        pill_group.add(create_color_row("Dock Border Outline Color", "Customize color and transparency of the dock glass border outline", self.bridge.get_dock_border_color(), on_change=self.bridge.set_dock_border_color))
 
         thick_auto = Adw.SwitchRow(title="Auto Pill Thickness", subtitle="Scale pill height automatically with resting icon size")
         thick_auto.set_active(self.bridge.get_pill_thickness_auto())
@@ -537,7 +562,7 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         topbar_opaque = Adw.SwitchRow(
             title="Opaque Top Bar",
-            subtitle="Specifically make top bar 100% solid and opaque while leaving dock, menus, and popups translucent & blurry"
+            subtitle="Specifically make top bar 100% solid and opaque while leaving dock, menus, and popups translucent and blurry"
         )
         topbar_opaque.set_active(self.bridge.get_topbar_opaque())
         topbar_opaque.connect("notify::active", lambda s, p: self.bridge.set_topbar_opaque(s.get_active()))
@@ -696,6 +721,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         corn_group.add(create_spin_row("Window Corner Radius", "Corner curvature radius in pixels", 0, 40, 1, self.bridge.get_corner_radius(), digits=0, on_change=self.bridge.set_corner_radius))
         corn_group.add(create_spin_row("Apple Squircle Smoothing", "Curvature exponent for super-ellipse squircle corners (0.8 = authentic Apple curvature)", 0.0, 1.0, 0.05, self.bridge.get_corner_smoothing(), digits=2, on_change=self.bridge.set_corner_smoothing))
         corn_group.add(create_spin_row("Window Border Stroke Width", "Subtle macOS window border in pixels", 0, 10, 1, self.bridge.get_corner_border_width(), digits=0, on_change=self.bridge.set_corner_border_width))
+        corn_group.add(create_color_row("Window Border Highlight Color", "Edge border stroke tint and alpha for application windows", self.bridge.get_corner_border_color(), on_change=self.bridge.set_corner_border_color))
         corn_group.add(create_spin_row("Title Bar Button Size", "Diameter in pixels of macOS traffic light buttons (close, minimize, maximize)", 10, 22, 1, self.bridge.get_titlebar_button_size(), digits=0, on_change=self.bridge.set_titlebar_button_size))
         corn_group.add(create_spin_row("Title Bar Button Spacing", "Gap in pixels between traffic light buttons (closer or farther apart)", 0, 24, 1, self.bridge.get_titlebar_button_spacing(), digits=0, on_change=self.bridge.set_titlebar_button_spacing))
 
@@ -901,19 +927,24 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         sys_accent_row = Adw.ComboRow(
             title="Desktop Interface Accent Color",
-            subtitle="Standard GNOME Shell & GTK desktop accent color",
+            subtitle="Standard GNOME Shell and GTK desktop accent color",
             model=sys_accent_model
         )
         curr_sys_acc = self.bridge.get_system_accent_color()
         if curr_sys_acc in sys_accent_keys:
             sys_accent_row.set_selected(sys_accent_keys.index(curr_sys_acc))
         else:
-            sys_accent_row.set_selected(sys_accent_keys.index("purple") if "purple" in sys_accent_keys else 0)
+            sys_accent_row.set_selected(sys_accent_keys.index("blue") if "blue" in sys_accent_keys else 0)
 
         def _on_sys_accent_selected(row, param):
             idx = row.get_selected()
             if 0 <= idx < len(sys_accent_keys):
-                self.bridge.set_system_accent_color(sys_accent_keys[idx])
+                acc_key = sys_accent_keys[idx]
+                self.bridge.set_system_accent_color(acc_key)
+                try:
+                    theme_manager.update_desktop_accent(acc_key)
+                except Exception as e:
+                    print(f"[Main] Error updating desktop accent: {e}")
 
         sys_accent_row.connect("notify::selected", _on_sys_accent_selected)
         accent_group.add(sys_accent_row)
@@ -952,9 +983,9 @@ class MakAppWindow(Adw.ApplicationWindow):
         sys_chips_row.add_suffix(sys_chips_box)
         accent_group.add(sys_chips_row)
 
-        # ── Chromium & Brave Browser Topbar Accent ──
+        # ── Chromium and Brave Browser Topbar Accent ──
         chrom_group = Adw.PreferencesGroup(
-            title="Chromium & Brave Browser Topbar Accent",
+            title="Chromium and Brave Browser Topbar Accent",
             description="Customize top bar background frame color for Chrome, Brave, Chromium, and Electron while preserving native macOS traffic lights (ensure 'Use GTK' is active in browser appearance):"
         )
         page.add(chrom_group)

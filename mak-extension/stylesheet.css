@@ -1406,7 +1406,7 @@
 
 .mak-qs-header-icon {
     icon-size: 24px;
-    color: #a855f7;
+    color: -st-accent-color;
 }
 
 .mak-qs-title {
@@ -1475,10 +1475,10 @@
 }
 
 .mak-qs-theme-btn.active {
-    background-color: #8b5cf6;
+    background-color: -st-accent-color;
     color: #ffffff;
-    border-color: #a855f7;
-    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.4);
+    border-color: st-lighten(-st-accent-color, 10%);
+    box-shadow: 0 2px 6px st-transparentize(-st-accent-color, 0.6);
 }
 
 .mak-qs-accent-row {
@@ -1616,7 +1616,7 @@
 }
 
 .light-mode .mak-qs-theme-btn.active {
-    background-color: #8b5cf6 !important;
+    background-color: -st-accent-color !important;
     color: #ffffff !important;
 }
 
