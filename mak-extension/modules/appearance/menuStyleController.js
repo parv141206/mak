@@ -321,7 +321,7 @@ export class MenuStyleController {
 .calendar-day:checked,
 .calendar .calendar-day:selected,
 .calendar .calendar-day:checked {
-    background-color: #9A57A3 !important;
+    background-color: -st-accent-color !important;
     color: #ffffff !important;
     font-weight: bold !important;
 }
@@ -330,7 +330,7 @@ export class MenuStyleController {
 .calendar-day-base.calendar-today,
 .calendar-day.calendar-today,
 .calendar .calendar-day.calendar-today {
-    background-color: #9A57A3 !important;
+    background-color: -st-accent-color !important;
     color: #ffffff !important;
     font-weight: bold !important;
     border-radius: 9999px !important;
@@ -427,7 +427,7 @@ export class MenuStyleController {
 }
 
 .mak-user-current-check {
-    color: #9A57A3 !important;
+    color: -st-accent-color !important;
 }
 
 .mak-user-menu-item:hover .mak-user-name-label {
@@ -523,11 +523,11 @@ export class MenuStyleController {
     color: ${secondaryTextColor} !important;
 }
 
-/* Checked / Active Toggles: purple accent with crisp WHITE text and icons */
+/* Checked / Active Toggles: dynamic shell accent with crisp WHITE text and icons */
 .quick-toggle:checked,
 .quick-toggle-has-menu:checked,
 .quick-toggle-has-menu .quick-toggle:checked {
-    background-color: #9A57A3 !important;
+    background-color: -st-accent-color !important;
     color: #ffffff !important;
 }
 

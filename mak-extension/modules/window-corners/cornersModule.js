@@ -91,12 +91,27 @@ export class WindowCornersModule {
 
             const currentVal = s.get_value('global-rounded-corner-settings');
             const curDict = currentVal ? currentVal.recursiveUnpack() : {};
+
+            let borderColorTuple = curDict.borderColor || [1.0, 1.0, 1.0, 0.18];
+            const colorStr = this._settings.get_string('corner-border-color');
+            if (colorStr) {
+                const match = colorStr.match(/rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\)/i);
+                if (match) {
+                    borderColorTuple = [
+                        Math.max(0, Math.min(1, parseFloat(match[1]) / 255.0)),
+                        Math.max(0, Math.min(1, parseFloat(match[2]) / 255.0)),
+                        Math.max(0, Math.min(1, parseFloat(match[3]) / 255.0)),
+                        Math.max(0, Math.min(1, match[4] !== undefined ? parseFloat(match[4]) : 1.0))
+                    ];
+                }
+            }
+
             const variantDict = {
                 padding: new GLib.Variant('a{su}', curDict.padding || { left: 0, right: 0, top: 0, bottom: 0 }),
                 keepRoundedCorners: new GLib.Variant('a{sb}', { maximized: !unroundMaximized, fullscreen: false }),
                 borderRadius: GLib.Variant.new_uint32(radius),
                 smoothing: GLib.Variant.new_double(smoothing),
-                borderColor: new GLib.Variant('(dddd)', curDict.borderColor || [1.0, 1.0, 1.0, 0.18]),
+                borderColor: new GLib.Variant('(dddd)', borderColorTuple),
                 enabled: GLib.Variant.new_boolean(true),
             };
             s.set_value('global-rounded-corner-settings', new GLib.Variant('a{sv}', variantDict));

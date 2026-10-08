@@ -3,6 +3,7 @@
 # Connects the GTK 4 Control Center to Mak's unified schema and active Shell runtime.
 
 import os
+import re
 import gi
 
 gi.require_version('Gio', '2.0')
@@ -565,6 +566,33 @@ class MakSettingsBridge:
     def get_corner_border_width(self): return self._get_i("corner-border-width", self.corners, "border-width", 1)
     def set_corner_border_width(self, v): self._set_i("corner-border-width", self.corners, "border-width", v)
 
+    def get_corner_border_color(self):
+        c = self._read_corners_dict()
+        if 'borderColor' in c:
+            bc = c['borderColor']
+            if isinstance(bc, (list, tuple)) and len(bc) >= 3:
+                r = int(round(float(bc[0]) * 255))
+                g = int(round(float(bc[1]) * 255))
+                b = int(round(float(bc[2]) * 255))
+                a = round(float(bc[3]), 2) if len(bc) > 3 else 1.0
+                return f"rgba({r},{g},{b},{a})"
+        return self._get_s("corner-border-color", None, None, "rgba(255,255,255,0.18)")
+
+    def set_corner_border_color(self, v):
+        self._set_s("corner-border-color", None, None, str(v))
+        rgba = [1.0, 1.0, 1.0, 0.18]
+        try:
+            m = re.match(r"rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\)", str(v))
+            if m:
+                r = float(m.group(1)) / 255.0
+                g = float(m.group(2)) / 255.0
+                b = float(m.group(3)) / 255.0
+                a = float(m.group(4)) if m.group(4) is not None else 1.0
+                rgba = [round(max(0.0, min(1.0, x)), 3) for x in (r, g, b, a)]
+        except Exception:
+            pass
+        self._write_corners_dict({'borderColor': tuple(rgba)})
+
     def get_titlebar_button_size(self): return self._get_i("titlebar-button-size", None, None, 14)
     def set_titlebar_button_size(self, v):
         self._set_i("titlebar-button-size", None, None, v)
@@ -868,6 +896,7 @@ class MakSettingsBridge:
         self.set_corner_radius(16)
         self.set_corner_smoothing(0.8)
         self.set_corner_border_width(1)
+        self.set_corner_border_color("rgba(255, 255, 255, 0.18)")
         self.set_unround_maximized(False)
         self.set_shadow_enabled(True)
         self.set_focused_shadow_v_offset(6)
