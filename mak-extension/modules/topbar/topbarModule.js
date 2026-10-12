@@ -272,7 +272,8 @@ export class TopBarModule {
             } else if (key === 'topbar-media-pill') {
                 if (this._settings.get_boolean('topbar-media-pill')) this._enableMediaPill();
                 else this._disableMediaPill();
-            } else if (key === 'topbar-transparency' || key === 'topbar-opaque' || key === 'global-opacity') {
+            } else if (key === 'topbar-transparency' || key === 'topbar-opaque' || key === 'global-opacity' ||
+                       key === 'topbar-blur' || key === 'topbar-blur-radius' || key === 'blur-panel') {
                 this._applyPanelTransparency();
             }
         });

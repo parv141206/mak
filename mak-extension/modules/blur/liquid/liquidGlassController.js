@@ -192,21 +192,49 @@ export class LiquidGlassController {
             this._liquidSettings.set_string('dock-tint-color', '#ffffff');
             this._liquidSettings.set_double('dock-tint-strength', 0.08);
 
-            // Top Bar: Clean edge-to-edge glass bar, 0 margins, 0 paddings, 0 corner-radius
-            this._liquidSettings.set_string('top-bar-style', 'pill');
-            this._liquidSettings.set_double('top-bar-corner-radius', 0.0);
-            this._liquidSettings.set_int('top-bar-blur-radius', 18);
-            this._liquidSettings.set_string('top-bar-tint-color', '#ffffff');
-            this._liquidSettings.set_double('top-bar-tint-strength', 0.08);
-            this._liquidSettings.set_int('top-bar-margin-top', 0);
-            this._liquidSettings.set_int('top-bar-margin-bottom', 0);
-            this._liquidSettings.set_int('top-bar-margin-left', 0);
-            this._liquidSettings.set_int('top-bar-margin-right', 0);
+            // Top Bar
+            const topbarBlur = this._makSettings.get_boolean('topbar-blur');
+            const blurPanel = this._makSettings.get_boolean('blur-panel');
+            const topbarOpaque = this._makSettings.get_boolean('topbar-opaque');
+            const topbarPill = this._makSettings.get_boolean('topbar-pill-style');
+            const topbarBlurRad = this._makSettings.get_int('topbar-blur-radius');
+            const topbarTrans = this._makSettings.get_double('topbar-transparency');
+            const blurBright = this._makSettings.get_double('blur-brightness');
+
+            if (!topbarBlur || !blurPanel || topbarOpaque) {
+                this._liquidSettings.set_string('top-bar-style', 'off');
+            } else {
+                this._liquidSettings.set_string('top-bar-style', 'pill');
+                this._liquidSettings.set_string('top-bar-tint-color', '#ffffff');
+                // Calculate tint strength from panel transparency:
+                const tintStr = Math.max(0.02, Math.min(0.40, (1.0 - topbarTrans) * 0.22));
+                this._liquidSettings.set_double('top-bar-tint-strength', tintStr);
+                this._liquidSettings.set_int('top-bar-blur-radius', topbarBlurRad > 0 ? topbarBlurRad : 24);
+                this._liquidSettings.set_double('top-bar-brightness', blurBright > 0 ? blurBright : 1.0);
+
+                if (topbarPill) {
+                    this._liquidSettings.set_double('top-bar-corner-radius', 14.0);
+                    this._liquidSettings.set_int('top-bar-margin-top', 6);
+                    this._liquidSettings.set_int('top-bar-margin-bottom', 0);
+                    this._liquidSettings.set_int('top-bar-margin-left', 12);
+                    this._liquidSettings.set_int('top-bar-margin-right', 12);
+                } else {
+                    this._liquidSettings.set_double('top-bar-corner-radius', 0.0);
+                    this._liquidSettings.set_int('top-bar-margin-top', 0);
+                    this._liquidSettings.set_int('top-bar-margin-bottom', 0);
+                    this._liquidSettings.set_int('top-bar-margin-left', 0);
+                    this._liquidSettings.set_int('top-bar-margin-right', 0);
+                }
+            }
+
             this._liquidSettings.set_int('top-bar-padding-top', 0);
             this._liquidSettings.set_int('top-bar-padding-bottom', 0);
             this._liquidSettings.set_int('top-bar-padding-left', 0);
             this._liquidSettings.set_int('top-bar-padding-right', 0);
             this._liquidSettings.set_boolean('top-bar-enable-adaptive-text-color', false);
+
+            // Re-apply topbar module transparency styling
+            try { this._extension?._topbar?._applyPanelTransparency?.(); } catch (e) {}
 
             // Calendar & Date Menu
             this._liquidSettings.set_boolean('enable-menu-glass', true);
@@ -273,7 +301,15 @@ export class LiquidGlassController {
             'blur-chromatic-dispersion',
             'global-opacity',
             'corner-radius',
-            'dock-radius'
+            'dock-radius',
+            'topbar-blur',
+            'topbar-blur-radius',
+            'topbar-transparency',
+            'topbar-opaque',
+            'topbar-pill-style',
+            'blur-panel',
+            'blur-brightness',
+            'blur-sigma'
         ]) {
             const id = this._makSettings.connect(`changed::${key}`, sync);
             this._makSettingsIds.push(id);
