@@ -1663,10 +1663,14 @@
     border-color: transparent !important;
 }
 
-/* Dash to Dock's own background, only while it has glass. */
+/* Dock background, only while it has glass. */
 #dashtodockDashContainer.liquid-glass-transparent,
 .liquid-glass-transparent #dashtodockContainer,
-.liquid-glass-transparent .dash-background {
+.liquid-glass-transparent .dash-background,
+#makDockContainer.liquid-glass-transparent,
+.liquid-glass-transparent #makDockContainer,
+.liquid-glass-transparent .aqua-bg,
+#makDockContainer.liquid-glass-transparent .aqua-bg {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;

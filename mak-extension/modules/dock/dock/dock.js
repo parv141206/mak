@@ -1,6 +1,7 @@
 // Dock chrome actor hierarchy and GNOME Shell stage registration.
 
 import Clutter from 'gi://Clutter';
+import Gio from 'gi://Gio';
 import St from 'gi://St';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -102,15 +103,23 @@ export class DockChrome {
                 trackFullscreen: false,
             });
 
+            let liquidGlassActive = false;
             try {
-                this._glassPipeline = new GlassBlurPipeline(this._bg, this._container, {
-                    radius: 32,
-                    brightness: 0.75,
-                    cornerRadius: 20,
-                });
-            } catch (err) {
-                console.warn('[Mak Dock] GlassBlurPipeline init error:', err);
-                this._glassPipeline = null;
+                const makSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.mak' });
+                liquidGlassActive = makSettings.get_boolean('blur-liquid-glass');
+            } catch (e) {}
+
+            if (!liquidGlassActive) {
+                try {
+                    this._glassPipeline = new GlassBlurPipeline(this._bg, this._container, {
+                        radius: 32,
+                        brightness: 0.75,
+                        cornerRadius: 20,
+                    });
+                } catch (err) {
+                    console.warn('[Mak Dock] GlassBlurPipeline init error:', err);
+                    this._glassPipeline = null;
+                }
             }
         } catch (error) {
             this.destroy();

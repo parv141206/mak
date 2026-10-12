@@ -110,8 +110,13 @@ export class LiquidGlassController {
             }
         });
 
-        this._dashSearchId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1000, () => {
-            this._dashSearchId = 0;
+        // Search immediately, and check with short retries in case dock is initializing
+        this._findDocks();
+        this._dashSearchId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
+            this._findDocks();
+            return GLib.SOURCE_REMOVE;
+        });
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1200, () => {
             this._findDocks();
             return GLib.SOURCE_REMOVE;
         });
@@ -196,11 +201,23 @@ export class LiquidGlassController {
 
     _collectDockContainers() {
         const found = [];
+        // 1. Direct reference from Mak Dock module if available
+        try {
+            const docks = this._extension?._dock?._manager?._docks;
+            if (Array.isArray(docks)) {
+                for (const d of docks) {
+                    const c = d?._chrome?.container;
+                    if (c && !found.includes(c)) found.push(c);
+                }
+            }
+        } catch (e) {}
+
+        // 2. Traversal of uiGroup & chrome
         const walk = actor => {
-            if (actor === global.window_group) return;
+            if (!actor || actor === global.window_group) return;
             const name = actor.get_name();
-            if (name === 'makDockContainer' || name === 'dashtodockDashContainer') {
-                found.push(actor);
+            if (name === 'makDockContainer' || name === 'dashtodockDashContainer' || name === 'dashtodockContainer') {
+                if (!found.includes(actor)) found.push(actor);
                 return;
             }
             for (const child of actor.get_children()) {
