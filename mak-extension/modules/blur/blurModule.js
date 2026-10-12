@@ -8,12 +8,14 @@ import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import BlurMyShell from './bms/extension.js';
 import { NativeDynamicBlurEffect } from './bms/effects/native_dynamic_gaussian_blur.js';
 import { unpack_pipelines, pack_pipelines } from './bms/conveniences/pipeline_settings.js';
+import { LiquidGlassController } from './liquid/liquidGlassController.js';
 
 export class BlurModule {
     constructor(extension) {
         this._extension = extension;
         this._makSettings = extension.getSettings('org.gnome.shell.extensions.mak');
         this._bms = null;
+        this._liquidGlass = null;
         this._settingsChangedId = 0;
     }
 
@@ -150,8 +152,9 @@ export class BlurModule {
             const appfolderSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.appfolder' });
             const bmsSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell' });
 
+            const liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
             const isTopBarOpaque = this._makSettings.get_boolean('topbar-opaque');
-            const topbarBlur = !isTopBarOpaque && (this._makSettings.get_boolean('topbar-blur') || this._makSettings.get_boolean('blur-panel'));
+            const topbarBlur = !liquidGlass && !isTopBarOpaque && (this._makSettings.get_boolean('topbar-blur') || this._makSettings.get_boolean('blur-panel'));
             panelSettings.set_boolean('blur', topbarBlur);
             panelSettings.set_boolean('override-background', !isTopBarOpaque);
             overviewSettings.set_boolean('blur', this._makSettings.get_boolean('blur-overview'));
@@ -163,7 +166,6 @@ export class BlurModule {
             const noise = this._makSettings.get_double('blur-noise-amount');
             const refractionStrength = this._makSettings.get_double('blur-refraction-strength');
             const chromaticDispersion = this._makSettings.get_double('blur-chromatic-dispersion');
-            const liquidGlass = this._makSettings.get_boolean('blur-liquid-glass');
 
             // Apply sigma and brightness directly to individual component settings
             panelSettings.set_int('sigma', sigma);
@@ -177,7 +179,7 @@ export class BlurModule {
                 const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
                 appSettings.set_int('sigma', sigma);
                 appSettings.set_double('brightness', brightness);
-                appSettings.set_boolean('blur', true);
+                appSettings.set_boolean('blur', !liquidGlass);
                 appSettings.set_boolean('static-blur', false);
                 appSettings.set_boolean('enable-all', true);
                 appSettings.set_boolean('dynamic-opacity', false);
@@ -265,17 +267,32 @@ export class BlurModule {
                 console.warn('[Mak Blur] Error updating pipelines parameters:', pErr.message);
             }
 
-            // ── Pipeline assignment ──
-            // DummyPipeline (dynamic, static-blur=false) ignores pipeline string.
-            // RefractionEffect only activates via the static Pipeline path (static-blur=true).
+            // ── Liquid Glass Refraction Engine vs Native Frosted Blur ──
             panelSettings.set_boolean('unblur-in-overview', true);
 
             if (liquidGlass) {
-                panelSettings.set_boolean('static-blur', true);
-                popupSettings.set_boolean('static-blur', true);
-                panelSettings.set_string('pipeline', 'pipeline_liquid_glass');
-                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
+                // When hardware Liquid Glass is active, disable BMS panel, popup & application blur
+                // to avoid double-blur and let the Snell-law refraction engine take over
+                panelSettings.set_boolean('blur', false);
+                popupSettings.set_boolean('blur', false);
+                try {
+                    const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
+                    appSettings.set_boolean('blur', false);
+                } catch (e) {}
+                if (!this._liquidGlass) {
+                    this._liquidGlass = new LiquidGlassController(this._extension);
+                }
+                this._liquidGlass.enable();
             } else {
+                if (this._liquidGlass) {
+                    this._liquidGlass.disable();
+                }
+                panelSettings.set_boolean('blur', true);
+                popupSettings.set_boolean('blur', true);
+                try {
+                    const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
+                    appSettings.set_boolean('blur', true);
+                } catch (e) {}
                 panelSettings.set_boolean('static-blur', false);
                 popupSettings.set_boolean('static-blur', false);
                 panelSettings.set_string('pipeline', 'pipeline_default');
@@ -286,6 +303,7 @@ export class BlurModule {
                 try {
                     this._bms._panel_blur?.reset();
                     this._bms._popup?.reset();
+                    this._bms._applications?.reset();
                 } catch (e) {}
             }
         } catch (err) {
@@ -297,6 +315,11 @@ export class BlurModule {
         if (this._settingsChangedId) {
             try { this._makSettings.disconnect(this._settingsChangedId); } catch (e) {}
             this._settingsChangedId = 0;
+        }
+
+        if (this._liquidGlass) {
+            try { this._liquidGlass.disable(); } catch (e) {}
+            this._liquidGlass = null;
         }
 
         if (this._bms) {

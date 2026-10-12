@@ -1643,3 +1643,260 @@
 
 
 
+/* Clears the shell's own background from a surface that gets glass. */
+.liquid-glass-transparent,
+.liquid-glass-transparent-keep-border {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    background-image: none !important;
+
+    /* The open and close animations are driven from JavaScript. */
+    transition: none !important;
+    transition-duration: 0ms !important;
+}
+
+.liquid-glass-transparent {
+    border: none !important;
+}
+
+.liquid-glass-transparent-keep-border {
+    border-color: transparent !important;
+}
+
+/* Dash to Dock's own background, only while it has glass. */
+#dashtodockDashContainer.liquid-glass-transparent,
+.liquid-glass-transparent #dashtodockContainer,
+.liquid-glass-transparent .dash-background {
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Plain calendar days; today and interactive states keep their theme style. */
+.liquid-glass-transparent .calendar-day:not(.calendar-today):not(:hover):not(:active):not(:focus):not(:checked) {
+    background-color: transparent !important;
+    background-image: none !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Calendar menu: the calendar sits on a translucent rounded card. */
+.liquid-glass-menu-root .calendar {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+    border-radius: 24px !important;
+    padding: 12px !important;
+    margin: 4px !important;
+}
+
+.liquid-glass-menu-root StButton,
+.liquid-glass-menu-root StLabel {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}
+
+.liquid-glass-menu-root StButton:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.liquid-glass-menu-root StButton:active,
+.liquid-glass-menu-root StButton:checked,
+.liquid-glass-menu-root StButton:focus {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Today is drawn as a circle in every state. */
+.liquid-glass-menu-root .calendar-today,
+.liquid-glass-menu-root .calendar-today:hover,
+.liquid-glass-menu-root .calendar-today:active,
+.liquid-glass-menu-root .calendar-today:checked,
+.liquid-glass-menu-root .calendar-today:focus {
+    border-radius: 99px !important;
+}
+
+/* Notification, events and world clock cards. These come after the rules
+   above so they win over the transparent buttons. */
+.liquid-glass-menu-root .events-button,
+.liquid-glass-menu-root .world-clocks-button {
+    background-color: rgba(51, 51, 51, 0.8) !important;
+    border-radius: 16px !important;
+    margin-bottom: 6px !important;
+}
+
+.liquid-glass-menu-root .message {
+    background-color: rgba(51, 51, 51, 0.8) !important;
+    border-radius: 24px !important;
+    margin-bottom: 6px !important;
+}
+
+.liquid-glass-menu-root .message:hover,
+.liquid-glass-menu-root .message:focus,
+.liquid-glass-menu-root .events-button:hover,
+.liquid-glass-menu-root .events-button:focus,
+.liquid-glass-menu-root .world-clocks-button:hover,
+.liquid-glass-menu-root .world-clocks-button:focus {
+    background-color: rgba(65, 65, 65, 0.8) !important;
+}
+
+/* Quick Settings sliders sit on a translucent card. */
+.liquid-glass-qs-root .quick-slider {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-radius: 20px !important;
+    padding: 24px 24px !important;
+    margin-bottom: 8px !important;
+    box-shadow: none !important;
+}
+
+/* Desktop widgets. The card's glass is drawn behind it; the colours here are
+   the starting point that automatic text contrast adjusts. */
+.liquid-glass-desktop-card {
+    padding: 16px 18px;
+    spacing: 8px;
+    color: #ffffff;
+}
+
+.liquid-glass-desktop-card .lg-title {
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+.liquid-glass-desktop-card .lg-big {
+    font-size: 30pt;
+    font-weight: 300;
+    padding: 0 10px;
+}
+
+.liquid-glass-desktop-card .lg-dim {
+    font-size: 10pt;
+}
+
+.liquid-glass-desktop-card .lg-small {
+    font-size: 9pt;
+}
+
+.liquid-glass-desktop-card .lg-row,
+.liquid-glass-desktop-card .lg-event {
+    spacing: 10px;
+}
+
+.liquid-glass-desktop-card .lg-hour,
+.liquid-glass-desktop-card .lg-list {
+    spacing: 4px;
+}
+
+.liquid-glass-desktop-card .lg-event-time {
+    font-feature-settings: "tnum";
+    min-width: 64px;
+    font-size: 10pt;
+    font-weight: bold;
+}
+
+.liquid-glass-desktop-card .lg-heading {
+    padding-top: 6px;
+    font-weight: bold;
+}
+
+.liquid-glass-desktop-card .lg-controls {
+    spacing: 18px;
+}
+
+.liquid-glass-desktop-card .lg-control {
+    padding: 6px;
+    border-radius: 99px;
+}
+
+.liquid-glass-desktop-card .lg-control:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.liquid-glass-clock-date {
+    color: #ffffff;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+/* The frame a desktop item is moved and resized with. */
+.liquid-glass-edit-frame {
+    border: 2px solid #3584e4;
+    border-radius: 12px;
+    background-color: rgba(53, 132, 228, 0.08);
+}
+
+.liquid-glass-edit-handle {
+    border: 2px solid #3584e4;
+    border-radius: 7px;
+    background-color: #ffffff;
+}
+
+.liquid-glass-edit-guide {
+    color: #ff4f8b;
+}
+
+.liquid-glass-edit-done {
+    padding: 6px 18px;
+    border-radius: 99px;
+    color: #ffffff;
+    font-weight: bold;
+    background-color: #3584e4;
+}
+
+.liquid-glass-edit-done:hover {
+    background-color: #4a90e8;
+}
+
+/* The launcher: a search field and its results on one sheet of glass. */
+.liquid-glass-launcher {
+    padding: 10px;
+    spacing: 6px;
+    color: #ffffff;
+}
+
+.liquid-glass-launcher .lg-launcher-entry {
+    font-size: 16pt;
+    padding: 10px 14px;
+    border-radius: 18px;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: inherit;
+    caret-color: inherit;
+    selected-color: #ffffff;
+}
+
+.liquid-glass-launcher .lg-launcher-entry .hint-text {
+    color: inherit;
+}
+
+.liquid-glass-launcher .lg-launcher-entry-icon {
+    icon-size: 22px;
+    padding-right: 10px;
+}
+
+.liquid-glass-launcher .lg-launcher-list {
+    spacing: 2px;
+}
+
+.liquid-glass-launcher .lg-launcher-result {
+    padding: 8px 12px;
+    border-radius: 16px;
+    color: inherit;
+    background-color: transparent;
+}
+
+.liquid-glass-launcher .lg-launcher-result:selected {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.liquid-glass-launcher .lg-launcher-result-box {
+    spacing: 12px;
+}
+
+.liquid-glass-launcher .lg-launcher-name {
+    font-size: 12pt;
+    font-weight: bold;
+}
+
+.liquid-glass-launcher .lg-launcher-detail {
+    font-size: 9.5pt;
+}
