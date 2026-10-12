@@ -1351,6 +1351,13 @@ def generate_nautilus_override(is_dark=True):
 }}
 
 /* Column Header Titles: Name, Size, Modified */
+columnview header,
+columnview header > button,
+columnview header button,
+columnview.view > header > button,
+treeview.view > header > button,
+.nautilus-window columnview header,
+.nautilus-window columnview header > button,
 .nautilus-window columnview header button,
 .nautilus-window columnview header button label {{
     color: {text_secondary};
@@ -1359,6 +1366,33 @@ def generate_nautilus_override(is_dark=True):
     letter-spacing: 0.3px;
     border: none;
     background: transparent;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    padding: 4px 8px;
+    min-height: 24px;
+}}
+
+columnview header > button:hover,
+columnview header button:hover,
+columnview.view > header > button:hover,
+treeview.view > header > button:hover,
+.nautilus-window columnview header button:hover {{
+    background: transparent;
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: none;
+    box-shadow: none;
+    color: {text_primary};
+}}
+
+columnview header > button:active,
+columnview header button:active,
+columnview.view > header > button:active,
+treeview.view > header > button:active,
+.nautilus-window columnview header button:active {{
+    background: transparent;
+    background-color: rgba(255, 255, 255, 0.08);
+    background-image: none;
     box-shadow: none;
 }}
 
@@ -1411,12 +1445,14 @@ def generate_nautilus_override(is_dark=True):
     color: #f5a623;
 }}
 
-/* Pathbar Pills */
+/* Pathbar Pills & Action Buttons */
 .nautilus-window .nautilus-pathbar button {{
     border-radius: 6px;
-    background-color: {path_btn_bg};
-    border: 1px solid {border_color};
-    padding: 3px 10px;
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    padding: 3px 8px;
     min-height: 26px;
     color: {text_primary};
     box-shadow: none;
@@ -1529,6 +1565,8 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
 }}
 
 /* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, square squircle, gentle hover) */
+window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 headerbar menubutton > button,
@@ -1537,9 +1575,10 @@ headerbar menubutton.flat > button,
 tab button,
 .sidebar button,
 popover button:not(.suggested-action):not(.destructive-action) {{
+    background: transparent;
     background-color: transparent;
     background-image: none;
-    border: 1px solid transparent;
+    border: none;
     box-shadow: none;
     border-radius: 6px;
     color: {btn_fg};
@@ -1550,6 +1589,8 @@ popover button:not(.suggested-action):not(.destructive-action) {{
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
+window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
 headerbar menubutton > button:hover,
@@ -1560,10 +1601,12 @@ tab button:hover,
 popover button:not(.suggested-action):not(.destructive-action):hover {{
     background-color: {hover_subtle};
     background-image: none;
-    border-color: transparent;
+    border: none;
     box-shadow: none;
 }}
 
+window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
 headerbar menubutton > button:active,
@@ -1599,7 +1642,7 @@ headerbar splitbutton,
     border: none;
     box-shadow: none;
     border-radius: 6px;
-    margin: 0 4px;
+    margin: 0 2px;
     padding: 0;
 }}
 
@@ -1609,9 +1652,9 @@ headerbar splitbutton > menubutton > button {{
     min-width: 28px;
     padding: 4px 6px;
     border-radius: 6px;
-    background-color: {pill_bg};
+    background-color: transparent;
     background-image: none;
-    border: 1px solid {pill_border};
+    border: none;
     box-shadow: none;
     color: {btn_fg};
     transition: background-color 80ms ease;
@@ -1619,14 +1662,14 @@ headerbar splitbutton > menubutton > button {{
 
 headerbar splitbutton > button:hover,
 headerbar splitbutton > menubutton > button:hover {{
-    background-color: {pill_hover};
+    background-color: {hover_subtle};
     background-image: none;
     box-shadow: none;
 }}
 
 headerbar splitbutton > button:active,
 headerbar splitbutton > menubutton > button:active {{
-    background-color: {pill_active};
+    background-color: {active_subtle};
     background-image: none;
     box-shadow: none;
 }}
@@ -1635,7 +1678,6 @@ headerbar splitbutton > button:dir(ltr),
 headerbar splitbutton > menubutton > button:dir(rtl) {{
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right-width: 0;
     margin-right: 0;
 }}
 
@@ -1643,7 +1685,6 @@ headerbar splitbutton > menubutton > button:dir(ltr),
 headerbar splitbutton > button:dir(rtl) {{
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    border-left: 1px solid {pill_border};
     margin-left: 0;
 }}
 
@@ -1651,13 +1692,15 @@ headerbar splitbutton > button:dir(rtl) {{
 headerbar .linked > button,
 headerbar .linked > menubutton > button,
 headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
-headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
+headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button,
+headerbar box.linked > button,
+headerbar box.linked > menubutton > button {{
     min-height: 28px;
     min-width: 28px;
     padding: 4px 6px;
-    background-color: {pill_bg};
+    background-color: transparent;
     background-image: none;
-    border: 1px solid {pill_border};
+    border: none;
     box-shadow: none;
     border-radius: 6px;
     color: {btn_fg};
@@ -1667,23 +1710,36 @@ headerbar > windowhandle > box > widget > box.start > box > stack > widget > box
 headerbar .linked > button:hover,
 headerbar .linked > menubutton > button:hover,
 headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
-headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
-    background-color: {pill_hover};
+headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
+headerbar box.linked > button:hover,
+headerbar box.linked > menubutton > button:hover {{
+    background-color: {hover_subtle};
     background-image: none;
     box-shadow: none;
 }}
 
-headerbar .linked > button:dir(ltr):not(:last-child) {{
+headerbar .linked > button:active,
+headerbar .linked > menubutton > button:active,
+headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:active,
+headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:active,
+headerbar box.linked > button:active,
+headerbar box.linked > menubutton > button:active {{
+    background-color: {active_subtle};
+    background-image: none;
+    box-shadow: none;
+}}
+
+headerbar .linked > button:dir(ltr):not(:last-child),
+headerbar box.linked > button:dir(ltr):not(:last-child) {{
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
-    border-right-width: 0;
     margin-right: 0;
 }}
 
-headerbar .linked > button:dir(ltr):not(:first-child) {{
+headerbar .linked > button:dir(ltr):not(:first-child),
+headerbar box.linked > button:dir(ltr):not(:first-child) {{
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    border-left: 1px solid {pill_border};
     margin-left: 0;
 }}
 
@@ -1691,7 +1747,7 @@ headerbar .linked > button:dir(ltr):not(:first-child) {{
 button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     background-color: transparent;
     background-image: none;
-    border: 1px solid transparent;
+    border: none;
     box-shadow: none;
     border-radius: 6px;
     transition: background-color 80ms ease, color 80ms ease;
