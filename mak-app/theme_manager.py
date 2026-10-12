@@ -393,6 +393,24 @@ headerbar windowcontrols,
     box-shadow: none;
 }}
 
+windowcontrols.start,
+headerbar windowcontrols.start,
+.titlebar windowcontrols.start,
+headerbar windowcontrols:first-child,
+.titlebar windowcontrols:first-child {{
+    margin-left: 12px;
+    margin-right: 18px;
+}}
+
+windowcontrols.end,
+headerbar windowcontrols.end,
+.titlebar windowcontrols.end,
+headerbar windowcontrols:last-child,
+.titlebar windowcontrols:last-child {{
+    margin-right: 12px;
+    margin-left: 18px;
+}}
+
 /* Universal Chrome, Chromium, Brave & Electron solid titlebar background */
 headerbar.header-bar.titlebar {{
     padding-left: 14px;
@@ -1016,12 +1034,12 @@ window.solid-csd {{
 
 window.csd:not(.fullscreen):not(.tiled):not(.maximized),
 window.background.csd:not(.fullscreen):not(.tiled):not(.maximized) {{
-    box-shadow: {window_shadow} !important;
+    box-shadow: {window_shadow};
 }}
 
 window.csd:not(.fullscreen):not(.tiled):not(.maximized):backdrop,
 window.background.csd:not(.fullscreen):not(.tiled):not(.maximized):backdrop {{
-    box-shadow: {backdrop_shadow} !important;
+    box-shadow: {backdrop_shadow};
 }}
 
 window.csd.maximized,
@@ -1100,7 +1118,7 @@ window.background.csd.fullscreen,
 window.fullscreen.csd {{
     border-radius: 0;
     outline: none;
-    box-shadow: none !important;
+    box-shadow: none;
     border: none;
 }}
 
@@ -1135,29 +1153,29 @@ popover.menu,
 popover.menu.background,
 popover.menu:backdrop,
 popover:backdrop {{
-    background: transparent !important;
-    background-color: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-    padding: 0 !important;
+    background: transparent;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
 }}
 
 popover > contents,
 popover.menu > contents,
 popover.menu.background > contents {{
-    background-color: @popover_bg_color !important;
-    color: @popover_fg_color !important;
-    border-radius: 10px !important;
-    border: 1px solid {border_color} !important;
-    box-shadow: {shadow} !important;
-    padding: 5px !important;
+    background-color: @popover_bg_color;
+    color: @popover_fg_color;
+    border-radius: 10px;
+    border: 1px solid {border_color};
+    box-shadow: {shadow};
+    padding: 5px;
 }}
 
 popover > arrow,
 popover.menu > arrow {{
-    background-color: @popover_bg_color !important;
-    border: 1px solid {border_color} !important;
-    box-shadow: none !important;
+    background-color: @popover_bg_color;
+    border: 1px solid {border_color};
+    box-shadow: none;
 }}
 
 popover modelbutton,
@@ -1166,12 +1184,12 @@ popover listview > row,
 popover list > row,
 row.combo popover listview > row,
 row.combo popover list > row {{
-    border-radius: 6px !important;
-    min-height: 28px !important;
-    padding: 5px 10px !important;
-    margin: 1px 2px !important;
-    color: {text_color} !important;
-    font-size: 13px !important;
+    border-radius: 6px;
+    min-height: 28px;
+    padding: 5px 10px;
+    margin: 1px 2px;
+    color: {text_color};
+    font-size: 13px;
 }}
 
 popover modelbutton:hover,
@@ -1182,8 +1200,8 @@ popover listview > row:hover,
 popover list > row:hover,
 row.combo popover listview > row:hover,
 row.combo popover list > row:hover {{
-    background-color: {hover_bg} !important;
-    color: {text_color} !important;
+    background-color: {hover_bg};
+    color: {text_color};
 }}
 
 popover modelbutton:selected,
@@ -1192,9 +1210,9 @@ popover listview > row:selected,
 popover list > row:selected,
 row.combo popover listview > row:selected,
 row.combo popover list > row:selected {{
-    background-color: {selected_bg} !important;
-    color: {text_color} !important;
-    font-weight: 500 !important;
+    background-color: {selected_bg};
+    color: {text_color};
+    font-weight: 500;
 }}
 
 popover check,
@@ -1202,12 +1220,12 @@ popover radio,
 popover check:checked,
 popover radio:checked,
 popover image {{
-    color: inherit !important;
+    color: inherit;
 }}
 
 popover separator {{
-    margin: 4px 2px !important;
-    background-color: {border_color} !important;
+    margin: 4px 2px;
+    background-color: {border_color};
 }}
 """
 
@@ -1228,7 +1246,7 @@ def generate_nautilus_override(is_dark=True):
     return f"""
 /* ── macOS Finder (Nautilus) Elegant Native Styling ──────────────────────── */
 .nautilus-window {{
-    background-color: @window_bg_color !important;
+    background-color: @window_bg_color;
 }}
 
 /* Seamless Sidebar: completely eliminate 6px black outline & gap */
@@ -1242,69 +1260,69 @@ def generate_nautilus_override(is_dark=True):
 #NautilusFileChooser .sidebar-pane:dir(ltr),
 #NautilusFileChooser .sidebar-pane:dir(rtl),
 #NautilusFileChooser .sidebar-pane:backdrop {{
-    box-shadow: none !important;
-    background-color: @sidebar_bg_color !important;
-    border-right: 1px solid {border_color} !important;
+    box-shadow: none;
+    background-color: @sidebar_bg_color;
+    border-right: 1px solid {border_color};
 }}
 
 .nautilus-window .sidebar-pane placessidebar,
 #NautilusFileChooser .sidebar-pane placessidebar,
 .nautilus-window placessidebar {{
-    background: transparent !important;
-    background-color: transparent !important;
+    background: transparent;
+    background-color: transparent;
 }}
 
 /* Sidebar Rows */
 .nautilus-window .sidebar-pane placessidebar row,
 .nautilus-window placessidebar row,
 .nautilus-window .navigation-sidebar > row {{
-    border-radius: 6px !important;
-    margin: 1px 8px !important;
-    padding: 6px 10px !important;
-    min-height: 28px !important;
-    color: {text_sidebar} !important;
-    transition: background-color 80ms ease, color 80ms ease !important;
+    border-radius: 6px;
+    margin: 1px 8px;
+    padding: 6px 10px;
+    min-height: 28px;
+    color: {text_sidebar};
+    transition: background-color 80ms ease, color 80ms ease;
 }}
 
 .nautilus-window .sidebar-pane placessidebar row label,
 .nautilus-window placessidebar row label,
 .nautilus-window .navigation-sidebar > row label {{
-    color: {text_sidebar} !important;
+    color: {text_sidebar};
 }}
 
 .nautilus-window .sidebar-pane placessidebar row image,
 .nautilus-window placessidebar row image,
 .nautilus-window .navigation-sidebar > row image {{
-    color: {icon_sidebar} !important;
+    color: {icon_sidebar};
 }}
 
 /* Sidebar Row Hover */
 .nautilus-window .sidebar-pane placessidebar row:hover,
 .nautilus-window placessidebar row:hover,
 .nautilus-window .navigation-sidebar > row:hover {{
-    background-color: {sidebar_hover_bg} !important;
-    color: {text_primary} !important;
+    background-color: {sidebar_hover_bg};
+    color: {text_primary};
 }}
 
 .nautilus-window .sidebar-pane placessidebar row:hover label,
 .nautilus-window .sidebar-pane placessidebar row:hover image,
 .nautilus-window placessidebar row:hover label,
 .nautilus-window placessidebar row:hover image {{
-    color: {text_primary} !important;
+    color: {text_primary};
 }}
 
-/* Selected Sidebar Row (Home, Downloads, etc.): Crisp White Text & Icon on Translucent Pill */
+/* Selected Sidebar Row */
 .nautilus-window .sidebar-pane placessidebar row:selected,
 .nautilus-window placessidebar row:selected,
 .nautilus-window .navigation-sidebar > row:selected,
 .nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
 #NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected {{
-    background-color: {sidebar_selected_bg} !important;
-    color: {text_primary} !important;
-    font-weight: 500 !important;
-    box-shadow: none !important;
-    outline: none !important;
-    border: none !important;
+    background-color: {sidebar_selected_bg};
+    color: {text_primary};
+    font-weight: 500;
+    box-shadow: none;
+    outline: none;
+    border: none;
 }}
 
 .nautilus-window .sidebar-pane placessidebar row:selected label,
@@ -1313,14 +1331,14 @@ def generate_nautilus_override(is_dark=True):
 .nautilus-window placessidebar row:selected image,
 .nautilus-window .navigation-sidebar > row:selected label,
 .nautilus-window .navigation-sidebar > row:selected image {{
-    color: {text_primary} !important;
-    font-weight: 500 !important;
+    color: {text_primary};
+    font-weight: 500;
 }}
 
 /* Content Pane (Files View) */
 .nautilus-window .content-pane,
 #NautilusFileChooser .content-pane {{
-    background-color: @view_bg_color !important;
+    background-color: @view_bg_color;
 }}
 
 .nautilus-window .view,
@@ -1328,83 +1346,85 @@ def generate_nautilus_override(is_dark=True):
 .nautilus-window columnview,
 .nautilus-window .nautilus-list-view,
 .nautilus-window .nautilus-grid-view {{
-    background-color: @view_bg_color !important;
-    color: @view_fg_color !important;
+    background-color: @view_bg_color;
+    color: @view_fg_color;
 }}
 
 /* Column Header Titles: Name, Size, Modified */
 .nautilus-window columnview header button,
 .nautilus-window columnview header button label {{
-    color: {text_secondary} !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.3px !important;
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
+    color: {text_secondary};
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    border: none;
+    background: transparent;
+    box-shadow: none;
 }}
 
 /* List View Alternating Rows & Spacing */
 .nautilus-window .nautilus-list-view listview.view > row.activatable {{
-    padding: 5px 8px !important;
-    border-radius: 5px !important;
-    margin: 1px 4px !important;
+    padding: 5px 8px;
+    border-radius: 5px;
+    margin: 1px 4px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even) {{
-    background-color: transparent !important;
+    background-color: transparent;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover) {{
-    background-color: {alt_row_bg} !important;
+    background-color: {alt_row_bg};
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:hover {{
-    background-color: {row_hover_bg} !important;
+    background-color: {row_hover_bg};
 }}
 
-/* Selected File Row: Clean macOS Blue / Accent Highlight with Pure White Text */
+/* Selected File Row */
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected,
 .nautilus-window .nautilus-grid-view child.activatable:selected {{
-    background-color: @accent_bg_color !important;
-    color: #ffffff !important;
-    border-radius: 5px !important;
+    background-color: @accent_bg_color;
+    color: #ffffff;
+    border-radius: 5px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label,
 .nautilus-window .nautilus-grid-view child.activatable:selected label {{
-    color: #ffffff !important;
+    color: #ffffff;
 }}
 
-/* Subtitle / Dim labels (334 items, Today, 5:13 PM) */
+/* Subtitle / Dim labels */
 .nautilus-window .dim-label,
 .nautilus-window label.subtitle,
 .nautilus-window cell label:not(:first-child) {{
-    color: {text_secondary} !important;
+    color: {text_secondary};
 }}
 
 /* Star / Favorite Icon */
 .nautilus-window cell button.star image {{
-    color: {text_secondary} !important;
+    color: {text_secondary};
 }}
 
 .nautilus-window cell button.star:checked image {{
-    color: #f5a623 !important;
+    color: #f5a623;
 }}
 
 /* Pathbar Pills */
 .nautilus-window .nautilus-pathbar button {{
-    border-radius: 6px !important;
-    background-color: {path_btn_bg} !important;
-    border: 1px solid {border_color} !important;
-    padding: 3px 10px !important;
-    color: {text_primary} !important;
+    border-radius: 6px;
+    background-color: {path_btn_bg};
+    border: 1px solid {border_color};
+    padding: 3px 10px;
+    min-height: 26px;
+    color: {text_primary};
+    box-shadow: none;
 }}
 
 .nautilus-window .nautilus-pathbar button:hover {{
-    background-color: {path_btn_hover} !important;
+    background-color: {path_btn_hover};
+    box-shadow: none;
 }}
 """
 
@@ -1412,20 +1432,24 @@ def generate_nautilus_override(is_dark=True):
 
 def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     if not is_dark:
-        btn_bg = "rgba(255, 255, 255, 0.75)" if is_glassy else "#ffffff"
-        btn_hover = "rgba(255, 255, 255, 0.95)" if is_glassy else "#f5f5f7"
-        btn_active = "rgba(225, 225, 230, 0.85)" if is_glassy else "#e5e5ea"
-        btn_border = "rgba(0, 0, 0, 0.12)"
-        btn_border_hover = "rgba(0, 0, 0, 0.20)"
+        btn_bg = "rgba(0, 0, 0, 0.05)" if is_glassy else "#f0f0f4"
+        btn_hover = "rgba(0, 0, 0, 0.09)" if is_glassy else "#e4e4ea"
+        btn_active = "rgba(0, 0, 0, 0.14)" if is_glassy else "#d8d8e0"
+        btn_border = "rgba(0, 0, 0, 0.10)"
+        btn_border_hover = "rgba(0, 0, 0, 0.18)"
         btn_fg = "#1d1d1f"
         dim_label = "rgba(0, 0, 0, 0.50)"
         entry_bg = "rgba(255, 255, 255, 0.65)" if is_glassy else "#ffffff"
         entry_border = "rgba(0, 0, 0, 0.12)"
         entry_border_hover = "rgba(0, 0, 0, 0.24)"
-        hover_subtle = "rgba(0, 0, 0, 0.05)"
-        active_subtle = "rgba(0, 0, 0, 0.09)"
+        hover_subtle = "rgba(0, 0, 0, 0.06)"
+        active_subtle = "rgba(0, 0, 0, 0.12)"
         switch_off_bg = "rgba(0, 0, 0, 0.15)"
         scale_trough_bg = "rgba(0, 0, 0, 0.12)"
+        pill_bg = "rgba(0, 0, 0, 0.06)"
+        pill_hover = "rgba(0, 0, 0, 0.10)"
+        pill_active = "rgba(0, 0, 0, 0.15)"
+        pill_border = "rgba(0, 0, 0, 0.08)"
     elif is_amoled:
         btn_bg = "rgba(255, 255, 255, 0.08)" if is_glassy else "#161618"
         btn_hover = "rgba(255, 255, 255, 0.15)" if is_glassy else "#222226"
@@ -1437,91 +1461,48 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         entry_bg = "rgba(0, 0, 0, 0.40)" if is_glassy else "#0a0a0c"
         entry_border = "rgba(255, 255, 255, 0.14)"
         entry_border_hover = "rgba(255, 255, 255, 0.28)"
-        hover_subtle = "rgba(255, 255, 255, 0.07)"
-        active_subtle = "rgba(255, 255, 255, 0.13)"
+        hover_subtle = "rgba(255, 255, 255, 0.08)"
+        active_subtle = "rgba(255, 255, 255, 0.16)"
         switch_off_bg = "rgba(255, 255, 255, 0.18)"
         scale_trough_bg = "rgba(255, 255, 255, 0.14)"
+        pill_bg = "rgba(255, 255, 255, 0.08)"
+        pill_hover = "rgba(255, 255, 255, 0.14)"
+        pill_active = "rgba(255, 255, 255, 0.20)"
+        pill_border = "rgba(255, 255, 255, 0.10)"
     else:
-        btn_bg = "rgba(255, 255, 255, 0.10)" if is_glassy else "#323236"
-        btn_hover = "rgba(255, 255, 255, 0.16)" if is_glassy else "#3e3e44"
-        btn_active = "rgba(255, 255, 255, 0.24)" if is_glassy else "#4a4a52"
-        btn_border = "rgba(255, 255, 255, 0.14)"
-        btn_border_hover = "rgba(255, 255, 255, 0.26)"
+        btn_bg = "rgba(255, 255, 255, 0.10)" if is_glassy else "#2e2e32"
+        btn_hover = "rgba(255, 255, 255, 0.16)" if is_glassy else "#3a3a40"
+        btn_active = "rgba(255, 255, 255, 0.24)" if is_glassy else "#46464e"
+        btn_border = "rgba(255, 255, 255, 0.12)"
+        btn_border_hover = "rgba(255, 255, 255, 0.24)"
         btn_fg = "#f5f5f7"
         dim_label = "rgba(255, 255, 255, 0.50)"
         entry_bg = "rgba(0, 0, 0, 0.28)" if is_glassy else "#1e1e20"
         entry_border = "rgba(255, 255, 255, 0.14)"
         entry_border_hover = "rgba(255, 255, 255, 0.26)"
-        hover_subtle = "rgba(255, 255, 255, 0.08)"
-        active_subtle = "rgba(255, 255, 255, 0.14)"
+        hover_subtle = "rgba(255, 255, 255, 0.09)"
+        active_subtle = "rgba(255, 255, 255, 0.16)"
         switch_off_bg = "rgba(255, 255, 255, 0.20)"
         scale_trough_bg = "rgba(255, 255, 255, 0.16)"
+        pill_bg = "rgba(255, 255, 255, 0.08)"
+        pill_hover = "rgba(255, 255, 255, 0.14)"
+        pill_active = "rgba(255, 255, 255, 0.20)"
+        pill_border = "rgba(255, 255, 255, 0.10)"
 
     return f"""
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
-/* 1. Headerbar & Toolbar Flat Buttons (macOS Finder / Libadwaita standard) */
-headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
-.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
-headerbar menubutton > button,
-.titlebar menubutton > button,
-tab button,
-.sidebar button,
-popover button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised) {{
-    background-color: transparent !important;
-    background-image: none !important;
-    border: 1px solid transparent !important;
-    box-shadow: none !important;
-    border-radius: 6px !important;
-    color: {btn_fg} !important;
-    transition: background-color 80ms ease, color 80ms ease !important;
-}}
-
-headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
-.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
-headerbar menubutton > button:hover,
-.titlebar menubutton > button:hover,
-tab button:hover,
-.sidebar button:hover,
-popover button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):hover {{
-    background-color: {hover_subtle} !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-}}
-
-headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
-.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
-headerbar menubutton > button:active,
-.titlebar menubutton > button:active,
-tab button:active,
-.sidebar button:active,
-popover button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):active {{
-    background-color: {active_subtle} !important;
-    border-color: transparent !important;
-    box-shadow: none !important;
-}}
-
-headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
-.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
-headerbar menubutton > button:checked,
-.titlebar menubutton > button:checked,
-tab button:checked {{
-    background-color: {active_subtle} !important;
-    border-color: transparent !important;
-    color: @accent_bg_color !important;
-    box-shadow: none !important;
-}}
-
-/* 2. Default In-Window Push Buttons */
+/* 1. Universal In-Window Push Buttons (Dialogs, content pages, settings) */
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button) {{
     background-color: {btn_bg};
+    background-image: none;
     border: 1px solid {btn_border};
     color: {btn_fg};
     border-radius: 6px;
-    padding: 5px 12px;
-    min-height: 24px;
+    padding: 4px 12px;
+    min-height: 26px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: background-color 100ms ease, border-color 100ms ease, box-shadow 100ms ease, color 100ms ease;
+    transition: background-color 80ms ease, border-color 80ms ease, color 80ms ease;
 }}
 
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):hover {{
@@ -1547,9 +1528,169 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
     box-shadow: none;
 }}
 
-/* 3. Flat Buttons */
+/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, square squircle, gentle hover) */
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+headerbar menubutton > button,
+.titlebar menubutton > button,
+headerbar menubutton.flat > button,
+tab button,
+.sidebar button,
+popover button:not(.suggested-action):not(.destructive-action) {{
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid transparent;
+    box-shadow: none;
+    border-radius: 6px;
+    color: {btn_fg};
+    min-height: 28px;
+    min-width: 28px;
+    padding: 4px;
+    margin: 0 2px;
+    transition: background-color 80ms ease, color 80ms ease;
+}}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+headerbar menubutton > button:hover,
+.titlebar menubutton > button:hover,
+headerbar menubutton.flat > button:hover,
+tab button:hover,
+.sidebar button:hover,
+popover button:not(.suggested-action):not(.destructive-action):hover {{
+    background-color: {hover_subtle};
+    background-image: none;
+    border-color: transparent;
+    box-shadow: none;
+}}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+headerbar menubutton > button:active,
+.titlebar menubutton > button:active,
+headerbar menubutton.flat > button:active,
+tab button:active,
+.sidebar button:active,
+popover button:not(.suggested-action):not(.destructive-action):active {{
+    background-color: {active_subtle};
+    background-image: none;
+    border-color: transparent;
+    box-shadow: none;
+}}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
+headerbar menubutton > button:checked,
+.titlebar menubutton > button:checked,
+headerbar menubutton.flat > button:checked,
+tab button:checked {{
+    background-color: {active_subtle};
+    background-image: none;
+    border-color: transparent;
+    color: @accent_bg_color;
+    box-shadow: none;
+}}
+
+/* 3. Headerbar Split Buttons (e.g. Console '+ | v' tab button) */
+headerbar splitbutton,
+.titlebar splitbutton {{
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 6px;
+    margin: 0 4px;
+    padding: 0;
+}}
+
+headerbar splitbutton > button,
+headerbar splitbutton > menubutton > button {{
+    min-height: 28px;
+    min-width: 28px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    background-color: {pill_bg};
+    background-image: none;
+    border: 1px solid {pill_border};
+    box-shadow: none;
+    color: {btn_fg};
+    transition: background-color 80ms ease;
+}}
+
+headerbar splitbutton > button:hover,
+headerbar splitbutton > menubutton > button:hover {{
+    background-color: {pill_hover};
+    background-image: none;
+    box-shadow: none;
+}}
+
+headerbar splitbutton > button:active,
+headerbar splitbutton > menubutton > button:active {{
+    background-color: {pill_active};
+    background-image: none;
+    box-shadow: none;
+}}
+
+headerbar splitbutton > button:dir(ltr),
+headerbar splitbutton > menubutton > button:dir(rtl) {{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+    margin-right: 0;
+}}
+
+headerbar splitbutton > menubutton > button:dir(ltr),
+headerbar splitbutton > button:dir(rtl) {{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 1px solid {pill_border};
+    margin-left: 0;
+}}
+
+/* 4. Headerbar Linked Button Groups (e.g. Nautilus '< | >' history buttons) */
+headerbar .linked > button,
+headerbar .linked > menubutton > button,
+headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
+headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
+    min-height: 28px;
+    min-width: 28px;
+    padding: 4px 6px;
+    background-color: {pill_bg};
+    background-image: none;
+    border: 1px solid {pill_border};
+    box-shadow: none;
+    border-radius: 6px;
+    color: {btn_fg};
+    transition: background-color 80ms ease;
+}}
+
+headerbar .linked > button:hover,
+headerbar .linked > menubutton > button:hover,
+headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
+headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
+    background-color: {pill_hover};
+    background-image: none;
+    box-shadow: none;
+}}
+
+headerbar .linked > button:dir(ltr):not(:last-child) {{
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right-width: 0;
+    margin-right: 0;
+}}
+
+headerbar .linked > button:dir(ltr):not(:first-child) {{
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: 1px solid {pill_border};
+    margin-left: 0;
+}}
+
+/* 5. Flat Buttons */
 button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     background-color: transparent;
+    background-image: none;
     border: 1px solid transparent;
     box-shadow: none;
     border-radius: 6px;
@@ -1569,49 +1710,51 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked 
     color: @accent_bg_color;
 }}
 
-/* 4. Action Buttons */
+/* 6. Action Buttons */
 button.suggested-action {{
-    background-color: @accent_bg_color !important;
-    color: @accent_fg_color !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    border-radius: 6px !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
-    transition: filter 100ms ease !important;
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }}
 
 button.suggested-action:hover {{
-    filter: brightness(1.10) !important;
+    background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12));
 }}
 
 button.suggested-action:active {{
-    filter: brightness(0.90) !important;
+    background-image: linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12));
 }}
 
 button.destructive-action {{
-    background-color: #ff3b30 !important;
-    color: #ffffff !important;
-    border: 1px solid rgba(0, 0, 0, 0.15) !important;
-    border-radius: 6px !important;
-    transition: background-color 100ms ease !important;
+    background-color: #ff3b30;
+    color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    transition: background-color 100ms ease;
 }}
 
 button.destructive-action:hover {{
-    background-color: #e03228 !important;
+    background-color: #e03228;
 }}
 
 button.destructive-action:active {{
-    background-color: #c4271e !important;
+    background-color: #c4271e;
 }}
 
-/* 5. Dropdowns & Combo Boxes (In content views / forms) */
+/* 7. Dropdowns & Combo Boxes (In content views / forms) */
 dropdown,
 combobox,
 row.combo {{
     border-radius: 6px;
 }}
 
-dropdown:not(headerbar dropdown) > button,
-combobox:not(headerbar combobox) > box > button.combo,
+box.content dropdown > button,
+preferencespage dropdown > button,
+dialog dropdown > button,
+row.combo dropdown > button,
+combobox > box > button.combo,
 box.content menubutton:not(.flat) > button,
 preferencespage menubutton:not(.flat) > button {{
     background-color: {btn_bg};
@@ -1622,19 +1765,32 @@ preferencespage menubutton:not(.flat) > button {{
     transition: background-color 100ms ease, border-color 100ms ease;
 }}
 
-dropdown:not(headerbar dropdown) > button:hover,
-combobox:not(headerbar combobox) > box > button.combo:hover,
+box.content dropdown > button:hover,
+preferencespage dropdown > button:hover,
+dialog dropdown > button:hover,
+row.combo dropdown > button:hover,
+combobox > box > button.combo:hover,
 box.content menubutton:not(.flat) > button:hover,
 preferencespage menubutton:not(.flat) > button:hover {{
     background-color: {btn_hover};
     border-color: {btn_border_hover};
 }}
 
-dropdown:not(headerbar dropdown) > button:active,
-combobox:not(headerbar combobox) > box > button.combo:active,
+box.content dropdown > button:active,
+preferencespage dropdown > button:active,
+dialog dropdown > button:active,
+row.combo dropdown > button:active,
+combobox > box > button.combo:active,
 box.content menubutton:not(.flat) > button:active,
 preferencespage menubutton:not(.flat) > button:active {{
     background-color: {btn_active};
+}}
+
+headerbar dropdown > button {{
+    background-color: transparent;
+    background-image: none;
+    border: 1px solid transparent;
+    box-shadow: none;
 }}
 
 dropdown arrow,
@@ -1644,184 +1800,165 @@ combobox arrow {{
     min-height: 12px;
 }}
 
-/* 5. Text Entries */
+/* 8. Text Entries */
 entry {{
-    background-color: {entry_bg} !important;
-    border: 1px solid {entry_border} !important;
-    border-radius: 8px !important;
-    padding: 6px 10px !important;
-    color: {btn_fg} !important;
-    box-shadow: none !important;
-    transition: border-color 120ms ease, outline 120ms ease !important;
+    background-color: {entry_bg};
+    border: 1px solid {entry_border};
+    border-radius: 8px;
+    padding: 6px 10px;
+    color: {btn_fg};
+    box-shadow: none;
+    transition: border-color 120ms ease, outline 120ms ease;
 }}
 
 entry:hover {{
-    border-color: {entry_border_hover} !important;
+    border-color: {entry_border_hover};
 }}
 
 entry:focus-within {{
-    border-color: @accent_bg_color !important;
-    outline: 2px solid @accent_bg_color !important;
-    outline-offset: -1px !important;
+    border-color: @accent_bg_color;
+    outline: 2px solid @accent_bg_color;
+    outline-offset: -1px;
 }}
 
 entry.search {{
-    border-radius: 9999px !important;
+    border-radius: 9999px;
 }}
 
-/* 6. Switches */
+/* 9. Switches */
 switch {{
-    border-radius: 9999px !important;
-    min-width: 40px !important;
-    min-height: 22px !important;
-    background-color: {switch_off_bg} !important;
-    border: 1px solid {btn_border} !important;
-    transition: background-color 160ms ease, border-color 160ms ease !important;
-}}
-
-switch:hover {{
-    filter: brightness(1.08) !important;
+    border-radius: 9999px;
+    min-width: 40px;
+    min-height: 22px;
+    background-color: {switch_off_bg};
+    border: 1px solid {btn_border};
+    transition: background-color 160ms ease, border-color 160ms ease;
 }}
 
 switch:checked {{
-    background-color: @accent_bg_color !important;
-    border-color: rgba(0, 0, 0, 0.15) !important;
+    background-color: @accent_bg_color;
+    border-color: rgba(0, 0, 0, 0.15);
 }}
 
 switch > slider {{
-    min-width: 18px !important;
-    min-height: 18px !important;
-    margin: 1px !important;
-    border-radius: 9999px !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28) !important;
-    border: none !important;
+    min-width: 18px;
+    min-height: 18px;
+    margin: 1px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28);
+    border: none;
 }}
 
-/* 7. Checkboxes & Radio Buttons */
+/* 10. Checkboxes & Radio Buttons */
 check {{
-    border-radius: 4px !important;
-    border: 1px solid {btn_border_hover} !important;
-    min-width: 16px !important;
-    min-height: 16px !important;
-    background-color: {entry_bg} !important;
-    color: transparent !important;
-    transition: background-color 100ms ease, border-color 100ms ease !important;
+    border-radius: 4px;
+    border: 1px solid {btn_border_hover};
+    min-width: 16px;
+    min-height: 16px;
+    background-color: {entry_bg};
+    color: transparent;
+    transition: background-color 100ms ease, border-color 100ms ease;
 }}
 
 check:checked {{
-    background-color: @accent_bg_color !important;
-    border-color: @accent_bg_color !important;
-    color: @accent_fg_color !important;
+    background-color: @accent_bg_color;
+    border-color: @accent_bg_color;
+    color: @accent_fg_color;
 }}
 
 radio {{
-    border-radius: 9999px !important;
-    border: 1px solid {btn_border_hover} !important;
-    min-width: 16px !important;
-    min-height: 16px !important;
-    background-color: {entry_bg} !important;
-    color: transparent !important;
-    transition: background-color 100ms ease, border-color 100ms ease !important;
+    border-radius: 9999px;
+    border: 1px solid {btn_border_hover};
+    min-width: 16px;
+    min-height: 16px;
+    background-color: {entry_bg};
+    color: transparent;
+    transition: background-color 100ms ease, border-color 100ms ease;
 }}
 
 radio:checked {{
-    background-color: @accent_bg_color !important;
-    border-color: @accent_bg_color !important;
-    color: @accent_fg_color !important;
+    background-color: @accent_bg_color;
+    border-color: @accent_bg_color;
+    color: @accent_fg_color;
 }}
 
-/* 8. Sliders (GtkScale) */
+/* 11. Sliders (GtkScale) */
 scale trough {{
-    background-color: {scale_trough_bg} !important;
-    border-radius: 9999px !important;
-    min-height: 5px !important;
+    background-color: {scale_trough_bg};
+    border-radius: 9999px;
+    min-height: 5px;
 }}
 
 scale highlight {{
-    background-color: @accent_bg_color !important;
-    border-radius: 9999px !important;
+    background-color: @accent_bg_color;
+    border-radius: 9999px;
 }}
 
 scale slider {{
-    min-width: 18px !important;
-    min-height: 18px !important;
-    border-radius: 9999px !important;
-    background-color: #ffffff !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
-    border: 1px solid rgba(0, 0, 0, 0.12) !important;
-    transition: transform 100ms ease !important;
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 9999px;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(0, 0, 0, 0.12);
 }}
 
-scale slider:hover {{
-    transform: scale(1.06) !important;
-}}
-
-/* 9. Interactive List Rows */
+/* 12. Interactive List Rows */
 list > row.activatable:hover,
 listview > row.activatable:hover,
 columnview row:hover {{
-    background-color: {hover_subtle} !important;
+    background-color: {hover_subtle};
 }}
 
 list > row.activatable:active,
 listview > row.activatable:active {{
-    background-color: {active_subtle} !important;
+    background-color: {active_subtle};
 }}
 
 list > row.activatable:selected,
 listview > row.activatable:selected {{
-    background-color: @accent_bg_color !important;
-    color: @accent_fg_color !important;
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
 }}
 
-/* 10. Stack Switchers / Segmented Controls */
+/* 13. Stack Switchers / Segmented Controls */
 stackswitcher > button {{
-    border-radius: 6px !important;
-    padding: 4px 12px !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    border-radius: 6px;
+    padding: 4px 12px;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
 }}
 
 stackswitcher > button:hover {{
-    background-color: {hover_subtle} !important;
+    background-color: {hover_subtle};
 }}
 
 stackswitcher > button:checked {{
-    background-color: {btn_hover} !important;
-    color: {btn_fg} !important;
-    font-weight: 600 !important;
+    background-color: {btn_hover};
+    color: {btn_fg};
+    font-weight: 600;
 }}
 
-/* 11. Minimal macOS Scrollbars */
+/* 14. Minimal macOS Scrollbars */
 scrollbar trough {{
-    background: transparent !important;
-    border: none !important;
+    background: transparent;
+    border: none;
 }}
 
 scrollbar slider {{
-    border-radius: 9999px !important;
-    min-width: 6px !important;
-    min-height: 6px !important;
-    background-color: {dim_label} !important;
-    border: 2px solid transparent !important;
-    background-clip: padding-box !important;
-    transition: background-color 120ms ease !important;
+    border-radius: 9999px;
+    min-width: 6px;
+    min-height: 6px;
+    background-color: {dim_label};
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 120ms ease;
 }}
 
 scrollbar slider:hover {{
-    background-color: {btn_fg} !important;
-}}
-
-/* 12. Focus Ring Consistency */
-*:focus:not(:focus-visible) {{
-    outline: none !important;
-}}
-
-*:focus-visible {{
-    outline: 2px solid @accent_bg_color !important;
-    outline-offset: 1px !important;
+    background-color: {btn_fg};
 }}
 """
 
