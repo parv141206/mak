@@ -33,6 +33,7 @@ export class DockChrome {
 
         try {
             this._container = new St.Widget({
+                name: 'makDockContainer',
                 reactive: true,
                 track_hover: true,
                 layout_manager: new Clutter.FixedLayout(),
