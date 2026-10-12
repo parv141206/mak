@@ -302,12 +302,14 @@ export class DashManager {
             monitorIndex = Main.layoutManager.primaryIndex;
         }
         let monitor = Main.layoutManager.monitors[monitorIndex] || Main.layoutManager.primaryMonitor;
-        const edges = dockEdges(bounds, monitor);
-        bounds = this._stabilizeDockBounds(bounds, edges);
-        const refActor = this._findReferenceActor(this.targetActor);
-        if (refActor)
-            bounds = balanceDockBounds(bounds, this._actorBounds(refActor), edges);
-        bounds = this._applyDockMargin(bounds, monitor, edges);
+        if (!bounds.isAqua) {
+            const edges = dockEdges(bounds, monitor);
+            bounds = this._stabilizeDockBounds(bounds, edges);
+            const refActor = this._findReferenceActor(this.targetActor);
+            if (refActor)
+                bounds = balanceDockBounds(bounds, this._actorBounds(refActor), edges);
+            bounds = this._applyDockMargin(bounds, monitor, edges);
+        }
         const { baseW, baseH } = bounds;
         if (baseW <= 9 || baseH <= 9) {
             this._hideGlass();
@@ -315,7 +317,9 @@ export class DashManager {
         }
         this.glass.show();
         this.glass.opacity = this.targetActor.opacity;
-        this._syncDockVisibility(bounds, monitor);
+        if (!bounds.isAqua) {
+            this._syncDockVisibility(bounds, monitor);
+        }
         this._syncDockGlass(bounds, monitor);
     }
 
@@ -330,19 +334,27 @@ export class DashManager {
     _readDockBounds() {
         let sourceActor = this.targetActor;
         let children = this.targetActor.get_children();
+        let isAqua = false;
         for (let i = 0; i < children.length; i++) {
-            if (children[i].has_style_class_name('dash-background') || children[i].has_style_class_name('aqua-bg')) {
+            if (children[i].has_style_class_name('aqua-bg')) {
+                sourceActor = children[i];
+                isAqua = true;
+                break;
+            } else if (children[i].has_style_class_name('dash-background')) {
                 children[i].opacity = 0;
                 sourceActor = children[i];
             }
         }
         let [baseW, baseH] = sourceActor.get_size();
         let [absX, absY] = sourceActor.get_transformed_position();
-        if (Number.isNaN(absX) || Number.isNaN(absY))
+        if (Number.isNaN(absX) || Number.isNaN(absY) || !(baseW > 0) || !(baseH > 0))
             return null;
         // The uncorrected position, which _syncGlassGeometryLive() compares against.
         this._liveSource = { actor: sourceActor, rawX: absX, rawY: absY };
-        const bounds = { absX, absY, baseW, baseH };
+        const bounds = { absX, absY, baseW, baseH, isAqua };
+        if (isAqua) {
+            return bounds;
+        }
         return sourceActor === this.targetActor ? bounds : clipDockBounds(bounds, this._actorBounds(this.targetActor));
     }
 
