@@ -278,6 +278,19 @@ export class LiquidGlassController {
             const id = this._makSettings.connect(`changed::${key}`, sync);
             this._makSettingsIds.push(id);
         }
+
+        for (const key of [
+            'dock-position',
+            'dock-alignment',
+            'dock-size',
+            'dock-enabled',
+            'dock-autohide',
+        ]) {
+            const id = this._makSettings.connect(`changed::${key}`, () => {
+                this._rescanDock();
+            });
+            this._makSettingsIds.push(id);
+        }
     }
 
     _collectDockContainers() {
@@ -288,7 +301,9 @@ export class LiquidGlassController {
             if (Array.isArray(docks)) {
                 for (const d of docks) {
                     const c = d?._chrome?.container;
-                    if (c && !found.includes(c)) found.push(c);
+                    if (c && !found.includes(c) && (!c.get_stage || c.get_stage())) {
+                        found.push(c);
+                    }
                 }
             }
         } catch (e) {}
@@ -311,6 +326,14 @@ export class LiquidGlassController {
 
     _findDocks() {
         if (!this._enabled || !this._liquidSettings) return;
+
+        // Clean up any stale or unmounted dock containers
+        for (const entry of [...this._dashDocks]) {
+            if (!entry.container || !entry.container.get_stage?.()) {
+                this._releaseDock(entry);
+            }
+        }
+
         const path = this._extension.path + '/modules/blur/liquid';
         for (const container of this._collectDockContainers()) {
             if (this._dashDocks.some(entry => entry.container === container)) continue;
@@ -331,10 +354,20 @@ export class LiquidGlassController {
     }
 
     _rescanDock() {
-        if (this._dashSearchId) return;
-        this._dashSearchId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+        if (!this._enabled) return;
+        if (this._dashSearchId) {
+            GLib.Source.remove(this._dashSearchId);
+            this._dashSearchId = 0;
+        }
+        this._dashSearchId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
             this._dashSearchId = 0;
             this._findDocks();
+            return GLib.SOURCE_REMOVE;
+        });
+
+        // Fallback scan to guarantee latching onto newly created docks after transition settles
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 500, () => {
+            if (this._enabled) this._findDocks();
             return GLib.SOURCE_REMOVE;
         });
     }
@@ -349,6 +382,9 @@ export class LiquidGlassController {
         } catch (e) {}
         const idx = this._dashDocks.indexOf(entry);
         if (idx >= 0) this._dashDocks.splice(idx, 1);
+        if (this._enabled) {
+            this._rescanDock();
+        }
     }
 
     disable() {

@@ -140,6 +140,8 @@ export class DashManager {
     _applyMargin() {
         if (!this.targetActor)
             return;
+        if (this.targetActor.get_name?.() === 'makDockContainer')
+            return;
         let marginBottom = this._settings.get_int('dock-margin-bottom');
         let [w, h] = this.targetActor.get_size();
         let [x, y] = this.targetActor.get_transformed_position();
