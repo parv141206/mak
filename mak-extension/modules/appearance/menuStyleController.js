@@ -446,13 +446,29 @@ export class MenuStyleController {
 }
 
 /* ── Quick Settings Control Center ────────────────────────────────────────── */
-.quick-settings,
-.quick-toggle-menu {
+.quick-settings:not(.liquid-glass-transparent):not(.liquid-glass-qs-root),
+.quick-toggle-menu:not(.liquid-glass-transparent):not(.liquid-glass-qs-root) {
     border-radius: ${qsRadius}px !important;
     border: ${borderCss} !important;
     background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
     box-shadow: ${qsBoxShadow} !important;
     color: ${textColor} !important;
+}
+
+.liquid-glass-transparent .quick-settings,
+.liquid-glass-transparent.quick-settings,
+.liquid-glass-qs-root .quick-settings,
+.liquid-glass-qs-root.quick-settings,
+.liquid-glass-transparent .quick-toggle-menu,
+.liquid-glass-transparent.quick-toggle-menu,
+.liquid-glass-qs-root .quick-toggle-menu,
+.liquid-glass-qs-root.quick-toggle-menu,
+.liquid-glass-transparent .popup-menu-content,
+.liquid-glass-qs-root .popup-menu-content {
+    border: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
 }
 
 .quick-settings StLabel,

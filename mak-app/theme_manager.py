@@ -992,16 +992,37 @@ window.background.brave windowcontrols button.maximize:backdrop:hover {{
 
 TRAFFIC_LIGHTS_OVERRIDE = generate_traffic_lights_override(14, 8)
 
-WINDOW_CORNERS_CSS_OVERRIDE = """
+def generate_window_corners_override(is_dark=True):
+    window_shadow = (
+        "0 10px 28px rgba(0, 0, 0, 0.22), 0 3px 10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.08)"
+        if is_dark
+        else "0 10px 28px rgba(0, 0, 0, 0.10), 0 3px 10px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.08)"
+    )
+    backdrop_shadow = (
+        "0 6px 18px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.05)"
+        if is_dark
+        else "0 6px 18px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.06)"
+    )
+    return f"""
 /* ── Mak macOS Window Corner & Geometry Consistency (16px) ──────────────── */
 window,
 window.background,
 window.csd,
 window.background.csd,
 window.background.solid-csd,
-window.solid-csd {
+window.solid-csd {{
     border-radius: 16px;
-}
+}}
+
+window.csd:not(.fullscreen):not(.tiled):not(.maximized),
+window.background.csd:not(.fullscreen):not(.tiled):not(.maximized) {{
+    box-shadow: {window_shadow} !important;
+}}
+
+window.csd:not(.fullscreen):not(.tiled):not(.maximized):backdrop,
+window.background.csd:not(.fullscreen):not(.tiled):not(.maximized):backdrop {{
+    box-shadow: {backdrop_shadow} !important;
+}}
 
 window.csd.maximized,
 window.csd.tiled,
@@ -1023,9 +1044,9 @@ window.background.tiled-bottom,
 window.background.tiled-left,
 window.background.csd.tiled,
 window.tiled.csd,
-window.tiled {
+window.tiled {{
     border-radius: 16px;
-}
+}}
 
 headerbar,
 headerbar.default-decoration,
@@ -1049,10 +1070,10 @@ window.background.csd.tiled headerbar,
 window.tiled.csd headerbar,
 window.tiled headerbar,
 window.background.tiled .titlebar,
-window.tiled .titlebar {
+window.tiled .titlebar {{
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
-}
+}}
 
 window.background.maximized > contents,
 window.background.maximized.csd > contents,
@@ -1062,13 +1083,13 @@ window.maximized > contents,
 window.background.maximized > widget,
 window.maximized > widget,
 window.background.maximized > box,
-window.maximized > box {
+window.maximized > box {{
     border-radius: 16px;
-}
+}}
 
-window.background.chromium headerbar.header-bar.titlebar {
+window.background.chromium headerbar.header-bar.titlebar {{
     border-radius: 16px 16px 0 0;
-}
+}}
 
 /* True Fullscreen Only */
 window.fullscreen,
@@ -1076,32 +1097,34 @@ window.csd.fullscreen,
 window.background.fullscreen,
 window.background.fullscreen.csd,
 window.background.csd.fullscreen,
-window.fullscreen.csd {
+window.fullscreen.csd {{
     border-radius: 0;
     outline: none;
-    box-shadow: none;
+    box-shadow: none !important;
     border: none;
-}
+}}
 
 window.fullscreen headerbar,
 window.fullscreen .titlebar,
 window.background.fullscreen headerbar,
 window.background.fullscreen.csd headerbar,
 window.background.csd.fullscreen headerbar,
-window.fullscreen.csd headerbar {
+window.fullscreen.csd headerbar {{
     border-radius: 0;
-}
+}}
 """
 
+WINDOW_CORNERS_CSS_OVERRIDE = generate_window_corners_override(True)
+
 def generate_popover_override(is_dark=True):
-    border_color = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.10)"
-    hover_bg = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.06)"
-    selected_bg = "rgba(255, 255, 255, 0.18)" if is_dark else "rgba(0, 0, 0, 0.10)"
+    border_color = "rgba(255, 255, 255, 0.10)" if is_dark else "rgba(0, 0, 0, 0.08)"
+    hover_bg = "rgba(255, 255, 255, 0.10)" if is_dark else "rgba(0, 0, 0, 0.05)"
+    selected_bg = "rgba(255, 255, 255, 0.16)" if is_dark else "rgba(0, 0, 0, 0.08)"
     text_color = "#f5f5f7" if is_dark else "#1d1d1f"
     shadow = (
-        "0 10px 28px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.20)"
+        "0 8px 18px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.10)"
         if is_dark
-        else "0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06)"
+        else "0 6px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)"
     )
 
     return f"""
@@ -1437,7 +1460,59 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     return f"""
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
-/* 1. Default Push Buttons */
+/* 1. Headerbar & Toolbar Flat Buttons (macOS Finder / Libadwaita standard) */
+headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+headerbar menubutton > button,
+.titlebar menubutton > button,
+tab button,
+.sidebar button,
+popover button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised) {{
+    background-color: transparent !important;
+    background-image: none !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+    color: {btn_fg} !important;
+    transition: background-color 80ms ease, color 80ms ease !important;
+}}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+headerbar menubutton > button:hover,
+.titlebar menubutton > button:hover,
+tab button:hover,
+.sidebar button:hover,
+popover button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):hover {{
+    background-color: {hover_subtle} !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+headerbar menubutton > button:active,
+.titlebar menubutton > button:active,
+tab button:active,
+.sidebar button:active,
+popover button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):active {{
+    background-color: {active_subtle} !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+}}
+
+headerbar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
+.titlebar button:not(.suggested-action):not(.destructive-action):not(.opaque):not(.raised):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
+headerbar menubutton > button:checked,
+.titlebar menubutton > button:checked,
+tab button:checked {{
+    background-color: {active_subtle} !important;
+    border-color: transparent !important;
+    color: @accent_bg_color !important;
+    box-shadow: none !important;
+}}
+
+/* 2. Default In-Window Push Buttons */
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button) {{
     background-color: {btn_bg};
     border: 1px solid {btn_border};
@@ -1445,7 +1520,7 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     border-radius: 6px;
     padding: 5px 12px;
     min-height: 24px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: background-color 100ms ease, border-color 100ms ease, box-shadow 100ms ease, color 100ms ease;
 }}
 
@@ -1458,7 +1533,7 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):active {{
     background-color: {btn_active};
     border-color: {btn_border_hover};
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.10);
 }}
 
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):checked {{
@@ -1472,7 +1547,7 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
     box-shadow: none;
 }}
 
-/* 2. Flat Buttons */
+/* 3. Flat Buttons */
 button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     background-color: transparent;
     border: 1px solid transparent;
@@ -1494,7 +1569,7 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked 
     color: @accent_bg_color;
 }}
 
-/* 3. Action Buttons */
+/* 4. Action Buttons */
 button.suggested-action {{
     background-color: @accent_bg_color !important;
     color: @accent_fg_color !important;
@@ -1528,16 +1603,17 @@ button.destructive-action:active {{
     background-color: #c4271e !important;
 }}
 
-/* 4. Dropdowns & Combo Boxes */
+/* 5. Dropdowns & Combo Boxes (In content views / forms) */
 dropdown,
 combobox,
 row.combo {{
     border-radius: 6px;
 }}
 
-dropdown > button,
-combobox > box > button.combo,
-menubutton:not(.flat) > button {{
+dropdown:not(headerbar dropdown) > button,
+combobox:not(headerbar combobox) > box > button.combo,
+box.content menubutton:not(.flat) > button,
+preferencespage menubutton:not(.flat) > button {{
     background-color: {btn_bg};
     border: 1px solid {btn_border};
     color: {btn_fg};
@@ -1546,16 +1622,18 @@ menubutton:not(.flat) > button {{
     transition: background-color 100ms ease, border-color 100ms ease;
 }}
 
-dropdown > button:hover,
-combobox > box > button.combo:hover,
-menubutton:not(.flat) > button:hover {{
+dropdown:not(headerbar dropdown) > button:hover,
+combobox:not(headerbar combobox) > box > button.combo:hover,
+box.content menubutton:not(.flat) > button:hover,
+preferencespage menubutton:not(.flat) > button:hover {{
     background-color: {btn_hover};
     border-color: {btn_border_hover};
 }}
 
-dropdown > button:active,
-combobox > box > button.combo:active,
-menubutton:not(.flat) > button:active {{
+dropdown:not(headerbar dropdown) > button:active,
+combobox:not(headerbar combobox) > box > button.combo:active,
+box.content menubutton:not(.flat) > button:active,
+preferencespage menubutton:not(.flat) > button:active {{
     background-color: {btn_active};
 }}
 
@@ -1800,7 +1878,8 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
     popover_override = generate_popover_override(is_dark=is_dark)
     nautilus_override = generate_nautilus_override(is_dark=is_dark)
-    rules_to_append = [widgets_override, WINDOW_CORNERS_CSS_OVERRIDE, popover_override, nautilus_override, traffic_override]
+    window_corners_override = generate_window_corners_override(is_dark=is_dark)
+    rules_to_append = [widgets_override, window_corners_override, popover_override, nautilus_override, traffic_override]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 

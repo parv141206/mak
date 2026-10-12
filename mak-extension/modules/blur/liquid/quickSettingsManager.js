@@ -351,12 +351,15 @@ export class QuickSettingsManager {
     _applyClassStyles() {
         if (!this.targetActor)
             return;
-        if (!this._hasStyleClass(this.targetActor, 'liquid-glass-transparent'))
-            this.targetActor.add_style_class_name('liquid-glass-transparent');
-        if (!this._hasStyleClass(this.animActor, 'liquid-glass-transparent'))
-            this.animActor.add_style_class_name('liquid-glass-transparent');
-        if (!this._hasStyleClass(this.animActor, 'liquid-glass-qs-root'))
-            this.animActor.add_style_class_name('liquid-glass-qs-root');
+        const actors = [this.targetActor, this.animActor, this.menu?.boxpointer, this.menu?.box];
+        for (const actor of actors) {
+            if (actor && actor.add_style_class_name) {
+                if (!this._hasStyleClass(actor, 'liquid-glass-transparent'))
+                    actor.add_style_class_name('liquid-glass-transparent');
+                if (!this._hasStyleClass(actor, 'liquid-glass-qs-root'))
+                    actor.add_style_class_name('liquid-glass-qs-root');
+            }
+        }
     }
 
     _applyEffect() {
@@ -1466,10 +1469,14 @@ export class QuickSettingsManager {
     }
 
     _restoreMenuActors() {
-        this.targetActor.remove_style_class_name('liquid-glass-transparent');
+        const actors = [this.targetActor, this.animActor, this.menu?.boxpointer, this.menu?.box];
+        for (const actor of actors) {
+            if (actor && actor.remove_style_class_name) {
+                actor.remove_style_class_name('liquid-glass-transparent');
+                actor.remove_style_class_name('liquid-glass-qs-root');
+            }
+        }
         if (this.animActor) {
-            this.animActor.remove_style_class_name('liquid-glass-transparent');
-            this.animActor.remove_style_class_name('liquid-glass-qs-root');
             this.animActor.translation_x = 0;
             this.animActor.translation_y = 0;
             this.animActor.set_scale(1.0, 1.0);
