@@ -294,3 +294,7 @@ This safely disables the extension, removes the extension directory, deletes <co
 Mak is distributed under the **GPL-3.0 License**. See [LICENSE](LICENSE) for details.
 
 Developed with ❤️ for the Linux and GNOME desktop community.
+
+
+
+Safe for now
