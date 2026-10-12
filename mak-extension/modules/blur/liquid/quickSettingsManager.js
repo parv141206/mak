@@ -377,6 +377,7 @@ export class QuickSettingsManager {
 
     // Background mode: one sheet of glass behind the whole menu.
     _applyBackgroundEffect() {
+        this._clearButtonStyles();
         this._menuYoffset = this._settings.get_int('quick-settings-y-offset');
         this._menuXoffset = this._settings.get_int('quick-settings-x-offset');
         this._glassExpand = this._settings.get_int('quick-settings-glass-expand');
@@ -428,12 +429,10 @@ export class QuickSettingsManager {
                 this._forgetSubmenus();
                 this._applyClassStyles();
                 this._applyMenuOffsets();
+                this._clearButtonStyles();
                 this._stableBaseW = undefined;
                 this._stableBaseH = undefined;
                 startFrameSync();
-                // The first colours of an open are applied without a tween.
-                this._startAdaptiveColorSampling(true);
-                this._startButtonAlphaSampling();
                 this._startAnimation(1);
                 return;
             }
@@ -447,7 +446,10 @@ export class QuickSettingsManager {
         this._signals.push({
             target: this.menu.actor,
             id: this.menu.actor.connect('notify::mapped', () => {
-                if (!this.menu.actor.mapped) {
+                if (this.menu.actor.mapped) {
+                    startFrameSync();
+                    this._syncGeometry();
+                } else {
                     stopFrameSync();
                     this._forgetSubmenus();
                     if (this.glass) {
@@ -581,7 +583,7 @@ export class QuickSettingsManager {
         if (this._frameSignalId !== 0)
             return;
         startSyncLoop(this._frameSignalSlot, this._frameSlot, {
-            alive: () => !!this.glass && this.targetActor.mapped,
+            alive: () => !!this.glass && (this.targetActor.mapped || this.menu.isOpen),
             honourFreeze,
             errorTag,
             step: () => {
@@ -1034,7 +1036,7 @@ export class QuickSettingsManager {
      *   while the open animation runs. The last open's decision is forgotten.
      */
     _startAdaptiveColorSampling(skipAnimations = false) {
-        if (!this._adaptiveConfig.enabled || this._applyTo === 0)
+        if (!this._adaptiveConfig.enabled || this._applyTo === 'background')
             return;
         if (skipAnimations) {
             this._contrastSampler.reset();
@@ -1255,7 +1257,7 @@ export class QuickSettingsManager {
     }
 
     _startButtonAlphaSampling() {
-        if (this._applyTo === 0)
+        if (this._applyTo === 'background')
             return;
         this._updateButtonAlpha();
         if (this._buttonTimerId !== 0)
@@ -1288,6 +1290,11 @@ export class QuickSettingsManager {
                 button.set_style(originalStyle || null);
         }
         this._styledButtons.clear();
+        for (const [actor, originalStyle] of this._styledActors.entries()) {
+            if (actor instanceof St.Widget)
+                actor.set_style(originalStyle || null);
+        }
+        this._styledActors.clear();
     }
 
     _disconnectButtonSignals() {
@@ -1305,7 +1312,18 @@ export class QuickSettingsManager {
             this._tickId = 0;
         }
         if (!this._enableAnimation) {
-            showMenuAtRest(this.glass, this.animActor);
+            if (targetValue === 1) {
+                showMenuAtRest(this.glass, this.animActor);
+                this._syncGeometry();
+            } else {
+                if (this.glass) {
+                    this.glass.hide();
+                    this.glass.opacity = 0;
+                }
+                if (this.animActor) {
+                    this.animActor.opacity = 0;
+                }
+            }
             return;
         }
         if (this.animActor)

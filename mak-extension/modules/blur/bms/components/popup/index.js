@@ -205,6 +205,10 @@ export const PopupBlur = class PopupBlur {
             || this.is_internal_actor(root_actor)
             || !this.watch_actor(target)
             || !this.watch_actor(root_actor)
+            || this.has_style_class(root_actor, 'liquid-glass-qs-root')
+            || this.has_style_class(target, 'liquid-glass-qs-root')
+            || this.has_style_class(root_actor, 'liquid-glass-menu-root')
+            || this.has_style_class(target, 'liquid-glass-menu-root')
         )
             return;
 

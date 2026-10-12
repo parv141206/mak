@@ -63,10 +63,12 @@ export function showMenuAtRest(glass, animActor) {
     if (!glass)
         return;
     glass.remove_all_transitions();
+    glass.show();
     glass.opacity = 255;
     glass.set_scale(1.0, 1.0);
     if (!animActor)
         return;
+    animActor.show();
     animActor.set_scale(1.0, 1.0);
     animActor.opacity = 255;
 }
