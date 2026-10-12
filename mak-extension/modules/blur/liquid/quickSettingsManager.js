@@ -1034,7 +1034,7 @@ export class QuickSettingsManager {
      *   while the open animation runs. The last open's decision is forgotten.
      */
     _startAdaptiveColorSampling(skipAnimations = false) {
-        if (!this._adaptiveConfig.enabled)
+        if (!this._adaptiveConfig.enabled || this._applyTo === 0)
             return;
         if (skipAnimations) {
             this._contrastSampler.reset();
@@ -1255,6 +1255,8 @@ export class QuickSettingsManager {
     }
 
     _startButtonAlphaSampling() {
+        if (this._applyTo === 0)
+            return;
         this._updateButtonAlpha();
         if (this._buttonTimerId !== 0)
             return;

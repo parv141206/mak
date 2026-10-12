@@ -85,7 +85,8 @@ export class TopBarManager {
         glass.setPadding(SHADER_PADDING);
         glass.setIsDock(false);
         glass.setMultiRegionMode(this._style === 'islands');
-        glass.setShadowMaxRadius(SHADOW_ROOM - 8);
+        const cr = this._settings.get_double(this._key('corner-radius'));
+        glass.setShadowMaxRadius(cr > 0.1 ? Math.max(0, SHADOW_ROOM - 8) : 0);
         // Below the bar, so the glass reads the stage before the bar is drawn.
         Main.layoutManager.uiGroup.insert_child_below(glass, panelBox);
         this._applyMaterial();
@@ -111,10 +112,12 @@ export class TopBarManager {
         const glass = this._glass;
         if (!glass)
             return;
+        const cr = this._settings.get_double(this._key('corner-radius'));
+        glass.setShadowMaxRadius(cr > 0.1 ? Math.max(0, SHADOW_ROOM - 8) : 0);
         glass.setTintColor(...hexToColorArray(this._settings.get_string(this._key('tint-color'))));
         glass.setTintStrength(this._settings.get_double(this._key('tint-strength')));
         glass.setBlurRadius(this._settings.get_int(this._key('blur-radius')));
-        glass.setCornerRadius(this._settings.get_double(this._key('corner-radius')));
+        glass.setCornerRadius(cr);
         glass.setBrightness(this._settings.get_double(this._key('brightness')));
         glass.setContrast(this._settings.get_double(this._key('contrast')));
         glass.setSaturation(this._settings.get_double(this._key('saturation')));
@@ -219,12 +222,14 @@ export class TopBarManager {
                     rects.push([x0, top, x1 - x0, pillHeight]);
             }
         }
-        const key = `${x},${y},${width},${height},${rects.flat().join(',')}`;
+        const cr = this._settings.get_double(this._key('corner-radius'));
+        const shadowRoom = cr > 0.1 ? SHADOW_ROOM : 0;
+        const key = `${x},${y},${width},${height},${shadowRoom},${rects.flat().join(',')}`;
         if (key !== this._lastKey) {
             this._lastKey = key;
             glass.set_position(x, y);
-            glass.set_size(width, height + SHADOW_ROOM);
-            glass.setResolution(width, height + SHADOW_ROOM);
+            glass.set_size(width, height + shadowRoom);
+            glass.setResolution(width, height + shadowRoom);
             const p = SHADER_PADDING;
             if (this._style === 'pill') {
                 const [rx, ry, rw, rh] = rects[0];

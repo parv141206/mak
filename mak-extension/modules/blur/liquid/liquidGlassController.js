@@ -14,6 +14,7 @@ import { PanelMenuManager } from './panelMenuManager.js';
 import { QuickSettingsManager } from './quickSettingsManager.js';
 import { NotificationManager } from './notificationManager.js';
 import { OsdManager } from './osdManager.js';
+import { UIManager } from './uiManager.js';
 import { Logger } from './logger.js';
 import { installGlassDiagnostics, removeGlassDiagnostics } from './diagnostics/glass.js';
 import { setUtilsLogger } from './diagnostics/logging.js';
@@ -27,6 +28,7 @@ export class LiquidGlassController {
         this._applicationManager = null;
         this._topBarManager = null;
         this._panelMenuManager = null;
+        this._calendarMenuManager = null;
         this._quickSettingsManager = null;
         this._notificationManager = null;
         this._osdManager = null;
@@ -78,6 +80,25 @@ export class LiquidGlassController {
             this._panelMenuManager.setup();
         } catch (err) {
             console.error('[Mak LiquidGlass] PanelMenuManager error:', err);
+        }
+
+        try {
+            if (Main.panel?.statusArea?.dateMenu) {
+                this._calendarMenuManager = new UIManager(
+                    path,
+                    this._liquidSettings,
+                    this._logger,
+                    Main.panel.statusArea.dateMenu,
+                    false,
+                    'enable-menu-glass',
+                    'menu',
+                    'calendar',
+                    true
+                );
+                this._calendarMenuManager.setup();
+            }
+        } catch (err) {
+            console.error('[Mak LiquidGlass] Calendar UIManager error:', err);
         }
 
         try {
@@ -171,30 +192,73 @@ export class LiquidGlassController {
             this._liquidSettings.set_string('dock-tint-color', '#ffffff');
             this._liquidSettings.set_double('dock-tint-strength', 0.08);
 
-            // Top Bar & Menus
+            // Top Bar: Clean edge-to-edge glass bar, 0 margins, 0 paddings, 0 corner-radius
             this._liquidSettings.set_string('top-bar-style', 'pill');
             this._liquidSettings.set_double('top-bar-corner-radius', 0.0);
             this._liquidSettings.set_int('top-bar-blur-radius', 18);
             this._liquidSettings.set_string('top-bar-tint-color', '#ffffff');
             this._liquidSettings.set_double('top-bar-tint-strength', 0.08);
+            this._liquidSettings.set_int('top-bar-margin-top', 0);
+            this._liquidSettings.set_int('top-bar-margin-bottom', 0);
+            this._liquidSettings.set_int('top-bar-margin-left', 0);
+            this._liquidSettings.set_int('top-bar-margin-right', 0);
+            this._liquidSettings.set_int('top-bar-padding-top', 0);
+            this._liquidSettings.set_int('top-bar-padding-bottom', 0);
+            this._liquidSettings.set_int('top-bar-padding-left', 0);
+            this._liquidSettings.set_int('top-bar-padding-right', 0);
+            this._liquidSettings.set_boolean('top-bar-enable-adaptive-text-color', false);
 
+            // Calendar & Date Menu
             this._liquidSettings.set_boolean('enable-menu-glass', true);
+            this._liquidSettings.set_boolean('enable-menu-animation', false);
+            this._liquidSettings.set_double('menu-corner-radius', 14.0);
+            this._liquidSettings.set_int('menu-glass-expand', 0);
+            this._liquidSettings.set_int('menu-blur-radius', 16);
             this._liquidSettings.set_string('menu-tint-color', '#ffffff');
             this._liquidSettings.set_double('menu-tint-strength', 0.08);
+            this._liquidSettings.set_boolean('menu-enable-adaptive-text-color', false);
 
+            // Extra Panel Menus (Kiwi Apple menu, system indicators)
             this._liquidSettings.set_boolean('enable-extra-menu-glass', true);
+            this._liquidSettings.set_boolean('enable-panel-menu-animation', false);
+            this._liquidSettings.set_double('panel-menu-corner-radius', 14.0);
+            this._liquidSettings.set_int('panel-menu-glass-expand', 0);
+            this._liquidSettings.set_int('panel-menu-blur-radius', 16);
+            this._liquidSettings.set_string('panel-menu-tint-color', '#ffffff');
+            this._liquidSettings.set_double('panel-menu-tint-strength', 0.08);
+            this._liquidSettings.set_boolean('panel-menu-enable-adaptive-text-color', false);
 
-            // Quick Settings: Unified background card mode (0), not individual toggle button mode
+            // Desktop & Application Context Menus
+            this._liquidSettings.set_boolean('enable-desktop-menu-glass', true);
+            this._liquidSettings.set_double('desktop-menu-corner-radius', 14.0);
+            this._liquidSettings.set_int('desktop-menu-blur-radius', 16);
+            this._liquidSettings.set_string('desktop-menu-tint-color', '#ffffff');
+            this._liquidSettings.set_double('desktop-menu-tint-strength', 0.08);
+            this._liquidSettings.set_double('desktop-menu-content-opacity', 0.88);
+
+            // Quick Settings: Unified background card mode (0), native toggle styling
             this._liquidSettings.set_boolean('enable-quick-settings-glass', true);
+            this._liquidSettings.set_boolean('enable-quick-settings-animation', false);
             this._liquidSettings.set_int('quick-settings-apply-to', 0);
+            this._liquidSettings.set_double('quick-settings-corner-radius', 20.0);
+            this._liquidSettings.set_int('quick-settings-blur-radius', 18);
             this._liquidSettings.set_string('quick-settings-tint-color', '#ffffff');
             this._liquidSettings.set_double('quick-settings-tint-strength', 0.08);
+            this._liquidSettings.set_boolean('quick-settings-enable-adaptive-text-color', false);
 
+            // Notifications
             this._liquidSettings.set_boolean('enable-notification-glass', true);
+            this._liquidSettings.set_int('notification-glass-expand', 0);
+            this._liquidSettings.set_double('notification-corner-radius', 16.0);
+            this._liquidSettings.set_int('notification-blur-radius', 16);
             this._liquidSettings.set_string('notification-tint-color', '#ffffff');
             this._liquidSettings.set_double('notification-tint-strength', 0.08);
+            this._liquidSettings.set_boolean('notification-enable-adaptive-text-color', false);
 
+            // OSDs
             this._liquidSettings.set_boolean('enable-osd-glass', true);
+            this._liquidSettings.set_double('osd-corner-radius', 16.0);
+            this._liquidSettings.set_int('osd-blur-radius', 16);
             this._liquidSettings.set_string('osd-tint-color', '#ffffff');
             this._liquidSettings.set_double('osd-tint-strength', 0.08);
         } catch (e) {
@@ -324,6 +388,9 @@ export class LiquidGlassController {
 
         try { this._panelMenuManager?.cleanup(); } catch (e) {}
         this._panelMenuManager = null;
+
+        try { this._calendarMenuManager?.cleanup(); } catch (e) {}
+        this._calendarMenuManager = null;
 
         try { this._quickSettingsManager?.cleanup(); } catch (e) {}
         this._quickSettingsManager = null;
