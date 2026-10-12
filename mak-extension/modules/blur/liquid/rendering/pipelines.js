@@ -15,7 +15,7 @@ export class ShaderPipelines {
     }
 
     async load(extensionPath, cancellable = null) {
-        if (!extensionPath)
+        if (!extensionPath) return;
         let basePath = extensionPath;
         const testFile = Gio.File.new_for_path(basePath + '/shaders/glass.frag');
         if (!testFile.query_exists(null)) {

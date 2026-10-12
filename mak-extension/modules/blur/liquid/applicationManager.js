@@ -157,13 +157,21 @@ export class ApplicationManager {
         return this._isProfileEnabled('application') || this._isProfileEnabled('desktop-menu');
     }
 
-    // WM_CLASS casing differs between toolkits, and the preferences promise a
-    // case-insensitive match.
+    // WM_CLASS casing differs between toolkits, and patterns may contain wildcards like 'google-chrome*'.
     _listContainsClass(list, wmClass) {
         if (!wmClass)
             return false;
         const normalized = wmClass.toLowerCase();
-        return list.some(entry => entry.toLowerCase() === normalized);
+        return list.some(entry => {
+            const e = entry.toLowerCase();
+            if (e.includes('*')) {
+                const pattern = '^' + e.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+                try {
+                    return new RegExp(pattern, 'i').test(normalized);
+                } catch (_) {}
+            }
+            return e === normalized || normalized.includes(e);
+        });
     }
 
     _windowMatchesWhitelist(metaWindow) {
