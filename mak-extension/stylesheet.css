@@ -1686,8 +1686,19 @@
     box-shadow: none !important;
 }
 
-/* Shell boxpointer and notifications while glass is active */
+/* Shell boxpointer, quick settings and notifications while glass is active */
 .liquid-glass-transparent .popup-menu-boxpointer,
+.liquid-glass-transparent .popup-menu-content,
+.liquid-glass-transparent .quick-settings,
+.liquid-glass-transparent .quick-toggle-menu,
+.liquid-glass-transparent.quick-settings,
+.liquid-glass-transparent.quick-toggle-menu,
+.liquid-glass-qs-root .popup-menu-boxpointer,
+.liquid-glass-qs-root .popup-menu-content,
+.liquid-glass-qs-root .quick-settings,
+.liquid-glass-qs-root .quick-toggle-menu,
+.liquid-glass-qs-root.quick-settings,
+.liquid-glass-qs-root.quick-toggle-menu,
 .liquid-glass-transparent.popup-menu,
 .liquid-glass-transparent.notification-banner,
 .liquid-glass-transparent .notification-banner,
@@ -1729,6 +1740,25 @@
 
 .quick-settings .quick-toggle-has-menu .quick-toggle:not(:checked) {
     background-color: transparent !important;
+}
+
+.quick-settings .quick-toggle:checked,
+.quick-settings .quick-toggle-has-menu:checked,
+.quick-toggle-menu .quick-toggle:checked,
+.quick-toggle-menu .quick-toggle-has-menu:checked {
+    background-color: -st-accent-color !important;
+    color: #ffffff !important;
+}
+
+.quick-settings .quick-toggle:checked StLabel,
+.quick-settings .quick-toggle:checked StIcon,
+.quick-settings .quick-toggle:checked .quick-toggle-icon,
+.quick-settings .quick-toggle-has-menu:checked StLabel,
+.quick-settings .quick-toggle-has-menu:checked StIcon,
+.quick-settings .quick-toggle-has-menu:checked .quick-toggle-icon,
+.quick-settings .quick-toggle-has-menu:checked .quick-toggle-title,
+.quick-settings .quick-toggle-has-menu:checked .quick-toggle-subtitle {
+    color: #ffffff !important;
 }
 
 .light-mode .quick-settings .quick-toggle:not(:checked),
@@ -1821,12 +1851,12 @@
     background-color: rgba(65, 65, 65, 0.8) !important;
 }
 
-/* Quick Settings sliders sit on a translucent card. */
+/* Quick Settings sliders sit on a clean transparent base */
 .liquid-glass-qs-root .quick-slider {
-    background-color: rgba(255, 255, 255, 0.15) !important;
-    border-radius: 20px !important;
-    padding: 24px 24px !important;
-    margin-bottom: 8px !important;
+    background-color: transparent !important;
+    border-radius: 14px !important;
+    padding: 4px 8px !important;
+    margin-bottom: 4px !important;
     box-shadow: none !important;
 }
 
