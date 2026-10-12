@@ -6433,7 +6433,7 @@ row.expander.property #NautilusFileChooser .nautilus-grid-view child.activatable
 #NautilusFileChooser .sidebar-pane:dir(ltr) banner > revealer > widget,
 #NautilusFileChooser .sidebar-pane.end:dir(rtl),
 #NautilusFileChooser .sidebar-pane.end:dir(rtl) banner > revealer > widget {
-  box-shadow: 0 0 0 6px #ffffff, 0 32px 0 6px #ffffff, 0 -32px 0 6px #ffffff, 2px 3px 12px rgba(0, 0, 0, 0.1), inset 0 0 0 1px white;
+  box-shadow: none;
 }
 
 .nautilus-window .sidebar-pane:dir(rtl), .nautilus-window .sidebar-pane:dir(rtl) banner > revealer > widget, .nautilus-window .sidebar-pane.end:dir(ltr), .nautilus-window .sidebar-pane.end:dir(ltr) banner > revealer > widget,
@@ -6441,7 +6441,7 @@ row.expander.property #NautilusFileChooser .nautilus-grid-view child.activatable
 #NautilusFileChooser .sidebar-pane:dir(rtl) banner > revealer > widget,
 #NautilusFileChooser .sidebar-pane.end:dir(ltr),
 #NautilusFileChooser .sidebar-pane.end:dir(ltr) banner > revealer > widget {
-  box-shadow: 0 0 0 6px #ffffff, 0 32px 0 6px #ffffff, 0 -32px 0 6px #ffffff, -2px 3px 12px rgba(0, 0, 0, 0.1), inset 0 0 0 1px white;
+  box-shadow: none;
 }
 
 .nautilus-window .sidebar-pane:backdrop:dir(ltr), .nautilus-window .sidebar-pane:backdrop:dir(ltr) banner > revealer > widget, .nautilus-window .sidebar-pane:backdrop.end:dir(rtl), .nautilus-window .sidebar-pane:backdrop.end:dir(rtl) banner > revealer > widget,

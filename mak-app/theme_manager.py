@@ -228,7 +228,6 @@ GLASSY_CONTAINER_RULES = """
 /* ── Libadwaita & GTK4 Translucent Glass App Windows ──────────────────────── */
 window,
 window.background,
-.background,
 window.background.csd,
 window.background.csd > contents,
 window.background.csd > contents > *,
@@ -246,12 +245,6 @@ split-view,
 .view,
 view,
 tab-view,
-.nautilus-window,
-.nautilus-window view,
-.nautilus-window .view,
-.nautilus-window scrolledwindow,
-.nautilus-window columnview,
-.nautilus-window listview,
 .calculator-window,
 .calculator-window view {
     background-color: @window_bg_color;
@@ -1100,6 +1093,299 @@ window.fullscreen.csd headerbar {
 }
 """
 
+def generate_popover_override(is_dark=True):
+    border_color = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.10)"
+    hover_bg = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.06)"
+    selected_bg = "rgba(255, 255, 255, 0.18)" if is_dark else "rgba(0, 0, 0, 0.10)"
+    text_color = "#f5f5f7" if is_dark else "#1d1d1f"
+    shadow = (
+        "0 10px 28px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.20)"
+        if is_dark
+        else "0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06)"
+    )
+
+    return f"""
+/* ── Clean macOS Translucent Popover & Dropdown Cards ────────────────────── */
+popover,
+popover.background,
+popover.menu,
+popover.menu.background,
+popover.menu:backdrop,
+popover:backdrop {{
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+}}
+
+popover > contents,
+popover.menu > contents,
+popover.menu.background > contents {{
+    background-color: @popover_bg_color !important;
+    color: @popover_fg_color !important;
+    border-radius: 10px !important;
+    border: 1px solid {border_color} !important;
+    box-shadow: {shadow} !important;
+    padding: 5px !important;
+}}
+
+popover > arrow,
+popover.menu > arrow {{
+    background-color: @popover_bg_color !important;
+    border: 1px solid {border_color} !important;
+    box-shadow: none !important;
+}}
+
+popover modelbutton,
+popover.menu modelbutton,
+popover listview > row,
+popover list > row,
+row.combo popover listview > row,
+row.combo popover list > row {{
+    border-radius: 6px !important;
+    min-height: 28px !important;
+    padding: 5px 10px !important;
+    margin: 1px 2px !important;
+    color: {text_color} !important;
+    font-size: 13px !important;
+}}
+
+popover modelbutton:hover,
+popover modelbutton:focus,
+popover.menu modelbutton:hover,
+popover.menu modelbutton:focus,
+popover listview > row:hover,
+popover list > row:hover,
+row.combo popover listview > row:hover,
+row.combo popover list > row:hover {{
+    background-color: {hover_bg} !important;
+    color: {text_color} !important;
+}}
+
+popover modelbutton:selected,
+popover.menu modelbutton:selected,
+popover listview > row:selected,
+popover list > row:selected,
+row.combo popover listview > row:selected,
+row.combo popover list > row:selected {{
+    background-color: {selected_bg} !important;
+    color: {text_color} !important;
+    font-weight: 500 !important;
+}}
+
+popover check,
+popover radio,
+popover check:checked,
+popover radio:checked,
+popover image {{
+    color: inherit !important;
+}}
+
+popover separator {{
+    margin: 4px 2px !important;
+    background-color: {border_color} !important;
+}}
+"""
+
+
+def generate_nautilus_override(is_dark=True):
+    border_color = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.08)"
+    text_primary = "#f5f5f7" if is_dark else "#1d1d1f"
+    text_secondary = "rgba(255, 255, 255, 0.50)" if is_dark else "rgba(0, 0, 0, 0.50)"
+    text_sidebar = "rgba(255, 255, 255, 0.85)" if is_dark else "rgba(0, 0, 0, 0.82)"
+    icon_sidebar = "rgba(255, 255, 255, 0.70)" if is_dark else "rgba(0, 0, 0, 0.65)"
+    sidebar_selected_bg = "rgba(255, 255, 255, 0.14)" if is_dark else "rgba(0, 0, 0, 0.08)"
+    sidebar_hover_bg = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.05)"
+    alt_row_bg = "rgba(255, 255, 255, 0.02)" if is_dark else "rgba(0, 0, 0, 0.02)"
+    row_hover_bg = "rgba(255, 255, 255, 0.06)" if is_dark else "rgba(0, 0, 0, 0.05)"
+    path_btn_bg = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.06)"
+    path_btn_hover = "rgba(255, 255, 255, 0.14)" if is_dark else "rgba(0, 0, 0, 0.10)"
+
+    return f"""
+/* ── macOS Finder (Nautilus) Elegant Native Styling ──────────────────────── */
+.nautilus-window {{
+    background-color: @window_bg_color !important;
+}}
+
+/* Seamless Sidebar: completely eliminate 6px black outline & gap */
+.nautilus-window .sidebar-pane,
+.nautilus-window .sidebar-pane:dir(ltr),
+.nautilus-window .sidebar-pane:dir(rtl),
+.nautilus-window .sidebar-pane:backdrop,
+.nautilus-window .sidebar-pane:backdrop:dir(ltr),
+.nautilus-window .sidebar-pane:backdrop:dir(rtl),
+#NautilusFileChooser .sidebar-pane,
+#NautilusFileChooser .sidebar-pane:dir(ltr),
+#NautilusFileChooser .sidebar-pane:dir(rtl),
+#NautilusFileChooser .sidebar-pane:backdrop {{
+    box-shadow: none !important;
+    background-color: @sidebar_bg_color !important;
+    border-right: 1px solid {border_color} !important;
+}}
+
+.nautilus-window .sidebar-pane placessidebar,
+#NautilusFileChooser .sidebar-pane placessidebar,
+.nautilus-window placessidebar {{
+    background: transparent !important;
+    background-color: transparent !important;
+}}
+
+/* Sidebar Rows */
+.nautilus-window .sidebar-pane placessidebar row,
+.nautilus-window placessidebar row,
+.nautilus-window .navigation-sidebar > row {{
+    border-radius: 6px !important;
+    margin: 1px 8px !important;
+    padding: 6px 10px !important;
+    min-height: 28px !important;
+    color: {text_sidebar} !important;
+    transition: background-color 80ms ease, color 80ms ease !important;
+}}
+
+.nautilus-window .sidebar-pane placessidebar row label,
+.nautilus-window placessidebar row label,
+.nautilus-window .navigation-sidebar > row label {{
+    color: {text_sidebar} !important;
+}}
+
+.nautilus-window .sidebar-pane placessidebar row image,
+.nautilus-window placessidebar row image,
+.nautilus-window .navigation-sidebar > row image {{
+    color: {icon_sidebar} !important;
+}}
+
+/* Sidebar Row Hover */
+.nautilus-window .sidebar-pane placessidebar row:hover,
+.nautilus-window placessidebar row:hover,
+.nautilus-window .navigation-sidebar > row:hover {{
+    background-color: {sidebar_hover_bg} !important;
+    color: {text_primary} !important;
+}}
+
+.nautilus-window .sidebar-pane placessidebar row:hover label,
+.nautilus-window .sidebar-pane placessidebar row:hover image,
+.nautilus-window placessidebar row:hover label,
+.nautilus-window placessidebar row:hover image {{
+    color: {text_primary} !important;
+}}
+
+/* Selected Sidebar Row (Home, Downloads, etc.): Crisp White Text & Icon on Translucent Pill */
+.nautilus-window .sidebar-pane placessidebar row:selected,
+.nautilus-window placessidebar row:selected,
+.nautilus-window .navigation-sidebar > row:selected,
+.nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
+#NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected {{
+    background-color: {sidebar_selected_bg} !important;
+    color: {text_primary} !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    outline: none !important;
+    border: none !important;
+}}
+
+.nautilus-window .sidebar-pane placessidebar row:selected label,
+.nautilus-window .sidebar-pane placessidebar row:selected image,
+.nautilus-window placessidebar row:selected label,
+.nautilus-window placessidebar row:selected image,
+.nautilus-window .navigation-sidebar > row:selected label,
+.nautilus-window .navigation-sidebar > row:selected image {{
+    color: {text_primary} !important;
+    font-weight: 500 !important;
+}}
+
+/* Content Pane (Files View) */
+.nautilus-window .content-pane,
+#NautilusFileChooser .content-pane {{
+    background-color: @view_bg_color !important;
+}}
+
+.nautilus-window .view,
+.nautilus-window listview.view,
+.nautilus-window columnview,
+.nautilus-window .nautilus-list-view,
+.nautilus-window .nautilus-grid-view {{
+    background-color: @view_bg_color !important;
+    color: @view_fg_color !important;
+}}
+
+/* Column Header Titles: Name, Size, Modified */
+.nautilus-window columnview header button,
+.nautilus-window columnview header button label {{
+    color: {text_secondary} !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.3px !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}}
+
+/* List View Alternating Rows & Spacing */
+.nautilus-window .nautilus-list-view listview.view > row.activatable {{
+    padding: 5px 8px !important;
+    border-radius: 5px !important;
+    margin: 1px 4px !important;
+}}
+
+.nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even) {{
+    background-color: transparent !important;
+}}
+
+.nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover) {{
+    background-color: {alt_row_bg} !important;
+}}
+
+.nautilus-window .nautilus-list-view listview.view > row.activatable:hover {{
+    background-color: {row_hover_bg} !important;
+}}
+
+/* Selected File Row: Clean macOS Blue / Accent Highlight with Pure White Text */
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected,
+.nautilus-window .nautilus-grid-view child.activatable:selected {{
+    background-color: @accent_bg_color !important;
+    color: #ffffff !important;
+    border-radius: 5px !important;
+}}
+
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label,
+.nautilus-window .nautilus-grid-view child.activatable:selected label {{
+    color: #ffffff !important;
+}}
+
+/* Subtitle / Dim labels (334 items, Today, 5:13 PM) */
+.nautilus-window .dim-label,
+.nautilus-window label.subtitle,
+.nautilus-window cell label:not(:first-child) {{
+    color: {text_secondary} !important;
+}}
+
+/* Star / Favorite Icon */
+.nautilus-window cell button.star image {{
+    color: {text_secondary} !important;
+}}
+
+.nautilus-window cell button.star:checked image {{
+    color: #f5a623 !important;
+}}
+
+/* Pathbar Pills */
+.nautilus-window .nautilus-pathbar button {{
+    border-radius: 6px !important;
+    background-color: {path_btn_bg} !important;
+    border: 1px solid {border_color} !important;
+    padding: 3px 10px !important;
+    color: {text_primary} !important;
+}}
+
+.nautilus-window .nautilus-pathbar button:hover {{
+    background-color: {path_btn_hover} !important;
+}}
+"""
+
+
 def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
     try:
         with open(src_css_path, "r", encoding="utf-8") as f:
@@ -1148,7 +1434,9 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
 """
 
     traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
-    rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE]
+    popover_override = generate_popover_override(is_dark=is_dark)
+    nautilus_override = generate_nautilus_override(is_dark=is_dark)
+    rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE, popover_override, nautilus_override]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 
