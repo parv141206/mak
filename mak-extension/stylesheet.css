@@ -1686,29 +1686,73 @@
     box-shadow: none !important;
 }
 
-/* Popups, menus, submenus, and notifications while glass is active */
-.liquid-glass-transparent .popup-menu-content,
-.liquid-glass-menu-root .popup-menu-content,
-.liquid-glass-transparent .popup-sub-menu,
-.liquid-glass-menu-root .popup-sub-menu,
+/* Shell boxpointer and notifications while glass is active */
 .liquid-glass-transparent .popup-menu-boxpointer,
 .liquid-glass-transparent.popup-menu,
-.liquid-glass-transparent .candidate-popup-content,
 .liquid-glass-transparent.notification-banner,
 .liquid-glass-transparent .notification-banner,
 .liquid-glass-transparent.message,
 .liquid-glass-transparent .message,
 .liquid-glass-transparent .message-box,
 .notification-banner.liquid-glass-transparent,
-.notification-banner.liquid-glass-transparent-keep-border,
-.quick-settings.liquid-glass-transparent,
-.quick-toggle-menu.liquid-glass-transparent,
-.liquid-glass-qs-root.quick-settings,
-.liquid-glass-qs-root .quick-settings {
+.notification-banner.liquid-glass-transparent-keep-border {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;
     box-shadow: none !important;
+}
+
+/* Quick Settings macOS Toggle Button Contrast & Legibility across Dark and Light themes */
+.quick-settings .quick-toggle:not(:checked),
+.quick-settings .quick-toggle-has-menu:not(:checked),
+.quick-toggle-menu .quick-toggle:not(:checked),
+.quick-toggle-menu .quick-toggle-has-menu:not(:checked) {
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    color: #f5f5f7 !important;
+}
+
+.quick-settings .quick-toggle:not(:checked) StLabel,
+.quick-settings .quick-toggle:not(:checked) StIcon,
+.quick-settings .quick-toggle:not(:checked) .quick-toggle-icon,
+.quick-settings .quick-toggle-has-menu:not(:checked) StLabel,
+.quick-settings .quick-toggle-has-menu:not(:checked) StIcon,
+.quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-icon,
+.quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-title,
+.quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-subtitle {
+    color: #f5f5f7 !important;
+}
+
+.quick-settings .quick-toggle:not(:checked):hover,
+.quick-settings .quick-toggle-has-menu:not(:checked):hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.quick-settings .quick-toggle-has-menu .quick-toggle:not(:checked) {
+    background-color: transparent !important;
+}
+
+.light-mode .quick-settings .quick-toggle:not(:checked),
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked),
+.light-mode .quick-toggle-menu .quick-toggle:not(:checked),
+.light-mode .quick-toggle-menu .quick-toggle-has-menu:not(:checked) {
+    background-color: rgba(0, 0, 0, 0.08) !important;
+    color: #1d1d1f !important;
+}
+
+.light-mode .quick-settings .quick-toggle:not(:checked) StLabel,
+.light-mode .quick-settings .quick-toggle:not(:checked) StIcon,
+.light-mode .quick-settings .quick-toggle:not(:checked) .quick-toggle-icon,
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked) StLabel,
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked) StIcon,
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-icon,
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-title,
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-subtitle {
+    color: #1d1d1f !important;
+}
+
+.light-mode .quick-settings .quick-toggle:not(:checked):hover,
+.light-mode .quick-settings .quick-toggle-has-menu:not(:checked):hover {
+    background-color: rgba(0, 0, 0, 0.14) !important;
 }
 
 /* Plain calendar days; today and interactive states keep their theme style. */

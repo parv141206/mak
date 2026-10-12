@@ -271,10 +271,12 @@ export class BlurModule {
             panelSettings.set_boolean('unblur-in-overview', true);
 
             if (liquidGlass) {
-                // When hardware Liquid Glass is active, disable BMS panel, popup & application blur
-                // to avoid double-blur and let the Snell-law refraction engine take over
+                // When hardware Liquid Glass is active, disable BMS panel & application blur
+                // to avoid double-blur while keeping popup refraction blur active for submenus and context menus
                 panelSettings.set_boolean('blur', false);
-                popupSettings.set_boolean('blur', false);
+                popupSettings.set_boolean('blur', true);
+                popupSettings.set_boolean('static-blur', false);
+                popupSettings.set_string('pipeline', 'pipeline_liquid_glass');
                 try {
                     const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
                     appSettings.set_boolean('blur', false);

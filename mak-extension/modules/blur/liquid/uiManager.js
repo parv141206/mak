@@ -691,7 +691,7 @@ export class UIManager {
                 return;
             this._restackGlass();
             startSyncLoop(this._frameSignalSlot, this._frameSlot, {
-                alive: () => !!this.glass && this.targetActor.mapped,
+                alive: () => !!this.glass && (this.targetActor.mapped || this.menu.isOpen),
                 honourFreeze: true,
                 errorTag: 'UIManager',
                 step: () => {
@@ -711,6 +711,7 @@ export class UIManager {
                     this._stableBaseW = undefined;
                     this._stableBaseH = undefined;
                     startFrameSync();
+                    this._syncGeometry();
                     this._sampleColors.clear();
                     this._sharedColor = null;
                     this._startAdaptiveColorSampling(true);
@@ -727,7 +728,10 @@ export class UIManager {
         this._signals.push({
             target: this.menu.actor,
             id: this.menu.actor.connect('notify::mapped', () => {
-                if (!this.menu.actor.mapped) {
+                if (this.menu.actor.mapped) {
+                    startFrameSync();
+                    this._syncGeometry();
+                } else {
                     stopFrameSync();
                     // The glass outlives the menu while it goes back into the button.
                     if (this._morph && !this._morph.opening)
@@ -1193,7 +1197,18 @@ export class UIManager {
         }
         if (!this._enableAnimation) {
             this._endMorph();
-            showMenuAtRest(this.glass, this.animActor);
+            if (targetValue === 1) {
+                showMenuAtRest(this.glass, this.animActor);
+                this._syncGeometry();
+            } else {
+                if (this.glass) {
+                    this.glass.hide();
+                    this.glass.opacity = 0;
+                }
+                if (this.animActor) {
+                    this.animActor.opacity = 0;
+                }
+            }
             return;
         }
         if (this._growFromButton && St.Settings.get().enable_animations && this._startMorph(targetValue === 1))
