@@ -37,6 +37,15 @@
     box-shadow: none !important;
 }
 
+/* When Liquid Glass is enabled on top bar, clear panel background & shadow, leaving clean 1px bottom border */
+#panel.mak-panel.liquid-glass-transparent,
+.mak-panel.liquid-glass-transparent,
+#panel.liquid-glass-transparent {
+    background-color: transparent !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: none !important;
+}
+
 /* When Opaque Top Bar is enabled, enforce 100% solid opacity even if transparent-panel is applied */
 #panel.mak-panel.opaque-panel,
 .mak-panel.opaque-panel,
@@ -1671,6 +1680,31 @@
 .liquid-glass-transparent #makDockContainer,
 .liquid-glass-transparent .aqua-bg,
 #makDockContainer.liquid-glass-transparent .aqua-bg {
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Popups, menus, submenus, and notifications while glass is active */
+.liquid-glass-transparent .popup-menu-content,
+.liquid-glass-menu-root .popup-menu-content,
+.liquid-glass-transparent .popup-sub-menu,
+.liquid-glass-menu-root .popup-sub-menu,
+.liquid-glass-transparent .popup-menu-boxpointer,
+.liquid-glass-transparent.popup-menu,
+.liquid-glass-transparent .candidate-popup-content,
+.liquid-glass-transparent.notification-banner,
+.liquid-glass-transparent .notification-banner,
+.liquid-glass-transparent.message,
+.liquid-glass-transparent .message,
+.liquid-glass-transparent .message-box,
+.notification-banner.liquid-glass-transparent,
+.notification-banner.liquid-glass-transparent-keep-border,
+.quick-settings.liquid-glass-transparent,
+.quick-toggle-menu.liquid-glass-transparent,
+.liquid-glass-qs-root.quick-settings,
+.liquid-glass-qs-root .quick-settings {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;

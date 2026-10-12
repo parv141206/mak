@@ -218,20 +218,20 @@ export class ApplicationManager {
         const metaWindow = windowActor.get_meta_window();
         if (!metaWindow)
             return null;
-        // Checked first so a desktop menu can never fall through to "apply to
-        // all windows" and pick up the application settings.
-        if (this._isDesktopMenuWindow(metaWindow))
+        if (this._windowMatchesBlacklist(metaWindow))
+            return null;
+        const windowType = metaWindow.get_window_type();
+        if (this._isDesktopMenuWindow(metaWindow) || MENU_WINDOW_TYPES.includes(windowType))
             return this._isProfileEnabled('desktop-menu') ? 'desktop-menu' : null;
         if (!this._isProfileEnabled('application'))
             return null;
         // "Apply to all windows" skips the whitelist but still only covers normal
         // and dialog windows, and still honours the blacklist.
         if (this._settings.get_boolean('application-glass-all-windows')) {
-            const windowType = metaWindow.get_window_type();
             const isNormal = windowType === Meta.WindowType.NORMAL ||
                 windowType === Meta.WindowType.DIALOG ||
                 windowType === Meta.WindowType.MODAL_DIALOG;
-            if (!isNormal || this._windowMatchesBlacklist(metaWindow))
+            if (!isNormal)
                 return null;
             return 'application';
         }
