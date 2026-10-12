@@ -285,6 +285,7 @@ export class BlurModule {
                     this._liquidGlass = new LiquidGlassController(this._extension);
                 }
                 this._liquidGlass.enable();
+                try { this._liquidGlass._syncMakPreferences?.(); } catch (e) {}
             } else {
                 if (this._liquidGlass) {
                     this._liquidGlass.disable();

@@ -1386,6 +1386,368 @@ def generate_nautilus_override(is_dark=True):
 """
 
 
+
+def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
+    if not is_dark:
+        btn_bg = "rgba(255, 255, 255, 0.75)" if is_glassy else "#ffffff"
+        btn_hover = "rgba(255, 255, 255, 0.95)" if is_glassy else "#f5f5f7"
+        btn_active = "rgba(225, 225, 230, 0.85)" if is_glassy else "#e5e5ea"
+        btn_border = "rgba(0, 0, 0, 0.12)"
+        btn_border_hover = "rgba(0, 0, 0, 0.20)"
+        btn_fg = "#1d1d1f"
+        dim_label = "rgba(0, 0, 0, 0.50)"
+        entry_bg = "rgba(255, 255, 255, 0.65)" if is_glassy else "#ffffff"
+        entry_border = "rgba(0, 0, 0, 0.12)"
+        entry_border_hover = "rgba(0, 0, 0, 0.24)"
+        hover_subtle = "rgba(0, 0, 0, 0.05)"
+        active_subtle = "rgba(0, 0, 0, 0.09)"
+        switch_off_bg = "rgba(0, 0, 0, 0.15)"
+        scale_trough_bg = "rgba(0, 0, 0, 0.12)"
+    elif is_amoled:
+        btn_bg = "rgba(255, 255, 255, 0.08)" if is_glassy else "#161618"
+        btn_hover = "rgba(255, 255, 255, 0.15)" if is_glassy else "#222226"
+        btn_active = "rgba(255, 255, 255, 0.22)" if is_glassy else "#2e2e34"
+        btn_border = "rgba(255, 255, 255, 0.14)"
+        btn_border_hover = "rgba(255, 255, 255, 0.26)"
+        btn_fg = "#ffffff"
+        dim_label = "rgba(255, 255, 255, 0.50)"
+        entry_bg = "rgba(0, 0, 0, 0.40)" if is_glassy else "#0a0a0c"
+        entry_border = "rgba(255, 255, 255, 0.14)"
+        entry_border_hover = "rgba(255, 255, 255, 0.28)"
+        hover_subtle = "rgba(255, 255, 255, 0.07)"
+        active_subtle = "rgba(255, 255, 255, 0.13)"
+        switch_off_bg = "rgba(255, 255, 255, 0.18)"
+        scale_trough_bg = "rgba(255, 255, 255, 0.14)"
+    else:
+        btn_bg = "rgba(255, 255, 255, 0.10)" if is_glassy else "#323236"
+        btn_hover = "rgba(255, 255, 255, 0.16)" if is_glassy else "#3e3e44"
+        btn_active = "rgba(255, 255, 255, 0.24)" if is_glassy else "#4a4a52"
+        btn_border = "rgba(255, 255, 255, 0.14)"
+        btn_border_hover = "rgba(255, 255, 255, 0.26)"
+        btn_fg = "#f5f5f7"
+        dim_label = "rgba(255, 255, 255, 0.50)"
+        entry_bg = "rgba(0, 0, 0, 0.28)" if is_glassy else "#1e1e20"
+        entry_border = "rgba(255, 255, 255, 0.14)"
+        entry_border_hover = "rgba(255, 255, 255, 0.26)"
+        hover_subtle = "rgba(255, 255, 255, 0.08)"
+        active_subtle = "rgba(255, 255, 255, 0.14)"
+        switch_off_bg = "rgba(255, 255, 255, 0.20)"
+        scale_trough_bg = "rgba(255, 255, 255, 0.16)"
+
+    return f"""
+/* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
+
+/* 1. Default Push Buttons */
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button) {{
+    background-color: {btn_bg};
+    border: 1px solid {btn_border};
+    color: {btn_fg};
+    border-radius: 6px;
+    padding: 5px 12px;
+    min-height: 24px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+    transition: background-color 100ms ease, border-color 100ms ease, box-shadow 100ms ease, color 100ms ease;
+}}
+
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):hover {{
+    background-color: {btn_hover};
+    border-color: {btn_border_hover};
+    color: {btn_fg};
+}}
+
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):active {{
+    background-color: {btn_active};
+    border-color: {btn_border_hover};
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.12);
+}}
+
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):checked {{
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
+    border-color: rgba(0, 0, 0, 0.15);
+}}
+
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
+    opacity: 0.45;
+    box-shadow: none;
+}}
+
+/* 2. Flat Buttons */
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
+    background-color: transparent;
+    border: 1px solid transparent;
+    box-shadow: none;
+    border-radius: 6px;
+    transition: background-color 80ms ease, color 80ms ease;
+}}
+
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover {{
+    background-color: {hover_subtle};
+}}
+
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):active {{
+    background-color: {active_subtle};
+}}
+
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked {{
+    background-color: {active_subtle};
+    color: @accent_bg_color;
+}}
+
+/* 3. Action Buttons */
+button.suggested-action {{
+    background-color: @accent_bg_color !important;
+    color: @accent_fg_color !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15) !important;
+    transition: filter 100ms ease !important;
+}}
+
+button.suggested-action:hover {{
+    filter: brightness(1.10) !important;
+}}
+
+button.suggested-action:active {{
+    filter: brightness(0.90) !important;
+}}
+
+button.destructive-action {{
+    background-color: #ff3b30 !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.15) !important;
+    border-radius: 6px !important;
+    transition: background-color 100ms ease !important;
+}}
+
+button.destructive-action:hover {{
+    background-color: #e03228 !important;
+}}
+
+button.destructive-action:active {{
+    background-color: #c4271e !important;
+}}
+
+/* 4. Dropdowns & Combo Boxes */
+dropdown,
+combobox,
+row.combo {{
+    border-radius: 6px;
+}}
+
+dropdown > button,
+combobox > box > button.combo,
+menubutton:not(.flat) > button {{
+    background-color: {btn_bg};
+    border: 1px solid {btn_border};
+    color: {btn_fg};
+    border-radius: 6px;
+    padding: 5px 10px;
+    transition: background-color 100ms ease, border-color 100ms ease;
+}}
+
+dropdown > button:hover,
+combobox > box > button.combo:hover,
+menubutton:not(.flat) > button:hover {{
+    background-color: {btn_hover};
+    border-color: {btn_border_hover};
+}}
+
+dropdown > button:active,
+combobox > box > button.combo:active,
+menubutton:not(.flat) > button:active {{
+    background-color: {btn_active};
+}}
+
+dropdown arrow,
+combobox arrow {{
+    color: {dim_label};
+    min-width: 12px;
+    min-height: 12px;
+}}
+
+/* 5. Text Entries */
+entry {{
+    background-color: {entry_bg} !important;
+    border: 1px solid {entry_border} !important;
+    border-radius: 8px !important;
+    padding: 6px 10px !important;
+    color: {btn_fg} !important;
+    box-shadow: none !important;
+    transition: border-color 120ms ease, outline 120ms ease !important;
+}}
+
+entry:hover {{
+    border-color: {entry_border_hover} !important;
+}}
+
+entry:focus-within {{
+    border-color: @accent_bg_color !important;
+    outline: 2px solid @accent_bg_color !important;
+    outline-offset: -1px !important;
+}}
+
+entry.search {{
+    border-radius: 9999px !important;
+}}
+
+/* 6. Switches */
+switch {{
+    border-radius: 9999px !important;
+    min-width: 40px !important;
+    min-height: 22px !important;
+    background-color: {switch_off_bg} !important;
+    border: 1px solid {btn_border} !important;
+    transition: background-color 160ms ease, border-color 160ms ease !important;
+}}
+
+switch:hover {{
+    filter: brightness(1.08) !important;
+}}
+
+switch:checked {{
+    background-color: @accent_bg_color !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
+}}
+
+switch > slider {{
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 1px !important;
+    border-radius: 9999px !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.28) !important;
+    border: none !important;
+}}
+
+/* 7. Checkboxes & Radio Buttons */
+check {{
+    border-radius: 4px !important;
+    border: 1px solid {btn_border_hover} !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    background-color: {entry_bg} !important;
+    color: transparent !important;
+    transition: background-color 100ms ease, border-color 100ms ease !important;
+}}
+
+check:checked {{
+    background-color: @accent_bg_color !important;
+    border-color: @accent_bg_color !important;
+    color: @accent_fg_color !important;
+}}
+
+radio {{
+    border-radius: 9999px !important;
+    border: 1px solid {btn_border_hover} !important;
+    min-width: 16px !important;
+    min-height: 16px !important;
+    background-color: {entry_bg} !important;
+    color: transparent !important;
+    transition: background-color 100ms ease, border-color 100ms ease !important;
+}}
+
+radio:checked {{
+    background-color: @accent_bg_color !important;
+    border-color: @accent_bg_color !important;
+    color: @accent_fg_color !important;
+}}
+
+/* 8. Sliders (GtkScale) */
+scale trough {{
+    background-color: {scale_trough_bg} !important;
+    border-radius: 9999px !important;
+    min-height: 5px !important;
+}}
+
+scale highlight {{
+    background-color: @accent_bg_color !important;
+    border-radius: 9999px !important;
+}}
+
+scale slider {{
+    min-width: 18px !important;
+    min-height: 18px !important;
+    border-radius: 9999px !important;
+    background-color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(0, 0, 0, 0.12) !important;
+    transition: transform 100ms ease !important;
+}}
+
+scale slider:hover {{
+    transform: scale(1.06) !important;
+}}
+
+/* 9. Interactive List Rows */
+list > row.activatable:hover,
+listview > row.activatable:hover,
+columnview row:hover {{
+    background-color: {hover_subtle} !important;
+}}
+
+list > row.activatable:active,
+listview > row.activatable:active {{
+    background-color: {active_subtle} !important;
+}}
+
+list > row.activatable:selected,
+listview > row.activatable:selected {{
+    background-color: @accent_bg_color !important;
+    color: @accent_fg_color !important;
+}}
+
+/* 10. Stack Switchers / Segmented Controls */
+stackswitcher > button {{
+    border-radius: 6px !important;
+    padding: 4px 12px !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}}
+
+stackswitcher > button:hover {{
+    background-color: {hover_subtle} !important;
+}}
+
+stackswitcher > button:checked {{
+    background-color: {btn_hover} !important;
+    color: {btn_fg} !important;
+    font-weight: 600 !important;
+}}
+
+/* 11. Minimal macOS Scrollbars */
+scrollbar trough {{
+    background: transparent !important;
+    border: none !important;
+}}
+
+scrollbar slider {{
+    border-radius: 9999px !important;
+    min-width: 6px !important;
+    min-height: 6px !important;
+    background-color: {dim_label} !important;
+    border: 2px solid transparent !important;
+    background-clip: padding-box !important;
+    transition: background-color 120ms ease !important;
+}}
+
+scrollbar slider:hover {{
+    background-color: {btn_fg} !important;
+}}
+
+/* 12. Focus Ring Consistency */
+*:focus:not(:focus-visible) {{
+    outline: none !important;
+}}
+
+*:focus-visible {{
+    outline: 2px solid @accent_bg_color !important;
+    outline-offset: 1px !important;
+}}
+"""
+
+
 def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
     try:
         with open(src_css_path, "r", encoding="utf-8") as f:
@@ -1433,10 +1795,12 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
 @define-color selected_bg_color {acc_bg};
 """
 
+    is_amoled = "amoled" in dst_css_path.lower() or "amoled" in palette.lower()
+    widgets_override = generate_widgets_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
     traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
     popover_override = generate_popover_override(is_dark=is_dark)
     nautilus_override = generate_nautilus_override(is_dark=is_dark)
-    rules_to_append = [traffic_override, WINDOW_CORNERS_CSS_OVERRIDE, popover_override, nautilus_override]
+    rules_to_append = [widgets_override, WINDOW_CORNERS_CSS_OVERRIDE, popover_override, nautilus_override, traffic_override]
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 
