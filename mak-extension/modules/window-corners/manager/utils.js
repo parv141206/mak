@@ -16,7 +16,7 @@ import { getPref } from '../utils/settings.js';
  */
 export function unwrapActor(actor) {
     if (!actor) return null;
-    const BLUR_NAMES = new Set(['blur-actor', 'bms-application-blurred-widget']);
+    const BLUR_NAMES = new Set(['blur-actor', 'bms-application-blurred-widget', 'liquid-glass-window']);
 
     // Check direct children for the surface actor
     if (typeof actor.get_children === 'function') {

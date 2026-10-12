@@ -141,13 +141,14 @@ export class LiquidGlassController {
             this._liquidSettings.set_double('glass-ior', 2.40);
             this._liquidSettings.set_double('glass-corner-smoothing', 0.6);
 
-            // Windows
+            // Windows: Keep content crisp and readable with subtle refraction behind
             this._liquidSettings.set_boolean('enable-application-glass', true);
             this._liquidSettings.set_boolean('application-glass-all-windows', true);
-            this._liquidSettings.set_double('application-content-opacity', Math.max(0.65, Math.min(0.98, globalOp)));
+            this._liquidSettings.set_double('application-content-opacity', Math.max(0.78, Math.min(0.96, globalOp)));
             this._liquidSettings.set_double('application-corner-radius', cornerRad > 0 ? cornerRad : 16.0);
-            this._liquidSettings.set_int('application-blur-radius', 12);
-            this._liquidSettings.set_double('application-tint-strength', 0.12);
+            this._liquidSettings.set_int('application-blur-radius', 14);
+            this._liquidSettings.set_string('application-tint-color', '#ffffff');
+            this._liquidSettings.set_double('application-tint-strength', 0.05);
 
             // Blacklist Chrome, Brave, VS Code, Electron to preserve solid web rendering & authentic traffic lights
             const targetBlacklist = [
@@ -165,21 +166,37 @@ export class LiquidGlassController {
 
             // Dock
             this._liquidSettings.set_boolean('enable-dock-glass', true);
-            this._liquidSettings.set_double('dock-corner-radius', dockRad > 0 ? dockRad : 27.0);
+            this._liquidSettings.set_double('dock-corner-radius', dockRad > 0 ? dockRad : 24.0);
             this._liquidSettings.set_int('dock-blur-radius', 16);
-            this._liquidSettings.set_double('dock-tint-strength', 0.14);
+            this._liquidSettings.set_string('dock-tint-color', '#ffffff');
+            this._liquidSettings.set_double('dock-tint-strength', 0.08);
 
             // Top Bar & Menus
             this._liquidSettings.set_string('top-bar-style', 'pill');
             this._liquidSettings.set_double('top-bar-corner-radius', 0.0);
             this._liquidSettings.set_int('top-bar-blur-radius', 18);
-            this._liquidSettings.set_double('top-bar-tint-strength', 0.14);
+            this._liquidSettings.set_string('top-bar-tint-color', '#ffffff');
+            this._liquidSettings.set_double('top-bar-tint-strength', 0.08);
 
             this._liquidSettings.set_boolean('enable-menu-glass', true);
+            this._liquidSettings.set_string('menu-tint-color', '#ffffff');
+            this._liquidSettings.set_double('menu-tint-strength', 0.08);
+
             this._liquidSettings.set_boolean('enable-extra-menu-glass', true);
+
+            // Quick Settings: Unified background card mode (0), not individual toggle button mode
             this._liquidSettings.set_boolean('enable-quick-settings-glass', true);
+            this._liquidSettings.set_int('quick-settings-apply-to', 0);
+            this._liquidSettings.set_string('quick-settings-tint-color', '#ffffff');
+            this._liquidSettings.set_double('quick-settings-tint-strength', 0.08);
+
             this._liquidSettings.set_boolean('enable-notification-glass', true);
+            this._liquidSettings.set_string('notification-tint-color', '#ffffff');
+            this._liquidSettings.set_double('notification-tint-strength', 0.08);
+
             this._liquidSettings.set_boolean('enable-osd-glass', true);
+            this._liquidSettings.set_string('osd-tint-color', '#ffffff');
+            this._liquidSettings.set_double('osd-tint-strength', 0.08);
         } catch (e) {
             console.warn('[Mak LiquidGlass] Error syncing preferences:', e.message);
         }

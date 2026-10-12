@@ -11,54 +11,22 @@ import { isActorValid } from './lifecycle.js';
 const _strandedFrames = new WeakMap();
 const STRANDED_FRAMES_BEFORE_RESCUE = 3;
 const _windowActorStrandedFrames = new Map();
-let _windowActorRescueMode = 'two-stage';
+let _windowActorRescueMode = 'off';
 const WINDOW_ACTOR_RESCUE_MODES = ['two-stage', 'remap', 'off'];
 
 export function setWindowActorRescueMode(mode) {
-    _windowActorRescueMode =
-        WINDOW_ACTOR_RESCUE_MODES.includes(mode) ? mode : 'two-stage';
+    _windowActorRescueMode = 'off';
 }
 
 export function getWindowActorRescueMode() {
-    return _windowActorRescueMode;
+    return 'off';
 }
 
 /**
- * Rescues a stranded window actor, gentlest option first. Remapping mutter's
- * own window actor interrupts its animations, so the first attempt asks the
- * nearest ancestor that still has an allocation to relayout: its request is
- * not swallowed, and the next relayout allocates the whole subtree.
- *
- * Returns which stage ran ('' for none) so the caller can log them apart.
+ * Rescues a stranded window actor, gentlest option first.
+ * Never remap or hide mutter window actors on Wayland as it kills surface buffer rendering.
  */
 export function ensureWindowActorAllocated(actor, relayoutFrames, remapFrames) {
-    if (!actor)
-        return '';
-    if (_windowActorRescueMode === 'off')
-        return '';
-    if (!actor.visible || !actor.mapped || actor.has_allocation()) {
-        _windowActorStrandedFrames.delete(actor);
-        return '';
-    }
-    const strandedFor = (_windowActorStrandedFrames.get(actor) ?? 0) + 1;
-    _windowActorStrandedFrames.set(actor, strandedFor);
-    if (_windowActorRescueMode !== 'remap' && strandedFor === relayoutFrames) {
-        // The window group is usually stranded too, so its own queue_relayout()
-        // would be dropped the same way.
-        let ancestor = actor.get_parent();
-        while (ancestor && isActorValid(ancestor) && !ancestor.has_allocation())
-            ancestor = ancestor.get_parent();
-        if (ancestor && isActorValid(ancestor)) {
-            ancestor.queue_relayout();
-            return 'relayout';
-        }
-    }
-    if (strandedFor >= remapFrames) {
-        _windowActorStrandedFrames.delete(actor);
-        actor.hide();
-        actor.show();
-        return 'remap';
-    }
     return '';
 }
 
