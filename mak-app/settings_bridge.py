@@ -899,12 +899,12 @@ class MakSettingsBridge:
         self.set_corner_border_color("rgba(255, 255, 255, 0.18)")
         self.set_unround_maximized(False)
         self.set_shadow_enabled(True)
-        self.set_focused_shadow_v_offset(6)
-        self.set_focused_shadow_blur(32)
-        self.set_focused_shadow_opacity(55)
-        self.set_unfocused_shadow_v_offset(3)
-        self.set_unfocused_shadow_blur(16)
-        self.set_unfocused_shadow_opacity(40)
+        self.set_focused_shadow_v_offset(5)
+        self.set_focused_shadow_blur(36)
+        self.set_focused_shadow_opacity(45)
+        self.set_unfocused_shadow_v_offset(2)
+        self.set_unfocused_shadow_blur(18)
+        self.set_unfocused_shadow_opacity(32)
 
         # Blur & Liquid Glass Refraction
         self.set_blur_enabled(True)
@@ -928,8 +928,16 @@ class MakSettingsBridge:
         self.set_quick_settings_radius(24)
         self.set_notification_radius(18)
 
-        # Apply Sonoma Graphite Theme
+        # Reset Liquid Glass Dock Shadow to Soft Apple Diffusion
         try:
-            theme_manager.apply_theme("dark")
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "shadow-intensity", "0.12"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "shadow-radius", "70.0"], check=False)
+        except Exception:
+            pass
+
+        # Apply Current macOS Theme with updated widget overrides
+        try:
+            curr_th = theme_manager.get_current_theme() or "dark"
+            theme_manager.apply_global_theme(curr_th)
         except Exception as e:
             print(f"[Bridge] Error resetting theme: {e}")

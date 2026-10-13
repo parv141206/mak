@@ -76,8 +76,8 @@ export class MaterialSettings {
             this._uniforms.set('rim_light_color_intensity', 1.0);
             this._uniforms.set('sheen_intensity', 0.0);
             this._uniforms.set('light_angle_deg', 90.0);
-            this._uniforms.set('shadow_radius', 50.0);
-            this._uniforms.set('shadow_intensity', 0.22);
+            this._uniforms.set('shadow_radius', 70.0);
+            this._uniforms.set('shadow_intensity', 0.12);
             this._uniforms.set('ao_intensity', 0.65);
             this._uniforms.set('ao_radius', 1.0);
             this._uniforms.set('tint_strength', 0.0);
