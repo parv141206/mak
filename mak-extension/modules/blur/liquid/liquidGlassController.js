@@ -37,12 +37,21 @@ export class LiquidGlassController {
         this._uiChildAddedId = 0;
         this._monitorsChangedId = 0;
         this._makSettingsIds = [];
+        this._interfaceSettings = null;
+        this._ifaceChangedId = 0;
         this._enabled = false;
     }
 
     enable() {
         if (this._enabled) return;
         this._enabled = true;
+
+        try {
+            this._interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
+            this._ifaceChangedId = this._interfaceSettings.connect('changed::gtk-theme', () => this._syncMakPreferences());
+        } catch (e) {
+            console.warn('[Mak LiquidGlass] Failed to initialize desktop interface settings:', e);
+        }
 
         try {
             this._liquidSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com' });
@@ -162,10 +171,13 @@ export class LiquidGlassController {
             this._liquidSettings.set_double('glass-ior', 2.40);
             this._liquidSettings.set_double('glass-corner-smoothing', 0.6);
 
-            // Windows: Keep content crisp and readable with subtle refraction behind
-            this._liquidSettings.set_boolean('enable-application-glass', true);
-            this._liquidSettings.set_boolean('application-glass-all-windows', true);
-            this._liquidSettings.set_double('application-content-opacity', Math.max(0.78, Math.min(0.96, globalOp)));
+            const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
+            const isGlassyTheme = gtkTheme.toLowerCase().includes('glassy') || gtkTheme.toLowerCase().includes('glass');
+
+            // Windows: Enable liquid glass refraction only when a glassy theme is selected. Keep opaque otherwise.
+            this._liquidSettings.set_boolean('enable-application-glass', isGlassyTheme);
+            this._liquidSettings.set_boolean('application-glass-all-windows', isGlassyTheme);
+            this._liquidSettings.set_double('application-content-opacity', isGlassyTheme ? Math.max(0.78, Math.min(0.96, globalOp)) : 1.0);
             this._liquidSettings.set_double('application-corner-radius', cornerRad > 0 ? cornerRad : 16.0);
             this._liquidSettings.set_int('application-blur-radius', 14);
             this._liquidSettings.set_string('application-tint-color', '#ffffff');
@@ -431,6 +443,12 @@ export class LiquidGlassController {
             try { this._makSettings.disconnect(id); } catch (e) {}
         }
         this._makSettingsIds = [];
+
+        if (this._ifaceChangedId && this._interfaceSettings) {
+            try { this._interfaceSettings.disconnect(this._ifaceChangedId); } catch (e) {}
+            this._ifaceChangedId = 0;
+        }
+        this._interfaceSettings = null;
 
         if (this._dashSearchId) {
             GLib.Source.remove(this._dashSearchId);
