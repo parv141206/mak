@@ -158,7 +158,7 @@
 
     <!-- Dock Glass Pill & Appearance -->
     <key type="i" name="dock-radius">
-      <default>25</default>
+      <default>24</default>
       <range min="0" max="40"/>
       <summary>Dock Corner Radius</summary>
       <description>Corner radius of the dock glass pill.</description>
@@ -1174,7 +1174,7 @@
     </key>
 
     <key type="i" name="notification-radius">
-      <default>16</default>
+      <default>20</default>
       <summary>Notification Corner Radius</summary>
       <description>Corner radius in pixels for desktop notification banners.</description>
     </key>
