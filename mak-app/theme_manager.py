@@ -1184,12 +1184,13 @@ popover listview > row,
 popover list > row,
 row.combo popover listview > row,
 row.combo popover list > row {{
-    border-radius: 6px;
-    min-height: 28px;
-    padding: 5px 10px;
-    margin: 1px 2px;
+    border-radius: 5px;
+    min-height: 24px;
+    padding: 4px 8px;
+    margin: 1px 3px;
     color: {text_color};
     font-size: 13px;
+    transition: background-color 80ms ease, color 80ms ease;
 }}
 
 popover modelbutton:hover,
@@ -1200,8 +1201,25 @@ popover listview > row:hover,
 popover list > row:hover,
 row.combo popover listview > row:hover,
 row.combo popover list > row:hover {{
-    background-color: {hover_bg};
-    color: {text_color};
+    background-color: @accent_bg_color;
+    color: #ffffff;
+}}
+
+popover modelbutton:hover label,
+popover.menu modelbutton:hover label,
+popover listview > row:hover label,
+popover list > row:hover label,
+row.combo popover listview > row:hover label,
+row.combo popover list > row:hover label,
+popover modelbutton:hover image,
+popover.menu modelbutton:hover image,
+popover listview > row:hover image,
+popover list > row:hover image,
+row.combo popover listview > row:hover image,
+row.combo popover list > row:hover image,
+popover modelbutton:hover accelerator,
+popover.menu modelbutton:hover accelerator {{
+    color: #ffffff;
 }}
 
 popover modelbutton:selected,
@@ -1210,9 +1228,26 @@ popover listview > row:selected,
 popover list > row:selected,
 row.combo popover listview > row:selected,
 row.combo popover list > row:selected {{
-    background-color: {selected_bg};
-    color: {text_color};
+    background-color: @accent_bg_color;
+    color: #ffffff;
     font-weight: 500;
+}}
+
+popover modelbutton:selected label,
+popover.menu modelbutton:selected label,
+popover listview > row:selected label,
+popover list > row:selected label,
+row.combo popover listview > row:selected label,
+row.combo popover list > row:selected label,
+popover modelbutton:selected image,
+popover.menu modelbutton:selected image,
+popover listview > row:selected image,
+popover list > row:selected image,
+row.combo popover listview > row:selected image,
+row.combo popover list > row:selected image,
+popover modelbutton:selected accelerator,
+popover.menu modelbutton:selected accelerator {{
+    color: #ffffff;
 }}
 
 popover check,
@@ -1524,7 +1559,7 @@ actionbar > revealer > box {{
 .response-area button,
 actionbar button {{
     min-height: 28px;
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 4px 16px;
     font-weight: 500;
 }}
@@ -1894,6 +1929,17 @@ combobox arrow {{
     min-height: 12px;
 }}
 
+box.content dropdown > button:focus,
+preferencespage dropdown > button:focus,
+dialog dropdown > button:focus,
+row.combo dropdown > button:focus,
+combobox > box > button.combo:focus {{
+    border-color: @accent_bg_color;
+    outline: 2px solid @accent_bg_color;
+    outline-offset: -1px;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
+}}
+
 /* 8. Text Entries */
 entry {{
     background-color: {entry_bg};
@@ -1901,22 +1947,26 @@ entry {{
     border-radius: 6px;
     padding: 6px 10px;
     color: {btn_fg};
+    caret-color: @accent_bg_color;
     box-shadow: none;
-    transition: border-color 120ms ease, outline 120ms ease;
+    transition: border-color 120ms ease, box-shadow 120ms ease;
 }}
 
 entry:hover {{
     border-color: {entry_border_hover};
 }}
 
+entry:focus,
 entry:focus-within {{
     border-color: @accent_bg_color;
     outline: 2px solid @accent_bg_color;
     outline-offset: -1px;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
 }}
 
 entry.search {{
     border-radius: 9999px;
+    padding: 4px 12px;
 }}
 
 /* 9. Switches */
@@ -2061,6 +2111,35 @@ scrollbar slider {{
 
 scrollbar slider:hover {{
     background-color: {btn_fg};
+}}
+
+/* 15. macOS Alerts, Sheets & Dialog Boxes */
+window.dialog,
+dialog,
+messagedialog,
+.messagedialog,
+window.message {{
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.16), 0 0 0 1px {btn_border};
+}}
+
+window.dialog headerbar,
+dialog headerbar,
+messagedialog headerbar {{
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+}}
+
+window.dialog .dialog-action-area button,
+dialog .dialog-action-area button,
+messagedialog .dialog-action-area button,
+window.dialog .response-area button,
+dialog .response-area button,
+messagedialog .response-area button {{
+    min-height: 30px;
+    border-radius: 6px;
+    padding: 4px 16px;
+    font-weight: 500;
 }}
 """
 

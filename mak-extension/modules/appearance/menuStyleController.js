@@ -79,14 +79,14 @@ export class MenuStyleController {
         let menuOpacity = 0.65;
         let textColor = '#f5f5f7';
         let secondaryTextColor = 'rgba(255, 255, 255, 0.55)';
-        let itemHoverBg = 'rgba(255, 255, 255, 0.12)';
-        let itemActiveBg = 'rgba(255, 255, 255, 0.22)';
-        let itemSelectedBg = 'rgba(255, 255, 255, 0.16)';
+        let itemHoverBg = '#007aff';
+        let itemActiveBg = '#0062cc';
+        let itemSelectedBg = '#007aff';
         let itemHoverColor = '#ffffff';
         let separatorColor = 'rgba(255, 255, 255, 0.10)';
         let borderStrokeColor = 'rgba(255, 255, 255, 0.14)';
-        let boxShadow = '0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.22)';
-        let qsBoxShadow = '0 16px 40px rgba(0, 0, 0, 0.55), 0 3px 10px rgba(0, 0, 0, 0.28)';
+        let boxShadow = '0 10px 24px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.12)';
+        let qsBoxShadow = '0 12px 28px rgba(0, 0, 0, 0.28), 0 2px 8px rgba(0, 0, 0, 0.14)';
         let pillBodyBg = `rgba(28, 28, 34, ${menuOpacity})`;
         let qsTileBg = 'rgba(255, 255, 255, 0.10)';
         let qsTileHoverBg = 'rgba(255, 255, 255, 0.16)';
@@ -101,14 +101,14 @@ export class MenuStyleController {
             menuOpacity = 0.72;
             textColor = '#1d1d1f';
             secondaryTextColor = 'rgba(0, 0, 0, 0.55)';
-            itemHoverBg = 'rgba(0, 0, 0, 0.06)';
-            itemActiveBg = 'rgba(0, 0, 0, 0.12)';
-            itemSelectedBg = 'rgba(0, 0, 0, 0.09)';
-            itemHoverColor = '#000000';
+            itemHoverBg = '#007aff';
+            itemActiveBg = '#0062cc';
+            itemSelectedBg = '#007aff';
+            itemHoverColor = '#ffffff';
             separatorColor = 'rgba(0, 0, 0, 0.08)';
             borderStrokeColor = 'rgba(0, 0, 0, 0.12)';
-            boxShadow = '0 10px 30px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08)';
-            qsBoxShadow = '0 14px 34px rgba(0, 0, 0, 0.18), 0 3px 8px rgba(0, 0, 0, 0.08)';
+            boxShadow = '0 8px 20px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06)';
+            qsBoxShadow = '0 10px 24px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06)';
             pillBodyBg = `rgba(255, 255, 255, ${menuOpacity})`;
             qsTileBg = 'rgba(0, 0, 0, 0.05)';
             qsTileHoverBg = 'rgba(0, 0, 0, 0.09)';
@@ -122,14 +122,14 @@ export class MenuStyleController {
             menuOpacity = 0.85;
             textColor = '#ffffff';
             secondaryTextColor = 'rgba(255, 255, 255, 0.60)';
-            itemHoverBg = 'rgba(255, 255, 255, 0.15)';
-            itemActiveBg = 'rgba(255, 255, 255, 0.25)';
-            itemSelectedBg = 'rgba(255, 255, 255, 0.18)';
+            itemHoverBg = '#007aff';
+            itemActiveBg = '#0062cc';
+            itemSelectedBg = '#007aff';
             itemHoverColor = '#ffffff';
             separatorColor = 'rgba(255, 255, 255, 0.12)';
             borderStrokeColor = 'rgba(255, 255, 255, 0.18)';
-            boxShadow = '0 14px 36px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.35)';
-            qsBoxShadow = '0 18px 44px rgba(0, 0, 0, 0.85), 0 4px 12px rgba(0, 0, 0, 0.45)';
+            boxShadow = '0 10px 28px rgba(0, 0, 0, 0.50), 0 2px 6px rgba(0, 0, 0, 0.25)';
+            qsBoxShadow = '0 12px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.28)';
             pillBodyBg = `rgba(10, 10, 12, ${menuOpacity})`;
             qsTileBg = 'rgba(255, 255, 255, 0.12)';
             qsTileHoverBg = 'rgba(255, 255, 255, 0.18)';
@@ -145,11 +145,11 @@ export class MenuStyleController {
             menuOpacity = isLight ? 0.62 : 0.58;
             borderStrokeColor = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.16)';
             boxShadow = isLight
-                ? '0 8px 24px rgba(0, 0, 0, 0.12), 0 1px 4px rgba(0, 0, 0, 0.06)'
-                : '0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.22)';
+                ? '0 6px 18px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)'
+                : '0 10px 24px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.14)';
             qsBoxShadow = isLight
-                ? '0 12px 28px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 16px 40px rgba(0, 0, 0, 0.55), 0 3px 10px rgba(0, 0, 0, 0.28)';
+                ? '0 8px 22px rgba(0, 0, 0, 0.10), 0 2px 5px rgba(0, 0, 0, 0.05)'
+                : '0 12px 28px rgba(0, 0, 0, 0.32), 0 2px 8px rgba(0, 0, 0, 0.16)';
         }
 
         const borderCss = `${borderWidth > 0 ? borderWidth : 1}px solid ${borderStrokeColor}`;
@@ -446,13 +446,21 @@ export class MenuStyleController {
 }
 
 /* ── Quick Settings Control Center ────────────────────────────────────────── */
-.quick-settings:not(.liquid-glass-transparent):not(.liquid-glass-qs-root),
-.quick-toggle-menu:not(.liquid-glass-transparent):not(.liquid-glass-qs-root) {
-    border-radius: ${qsRadius}px !important;
-    border: ${borderCss} !important;
-    background-color: rgba(${bgR}, ${bgG}, ${bgB}, ${menuOpacity.toFixed(2)}) !important;
-    box-shadow: ${qsBoxShadow} !important;
+/* Eliminate duplicate background: the outer popup-menu-content provides the card */
+.quick-settings,
+.quick-toggle-menu {
+    border: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
     color: ${textColor} !important;
+}
+
+/* Ensure the popup container around quick settings has the proper radius & shadow */
+.quick-settings-menu .popup-menu-content,
+.popup-menu-content:has(.quick-settings) {
+    border-radius: ${qsRadius}px !important;
+    box-shadow: ${qsBoxShadow} !important;
 }
 
 .liquid-glass-transparent .quick-settings,
