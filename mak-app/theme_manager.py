@@ -1447,12 +1447,12 @@ treeview.view > header > button:active,
 
 /* Pathbar Pills & Action Buttons */
 .nautilus-window .nautilus-pathbar button {{
-    border-radius: 6px;
+    border-radius: 9999px;
     background: transparent;
     background-color: transparent;
     background-image: none;
     border: none;
-    padding: 3px 8px;
+    padding: 3px 10px;
     min-height: 26px;
     color: {text_primary};
     box-shadow: none;
@@ -1460,6 +1460,36 @@ treeview.view > header > button:active,
 
 .nautilus-window .nautilus-pathbar button:hover {{
     background-color: {path_btn_hover};
+    box-shadow: none;
+}}
+
+/* History Navigation Pills (< | >) with authentic macOS pill capsule container */
+.nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box,
+.nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box {{
+    margin-left: 10px;
+    padding: 2px;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.08);
+    background-image: image(rgba(255, 255, 255, 0.12));
+    background-size: 1px 14px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}}
+
+.nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
+.nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
+    min-height: 24px;
+    min-width: 24px;
+    padding: 2px 6px;
+    border-radius: 9999px;
+    background-color: transparent;
+    border: none;
     box-shadow: none;
 }}
 """
@@ -1534,8 +1564,8 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     background-image: none;
     border: 1px solid {btn_border};
     color: {btn_fg};
-    border-radius: 6px;
-    padding: 4px 12px;
+    border-radius: 9999px;
+    padding: 4px 14px;
     min-height: 26px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: background-color 80ms ease, border-color 80ms ease, color 80ms ease;
@@ -1564,7 +1594,7 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
     box-shadow: none;
 }}
 
-/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, square squircle, gentle hover) */
+/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, circular pill on hover) */
 window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
@@ -1580,7 +1610,7 @@ popover button:not(.suggested-action):not(.destructive-action) {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 9999px;
     color: {btn_fg};
     min-height: 28px;
     min-width: 28px;
@@ -1634,24 +1664,32 @@ tab button:checked {{
     box-shadow: none;
 }}
 
-/* 3. Headerbar Split Buttons (e.g. Console '+ | v' tab button) */
+/* 3. Headerbar Split Buttons & Linked Pills (e.g. Navigation, History, View Toggles) */
 headerbar splitbutton,
-.titlebar splitbutton {{
-    background-color: transparent;
+.titlebar splitbutton,
+headerbar .linked,
+.titlebar .linked,
+headerbar box.linked,
+.titlebar box.linked {{
+    background-color: {pill_bg};
     background-image: none;
-    border: none;
+    border: 1px solid {pill_border};
     box-shadow: none;
-    border-radius: 6px;
-    margin: 0 2px;
-    padding: 0;
+    border-radius: 9999px;
+    margin: 0 4px;
+    padding: 1px;
 }}
 
 headerbar splitbutton > button,
-headerbar splitbutton > menubutton > button {{
-    min-height: 28px;
-    min-width: 28px;
-    padding: 4px 6px;
-    border-radius: 6px;
+headerbar splitbutton > menubutton > button,
+headerbar .linked > button,
+headerbar .linked > menubutton > button,
+headerbar box.linked > button,
+headerbar box.linked > menubutton > button {{
+    min-height: 26px;
+    min-width: 26px;
+    padding: 3px 8px;
+    border-radius: 9999px;
     background-color: transparent;
     background-image: none;
     border: none;
@@ -1661,81 +1699,39 @@ headerbar splitbutton > menubutton > button {{
 }}
 
 headerbar splitbutton > button:hover,
-headerbar splitbutton > menubutton > button:hover {{
-    background-color: {hover_subtle};
+headerbar splitbutton > menubutton > button:hover,
+headerbar .linked > button:hover,
+headerbar .linked > menubutton > button:hover,
+headerbar box.linked > button:hover,
+headerbar box.linked > menubutton > button:hover {{
+    background-color: {pill_hover};
     background-image: none;
     box-shadow: none;
 }}
 
 headerbar splitbutton > button:active,
-headerbar splitbutton > menubutton > button:active {{
-    background-color: {active_subtle};
+headerbar splitbutton > menubutton > button:active,
+headerbar .linked > button:active,
+headerbar .linked > menubutton > button:active,
+headerbar box.linked > button:active,
+headerbar box.linked > menubutton > button:active {{
+    background-color: {pill_active};
     background-image: none;
     box-shadow: none;
 }}
 
 headerbar splitbutton > button:dir(ltr),
-headerbar splitbutton > menubutton > button:dir(rtl) {{
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-right: 0;
-}}
-
-headerbar splitbutton > menubutton > button:dir(ltr),
-headerbar splitbutton > button:dir(rtl) {{
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    margin-left: 0;
-}}
-
-/* 4. Headerbar Linked Button Groups (e.g. Nautilus '< | >' history buttons) */
-headerbar .linked > button,
-headerbar .linked > menubutton > button,
-headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
-headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button,
-headerbar box.linked > button,
-headerbar box.linked > menubutton > button {{
-    min-height: 28px;
-    min-width: 28px;
-    padding: 4px 6px;
-    background-color: transparent;
-    background-image: none;
-    border: none;
-    box-shadow: none;
-    border-radius: 6px;
-    color: {btn_fg};
-    transition: background-color 80ms ease;
-}}
-
-headerbar .linked > button:hover,
-headerbar .linked > menubutton > button:hover,
-headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
-headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
-headerbar box.linked > button:hover,
-headerbar box.linked > menubutton > button:hover {{
-    background-color: {hover_subtle};
-    background-image: none;
-    box-shadow: none;
-}}
-
-headerbar .linked > button:active,
-headerbar .linked > menubutton > button:active,
-headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:active,
-headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:active,
-headerbar box.linked > button:active,
-headerbar box.linked > menubutton > button:active {{
-    background-color: {active_subtle};
-    background-image: none;
-    box-shadow: none;
-}}
-
+headerbar splitbutton > menubutton > button:dir(rtl),
 headerbar .linked > button:dir(ltr):not(:last-child),
 headerbar box.linked > button:dir(ltr):not(:last-child) {{
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     margin-right: 0;
+    border-right: 1px solid {pill_border};
 }}
 
+headerbar splitbutton > menubutton > button:dir(ltr),
+headerbar splitbutton > button:dir(rtl),
 headerbar .linked > button:dir(ltr):not(:first-child),
 headerbar box.linked > button:dir(ltr):not(:first-child) {{
     border-top-left-radius: 0;
@@ -1749,7 +1745,7 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 9999px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
@@ -1771,7 +1767,8 @@ button.suggested-action {{
     background-color: @accent_bg_color;
     color: @accent_fg_color;
     border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    border-radius: 9999px;
+    padding: 4px 14px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }}
 
@@ -1787,7 +1784,8 @@ button.destructive-action {{
     background-color: #ff3b30;
     color: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    border-radius: 9999px;
+    padding: 4px 14px;
     transition: background-color 100ms ease;
 }}
 
@@ -1979,22 +1977,30 @@ listview > row.activatable:selected {{
 }}
 
 /* 13. Stack Switchers / Segmented Controls */
+stackswitcher {{
+    border-radius: 9999px;
+    padding: 2px;
+    background-color: {pill_bg};
+    border: 1px solid {pill_border};
+}}
+
 stackswitcher > button {{
-    border-radius: 6px;
-    padding: 4px 12px;
+    border-radius: 9999px;
+    padding: 3px 12px;
     background-color: transparent;
     border: none;
     box-shadow: none;
 }}
 
 stackswitcher > button:hover {{
-    background-color: {hover_subtle};
+    background-color: {pill_hover};
 }}
 
 stackswitcher > button:checked {{
     background-color: {btn_hover};
     color: {btn_fg};
     font-weight: 600;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }}
 
 /* 14. Minimal macOS Scrollbars */
