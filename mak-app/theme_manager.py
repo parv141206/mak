@@ -43,10 +43,10 @@ THEMES = {
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "is_glassy": False,
-        "dock_pill_color": "rgba(10, 10, 12, 0.60)",
-        "dock_border_color": "rgba(255, 255, 255, 0.16)",
-        "window_border_color": "rgba(255, 255, 255, 0.14)",
-        "description": "True pitch black solid OLED Midnight (#000000) with ultra-high contrast and obsidian surfaces."
+        "dock_pill_color": "rgba(24, 24, 28, 0.50)",
+        "dock_border_color": "rgba(255, 255, 255, 0.18)",
+        "window_border_color": "rgba(255, 255, 255, 0.16)",
+        "description": "Refined obsidian dark mode, a little darker than standard graphite (#18181a) with balanced contrast and crisp native accents."
     },
     "amoled-glassy": {
         "id": "amoled-glassy",
@@ -57,10 +57,10 @@ THEMES = {
         "cursor_theme": "MacTahoe-dark",
         "is_dark": True,
         "is_glassy": True,
-        "dock_pill_color": "rgba(0, 0, 0, 0.35)",
-        "dock_border_color": "rgba(255, 255, 255, 0.16)",
+        "dock_pill_color": "rgba(20, 20, 24, 0.35)",
+        "dock_border_color": "rgba(255, 255, 255, 0.18)",
         "window_border_color": "rgba(255, 255, 255, 0.16)",
-        "description": "Translucent pitch black obsidian glass with deep backdrop blur and native desktop accents."
+        "description": "Translucent deep obsidian glass with rich backdrop blur and native desktop accents."
     },
     "light": {
         "id": "light",
@@ -137,46 +137,45 @@ GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
 """
 
 AMOLED_PALETTE_OVERRIDE = """
-/* ── Mak macOS AMOLED Pitch Black Obsidian Palette ────────────────────────── */
-@define-color window_bg_color #000000;
-@define-color window_fg_color #ffffff;
-@define-color view_bg_color #000000;
-@define-color view_fg_color #ffffff;
-@define-color headerbar_bg_color #08080a;
-@define-color headerbar_solid_bg #08080a;
+/* ── Mak macOS Deep Obsidian Dark Palette (Sleek Deep Dark, Non-Void) ────────── */
+@define-color window_bg_color #18181a;
+@define-color window_fg_color #f5f5f7;
+@define-color view_bg_color #131315;
+@define-color view_fg_color #f5f5f7;
+@define-color headerbar_bg_color #1e1e21;
+@define-color headerbar_solid_bg #1e1e21;
 @define-color headerbar_fg_color #ffffff;
-@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color #000000;
-@define-color sidebar_fg_color #ffffff;
-@define-color secondary_sidebar_bg_color #000000;
-@define-color card_bg_color #121214;
-@define-color card_fg_color #ffffff;
-@define-color dialog_bg_color #0a0a0c;
-@define-color dialog_fg_color #ffffff;
-@define-color popover_bg_color #0e0e10;
-@define-color popover_fg_color #ffffff;
+@define-color headerbar_border_color rgba(255, 255, 255, 0.10);
+@define-color sidebar_bg_color #161618;
+@define-color sidebar_fg_color #f5f5f7;
+@define-color secondary_sidebar_bg_color #111113;
+@define-color card_bg_color #1e1e22;
+@define-color card_fg_color #f5f5f7;
+@define-color dialog_bg_color #1a1a1d;
+@define-color dialog_fg_color #f5f5f7;
+@define-color popover_bg_color #1e1e22;
+@define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
 AMOLED_GLASSY_PALETTE_OVERRIDE = """
-/* ── Mak macOS AMOLED Obsidian Glass Translucent Palette ─────────────────── */
-@define-color window_bg_color rgba(0, 0, 0, 0.75);
-@define-color window_fg_color #ffffff;
-@define-color view_bg_color rgba(0, 0, 0, 0.70);
-@define-color view_fg_color #ffffff;
-@define-color headerbar_bg_color rgba(12, 12, 14, 0.80);
-@define-color headerbar_solid_bg #08080a;
+/* ── Mak macOS Deep Obsidian Glass Translucent Palette ────────────────────── */
+@define-color window_bg_color rgba(24, 24, 26, 0.76);
+@define-color window_fg_color #f5f5f7;
+@define-color view_bg_color rgba(19, 19, 21, 0.72);
+@define-color view_fg_color #f5f5f7;
+@define-color headerbar_bg_color rgba(30, 30, 33, 0.78);
+@define-color headerbar_solid_bg #1e1e21;
 @define-color headerbar_fg_color #ffffff;
-@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color rgba(0, 0, 0, 0.68);
-@define-color sidebar_fg_color #ffffff;
-@define-color secondary_sidebar_bg_color rgba(0, 0, 0, 0.62);
-@define-color card_bg_color rgba(18, 18, 22, 0.70);
-@define-color card_fg_color #ffffff;
-@define-color dialog_bg_color rgba(12, 12, 14, 0.85);
-@define-color dialog_fg_color #ffffff;
-@define-color popover_bg_color rgba(14, 14, 16, 0.85);
-@define-color popover_fg_color #ffffff;
+@define-color headerbar_border_color rgba(255, 255, 255, 0.10);
+@define-color sidebar_bg_color rgba(22, 22, 24, 0.70);
+@define-color sidebar_fg_color #f5f5f7;
+@define-color secondary_sidebar_bg_color rgba(17, 17, 19, 0.65);
+@define-color card_bg_color rgba(30, 30, 34, 0.72);
+@define-color dialog_bg_color rgba(26, 26, 29, 0.85);
+@define-color dialog_fg_color #f5f5f7;
+@define-color popover_bg_color rgba(26, 26, 29, 0.85);
+@define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
