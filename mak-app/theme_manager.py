@@ -1696,7 +1696,7 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
 /* 1. Universal In-Window Push Buttons (Dialogs, content pages, settings) */
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button) {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular) {{
     background-color: {btn_bg};
     background-image: none;
     border: {btn_border};
@@ -1709,22 +1709,30 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):hover {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):hover {{
     background-color: {btn_hover};
     color: {btn_fg};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):active {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):active {{
     background-color: {btn_active};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):checked {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):checked {{
     background-color: @accent_bg_color;
     color: @accent_fg_color;
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.circular):disabled {{
     opacity: 0.35;
+    box-shadow: none;
+}}
+
+button.circular {{
+    border-radius: 9999px;
+    padding: 0;
+    min-width: 24px;
+    min-height: 24px;
     box-shadow: none;
 }}
 
