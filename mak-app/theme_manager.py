@@ -1385,7 +1385,7 @@ def generate_nautilus_override(is_dark=True):
     color: @view_fg_color;
 }}
 
-/* Column Header Titles: Name, Size, Modified */
+/* Column Header Titles: Name, Size, Modified (Flat, clean Apple typography) */
 columnview header,
 columnview header > button,
 columnview header button,
@@ -1395,17 +1395,17 @@ treeview.view > header > button,
 .nautilus-window columnview header > button,
 .nautilus-window columnview header button,
 .nautilus-window columnview header button label {{
-    color: {text_secondary};
-    font-size: 11px;
-    font-weight: 600;
+    color: {text_secondary} !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
     letter-spacing: 0.3px;
-    border: none;
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
-    box-shadow: none;
-    padding: 4px 8px;
-    min-height: 24px;
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    padding: 2px 8px !important;
+    min-height: 22px !important;
 }}
 
 columnview header > button:hover,
@@ -1413,55 +1413,69 @@ columnview header button:hover,
 columnview.view > header > button:hover,
 treeview.view > header > button:hover,
 .nautilus-window columnview header button:hover {{
-    background: transparent;
-    background-color: rgba(255, 255, 255, 0.05);
-    background-image: none;
-    box-shadow: none;
-    color: {text_primary};
+    background: transparent !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: {text_primary} !important;
 }}
 
 columnview header > button:active,
 columnview header button:active,
+columnview header button:checked,
 columnview.view > header > button:active,
+columnview.view > header > button:checked,
 treeview.view > header > button:active,
-.nautilus-window columnview header button:active {{
-    background: transparent;
-    background-color: rgba(255, 255, 255, 0.08);
-    background-image: none;
-    box-shadow: none;
+treeview.view > header > button:checked,
+.nautilus-window columnview header button:active,
+.nautilus-window columnview header button:checked {{
+    background: transparent !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }}
 
 /* List View Alternating Rows & Spacing */
-.nautilus-window .nautilus-list-view listview.view > row.activatable {{
-    padding: 5px 8px;
-    border-radius: 5px;
-    margin: 1px 4px;
+.nautilus-window .nautilus-list-view listview.view > row.activatable,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable {{
+    padding: 3px 8px !important;
+    min-height: 24px !important;
+    border-radius: 4px !important;
+    margin: 1px 4px !important;
+    font-size: 13px !important;
 }}
 
-.nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even) {{
-    background-color: transparent;
+.nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even),
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:nth-child(even) {{
+    background-color: transparent !important;
 }}
 
-.nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover) {{
-    background-color: {alt_row_bg};
+.nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover),
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover) {{
+    background-color: {alt_row_bg} !important;
 }}
 
-.nautilus-window .nautilus-list-view listview.view > row.activatable:hover {{
-    background-color: {row_hover_bg};
+.nautilus-window .nautilus-list-view listview.view > row.activatable:hover:not(:selected),
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:hover:not(:selected) {{
+    background-color: {row_hover_bg} !important;
 }}
 
 /* Selected File Row */
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected,
-.nautilus-window .nautilus-grid-view child.activatable:selected {{
-    background-color: @accent_bg_color;
-    color: #ffffff;
-    border-radius: 5px;
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected,
+.nautilus-window .nautilus-grid-view child.activatable:selected,
+#NautilusFileChooser .nautilus-grid-view child.activatable:selected {{
+    background-color: @accent_bg_color !important;
+    color: #ffffff !important;
+    border-radius: 4px !important;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label,
 .nautilus-window .nautilus-grid-view child.activatable:selected label {{
-    color: #ffffff;
+    color: #ffffff !important;
 }}
 
 /* Subtitle / Dim labels */
@@ -1480,35 +1494,36 @@ treeview.view > header > button:active,
     color: #f5a623;
 }}
 
-/* Pathbar Pills & Location Dropdown (Apple macOS Segmented Location Control) */
+/* Pathbar Container (Transparent: prevents stretched dark box across headerbar) */
 .nautilus-window .nautilus-pathbar,
 #NautilusFileChooser .nautilus-pathbar {{
-    background-color: {path_btn_bg};
-    border-radius: 8px;
-    border: 1px solid {border_color};
-    padding: 2px 4px;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
     margin: 0 4px;
 }}
 
+/* Pathbar Location Dropdown Button (Apple macOS Compact Pill) */
 .nautilus-window .nautilus-pathbar button,
 #NautilusFileChooser .nautilus-pathbar button {{
-    border-radius: 6px;
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
-    border: none;
-    padding: 2px 8px;
-    min-height: 22px;
-    font-size: 13px;
-    font-weight: 500;
-    color: {text_primary};
-    box-shadow: none;
+    border-radius: 6px !important;
+    background: transparent !important;
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid {border_color} !important;
+    padding: 3px 10px !important;
+    min-height: 24px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    color: {text_primary} !important;
+    box-shadow: none !important;
 }}
 
 .nautilus-window .nautilus-pathbar button:hover,
 #NautilusFileChooser .nautilus-pathbar button:hover {{
-    background-color: {path_btn_hover};
-    box-shadow: none;
+    background-color: rgba(255, 255, 255, 0.14) !important;
+    box-shadow: none !important;
 }}
 
 /* History Navigation Capsule (< | >) */
@@ -1518,31 +1533,32 @@ treeview.view > header > button:active,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box {{
     margin-left: 10px;
     padding: 1px;
-    border-radius: 8px;
-    background-color: {path_btn_bg};
-    border: 1px solid {border_color};
-    box-shadow: none;
+    border-radius: 7px !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    border: 1px solid {border_color} !important;
+    box-shadow: none !important;
 }}
 
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
-    min-height: 24px;
-    min-width: 26px;
-    padding: 2px 4px;
-    border-radius: 6px;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    color: {text_primary};
+    min-height: 24px !important;
+    min-width: 24px !important;
+    padding: 2px 4px !important;
+    border-radius: 5px !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: {text_primary} !important;
 }}
 
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
-    background-color: {path_btn_hover};
+    background-color: rgba(255, 255, 255, 0.10) !important;
 }}
 
 /* Dialog & Window Bottom Action Bar (Save / Cancel / New Folder / Delete) */
@@ -1666,23 +1682,23 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
 }}
 
 /* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, rounded rect on hover) */
-window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
-window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 headerbar menubutton > button,
 .titlebar menubutton > button,
 headerbar menubutton.flat > button,
 tab button,
 .sidebar button,
 popover button:not(.suggested-action):not(.destructive-action) {{
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
-    border: none;
-    box-shadow: none;
-    border-radius: 6px;
-    color: {btn_fg};
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 6px !important;
+    color: {btn_fg} !important;
     min-height: 28px;
     min-width: 28px;
     padding: 4px;
@@ -1690,36 +1706,38 @@ popover button:not(.suggested-action):not(.destructive-action) {{
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
-window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
+window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover,
 headerbar menubutton > button:hover,
 .titlebar menubutton > button:hover,
 headerbar menubutton.flat > button:hover,
 tab button:hover,
 .sidebar button:hover,
 popover button:not(.suggested-action):not(.destructive-action):hover {{
-    background-color: {hover_subtle};
-    background-image: none;
-    border: none;
-    box-shadow: none;
+    background: transparent !important;
+    background-color: {hover_subtle} !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }}
 
-window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
-window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
+window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
 headerbar menubutton > button:active,
 .titlebar menubutton > button:active,
 headerbar menubutton.flat > button:active,
 tab button:active,
 .sidebar button:active,
 popover button:not(.suggested-action):not(.destructive-action):active {{
-    background-color: {active_subtle};
-    background-image: none;
-    border-color: transparent;
-    box-shadow: none;
+    background: transparent !important;
+    background-color: {active_subtle} !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
 }}
 
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
@@ -1728,11 +1746,12 @@ headerbar menubutton > button:checked,
 .titlebar menubutton > button:checked,
 headerbar menubutton.flat > button:checked,
 tab button:checked {{
-    background-color: {active_subtle};
-    background-image: none;
-    border-color: transparent;
-    color: @accent_bg_color;
-    box-shadow: none;
+    background: transparent !important;
+    background-color: {active_subtle} !important;
+    background-image: none !important;
+    border: none !important;
+    color: @accent_bg_color !important;
+    box-shadow: none !important;
 }}
 
 /* 3. Headerbar Split Buttons & Linked Controls (e.g. Navigation, History, View Toggles) */
