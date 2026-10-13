@@ -1172,10 +1172,15 @@ popover.menu.background > contents {{
 }}
 
 popover > arrow,
-popover.menu > arrow {{
-    background-color: @popover_bg_color;
-    border: 1px solid {border_color};
+popover.menu > arrow,
+popover arrow {{
+    background: transparent;
+    background-color: transparent;
+    border: none;
     box-shadow: none;
+    opacity: 0;
+    min-width: 0;
+    min-height: 0;
 }}
 
 popover modelbutton,
@@ -1414,7 +1419,7 @@ columnview.view > header > button:hover,
 treeview.view > header > button:hover,
 .nautilus-window columnview header button:hover {{
     background: transparent;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: transparent;
     background-image: none;
     border: none;
     box-shadow: none;
@@ -1431,35 +1436,58 @@ treeview.view > header > button:checked,
 .nautilus-window columnview header button:active,
 .nautilus-window columnview header button:checked {{
     background: transparent;
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: transparent;
     background-image: none;
     border: none;
     box-shadow: none;
+    color: {text_primary};
 }}
 
-/* List View Alternating Rows & Spacing */
+/* List View Alternating Rows & Spacing: Full width, compact macOS height */
+.nautilus-window .nautilus-list-view listview.view,
+#NautilusFileChooser .nautilus-list-view listview.view {{
+    border-spacing: 0;
+    padding: 0;
+    margin: 0;
+}}
+
 .nautilus-window .nautilus-list-view listview.view > row.activatable,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable {{
-    padding: 3px 8px;
-    min-height: 24px;
-    border-radius: 4px;
-    margin: 1px 4px;
+    padding: 0 4px;
+    min-height: 20px;
+    border-radius: 0;
+    margin: 0;
     font-size: 13px;
+}}
+
+.nautilus-window .nautilus-list-view cell,
+#NautilusFileChooser .nautilus-list-view cell {{
+    min-height: 20px;
+    padding: 0;
+}}
+
+.nautilus-window .nautilus-list-view listview.view > row.activatable > cell > widget#NautilusViewCell,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable > cell > widget#NautilusViewCell {{
+    padding: 1px 4px;
+    min-height: 20px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even),
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:nth-child(even) {{
     background-color: transparent;
+    background-image: none;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover),
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover) {{
     background-color: {alt_row_bg};
+    background-image: none;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:hover:not(:selected),
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:hover:not(:selected) {{
     background-color: {row_hover_bg};
+    background-image: none;
 }}
 
 /* Selected File Row */
@@ -1468,8 +1496,10 @@ treeview.view > header > button:checked,
 .nautilus-window .nautilus-grid-view child.activatable:selected,
 #NautilusFileChooser .nautilus-grid-view child.activatable:selected {{
     background-color: @accent_bg_color;
-    color: #ffffff;
-    border-radius: 4px;
+    background-image: none;
+    color: @accent_fg_color;
+    border-radius: 0;
+    margin: 0;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
@@ -1508,11 +1538,11 @@ treeview.view > header > button:checked,
 /* Pathbar Location Dropdown Button (Apple macOS Compact Pill) */
 .nautilus-window .nautilus-pathbar button,
 #NautilusFileChooser .nautilus-pathbar button {{
-    border-radius: 6px;
+    border-radius: 9999px;
     background: transparent;
     background-color: rgba(255, 255, 255, 0.08);
     border: none;
-    padding: 2px 9px;
+    padding: 2px 10px;
     min-height: 24px;
     font-size: 13px;
     font-weight: 500;
@@ -1533,7 +1563,7 @@ treeview.view > header > button:checked,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box {{
     margin-left: 10px;
     padding: 2px;
-    border-radius: 6px;
+    border-radius: 9999px;
     background-color: rgba(255, 255, 255, 0.08);
     border: none;
     box-shadow: none;
@@ -1546,7 +1576,7 @@ treeview.view > header > button:checked,
     min-height: 22px;
     min-width: 22px;
     padding: 2px 4px;
-    border-radius: 5px;
+    border-radius: 9999px;
     background: transparent;
     background-color: transparent;
     border: none;
@@ -1575,8 +1605,8 @@ actionbar > revealer > box {{
 .response-area button,
 actionbar button {{
     min-height: 28px;
-    border-radius: 6px;
-    padding: 4px 16px;
+    border-radius: 9999px;
+    padding: 4px 18px;
     font-weight: 500;
 }}
 """
@@ -1650,8 +1680,8 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     background-image: none;
     border: {btn_border};
     color: {btn_fg};
-    border-radius: 6px;
-    padding: 3px 12px;
+    border-radius: 9999px;
+    padding: 3px 14px;
     min-height: 26px;
     font-weight: 400;
     box-shadow: {btn_shadow};
@@ -1677,7 +1707,7 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
     box-shadow: none;
 }}
 
-/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat, borderless at rest, subtle rounded rect on hover) */
+/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat, borderless at rest, subtle rounded pill on hover) */
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
@@ -1695,11 +1725,11 @@ window.kgx headerbar button:not(.suggested-action):not(.destructive-action) {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 9999px;
     color: {btn_fg};
     min-height: 26px;
     min-width: 26px;
-    padding: 3px 5px;
+    padding: 3px 6px;
     margin: 0 1px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
@@ -1775,7 +1805,7 @@ window.kgx headerbar .linked {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 9999px;
     margin: 0 3px;
     padding: 2px;
 }}
@@ -1794,8 +1824,8 @@ window.kgx headerbar splitbutton > button,
 window.kgx headerbar splitbutton > menubutton > button {{
     min-height: 22px;
     min-width: 22px;
-    padding: 2px 7px;
-    border-radius: 5px;
+    padding: 2px 8px;
+    border-radius: 9999px;
     background: transparent;
     background-color: transparent;
     background-image: none;
@@ -1849,7 +1879,7 @@ headerbar viewswitcher > button:checked {{
     border: none;
     color: {pill_checked_fg};
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
-    border-radius: 5px;
+    border-radius: 9999px;
 }}
 
 /* 5. Flat Buttons */
@@ -1858,7 +1888,7 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 6px;
+    border-radius: 9999px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
@@ -1877,23 +1907,23 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked 
 
 /* 6. Action Buttons */
 button.suggested-action {{
-    background-color: #007aff;
-    color: #ffffff;
+    background-color: @accent_bg_color;
+    color: @accent_fg_color;
     border: none;
-    border-radius: 6px;
-    padding: 3px 14px;
+    border-radius: 9999px;
+    padding: 3px 16px;
     min-height: 26px;
     font-weight: 500;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }}
 
 button.suggested-action:hover {{
-    background-color: #1a88ff;
+    background-color: alpha(@accent_bg_color, 0.88);
     background-image: none;
 }}
 
 button.suggested-action:active {{
-    background-color: #0062cc;
+    background-color: alpha(@accent_bg_color, 0.72);
     background-image: none;
 }}
 
@@ -1901,8 +1931,8 @@ button.destructive-action {{
     background-color: {destr_bg};
     color: {destr_fg};
     border: none;
-    border-radius: 6px;
-    padding: 3px 14px;
+    border-radius: 9999px;
+    padding: 3px 16px;
     min-height: 26px;
     font-weight: 500;
     transition: background-color 100ms ease;
@@ -1920,7 +1950,7 @@ button.destructive-action:active {{
 dropdown,
 combobox,
 row.combo {{
-    border-radius: 6px;
+    border-radius: 9999px;
 }}
 
 box.content dropdown > button,
@@ -1933,8 +1963,8 @@ preferencespage menubutton:not(.flat) > button {{
     background-color: {dropdown_bg};
     border: {dropdown_border};
     color: {btn_fg};
-    border-radius: 6px;
-    padding: 3px 8px;
+    border-radius: 9999px;
+    padding: 3px 10px;
     min-height: 24px;
     box-shadow: {btn_shadow};
     transition: background-color 100ms ease;
@@ -1979,10 +2009,10 @@ preferencespage dropdown > button:focus,
 dialog dropdown > button:focus,
 row.combo dropdown > button:focus,
 combobox > box > button.combo:focus {{
-    border-color: #007aff;
-    outline: 2px solid #007aff;
+    border-color: @accent_bg_color;
+    outline: 2px solid @accent_bg_color;
     outline-offset: -1px;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
+    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
 }}
 
 /* 8. Text Entries */
@@ -2004,10 +2034,10 @@ entry:hover {{
 
 entry:focus,
 entry:focus-within {{
-    border-color: #007aff;
-    outline: 2px solid #007aff;
+    border-color: @accent_bg_color;
+    outline: 2px solid @accent_bg_color;
     outline-offset: -1px;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
+    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
 }}
 
 entry.search,
@@ -2024,9 +2054,9 @@ headerbar searchbar entry {{
 entry.search:focus,
 searchbar entry:focus,
 headerbar searchbar entry:focus {{
-    outline: 2px solid #007aff;
+    outline: 2px solid @accent_bg_color;
     outline-offset: -1px;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
+    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
 }}
 
 /* 9. Switches */
@@ -2128,7 +2158,7 @@ listview > row.activatable:selected {{
 
 /* 13. Stack Switchers / Segmented Controls */
 stackswitcher {{
-    border-radius: 6px;
+    border-radius: 9999px;
     padding: 2px;
     background-color: {pill_bg};
     border: none;
@@ -2136,8 +2166,8 @@ stackswitcher {{
 }}
 
 stackswitcher > button {{
-    border-radius: 5px;
-    padding: 2px 10px;
+    border-radius: 9999px;
+    padding: 2px 12px;
     min-height: 22px;
     background-color: transparent;
     border: none;
@@ -2154,6 +2184,7 @@ stackswitcher > button:checked {{
     color: {pill_checked_fg};
     font-weight: 500;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+    border-radius: 9999px;
 }}
 
 /* 14. Minimal macOS Scrollbars */
@@ -2200,8 +2231,8 @@ window.dialog .response-area button,
 dialog .response-area button,
 messagedialog .response-area button {{
     min-height: 30px;
-    border-radius: 6px;
-    padding: 4px 16px;
+    border-radius: 9999px;
+    padding: 4px 18px;
     font-weight: 500;
 }}
 """
