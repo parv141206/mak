@@ -1445,39 +1445,48 @@ treeview.view > header > button:active,
     color: #f5a623;
 }}
 
-/* Pathbar Pills & Action Buttons */
-.nautilus-window .nautilus-pathbar button {{
-    border-radius: 9999px;
+/* Pathbar Pills & Location Dropdown (Apple macOS Segmented Location Control) */
+.nautilus-window .nautilus-pathbar,
+#NautilusFileChooser .nautilus-pathbar {{
+    background-color: {path_btn_bg};
+    border-radius: 8px;
+    border: 1px solid {border_color};
+    padding: 2px 4px;
+    margin: 0 4px;
+}}
+
+.nautilus-window .nautilus-pathbar button,
+#NautilusFileChooser .nautilus-pathbar button {{
+    border-radius: 6px;
     background: transparent;
     background-color: transparent;
     background-image: none;
     border: none;
-    padding: 3px 10px;
-    min-height: 26px;
+    padding: 2px 8px;
+    min-height: 22px;
+    font-size: 13px;
+    font-weight: 500;
     color: {text_primary};
     box-shadow: none;
 }}
 
-.nautilus-window .nautilus-pathbar button:hover {{
+.nautilus-window .nautilus-pathbar button:hover,
+#NautilusFileChooser .nautilus-pathbar button:hover {{
     background-color: {path_btn_hover};
     box-shadow: none;
 }}
 
-/* History Navigation Pills (< | >) with authentic macOS pill capsule container */
+/* History Navigation Capsule (< | >) */
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box {{
     margin-left: 10px;
-    padding: 2px;
-    border-radius: 9999px;
-    background-color: rgba(255, 255, 255, 0.08);
-    background-image: image(rgba(255, 255, 255, 0.12));
-    background-size: 1px 14px;
-    background-position: center center;
-    background-repeat: no-repeat;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    padding: 1px;
+    border-radius: 8px;
+    background-color: {path_btn_bg};
+    border: 1px solid {border_color};
+    box-shadow: none;
 }}
 
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
@@ -1485,12 +1494,39 @@ treeview.view > header > button:active,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
     min-height: 24px;
-    min-width: 24px;
-    padding: 2px 6px;
-    border-radius: 9999px;
+    min-width: 26px;
+    padding: 2px 4px;
+    border-radius: 6px;
     background-color: transparent;
     border: none;
     box-shadow: none;
+    color: {text_primary};
+}}
+
+.nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
+.nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
+    background-color: {path_btn_hover};
+}}
+
+/* Dialog & Window Bottom Action Bar (Save / Cancel / New Folder / Delete) */
+.dialog-action-area,
+.response-area,
+actionbar,
+actionbar > revealer > box {{
+    background-color: @headerbar_bg_color;
+    border-top: 1px solid {border_color};
+    padding: 8px 16px;
+}}
+
+.dialog-action-area button,
+.response-area button,
+actionbar button {{
+    min-height: 28px;
+    border-radius: 8px;
+    padding: 4px 16px;
+    font-weight: 500;
 }}
 """
 
@@ -1564,9 +1600,9 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     background-image: none;
     border: 1px solid {btn_border};
     color: {btn_fg};
-    border-radius: 9999px;
+    border-radius: 6px;
     padding: 4px 14px;
-    min-height: 26px;
+    min-height: 28px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: background-color 80ms ease, border-color 80ms ease, color 80ms ease;
 }}
@@ -1594,7 +1630,7 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
     box-shadow: none;
 }}
 
-/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, circular pill on hover) */
+/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, rounded rect on hover) */
 window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 window.csd headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
@@ -1610,7 +1646,7 @@ popover button:not(.suggested-action):not(.destructive-action) {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 9999px;
+    border-radius: 6px;
     color: {btn_fg};
     min-height: 28px;
     min-width: 28px;
@@ -1664,7 +1700,7 @@ tab button:checked {{
     box-shadow: none;
 }}
 
-/* 3. Headerbar Split Buttons & Linked Pills (e.g. Navigation, History, View Toggles) */
+/* 3. Headerbar Split Buttons & Linked Controls (e.g. Navigation, History, View Toggles) */
 headerbar splitbutton,
 .titlebar splitbutton,
 headerbar .linked,
@@ -1675,7 +1711,7 @@ headerbar box.linked,
     background-image: none;
     border: 1px solid {pill_border};
     box-shadow: none;
-    border-radius: 9999px;
+    border-radius: 8px;
     margin: 0 4px;
     padding: 1px;
 }}
@@ -1689,7 +1725,7 @@ headerbar box.linked > menubutton > button {{
     min-height: 26px;
     min-width: 26px;
     padding: 3px 8px;
-    border-radius: 9999px;
+    border-radius: 6px;
     background-color: transparent;
     background-image: none;
     border: none;
@@ -1745,7 +1781,7 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 9999px;
+    border-radius: 6px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
@@ -1764,12 +1800,14 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked 
 
 /* 6. Action Buttons */
 button.suggested-action {{
-    background-color: @accent_bg_color;
-    color: @accent_fg_color;
+    background-color: #007aff;
+    color: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 9999px;
-    padding: 4px 14px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    padding: 4px 16px;
+    min-height: 28px;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }}
 
 button.suggested-action:hover {{
@@ -1781,20 +1819,22 @@ button.suggested-action:active {{
 }}
 
 button.destructive-action {{
-    background-color: #ff3b30;
-    color: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 9999px;
-    padding: 4px 14px;
+    background-color: rgba(255, 69, 58, 0.15);
+    color: #ff453a;
+    border: 1px solid rgba(255, 69, 58, 0.30);
+    border-radius: 6px;
+    padding: 4px 16px;
+    min-height: 28px;
+    font-weight: 500;
     transition: background-color 100ms ease;
 }}
 
 button.destructive-action:hover {{
-    background-color: #e03228;
+    background-color: rgba(255, 69, 58, 0.25);
 }}
 
 button.destructive-action:active {{
-    background-color: #c4271e;
+    background-color: rgba(255, 69, 58, 0.35);
 }}
 
 /* 7. Dropdowns & Combo Boxes (In content views / forms) */
@@ -1858,7 +1898,7 @@ combobox arrow {{
 entry {{
     background-color: {entry_bg};
     border: 1px solid {entry_border};
-    border-radius: 8px;
+    border-radius: 6px;
     padding: 6px 10px;
     color: {btn_fg};
     box-shadow: none;
@@ -1978,14 +2018,14 @@ listview > row.activatable:selected {{
 
 /* 13. Stack Switchers / Segmented Controls */
 stackswitcher {{
-    border-radius: 9999px;
+    border-radius: 7px;
     padding: 2px;
     background-color: {pill_bg};
     border: 1px solid {pill_border};
 }}
 
 stackswitcher > button {{
-    border-radius: 9999px;
+    border-radius: 5px;
     padding: 3px 12px;
     background-color: transparent;
     border: none;
