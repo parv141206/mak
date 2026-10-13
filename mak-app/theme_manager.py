@@ -971,7 +971,11 @@ window.background.brave windowcontrols button.maximize:active {{
     background-image: none;
 }}
 
-/* ── Inactive / Backdrop window traffic lights ── */
+/* ── Inactive / Backdrop window traffic lights (All windows & web browsers) ── */
+windowcontrols button:backdrop,
+headerbar windowcontrols button:backdrop,
+.titlebar windowcontrols button:backdrop,
+window.background.csd headerbar windowcontrols button:backdrop,
 window.background.chromium headerbar windowcontrols button:backdrop,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop,
 window.background.chromium headerbar.header-bar.titlebar button:backdrop,
@@ -990,6 +994,28 @@ window.background.brave windowcontrols button:backdrop {{
     background-color: {backdrop_bg};
     background-image: none;
     border: 1px solid rgba(0, 0, 0, 0.10);
+    box-shadow: none;
+    opacity: 0.70;
+}}
+
+windowcontrols button:backdrop:hover,
+headerbar windowcontrols button:backdrop:hover,
+.titlebar windowcontrols button:backdrop:hover,
+window.background.chromium windowcontrols button.close:backdrop:hover,
+window.background.brave windowcontrols button.close:backdrop:hover {{
+    opacity: 1.0;
+}}
+
+headerbar:backdrop label.title,
+headerbar:backdrop .title,
+.titlebar:backdrop label.title,
+.titlebar:backdrop .title {{
+    opacity: 0.55;
+}}
+
+headerbar:backdrop button:not(.suggested-action):not(.destructive-action),
+.titlebar:backdrop button:not(.suggested-action):not(.destructive-action) {{
+    opacity: 0.65;
 }}
 
 window.background.chromium windowcontrols button.close:backdrop:hover,
@@ -1021,6 +1047,8 @@ def generate_window_corners_override(is_dark=True):
         if is_dark
         else "0 6px 18px rgba(0, 0, 0, 0.06), 0 2px 6px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0, 0, 0, 0.06)"
     )
+    border_maximized = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.12)"
+    border_maximized_backdrop = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.08)"
     return f"""
 /* ── Mak macOS Window Corner & Geometry Consistency (16px) ──────────────── */
 window,
@@ -1042,35 +1070,62 @@ window.background.csd:not(.fullscreen):not(.tiled):not(.maximized):backdrop {{
     box-shadow: {backdrop_shadow};
 }}
 
+/* Maximized Window Borders (Preserve 1px outline border in maximized view) */
 window.csd.maximized,
+window.background.csd.maximized,
+window.background.maximized,
+window.background.solid-csd.maximized,
+window.maximized.csd,
+window.maximized.solid-csd,
+window.maximized,
 window.csd.tiled,
 window.csd.tiled-top,
 window.csd.tiled-bottom,
 window.csd.tiled-left,
 window.csd.tiled-right,
-window.background.maximized,
-window.background.maximized.csd,
-window.background.solid-csd.maximized,
-window.background.csd.maximized,
-window.maximized.csd,
-window.maximized.solid-csd,
-window.maximized,
 window.background.tiled,
-window.background.tiled-top,
-window.background.tiled-right,
-window.background.tiled-bottom,
-window.background.tiled-left,
-window.background.csd.tiled,
-window.tiled.csd,
 window.tiled {{
+    box-shadow: 0 0 0 1px {border_maximized};
     border-radius: 16px;
 }}
 
+window.csd.maximized:backdrop,
+window.background.csd.maximized:backdrop,
+window.background.maximized:backdrop,
+window.maximized:backdrop,
+window.csd.tiled:backdrop,
+window.tiled:backdrop {{
+    box-shadow: 0 0 0 1px {border_maximized_backdrop};
+}}
+
+/* Compact macOS Unified Titlebar Height (38px) */
 headerbar,
 headerbar.default-decoration,
 .titlebar,
 window.csd > headerbar,
 window.background.csd > headerbar,
+window.csd headerbar,
+window.background headerbar {{
+    min-height: 38px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}}
+
+headerbar > windowhandle > box,
+headerbar windowhandle > box {{
+    min-height: 38px;
+}}
+
+headerbar label.title,
+.titlebar label.title,
+headerbar .title,
+.titlebar .title {{
+    font-size: 13px;
+    font-weight: 600;
+}}
+
 .tiled headerbar,
 .maximized headerbar,
 window.background.maximized headerbar,
@@ -1333,27 +1388,37 @@ def generate_nautilus_override(is_dark=True):
     background-color: transparent;
 }}
 
-/* Sidebar Rows */
+/* Sidebar Rows (Compact Apple Finder Sidebar) */
 .nautilus-window .sidebar-pane placessidebar row,
 .nautilus-window placessidebar row,
-.nautilus-window .navigation-sidebar > row {{
+.nautilus-window .navigation-sidebar > row,
+#NautilusFileChooser placessidebar row,
+#NautilusFileChooser .navigation-sidebar > row {{
     border-radius: 6px;
-    margin: 1px 8px;
-    padding: 6px 10px;
-    min-height: 28px;
+    margin: 1px 6px;
+    padding: 2px 8px;
+    min-height: 22px;
+    font-size: 12.5px;
     color: {text_sidebar};
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
 .nautilus-window .sidebar-pane placessidebar row label,
 .nautilus-window placessidebar row label,
-.nautilus-window .navigation-sidebar > row label {{
+.nautilus-window .navigation-sidebar > row label,
+#NautilusFileChooser placessidebar row label,
+#NautilusFileChooser .navigation-sidebar > row label {{
     color: {text_sidebar};
 }}
 
 .nautilus-window .sidebar-pane placessidebar row image,
 .nautilus-window placessidebar row image,
-.nautilus-window .navigation-sidebar > row image {{
+.nautilus-window .navigation-sidebar > row image,
+#NautilusFileChooser placessidebar row image,
+#NautilusFileChooser .navigation-sidebar > row image {{
+    min-width: 16px;
+    min-height: 16px;
+    margin-right: 6px;
     color: {icon_sidebar};
 }}
 
@@ -1467,7 +1532,6 @@ treeview.view > header > button:checked,
 /* List View Alternating Rows & Spacing: Full width, compact macOS height */
 .nautilus-window .nautilus-list-view listview.view,
 #NautilusFileChooser .nautilus-list-view listview.view {{
-    border-spacing: 0;
     padding: 0;
     margin: 0;
 }}
@@ -1475,22 +1539,22 @@ treeview.view > header > button:checked,
 .nautilus-window .nautilus-list-view listview.view > row.activatable,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable {{
     padding: 0 4px;
-    min-height: 20px;
+    min-height: 18px;
     border-radius: 0;
     margin: 0;
-    font-size: 13px;
+    font-size: 12.5px;
 }}
 
 .nautilus-window .nautilus-list-view cell,
 #NautilusFileChooser .nautilus-list-view cell {{
-    min-height: 20px;
+    min-height: 18px;
     padding: 0;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable > cell > widget#NautilusViewCell,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable > cell > widget#NautilusViewCell {{
-    padding: 1px 4px;
-    min-height: 20px;
+    padding: 0 4px;
+    min-height: 18px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even),
@@ -1696,29 +1760,30 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
 /* 1. Universal In-Window Push Buttons (Dialogs, content pages, settings) */
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular) {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button) {{
     background-color: {btn_bg};
     background-image: none;
     border: {btn_border};
     color: {btn_fg};
     border-radius: 9999px;
-    padding: 3px 14px;
-    min-height: 26px;
+    padding: 2px 12px;
+    min-height: 24px;
+    font-size: 13px;
     font-weight: 400;
     box-shadow: {btn_shadow};
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):hover {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):hover {{
     background-color: {btn_hover};
     color: {btn_fg};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):active {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):active {{
     background-color: {btn_active};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):checked {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):checked {{
     background-color: @accent_bg_color;
     color: @accent_fg_color;
 }}
@@ -1728,11 +1793,50 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.circular
     box-shadow: none;
 }}
 
+/* Cards, Preference Row Buttons & Style Items (Preserve rounded rectangular geometry) */
+.card,
+button.card,
+.card.activatable,
+checkbutton.selection-mode,
+.style-item,
+.style-item button,
+flowboxchild.card,
+flowboxchild.style-item,
+row.activatable {{
+    border-radius: 12px;
+}}
+
+checkbutton.selection-mode:checked,
+.style-item:checked,
+button.card:checked {{
+    border-radius: 12px;
+    outline: 2px solid @accent_bg_color;
+    outline-offset: 2px;
+    box-shadow: none;
+}}
+
 button.circular {{
     border-radius: 9999px;
     padding: 0;
-    min-width: 24px;
+    min-width: 22px;
+    min-height: 22px;
+    box-shadow: none;
+}}
+
+/* Compact SpinButtons */
+spinbutton {{
     min-height: 24px;
+    padding: 0;
+    border-radius: 9999px;
+}}
+
+spinbutton > button,
+spinbutton button {{
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
+    border-radius: 9999px;
+    border: none;
     box-shadow: none;
 }}
 
@@ -1756,9 +1860,9 @@ window.kgx headerbar button:not(.suggested-action):not(.destructive-action) {{
     box-shadow: none;
     border-radius: 9999px;
     color: {btn_fg};
-    min-height: 26px;
-    min-width: 26px;
-    padding: 3px 6px;
+    min-height: 24px;
+    min-width: 24px;
+    padding: 2px 6px;
     margin: 0 1px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
@@ -1912,7 +2016,7 @@ headerbar viewswitcher > button:checked {{
 }}
 
 /* 5. Flat Buttons */
-button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.card):not(.style-item) {{
     background-color: transparent;
     background-image: none;
     border: none;
@@ -1921,15 +2025,15 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize) {{
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):hover {{
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.card):not(.style-item):hover {{
     background-color: {hover_subtle};
 }}
 
-button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):active {{
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.card):not(.style-item):active {{
     background-color: {active_subtle};
 }}
 
-button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked {{
+button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.card):not(.style-item):checked {{
     background-color: {active_subtle};
     color: @accent_bg_color;
 }}
@@ -1940,8 +2044,9 @@ button.suggested-action {{
     color: @accent_fg_color;
     border: none;
     border-radius: 9999px;
-    padding: 3px 16px;
-    min-height: 26px;
+    padding: 2px 14px;
+    min-height: 24px;
+    font-size: 13px;
     font-weight: 500;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }}
@@ -1961,8 +2066,9 @@ button.destructive-action {{
     color: {destr_fg};
     border: none;
     border-radius: 9999px;
-    padding: 3px 16px;
-    min-height: 26px;
+    padding: 2px 14px;
+    min-height: 24px;
+    font-size: 13px;
     font-weight: 500;
     transition: background-color 100ms ease;
 }}
@@ -2727,17 +2833,23 @@ def apply_global_theme(theme_key):
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")
 
-    # 9. Sync Application Translucency / Blur
+    # 9. Sync Application Translucency / Blur (Blur-my-shell & Liquid Glass)
     try:
         if is_glassy:
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "true"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "215"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "enable-application-glass", "true"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-glass-all-windows", "true"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-content-opacity", "0.85"], check=False)
         else:
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "false"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "255"], check=False)
-        log.append(f"Set application blur to {'enabled (translucent)' if is_glassy else 'disabled (solid opaque)'}.")
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "enable-application-glass", "false"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-glass-all-windows", "false"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-content-opacity", "1.0"], check=False)
+        log.append(f"Set application blur & glass to {'enabled (translucent)' if is_glassy else 'disabled (solid opaque)'}.")
     except Exception as e:
-        log.append(f"Error syncing application blur: {e}")
+        log.append(f"Error syncing application blur & glass: {e}")
 
     return {
         "success": True,
