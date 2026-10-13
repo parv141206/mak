@@ -216,6 +216,20 @@
       <description>Hardware accelerated Gaussian glass blur behind dock.</description>
     </key>
 
+    <key type="d" name="dock-edge-bending">
+      <default>0.42</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Dock Edge Refraction Bending</summary>
+      <description>Controls the physical Snell-law optical curvature bending scale along dock glass edges.</description>
+    </key>
+
+    <key type="d" name="dock-glass-level">
+      <default>0.60</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Dock Level of Glass</summary>
+      <description>Controls the frosted glass thickness, optical depth, and refraction intensity for the dock.</description>
+    </key>
+
     <!-- Autohide Behavior -->
     <key type="s" name="auto-hide-mode">
       <default>'dodge'</default>

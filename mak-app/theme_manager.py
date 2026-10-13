@@ -102,7 +102,7 @@ GRAPHITE_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #2c2c2e;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color #1e1e20;
+@define-color sidebar_bg_color #222224;
 @define-color sidebar_fg_color #f5f5f7;
 @define-color secondary_sidebar_bg_color #1a1a1c;
 @define-color card_bg_color #2c2c2e;
@@ -1094,7 +1094,7 @@ window.csd.tiled-left,
 window.csd.tiled-right,
 window.background.tiled,
 window.tiled {{
-    box-shadow: 0 0 0 1px {border_maximized};
+    box-shadow: inset 0 0 0 1px {border_maximized};
     border-radius: 16px;
 }}
 
@@ -1104,7 +1104,7 @@ window.background.maximized:backdrop,
 window.maximized:backdrop,
 window.csd.tiled:backdrop,
 window.tiled:backdrop {{
-    box-shadow: 0 0 0 1px {border_maximized_backdrop};
+    box-shadow: inset 0 0 0 1px {border_maximized_backdrop};
 }}
 
 /* Compact macOS Unified Titlebar Height (38px) */
