@@ -1175,19 +1175,24 @@ popover contents {{
 
 popover > arrow,
 popover.menu > arrow,
-popover arrow {{
-    display: none;
-    background: transparent;
+popover.menu.background > arrow,
+popover arrow,
+popover > arrow.top,
+popover > arrow.bottom,
+popover > arrow.left,
+popover > arrow.right {{
+    background: none;
     background-color: transparent;
+    background-image: none;
     border: none;
     box-shadow: none;
+    outline: none;
     opacity: 0;
     min-width: 0;
     min-height: 0;
-    width: 0;
-    height: 0;
     padding: 0;
     margin: 0;
+    border-image: none;
 }}
 
 popover.menu stack,
