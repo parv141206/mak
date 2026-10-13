@@ -257,7 +257,7 @@ export class LiquidGlassController {
             this._liquidSettings.set_boolean('panel-menu-enable-adaptive-text-color', false);
 
             // Desktop & Application Context Menus
-            this._liquidSettings.set_boolean('enable-desktop-menu-glass', true);
+            this._liquidSettings.set_boolean('enable-desktop-menu-glass', false);
             this._liquidSettings.set_double('desktop-menu-corner-radius', 14.0);
             this._liquidSettings.set_int('desktop-menu-blur-radius', 16);
             this._liquidSettings.set_string('desktop-menu-tint-color', '#ffffff');

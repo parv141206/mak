@@ -221,7 +221,7 @@ export class ApplicationManager {
         if (this._windowMatchesBlacklist(metaWindow))
             return null;
         const windowType = metaWindow.get_window_type();
-        if (this._isDesktopMenuWindow(metaWindow) || MENU_WINDOW_TYPES.includes(windowType))
+        if (this._isDesktopMenuWindow(metaWindow))
             return this._isProfileEnabled('desktop-menu') ? 'desktop-menu' : null;
         if (!this._isProfileEnabled('application'))
             return null;

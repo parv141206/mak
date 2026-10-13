@@ -932,6 +932,7 @@ class MakSettingsBridge:
         try:
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "shadow-intensity", "0.12"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "shadow-radius", "70.0"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "enable-desktop-menu-glass", "false"], check=False)
         except Exception:
             pass
 
