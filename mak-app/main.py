@@ -1016,13 +1016,25 @@ class MakAppWindow(Adw.ApplicationWindow):
         chrom_row.connect("notify::selected", _on_accent_selected)
         chrom_group.add(chrom_row)
 
-        chips_row = Adw.ActionRow(
-            title="Quick Color Palette",
-            subtitle="Click any chip to immediately apply the topbar frame accent"
-        )
-        chips_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
-        chips_box.set_margin_top(6)
-        chips_box.set_margin_bottom(6)
+        chips_row = Adw.PreferencesRow()
+        outer_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        outer_box.set_margin_top(12)
+        outer_box.set_margin_bottom(12)
+        outer_box.set_margin_start(16)
+        outer_box.set_margin_end(16)
+
+        header_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        lbl_title = Gtk.Label(label="Quick Color Palette", xalign=0)
+        lbl_title.add_css_class("heading")
+        lbl_sub = Gtk.Label(label="Click any chip to immediately apply the topbar frame accent", xalign=0)
+        lbl_sub.add_css_class("dim-label")
+        header_box.append(lbl_title)
+        header_box.append(lbl_sub)
+        outer_box.append(header_box)
+
+        chips_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        chips_box.set_valign(Gtk.Align.CENTER)
+        chips_box.set_halign(Gtk.Align.START)
 
         for k in accent_keys:
             info = theme_manager.CHROMIUM_ACCENT_PALETTES[k]
@@ -1030,8 +1042,12 @@ class MakAppWindow(Adw.ApplicationWindow):
             btn.set_tooltip_text(info["name"])
             btn.add_css_class("circular")
             btn.set_size_request(24, 24)
+            btn.set_valign(Gtk.Align.CENTER)
+            btn.set_halign(Gtk.Align.CENTER)
             dot = Gtk.DrawingArea()
             dot.set_size_request(16, 16)
+            dot.set_valign(Gtk.Align.CENTER)
+            dot.set_halign(Gtk.Align.CENTER)
             color_hex = info["color"]
             dot.set_draw_func(lambda da, cr, w, h, col=color_hex: (
                 cr.set_source_rgb(
@@ -1048,7 +1064,8 @@ class MakAppWindow(Adw.ApplicationWindow):
             ))
             chips_box.append(btn)
 
-        chips_row.add_suffix(chips_box)
+        outer_box.append(chips_box)
+        chips_row.set_child(outer_box)
         chrom_group.add(chips_row)
 
         # ── Shell UI & Menu Styling (macOS Unified Design) ──
