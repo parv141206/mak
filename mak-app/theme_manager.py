@@ -1162,18 +1162,21 @@ popover:backdrop {{
 
 popover > contents,
 popover.menu > contents,
-popover.menu.background > contents {{
+popover.menu.background > contents,
+popover contents {{
     background-color: @popover_bg_color;
     color: @popover_fg_color;
     border-radius: 10px;
     border: 1px solid {border_color};
     box-shadow: {shadow};
-    padding: 5px;
+    padding: 3px;
+    margin: 0;
 }}
 
 popover > arrow,
 popover.menu > arrow,
 popover arrow {{
+    display: none;
     background: transparent;
     background-color: transparent;
     border: none;
@@ -1181,6 +1184,19 @@ popover arrow {{
     opacity: 0;
     min-width: 0;
     min-height: 0;
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+}}
+
+popover.menu stack,
+popover.menu box,
+popover.menu > contents > stack,
+popover.menu > contents > stack > box,
+popover.menu > contents > scrolledwindow > viewport > stack > box {{
+    padding: 0;
+    margin: 0;
 }}
 
 popover modelbutton,
