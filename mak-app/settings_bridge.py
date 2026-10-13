@@ -221,6 +221,34 @@ class MakSettingsBridge:
     def get_pill_thickness_auto(self): return self._get_b("pill-thickness-auto", self.dock, "pill-thickness-auto", True)
     def set_pill_thickness_auto(self, v): self._set_b("pill-thickness-auto", self.dock, "pill-thickness-auto", v)
 
+    def get_dock_edge_bending(self):
+        return self._get_d("dock-edge-bending", None, None, 0.42)
+
+    def set_dock_edge_bending(self, v):
+        self._set_d("dock-edge-bending", None, None, v)
+        try:
+            scale = max(2.0, float(v) * 28.0)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "glass-displacement-scale", str(round(scale, 2))], check=False)
+        except Exception:
+            pass
+
+    def get_dock_glass_level(self):
+        return self._get_d("dock-glass-level", None, None, 0.60)
+
+    def set_dock_glass_level(self, v):
+        self._set_d("dock-glass-level", None, None, v)
+        try:
+            blur_rad = max(1, round(float(v) * 28.0))
+            max_z = max(10.0, float(v) * 120.0)
+            ior = 1.4 + float(v) * 1.0
+            tint_str = max(0.04, min(0.20, float(v) * 0.16))
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "dock-blur-radius", str(blur_rad)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "glass-max-z", str(round(max_z, 1))], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "glass-ior", str(round(ior, 2))], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "dock-tint-strength", str(round(tint_str, 2))], check=False)
+        except Exception:
+            pass
+
     # Autohide & Interactions
     def get_autohide_mode(self): return self._get_s("auto-hide-mode", self.dock, "auto-hide-mode", "dodge")
     def set_autohide_mode(self, v): self._set_s("auto-hide-mode", self.dock, "auto-hide-mode", v)

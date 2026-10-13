@@ -54,7 +54,9 @@ function computeConfig(s, mak = null) {
     const borderColor = mak ? mak.get_string('border-color') : s.get_string('border-color');
     const borderWidth = mak ? mak.get_int('border-width') : s.get_int('border-width');
     const liquidGlass = mak ? mak.get_boolean('blur-liquid-glass') : false;
-    const refractionStrength = mak ? mak.get_double('blur-refraction-strength') : 0.42;
+    const dockEdgeBending = mak ? mak.get_double('dock-edge-bending') : 0.42;
+    const dockGlassLevel = mak ? mak.get_double('dock-glass-level') : 0.60;
+    const refractionStrength = dockEdgeBending || (mak ? mak.get_double('blur-refraction-strength') : 0.42);
     const chromaticDispersion = mak ? mak.get_double('blur-chromatic-dispersion') : 0.08;
 
     return {
@@ -96,6 +98,8 @@ function computeConfig(s, mak = null) {
         liquidGlass,
         refractionStrength,
         chromaticDispersion,
+        dockEdgeBending,
+        dockGlassLevel,
 
         // ── Sections / behaviour ──
         showApps: s.get_boolean('show-apps-button'),

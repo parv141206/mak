@@ -163,12 +163,19 @@ export class LiquidGlassController {
             const globalOp = this._makSettings.get_double('global-opacity');
             const cornerRad = this._makSettings.get_int('corner-radius');
             const dockRad = this._makSettings.get_int('dock-radius');
+            const edgeBending = this._makSettings.get_double('dock-edge-bending') || refr;
+            const glassLevel = this._makSettings.get_double('dock-glass-level') || 0.60;
 
-            // Optics
-            this._liquidSettings.set_double('glass-displacement-scale', Math.max(3.0, refr * 25.0));
+            // Optics & Dock Refraction Bending
+            const dockDisp = Math.max(2.0, edgeBending * 28.0);
+            const dockMaxZ = Math.max(10.0, glassLevel * 120.0);
+            const dockIor = 1.4 + glassLevel * 1.0;
+            const dockBlurRad = Math.max(1, Math.round(glassLevel * 28.0));
+
+            this._liquidSettings.set_double('glass-displacement-scale', dockDisp);
             this._liquidSettings.set_double('glass-chroma-strength', disp);
-            this._liquidSettings.set_double('glass-max-z', 88.0);
-            this._liquidSettings.set_double('glass-ior', 2.40);
+            this._liquidSettings.set_double('glass-max-z', dockMaxZ);
+            this._liquidSettings.set_double('glass-ior', dockIor);
             this._liquidSettings.set_double('glass-corner-smoothing', 0.6);
 
             const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
@@ -200,9 +207,9 @@ export class LiquidGlassController {
             // Dock
             this._liquidSettings.set_boolean('enable-dock-glass', true);
             this._liquidSettings.set_double('dock-corner-radius', dockRad > 0 ? dockRad : 24.0);
-            this._liquidSettings.set_int('dock-blur-radius', 16);
+            this._liquidSettings.set_int('dock-blur-radius', dockBlurRad);
             this._liquidSettings.set_string('dock-tint-color', '#ffffff');
-            this._liquidSettings.set_double('dock-tint-strength', 0.08);
+            this._liquidSettings.set_double('dock-tint-strength', Math.max(0.04, Math.min(0.20, glassLevel * 0.16)));
 
             // Top Bar
             const topbarBlur = this._makSettings.get_boolean('topbar-blur');
@@ -311,6 +318,8 @@ export class LiquidGlassController {
         for (const key of [
             'blur-refraction-strength',
             'blur-chromatic-dispersion',
+            'dock-edge-bending',
+            'dock-glass-level',
             'global-opacity',
             'corner-radius',
             'dock-radius',

@@ -310,6 +310,8 @@ class MakAppWindow(Adw.ApplicationWindow):
         pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor (0 = fully transparent)", 0.0, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
         pill_group.add(create_spin_row("Pill Border Outline Width", "Glass border stroke thickness in pixels", 0, 6, 1, self.bridge.get_dock_border_width(), digits=0, on_change=self.bridge.set_dock_border_width))
         pill_group.add(create_color_row("Dock Border Outline Color", "Customize color and transparency of the dock glass border outline", self.bridge.get_dock_border_color(), on_change=self.bridge.set_dock_border_color))
+        pill_group.add(create_spin_row("Refraction Edge Bending", "Physical Snell-law optical bending scale along dock glass curved rim", 0.0, 1.0, 0.02, self.bridge.get_dock_edge_bending(), digits=2, on_change=self.bridge.set_dock_edge_bending))
+        pill_group.add(create_spin_row("Level of Glass (Thickness & Depth)", "Material optical density, refraction depth, and frosted translucency level", 0.0, 1.0, 0.02, self.bridge.get_dock_glass_level(), digits=2, on_change=self.bridge.set_dock_glass_level))
 
         thick_auto = Adw.SwitchRow(title="Auto Pill Thickness", subtitle="Scale pill height automatically with resting icon size")
         thick_auto.set_active(self.bridge.get_pill_thickness_auto())

@@ -209,11 +209,11 @@ export class DockChrome {
         if (cfg && this._glassPipeline) {
             this._glassPipeline.setParameters({
                 cornerRadius: cfg.dockRadius ?? 24,
-                radius: cfg.blurRadius ?? 32,
+                radius: cfg.dockGlassLevel !== undefined ? Math.round(cfg.dockGlassLevel * 48) : (cfg.blurRadius ?? 32),
                 brightness: cfg.blurBrightness ?? 0.75,
                 enabled: cfg.dockBlur ?? true,
                 liquidGlass: cfg.liquidGlass ?? false,
-                refractionStrength: cfg.refractionStrength ?? 0.42,
+                refractionStrength: cfg.dockEdgeBending ?? (cfg.refractionStrength ?? 0.42),
                 chromaticDispersion: cfg.chromaticDispersion ?? 0.08,
             });
         }

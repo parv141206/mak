@@ -48,11 +48,14 @@ export const RoundedCornersEffect = GObject.registerClass({
         const borderColor = config.borderColor;
         const outerRadius = config.borderRadius;
         const { padding, smoothing } = config;
+        const win = this.actor?.metaWindow;
+        const isMax = Boolean(win && (win.maximizedHorizontally || win.maximizedVertically));
+        const maxOffset = isMax ? 1 : 0;
         const bounds = [
-            windowBounds.x1 + padding.left,
-            windowBounds.y1 + padding.top,
-            windowBounds.x2 - padding.right,
-            windowBounds.y2 - padding.bottom,
+            windowBounds.x1 + padding.left + maxOffset,
+            windowBounds.y1 + padding.top + maxOffset,
+            windowBounds.x2 - padding.right - maxOffset,
+            windowBounds.y2 - padding.bottom - maxOffset,
         ];
         const borderedAreaBounds = [
             bounds[0] + borderWidth,
