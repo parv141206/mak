@@ -626,6 +626,7 @@ window.background.csd windowcontrols button.titlebutton:backdrop:hover {{
     padding: 0;
     margin: 0 {margin}px;
     border-radius: 9999px;
+    background-color: transparent;
     background-repeat: no-repeat;
     background-position: center center;
     background-size: {size}px {size}px;
@@ -971,11 +972,7 @@ window.background.brave windowcontrols button.maximize:active {{
     background-image: none;
 }}
 
-/* ── Inactive / Backdrop window traffic lights (All windows & web browsers) ── */
-windowcontrols button:backdrop,
-headerbar windowcontrols button:backdrop,
-.titlebar windowcontrols button:backdrop,
-window.background.csd headerbar windowcontrols button:backdrop,
+/* ── Inactive / Backdrop window traffic lights (Chromium, Chrome, Brave & Electron) ── */
 window.background.chromium headerbar windowcontrols button:backdrop,
 window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop,
 window.background.chromium headerbar.header-bar.titlebar button:backdrop,
@@ -998,12 +995,39 @@ window.background.brave windowcontrols button:backdrop {{
     opacity: 0.70;
 }}
 
+/* ── Native GTK Window Controls in Inactive / Backdrop State ── */
+windowcontrols button:backdrop,
+headerbar windowcontrols button:backdrop,
+.titlebar windowcontrols button:backdrop,
+window.background.csd headerbar windowcontrols button:backdrop {{
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    opacity: 0.55;
+}}
+
 windowcontrols button:backdrop:hover,
 headerbar windowcontrols button:backdrop:hover,
-.titlebar windowcontrols button:backdrop:hover,
+.titlebar windowcontrols button:backdrop:hover {{
+    opacity: 1.0;
+}}
+
 window.background.chromium windowcontrols button.close:backdrop:hover,
 window.background.brave windowcontrols button.close:backdrop:hover {{
     opacity: 1.0;
+    background-color: #ff5f56;
+}}
+
+window.background.chromium windowcontrols button.minimize:backdrop:hover,
+window.background.brave windowcontrols button.minimize:backdrop:hover {{
+    opacity: 1.0;
+    background-color: #ffbd2e;
+}}
+
+window.background.chromium windowcontrols button.maximize:backdrop:hover,
+window.background.brave windowcontrols button.maximize:backdrop:hover {{
+    opacity: 1.0;
+    background-color: #27c93f;
 }}
 
 headerbar:backdrop label.title,
@@ -1013,24 +1037,9 @@ headerbar:backdrop .title,
     opacity: 0.55;
 }}
 
-headerbar:backdrop button:not(.suggested-action):not(.destructive-action),
-.titlebar:backdrop button:not(.suggested-action):not(.destructive-action) {{
+headerbar:backdrop button:not(.suggested-action):not(.destructive-action):not(.close):not(.minimize):not(.maximize):not(.titlebutton),
+.titlebar:backdrop button:not(.suggested-action):not(.destructive-action):not(.close):not(.minimize):not(.maximize):not(.titlebutton) {{
     opacity: 0.65;
-}}
-
-window.background.chromium windowcontrols button.close:backdrop:hover,
-window.background.brave windowcontrols button.close:backdrop:hover {{
-    background-color: #ff5f56;
-}}
-
-window.background.chromium windowcontrols button.minimize:backdrop:hover,
-window.background.brave windowcontrols button.minimize:backdrop:hover {{
-    background-color: #ffbd2e;
-}}
-
-window.background.chromium windowcontrols button.maximize:backdrop:hover,
-window.background.brave windowcontrols button.maximize:backdrop:hover {{
-    background-color: #27c93f;
 }}
 """
 
