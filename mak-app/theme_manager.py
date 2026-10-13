@@ -1395,17 +1395,17 @@ treeview.view > header > button,
 .nautilus-window columnview header > button,
 .nautilus-window columnview header button,
 .nautilus-window columnview header button label {{
-    color: {text_secondary} !important;
-    font-size: 11px !important;
-    font-weight: 600 !important;
+    color: {text_secondary};
+    font-size: 11px;
+    font-weight: 600;
     letter-spacing: 0.3px;
-    border: none !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    padding: 2px 8px !important;
-    min-height: 22px !important;
+    border: none;
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    box-shadow: none;
+    padding: 2px 8px;
+    min-height: 22px;
 }}
 
 columnview header > button:hover,
@@ -1413,12 +1413,12 @@ columnview header button:hover,
 columnview.view > header > button:hover,
 treeview.view > header > button:hover,
 .nautilus-window columnview header button:hover {{
-    background: transparent !important;
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    background-image: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: {text_primary} !important;
+    background: transparent;
+    background-color: rgba(255, 255, 255, 0.05);
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    color: {text_primary};
 }}
 
 columnview header > button:active,
@@ -1430,36 +1430,36 @@ treeview.view > header > button:active,
 treeview.view > header > button:checked,
 .nautilus-window columnview header button:active,
 .nautilus-window columnview header button:checked {{
-    background: transparent !important;
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    background-image: none !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent;
+    background-color: rgba(255, 255, 255, 0.08);
+    background-image: none;
+    border: none;
+    box-shadow: none;
 }}
 
 /* List View Alternating Rows & Spacing */
 .nautilus-window .nautilus-list-view listview.view > row.activatable,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable {{
-    padding: 3px 8px !important;
-    min-height: 24px !important;
-    border-radius: 4px !important;
-    margin: 1px 4px !important;
-    font-size: 13px !important;
+    padding: 3px 8px;
+    min-height: 24px;
+    border-radius: 4px;
+    margin: 1px 4px;
+    font-size: 13px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even),
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:nth-child(even) {{
-    background-color: transparent !important;
+    background-color: transparent;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover),
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:nth-child(odd):not(:selected):not(:hover) {{
-    background-color: {alt_row_bg} !important;
+    background-color: {alt_row_bg};
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:hover:not(:selected),
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:hover:not(:selected) {{
-    background-color: {row_hover_bg} !important;
+    background-color: {row_hover_bg};
 }}
 
 /* Selected File Row */
@@ -1467,15 +1467,15 @@ treeview.view > header > button:checked,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected,
 .nautilus-window .nautilus-grid-view child.activatable:selected,
 #NautilusFileChooser .nautilus-grid-view child.activatable:selected {{
-    background-color: @accent_bg_color !important;
-    color: #ffffff !important;
-    border-radius: 4px !important;
+    background-color: @accent_bg_color;
+    color: #ffffff;
+    border-radius: 4px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label,
 .nautilus-window .nautilus-grid-view child.activatable:selected label {{
-    color: #ffffff !important;
+    color: #ffffff;
 }}
 
 /* Subtitle / Dim labels */
@@ -1497,10 +1497,10 @@ treeview.view > header > button:checked,
 /* Pathbar Container (Transparent: prevents stretched dark box across headerbar) */
 .nautilus-window .nautilus-pathbar,
 #NautilusFileChooser .nautilus-pathbar {{
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
     padding: 0;
     margin: 0 4px;
 }}
@@ -1508,22 +1508,22 @@ treeview.view > header > button:checked,
 /* Pathbar Location Dropdown Button (Apple macOS Compact Pill) */
 .nautilus-window .nautilus-pathbar button,
 #NautilusFileChooser .nautilus-pathbar button {{
-    border-radius: 6px !important;
-    background: transparent !important;
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid {border_color} !important;
-    padding: 3px 10px !important;
-    min-height: 24px !important;
-    font-size: 13px !important;
-    font-weight: 500 !important;
-    color: {text_primary} !important;
-    box-shadow: none !important;
+    border-radius: 6px;
+    background: transparent;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: none;
+    padding: 2px 9px;
+    min-height: 24px;
+    font-size: 13px;
+    font-weight: 500;
+    color: {text_primary};
+    box-shadow: none;
 }}
 
 .nautilus-window .nautilus-pathbar button:hover,
 #NautilusFileChooser .nautilus-pathbar button:hover {{
-    background-color: rgba(255, 255, 255, 0.14) !important;
-    box-shadow: none !important;
+    background-color: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
 }}
 
 /* History Navigation Capsule (< | >) */
@@ -1532,33 +1532,33 @@ treeview.view > header > button:checked,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box {{
     margin-left: 10px;
-    padding: 1px;
-    border-radius: 7px !important;
-    background-color: rgba(255, 255, 255, 0.06) !important;
-    border: 1px solid {border_color} !important;
-    box-shadow: none !important;
+    padding: 2px;
+    border-radius: 6px;
+    background-color: rgba(255, 255, 255, 0.08);
+    border: none;
+    box-shadow: none;
 }}
 
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
-    min-height: 24px !important;
-    min-width: 24px !important;
-    padding: 2px 4px !important;
-    border-radius: 5px !important;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    color: {text_primary} !important;
+    min-height: 22px;
+    min-width: 22px;
+    padding: 2px 4px;
+    border-radius: 5px;
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    color: {text_primary};
 }}
 
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
-    background-color: rgba(255, 255, 255, 0.10) !important;
+    background-color: rgba(255, 255, 255, 0.10);
 }}
 
 /* Dialog & Window Bottom Action Bar (Save / Cancel / New Folder / Delete) */
@@ -1585,62 +1585,61 @@ actionbar button {{
 
 def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     if not is_dark:
-        btn_bg = "rgba(0, 0, 0, 0.05)" if is_glassy else "#f0f0f4"
-        btn_hover = "rgba(0, 0, 0, 0.09)" if is_glassy else "#e4e4ea"
-        btn_active = "rgba(0, 0, 0, 0.14)" if is_glassy else "#d8d8e0"
-        btn_border = "rgba(0, 0, 0, 0.10)"
-        btn_border_hover = "rgba(0, 0, 0, 0.18)"
+        btn_bg = "rgba(0, 0, 0, 0.05)"
+        btn_hover = "rgba(0, 0, 0, 0.09)"
+        btn_active = "rgba(0, 0, 0, 0.14)"
+        btn_border = "0.5px solid rgba(0, 0, 0, 0.08)"
         btn_fg = "#1d1d1f"
+        btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.08)"
         dim_label = "rgba(0, 0, 0, 0.50)"
-        entry_bg = "rgba(255, 255, 255, 0.65)" if is_glassy else "#ffffff"
-        entry_border = "rgba(0, 0, 0, 0.12)"
-        entry_border_hover = "rgba(0, 0, 0, 0.24)"
+        entry_bg = "#ffffff"
+        entry_border = "1px solid rgba(0, 0, 0, 0.12)"
+        entry_border_hover = "rgba(0, 0, 0, 0.22)"
         hover_subtle = "rgba(0, 0, 0, 0.06)"
         active_subtle = "rgba(0, 0, 0, 0.12)"
         switch_off_bg = "rgba(0, 0, 0, 0.15)"
         scale_trough_bg = "rgba(0, 0, 0, 0.12)"
         pill_bg = "rgba(0, 0, 0, 0.06)"
-        pill_hover = "rgba(0, 0, 0, 0.10)"
-        pill_active = "rgba(0, 0, 0, 0.15)"
-        pill_border = "rgba(0, 0, 0, 0.08)"
-    elif is_amoled:
-        btn_bg = "rgba(255, 255, 255, 0.08)" if is_glassy else "#161618"
-        btn_hover = "rgba(255, 255, 255, 0.15)" if is_glassy else "#222226"
-        btn_active = "rgba(255, 255, 255, 0.22)" if is_glassy else "#2e2e34"
-        btn_border = "rgba(255, 255, 255, 0.14)"
-        btn_border_hover = "rgba(255, 255, 255, 0.26)"
+        pill_hover = "rgba(0, 0, 0, 0.08)"
+        pill_active = "rgba(0, 0, 0, 0.12)"
+        pill_checked = "#ffffff"
+        pill_checked_fg = "#1d1d1f"
+        search_bg = "rgba(0, 0, 0, 0.05)"
+        dropdown_bg = "rgba(0, 0, 0, 0.05)"
+        dropdown_border = "0.5px solid rgba(0, 0, 0, 0.08)"
+        destr_bg = "rgba(255, 59, 48, 0.12)"
+        destr_fg = "#d70015"
+        destr_hover = "rgba(255, 59, 48, 0.20)"
+        destr_active = "rgba(255, 59, 48, 0.30)"
+        dialog_ring = "rgba(0, 0, 0, 0.12)"
+    else:
+        btn_bg = "rgba(255, 255, 255, 0.10)"
+        btn_hover = "rgba(255, 255, 255, 0.16)"
+        btn_active = "rgba(255, 255, 255, 0.24)"
+        btn_border = "none"
         btn_fg = "#ffffff"
+        btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.15)"
         dim_label = "rgba(255, 255, 255, 0.50)"
-        entry_bg = "rgba(0, 0, 0, 0.40)" if is_glassy else "#0a0a0c"
-        entry_border = "rgba(255, 255, 255, 0.14)"
-        entry_border_hover = "rgba(255, 255, 255, 0.28)"
-        hover_subtle = "rgba(255, 255, 255, 0.08)"
-        active_subtle = "rgba(255, 255, 255, 0.16)"
+        entry_bg = "rgba(255, 255, 255, 0.06)"
+        entry_border = "1px solid rgba(255, 255, 255, 0.08)"
+        entry_border_hover = "rgba(255, 255, 255, 0.18)"
+        hover_subtle = "rgba(255, 255, 255, 0.10)"
+        active_subtle = "rgba(255, 255, 255, 0.18)"
         switch_off_bg = "rgba(255, 255, 255, 0.18)"
         scale_trough_bg = "rgba(255, 255, 255, 0.14)"
         pill_bg = "rgba(255, 255, 255, 0.08)"
-        pill_hover = "rgba(255, 255, 255, 0.14)"
-        pill_active = "rgba(255, 255, 255, 0.20)"
-        pill_border = "rgba(255, 255, 255, 0.10)"
-    else:
-        btn_bg = "rgba(255, 255, 255, 0.10)" if is_glassy else "#2e2e32"
-        btn_hover = "rgba(255, 255, 255, 0.16)" if is_glassy else "#3a3a40"
-        btn_active = "rgba(255, 255, 255, 0.24)" if is_glassy else "#46464e"
-        btn_border = "rgba(255, 255, 255, 0.12)"
-        btn_border_hover = "rgba(255, 255, 255, 0.24)"
-        btn_fg = "#f5f5f7"
-        dim_label = "rgba(255, 255, 255, 0.50)"
-        entry_bg = "rgba(0, 0, 0, 0.28)" if is_glassy else "#1e1e20"
-        entry_border = "rgba(255, 255, 255, 0.14)"
-        entry_border_hover = "rgba(255, 255, 255, 0.26)"
-        hover_subtle = "rgba(255, 255, 255, 0.09)"
-        active_subtle = "rgba(255, 255, 255, 0.16)"
-        switch_off_bg = "rgba(255, 255, 255, 0.20)"
-        scale_trough_bg = "rgba(255, 255, 255, 0.16)"
-        pill_bg = "rgba(255, 255, 255, 0.08)"
-        pill_hover = "rgba(255, 255, 255, 0.14)"
-        pill_active = "rgba(255, 255, 255, 0.20)"
-        pill_border = "rgba(255, 255, 255, 0.10)"
+        pill_hover = "rgba(255, 255, 255, 0.10)"
+        pill_active = "rgba(255, 255, 255, 0.16)"
+        pill_checked = "rgba(255, 255, 255, 0.18)"
+        pill_checked_fg = "#ffffff"
+        search_bg = "rgba(255, 255, 255, 0.08)"
+        dropdown_bg = "rgba(255, 255, 255, 0.08)"
+        dropdown_border = "none"
+        destr_bg = "rgba(255, 69, 58, 0.18)"
+        destr_fg = "#ff453a"
+        destr_hover = "rgba(255, 69, 58, 0.28)"
+        destr_active = "rgba(255, 69, 58, 0.38)"
+        dialog_ring = "rgba(255, 255, 255, 0.12)"
 
     return f"""
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
@@ -1649,39 +1648,36 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button) {{
     background-color: {btn_bg};
     background-image: none;
-    border: 1px solid {btn_border};
+    border: {btn_border};
     color: {btn_fg};
     border-radius: 6px;
-    padding: 4px 14px;
-    min-height: 28px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-    transition: background-color 80ms ease, border-color 80ms ease, color 80ms ease;
+    padding: 3px 12px;
+    min-height: 26px;
+    font-weight: 400;
+    box-shadow: {btn_shadow};
+    transition: background-color 80ms ease, color 80ms ease;
 }}
 
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):hover {{
     background-color: {btn_hover};
-    border-color: {btn_border_hover};
     color: {btn_fg};
 }}
 
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):active {{
     background-color: {btn_active};
-    border-color: {btn_border_hover};
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.10);
 }}
 
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):checked {{
     background-color: @accent_bg_color;
     color: @accent_fg_color;
-    border-color: rgba(0, 0, 0, 0.15);
 }}
 
 button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):disabled {{
-    opacity: 0.45;
+    opacity: 0.35;
     box-shadow: none;
 }}
 
-/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat at rest, rounded rect on hover) */
+/* 2. macOS Headerbar & Titlebar Icon Buttons (Flat, borderless at rest, subtle rounded rect on hover) */
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 .titlebar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
 window headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize),
@@ -1691,18 +1687,20 @@ headerbar menubutton > button,
 headerbar menubutton.flat > button,
 tab button,
 .sidebar button,
-popover button:not(.suggested-action):not(.destructive-action) {{
-    background: transparent !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    border-radius: 6px !important;
-    color: {btn_fg} !important;
-    min-height: 28px;
-    min-width: 28px;
-    padding: 4px;
-    margin: 0 2px;
+popover button:not(.suggested-action):not(.destructive-action),
+.kgx-window headerbar button:not(.suggested-action):not(.destructive-action),
+window.kgx headerbar button:not(.suggested-action):not(.destructive-action) {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 6px;
+    color: {btn_fg};
+    min-height: 26px;
+    min-width: 26px;
+    padding: 3px 5px;
+    margin: 0 1px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
@@ -1715,12 +1713,14 @@ headerbar menubutton > button:hover,
 headerbar menubutton.flat > button:hover,
 tab button:hover,
 .sidebar button:hover,
-popover button:not(.suggested-action):not(.destructive-action):hover {{
-    background: transparent !important;
-    background-color: {hover_subtle} !important;
-    background-image: none !important;
-    border: none !important;
-    box-shadow: none !important;
+popover button:not(.suggested-action):not(.destructive-action):hover,
+.kgx-window headerbar button:not(.suggested-action):not(.destructive-action):hover,
+window.kgx headerbar button:not(.suggested-action):not(.destructive-action):hover {{
+    background: transparent;
+    background-color: {hover_subtle};
+    background-image: none;
+    border: none;
+    box-shadow: none;
 }}
 
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):active,
@@ -1732,12 +1732,14 @@ headerbar menubutton > button:active,
 headerbar menubutton.flat > button:active,
 tab button:active,
 .sidebar button:active,
-popover button:not(.suggested-action):not(.destructive-action):active {{
-    background: transparent !important;
-    background-color: {active_subtle} !important;
-    background-image: none !important;
-    border: none !important;
-    box-shadow: none !important;
+popover button:not(.suggested-action):not(.destructive-action):active,
+.kgx-window headerbar button:not(.suggested-action):not(.destructive-action):active,
+window.kgx headerbar button:not(.suggested-action):not(.destructive-action):active {{
+    background: transparent;
+    background-color: {active_subtle};
+    background-image: none;
+    border: none;
+    box-shadow: none;
 }}
 
 headerbar button:not(.suggested-action):not(.destructive-action):not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked,
@@ -1746,28 +1748,36 @@ headerbar menubutton > button:checked,
 .titlebar menubutton > button:checked,
 headerbar menubutton.flat > button:checked,
 tab button:checked {{
-    background: transparent !important;
-    background-color: {active_subtle} !important;
-    background-image: none !important;
-    border: none !important;
-    color: @accent_bg_color !important;
-    box-shadow: none !important;
+    background: transparent;
+    background-color: {active_subtle};
+    background-image: none;
+    border: none;
+    color: @accent_bg_color;
+    box-shadow: none;
 }}
 
-/* 3. Headerbar Split Buttons & Linked Controls (e.g. Navigation, History, View Toggles) */
+/* 3. Headerbar Segmented Controls, Split Buttons & Linked Controls */
 headerbar splitbutton,
 .titlebar splitbutton,
 headerbar .linked,
 .titlebar .linked,
 headerbar box.linked,
-.titlebar box.linked {{
+.titlebar box.linked,
+headerbar stackswitcher,
+.titlebar stackswitcher,
+headerbar viewswitcher,
+.titlebar viewswitcher,
+.kgx-window headerbar splitbutton,
+window.kgx headerbar splitbutton,
+.kgx-window headerbar .linked,
+window.kgx headerbar .linked {{
     background-color: {pill_bg};
     background-image: none;
-    border: 1px solid {pill_border};
+    border: none;
     box-shadow: none;
-    border-radius: 8px;
-    margin: 0 4px;
-    padding: 1px;
+    border-radius: 6px;
+    margin: 0 3px;
+    padding: 2px;
 }}
 
 headerbar splitbutton > button,
@@ -1775,11 +1785,18 @@ headerbar splitbutton > menubutton > button,
 headerbar .linked > button,
 headerbar .linked > menubutton > button,
 headerbar box.linked > button,
-headerbar box.linked > menubutton > button {{
-    min-height: 26px;
-    min-width: 26px;
-    padding: 3px 8px;
-    border-radius: 6px;
+headerbar box.linked > menubutton > button,
+headerbar stackswitcher > button,
+headerbar viewswitcher > button,
+.kgx-window headerbar splitbutton > button,
+.kgx-window headerbar splitbutton > menubutton > button,
+window.kgx headerbar splitbutton > button,
+window.kgx headerbar splitbutton > menubutton > button {{
+    min-height: 22px;
+    min-width: 22px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: transparent;
     background-color: transparent;
     background-image: none;
     border: none;
@@ -1793,9 +1810,16 @@ headerbar splitbutton > menubutton > button:hover,
 headerbar .linked > button:hover,
 headerbar .linked > menubutton > button:hover,
 headerbar box.linked > button:hover,
-headerbar box.linked > menubutton > button:hover {{
+headerbar box.linked > menubutton > button:hover,
+headerbar stackswitcher > button:hover,
+headerbar viewswitcher > button:hover,
+.kgx-window headerbar splitbutton > button:hover,
+.kgx-window headerbar splitbutton > menubutton > button:hover,
+window.kgx headerbar splitbutton > button:hover,
+window.kgx headerbar splitbutton > menubutton > button:hover {{
     background-color: {pill_hover};
     background-image: none;
+    border: none;
     box-shadow: none;
 }}
 
@@ -1804,29 +1828,28 @@ headerbar splitbutton > menubutton > button:active,
 headerbar .linked > button:active,
 headerbar .linked > menubutton > button:active,
 headerbar box.linked > button:active,
-headerbar box.linked > menubutton > button:active {{
+headerbar box.linked > menubutton > button:active,
+.kgx-window headerbar splitbutton > button:active,
+.kgx-window headerbar splitbutton > menubutton > button:active,
+window.kgx headerbar splitbutton > button:active,
+window.kgx headerbar splitbutton > menubutton > button:active {{
     background-color: {pill_active};
     background-image: none;
+    border: none;
     box-shadow: none;
 }}
 
-headerbar splitbutton > button:dir(ltr),
-headerbar splitbutton > menubutton > button:dir(rtl),
-headerbar .linked > button:dir(ltr):not(:last-child),
-headerbar box.linked > button:dir(ltr):not(:last-child) {{
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-    margin-right: 0;
-    border-right: 1px solid {pill_border};
-}}
-
-headerbar splitbutton > menubutton > button:dir(ltr),
-headerbar splitbutton > button:dir(rtl),
-headerbar .linked > button:dir(ltr):not(:first-child),
-headerbar box.linked > button:dir(ltr):not(:first-child) {{
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-    margin-left: 0;
+/* Segmented Control Active / Selected Segment (Apple Elevated Plate) */
+headerbar .linked > button:checked,
+headerbar box.linked > button:checked,
+headerbar stackswitcher > button:checked,
+headerbar viewswitcher > button:checked {{
+    background-color: {pill_checked};
+    background-image: none;
+    border: none;
+    color: {pill_checked_fg};
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
+    border-radius: 5px;
 }}
 
 /* 5. Flat Buttons */
@@ -1856,39 +1879,41 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):checked 
 button.suggested-action {{
     background-color: #007aff;
     color: #ffffff;
-    border: 1px solid rgba(0, 0, 0, 0.15);
+    border: none;
     border-radius: 6px;
-    padding: 4px 16px;
-    min-height: 28px;
+    padding: 3px 14px;
+    min-height: 26px;
     font-weight: 500;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }}
 
 button.suggested-action:hover {{
-    background-image: linear-gradient(rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.12));
+    background-color: #1a88ff;
+    background-image: none;
 }}
 
 button.suggested-action:active {{
-    background-image: linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.12));
+    background-color: #0062cc;
+    background-image: none;
 }}
 
 button.destructive-action {{
-    background-color: rgba(255, 69, 58, 0.15);
-    color: #ff453a;
-    border: 1px solid rgba(255, 69, 58, 0.30);
+    background-color: {destr_bg};
+    color: {destr_fg};
+    border: none;
     border-radius: 6px;
-    padding: 4px 16px;
-    min-height: 28px;
+    padding: 3px 14px;
+    min-height: 26px;
     font-weight: 500;
     transition: background-color 100ms ease;
 }}
 
 button.destructive-action:hover {{
-    background-color: rgba(255, 69, 58, 0.25);
+    background-color: {destr_hover};
 }}
 
 button.destructive-action:active {{
-    background-color: rgba(255, 69, 58, 0.35);
+    background-color: {destr_active};
 }}
 
 /* 7. Dropdowns & Combo Boxes (In content views / forms) */
@@ -1905,12 +1930,14 @@ row.combo dropdown > button,
 combobox > box > button.combo,
 box.content menubutton:not(.flat) > button,
 preferencespage menubutton:not(.flat) > button {{
-    background-color: {btn_bg};
-    border: 1px solid {btn_border};
+    background-color: {dropdown_bg};
+    border: {dropdown_border};
     color: {btn_fg};
     border-radius: 6px;
-    padding: 5px 10px;
-    transition: background-color 100ms ease, border-color 100ms ease;
+    padding: 3px 8px;
+    min-height: 24px;
+    box-shadow: {btn_shadow};
+    transition: background-color 100ms ease;
 }}
 
 box.content dropdown > button:hover,
@@ -1921,7 +1948,6 @@ combobox > box > button.combo:hover,
 box.content menubutton:not(.flat) > button:hover,
 preferencespage menubutton:not(.flat) > button:hover {{
     background-color: {btn_hover};
-    border-color: {btn_border_hover};
 }}
 
 box.content dropdown > button:active,
@@ -1937,7 +1963,7 @@ preferencespage menubutton:not(.flat) > button:active {{
 headerbar dropdown > button {{
     background-color: transparent;
     background-image: none;
-    border: 1px solid transparent;
+    border: none;
     box-shadow: none;
 }}
 
@@ -1953,8 +1979,8 @@ preferencespage dropdown > button:focus,
 dialog dropdown > button:focus,
 row.combo dropdown > button:focus,
 combobox > box > button.combo:focus {{
-    border-color: @accent_bg_color;
-    outline: 2px solid @accent_bg_color;
+    border-color: #007aff;
+    outline: 2px solid #007aff;
     outline-offset: -1px;
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
 }}
@@ -1962,9 +1988,10 @@ combobox > box > button.combo:focus {{
 /* 8. Text Entries */
 entry {{
     background-color: {entry_bg};
-    border: 1px solid {entry_border};
+    border: {entry_border};
     border-radius: 6px;
-    padding: 6px 10px;
+    padding: 3px 8px;
+    min-height: 24px;
     color: {btn_fg};
     caret-color: @accent_bg_color;
     box-shadow: none;
@@ -1977,15 +2004,29 @@ entry:hover {{
 
 entry:focus,
 entry:focus-within {{
-    border-color: @accent_bg_color;
-    outline: 2px solid @accent_bg_color;
+    border-color: #007aff;
+    outline: 2px solid #007aff;
     outline-offset: -1px;
     box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
 }}
 
-entry.search {{
+entry.search,
+searchbar entry,
+headerbar searchbar entry {{
     border-radius: 9999px;
-    padding: 4px 12px;
+    border: none;
+    background-color: {search_bg};
+    padding: 3px 12px;
+    min-height: 24px;
+    box-shadow: none;
+}}
+
+entry.search:focus,
+searchbar entry:focus,
+headerbar searchbar entry:focus {{
+    outline: 2px solid #007aff;
+    outline-offset: -1px;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.35);
 }}
 
 /* 9. Switches */
@@ -1994,7 +2035,7 @@ switch {{
     min-width: 40px;
     min-height: 22px;
     background-color: {switch_off_bg};
-    border: 1px solid {btn_border};
+    border: 1px solid rgba(255, 255, 255, 0.08);
     transition: background-color 160ms ease, border-color 160ms ease;
 }}
 
@@ -2016,7 +2057,7 @@ switch > slider {{
 /* 10. Checkboxes & Radio Buttons */
 check {{
     border-radius: 4px;
-    border: 1px solid {btn_border_hover};
+    border: 1px solid {entry_border_hover};
     min-width: 16px;
     min-height: 16px;
     background-color: {entry_bg};
@@ -2032,7 +2073,7 @@ check:checked {{
 
 radio {{
     border-radius: 9999px;
-    border: 1px solid {btn_border_hover};
+    border: 1px solid {entry_border_hover};
     min-width: 16px;
     min-height: 16px;
     background-color: {entry_bg};
@@ -2087,18 +2128,21 @@ listview > row.activatable:selected {{
 
 /* 13. Stack Switchers / Segmented Controls */
 stackswitcher {{
-    border-radius: 7px;
+    border-radius: 6px;
     padding: 2px;
     background-color: {pill_bg};
-    border: 1px solid {pill_border};
+    border: none;
+    box-shadow: none;
 }}
 
 stackswitcher > button {{
     border-radius: 5px;
-    padding: 3px 12px;
+    padding: 2px 10px;
+    min-height: 22px;
     background-color: transparent;
     border: none;
     box-shadow: none;
+    color: {btn_fg};
 }}
 
 stackswitcher > button:hover {{
@@ -2106,10 +2150,10 @@ stackswitcher > button:hover {{
 }}
 
 stackswitcher > button:checked {{
-    background-color: {btn_hover};
-    color: {btn_fg};
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    background-color: {pill_checked};
+    color: {pill_checked_fg};
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }}
 
 /* 14. Minimal macOS Scrollbars */
@@ -2139,7 +2183,7 @@ messagedialog,
 .messagedialog,
 window.message {{
     border-radius: 18px;
-    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.16), 0 0 0 1px {btn_border};
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.16), 0 0 0 1px {dialog_ring};
 }}
 
 window.dialog headerbar,
@@ -2622,6 +2666,18 @@ def apply_global_theme(theme_key):
         log.append(f"Updated window corner settings (radius 16, smoothing 0.8, border {w_border}, skip-libadwaita true).")
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")
+
+    # 9. Sync Application Translucency / Blur
+    try:
+        if is_glassy:
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "true"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "215"], check=False)
+        else:
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "false"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "255"], check=False)
+        log.append(f"Set application blur to {'enabled (translucent)' if is_glassy else 'disabled (solid opaque)'}.")
+    except Exception as e:
+        log.append(f"Error syncing application blur: {e}")
 
     return {
         "success": True,

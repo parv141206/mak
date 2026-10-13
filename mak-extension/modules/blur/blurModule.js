@@ -14,9 +14,11 @@ export class BlurModule {
     constructor(extension) {
         this._extension = extension;
         this._makSettings = extension.getSettings('org.gnome.shell.extensions.mak');
+        this._interfaceSettings = new Gio.Settings({ schema_id: 'org.gnome.desktop.interface' });
         this._bms = null;
         this._liquidGlass = null;
         this._settingsChangedId = 0;
+        this._themeChangedId = 0;
     }
 
     enable() {
@@ -36,6 +38,10 @@ export class BlurModule {
                 key === 'topbar-transparency' || key === 'topbar-opaque') {
                 this._syncSettings();
             }
+        });
+
+        this._themeChangedId = this._interfaceSettings.connect('changed::gtk-theme', () => {
+            this._syncSettings();
         });
 
         this._syncSettings();
@@ -72,15 +78,16 @@ export class BlurModule {
             appfolderSettings.set_boolean('blur', true);
             lockscreenSettings.set_boolean('blur', true);
 
-            // Enable dynamic application window blur
+            // Dynamic application window blur - only enabled if active GTK theme is glassy
+            const gtkTheme = this._interfaceSettings.get_string('gtk-theme') || '';
+            const isGlassyTheme = gtkTheme.toLowerCase().includes('glass');
+
             const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
-            appSettings.set_boolean('blur', true);
+            appSettings.set_boolean('blur', isGlassyTheme);
             appSettings.set_boolean('static-blur', false);
             appSettings.set_boolean('enable-all', true);
             appSettings.set_boolean('dynamic-opacity', false);
-            if (appSettings.get_int('opacity') >= 250) {
-                appSettings.set_int('opacity', 215);
-            }
+            appSettings.set_int('opacity', isGlassyTheme ? 215 : 255);
             appSettings.set_int('corner-radius', 16);
             appSettings.set_boolean('corner-when-maximized', true);
 
@@ -175,19 +182,20 @@ export class BlurModule {
             appfolderSettings.set_int('sigma', sigma);
             appfolderSettings.set_double('brightness', brightness);
 
+            const gtkTheme = this._interfaceSettings.get_string('gtk-theme') || '';
+            const isGlassyTheme = gtkTheme.toLowerCase().includes('glass');
+
             try {
                 const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
                 appSettings.set_int('sigma', sigma);
                 appSettings.set_double('brightness', brightness);
-                appSettings.set_boolean('blur', !liquidGlass);
+                appSettings.set_boolean('blur', isGlassyTheme && !liquidGlass);
                 appSettings.set_boolean('static-blur', false);
                 appSettings.set_boolean('enable-all', true);
                 appSettings.set_boolean('dynamic-opacity', false);
                 appSettings.set_int('corner-radius', 16);
                 appSettings.set_boolean('corner-when-maximized', true);
-                if (appSettings.get_int('opacity') >= 250) {
-                    appSettings.set_int('opacity', 215);
-                }
+                appSettings.set_int('opacity', isGlassyTheme ? 215 : 255);
             } catch (e) {}
 
             bmsSettings.set_int('sigma', sigma);
@@ -294,7 +302,8 @@ export class BlurModule {
                 popupSettings.set_boolean('blur', true);
                 try {
                     const appSettings = new Gio.Settings({ schema_id: 'org.gnome.shell.extensions.blur-my-shell.applications' });
-                    appSettings.set_boolean('blur', true);
+                    appSettings.set_boolean('blur', isGlassyTheme);
+                    appSettings.set_int('opacity', isGlassyTheme ? 215 : 255);
                 } catch (e) {}
                 panelSettings.set_boolean('static-blur', false);
                 popupSettings.set_boolean('static-blur', false);
@@ -318,6 +327,11 @@ export class BlurModule {
         if (this._settingsChangedId) {
             try { this._makSettings.disconnect(this._settingsChangedId); } catch (e) {}
             this._settingsChangedId = 0;
+        }
+
+        if (this._themeChangedId) {
+            try { this._interfaceSettings.disconnect(this._themeChangedId); } catch (e) {}
+            this._themeChangedId = 0;
         }
 
         if (this._liquidGlass) {
