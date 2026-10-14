@@ -189,9 +189,9 @@ LIGHT_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #ebebef;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.12);
-@define-color sidebar_bg_color #e8e8ed;
+@define-color sidebar_bg_color #ebebf0;
 @define-color sidebar_fg_color #1d1d1f;
-@define-color secondary_sidebar_bg_color #e2e2e7;
+@define-color secondary_sidebar_bg_color #e4e4e9;
 @define-color card_bg_color #ffffff;
 @define-color card_fg_color #1d1d1f;
 @define-color dialog_bg_color #f5f5f7;
@@ -1354,71 +1354,244 @@ popover separator {{
 """
 
 
-def generate_nautilus_override(is_dark=True):
-    border_color = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.08)"
-    text_primary = "#f5f5f7" if is_dark else "#1d1d1f"
-    text_secondary = "rgba(255, 255, 255, 0.50)" if is_dark else "rgba(0, 0, 0, 0.50)"
-    text_sidebar = "rgba(255, 255, 255, 0.85)" if is_dark else "rgba(0, 0, 0, 0.82)"
-    icon_sidebar = "rgba(255, 255, 255, 0.70)" if is_dark else "rgba(0, 0, 0, 0.65)"
-    sidebar_selected_bg = "rgba(255, 255, 255, 0.14)" if is_dark else "rgba(0, 0, 0, 0.08)"
-    sidebar_hover_bg = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.05)"
-    alt_row_bg = "rgba(255, 255, 255, 0.02)" if is_dark else "rgba(0, 0, 0, 0.02)"
-    row_hover_bg = "rgba(255, 255, 255, 0.06)" if is_dark else "rgba(0, 0, 0, 0.05)"
-    path_btn_bg = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.06)"
-    path_btn_hover = "rgba(255, 255, 255, 0.14)" if is_dark else "rgba(0, 0, 0, 0.10)"
+def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
+    if not is_dark:
+        if is_glassy:
+            border_color = "rgba(0, 0, 0, 0.08)"
+            sidebar_selected_bg = "rgba(0, 0, 0, 0.09)"
+            sidebar_hover_bg = "rgba(0, 0, 0, 0.045)"
+            search_bg = "rgba(0, 0, 0, 0.05)"
+            search_border = "rgba(0, 0, 0, 0.08)"
+            path_floating_bg = "rgba(255, 255, 255, 0.82)"
+            path_btn_bg = "rgba(0, 0, 0, 0.05)"
+            path_btn_hover = "rgba(0, 0, 0, 0.09)"
+            hover_subtle = "rgba(0, 0, 0, 0.06)"
+        else:
+            border_color = "rgba(0, 0, 0, 0.08)"
+            sidebar_selected_bg = "rgba(0, 0, 0, 0.08)"
+            sidebar_hover_bg = "rgba(0, 0, 0, 0.04)"
+            search_bg = "rgba(0, 0, 0, 0.05)"
+            search_border = "rgba(0, 0, 0, 0.08)"
+            path_floating_bg = "rgba(255, 255, 255, 0.92)"
+            path_btn_bg = "rgba(0, 0, 0, 0.05)"
+            path_btn_hover = "rgba(0, 0, 0, 0.09)"
+            hover_subtle = "rgba(0, 0, 0, 0.05)"
+        text_primary = "#1d1d1f"
+        text_sidebar = "#1d1d1f"
+        text_secondary = "rgba(0, 0, 0, 0.50)"
+        text_muted = "rgba(0, 0, 0, 0.45)"
+        alt_row_bg = "rgba(0, 0, 0, 0.02)"
+        row_hover_bg = "rgba(0, 0, 0, 0.045)"
+    else:
+        if is_amoled:
+            if is_glassy:
+                border_color = "rgba(255, 255, 255, 0.08)"
+                sidebar_selected_bg = "rgba(255, 255, 255, 0.14)"
+                sidebar_hover_bg = "rgba(255, 255, 255, 0.07)"
+                search_bg = "rgba(255, 255, 255, 0.07)"
+                search_border = "rgba(255, 255, 255, 0.08)"
+                path_floating_bg = "rgba(24, 24, 28, 0.85)"
+                path_btn_bg = "rgba(255, 255, 255, 0.08)"
+                path_btn_hover = "rgba(255, 255, 255, 0.14)"
+                hover_subtle = "rgba(255, 255, 255, 0.09)"
+            else:
+                border_color = "rgba(255, 255, 255, 0.07)"
+                sidebar_selected_bg = "rgba(255, 255, 255, 0.13)"
+                sidebar_hover_bg = "rgba(255, 255, 255, 0.06)"
+                search_bg = "rgba(255, 255, 255, 0.06)"
+                search_border = "rgba(255, 255, 255, 0.07)"
+                path_floating_bg = "rgba(24, 24, 28, 0.92)"
+                path_btn_bg = "rgba(255, 255, 255, 0.07)"
+                path_btn_hover = "rgba(255, 255, 255, 0.13)"
+                hover_subtle = "rgba(255, 255, 255, 0.08)"
+            text_muted = "rgba(255, 255, 255, 0.42)"
+        else:
+            if is_glassy:
+                border_color = "rgba(255, 255, 255, 0.09)"
+                sidebar_selected_bg = "rgba(255, 255, 255, 0.14)"
+                sidebar_hover_bg = "rgba(255, 255, 255, 0.07)"
+                search_bg = "rgba(255, 255, 255, 0.08)"
+                search_border = "rgba(255, 255, 255, 0.09)"
+                path_floating_bg = "rgba(36, 36, 40, 0.85)"
+                path_btn_bg = "rgba(255, 255, 255, 0.09)"
+                path_btn_hover = "rgba(255, 255, 255, 0.15)"
+                hover_subtle = "rgba(255, 255, 255, 0.09)"
+            else:
+                border_color = "rgba(255, 255, 255, 0.08)"
+                sidebar_selected_bg = "rgba(255, 255, 255, 0.12)"
+                sidebar_hover_bg = "rgba(255, 255, 255, 0.06)"
+                search_bg = "rgba(255, 255, 255, 0.07)"
+                search_border = "rgba(255, 255, 255, 0.08)"
+                path_floating_bg = "rgba(36, 36, 40, 0.92)"
+                path_btn_bg = "rgba(255, 255, 255, 0.08)"
+                path_btn_hover = "rgba(255, 255, 255, 0.14)"
+                hover_subtle = "rgba(255, 255, 255, 0.08)"
+            text_muted = "rgba(255, 255, 255, 0.45)"
+        text_primary = "#f5f5f7"
+        text_sidebar = "#f5f5f7"
+        text_secondary = "rgba(255, 255, 255, 0.50)"
+        alt_row_bg = "rgba(255, 255, 255, 0.02)"
+        row_hover_bg = "rgba(255, 255, 255, 0.06)"
 
     return f"""
-/* ── macOS Finder (Nautilus) Elegant Native Styling ──────────────────────── */
-.nautilus-window {{
-    background-color: @window_bg_color;
+/* ── macOS 27 "Golden Gate" Finder & Universal System Sidebar ────────────── */
+
+/* 1. Seamless Top-Left Sidebar Titlebar (Eliminate separator above sidebar) */
+navigation-split-view > widget.sidebar-pane headerbar,
+overlay-split-view > widget.sidebar-pane headerbar,
+split-view > widget.sidebar-pane headerbar,
+navigation-split-view .sidebar-pane headerbar,
+overlay-split-view .sidebar-pane headerbar,
+split-view .sidebar-pane headerbar,
+.sidebar-pane headerbar,
+.sidebar headerbar,
+.nautilus-window .sidebar-pane headerbar,
+.nautilus-window headerbar.flat,
+headerbar.titlebar.tweak-titlebar-left,
+headerbar.titlebar.tweak-titlebar-left:backdrop {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    border-bottom: none;
+    box-shadow: none;
 }}
 
-/* Seamless Sidebar: completely eliminate 6px black outline & gap */
+/* 2. Unified Sidebar Pane Container & Hairline Vertical Divider */
+navigation-split-view > widget.sidebar-pane,
+overlay-split-view > widget.sidebar-pane,
+split-view > widget.sidebar-pane,
+navigation-split-view .sidebar-pane,
+overlay-split-view .sidebar-pane,
+split-view .sidebar-pane,
 .nautilus-window .sidebar-pane,
 .nautilus-window .sidebar-pane:dir(ltr),
 .nautilus-window .sidebar-pane:dir(rtl),
 .nautilus-window .sidebar-pane:backdrop,
-.nautilus-window .sidebar-pane:backdrop:dir(ltr),
-.nautilus-window .sidebar-pane:backdrop:dir(rtl),
 #NautilusFileChooser .sidebar-pane,
 #NautilusFileChooser .sidebar-pane:dir(ltr),
 #NautilusFileChooser .sidebar-pane:dir(rtl),
-#NautilusFileChooser .sidebar-pane:backdrop {{
-    box-shadow: none;
+#NautilusFileChooser .sidebar-pane:backdrop,
+.sidebar-pane,
+placessidebar,
+stacksidebar {{
     background-color: @sidebar_bg_color;
     border-right: 1px solid {border_color};
+    border-left: none;
+    box-shadow: none;
 }}
 
+navigation-split-view > widget.sidebar-pane:dir(rtl),
+overlay-split-view > widget.sidebar-pane:dir(rtl),
+split-view > widget.sidebar-pane:dir(rtl),
+.sidebar-pane:dir(rtl),
+placessidebar:dir(rtl),
+stacksidebar:dir(rtl) {{
+    border-left: 1px solid {border_color};
+    border-right: none;
+}}
+
+/* 3. Transparent Sidebar Background Containers */
 .nautilus-window .sidebar-pane placessidebar,
 #NautilusFileChooser .sidebar-pane placessidebar,
-.nautilus-window placessidebar {{
+.nautilus-window placessidebar,
+navigation-split-view > widget.sidebar-pane scrolledwindow,
+overlay-split-view > widget.sidebar-pane scrolledwindow,
+split-view > widget.sidebar-pane scrolledwindow,
+.sidebar-pane scrolledwindow,
+navigation-sidebar,
+.navigation-sidebar,
+placessidebar list,
+stacksidebar list {{
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}}
+
+/* 4. Category & Group Headers ("Favourites", "Locations", "Tags", etc.) */
+navigation-sidebar row.heading,
+.navigation-sidebar row.heading,
+placessidebar row.heading,
+.sidebar-pane row.heading,
+placessidebar row:not(.activatable),
+.navigation-sidebar row:not(.activatable),
+stacksidebar row:not(.activatable),
+navigation-sidebar label.heading,
+.navigation-sidebar label.heading,
+placessidebar label.heading,
+.sidebar-pane label.heading,
+.sidebar label.heading,
+.nautilus-window .sidebar-pane row.heading,
+.nautilus-window placessidebar row.heading,
+#NautilusFileChooser placessidebar row.heading {{
+    background: transparent;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    color: {text_muted};
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    margin-top: 14px;
+    margin-bottom: 2px;
+    padding: 2px 12px;
+    min-height: 20px;
+}}
+
+navigation-sidebar row.heading:hover,
+.navigation-sidebar row.heading:hover,
+placessidebar row.heading:hover,
+placessidebar row:not(.activatable):hover {{
     background: transparent;
     background-color: transparent;
 }}
 
-/* Sidebar Rows (Compact Apple Finder Sidebar) */
+/* 5. Inset Floating Rounded Pill Sidebar Rows (macOS 27 Signature Look) */
+navigation-sidebar > row,
+.navigation-sidebar > row,
+listview.navigation-sidebar > row,
+list.navigation-sidebar > row,
+placessidebar row.activatable,
+placessidebar row,
+placessidebar list > row,
+.sidebar-pane placessidebar row,
+.sidebar-pane row.activatable,
+.sidebar-pane row,
+stacksidebar row,
+stacksidebar list > row,
+.sidebar row,
+sidebar row,
 .nautilus-window .sidebar-pane placessidebar row,
 .nautilus-window placessidebar row,
 .nautilus-window .navigation-sidebar > row,
 #NautilusFileChooser placessidebar row,
 #NautilusFileChooser .navigation-sidebar > row {{
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 2px 8px;
-    min-height: 22px;
-    font-size: 12.5px;
+    border-radius: 8px;
+    margin: 1.5px 8px;
+    padding: 4px 10px;
+    min-height: 28px;
+    font-size: 13px;
+    font-weight: 500;
     color: {text_sidebar};
-    transition: background-color 80ms ease, color 80ms ease;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background-color: transparent;
+    transition: background-color 100ms ease, color 100ms ease;
 }}
 
-.nautilus-window .sidebar-pane placessidebar row label,
-.nautilus-window placessidebar row label,
-.nautilus-window .navigation-sidebar > row label,
-#NautilusFileChooser placessidebar row label,
-#NautilusFileChooser .navigation-sidebar > row label {{
-    color: {text_sidebar};
-}}
-
+/* 6. Sidebar SF-Symbols Vibrant Accent Glyphs */
+navigation-sidebar > row image,
+.navigation-sidebar > row image,
+listview.navigation-sidebar > row image,
+list.navigation-sidebar > row image,
+placessidebar row image,
+placessidebar list > row image,
+.sidebar-pane row image,
+stacksidebar row image,
+.sidebar row image,
 .nautilus-window .sidebar-pane placessidebar row image,
 .nautilus-window placessidebar row image,
 .nautilus-window .navigation-sidebar > row image,
@@ -1426,53 +1599,136 @@ def generate_nautilus_override(is_dark=True):
 #NautilusFileChooser .navigation-sidebar > row image {{
     min-width: 16px;
     min-height: 16px;
-    margin-right: 6px;
-    color: {icon_sidebar};
+    margin-right: 8px;
+    color: @accent_color;
 }}
 
-/* Sidebar Row Hover */
-.nautilus-window .sidebar-pane placessidebar row:hover,
-.nautilus-window placessidebar row:hover,
-.nautilus-window .navigation-sidebar > row:hover {{
+/* Eject and Action Buttons in Sidebar */
+navigation-sidebar row button.sidebar-button,
+placessidebar row button.sidebar-button,
+placessidebar row button.image-button,
+.sidebar-pane row button.sidebar-button,
+.nautilus-window .sidebar-pane placessidebar row button {{
+    border-radius: 9999px;
+    padding: 2px 4px;
+    min-height: 20px;
+    min-width: 20px;
+    color: {text_muted};
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    opacity: 0.65;
+    transition: opacity 100ms ease, background-color 100ms ease, color 100ms ease;
+}}
+
+navigation-sidebar row button.sidebar-button:hover,
+placessidebar row button.sidebar-button:hover,
+placessidebar row button.image-button:hover,
+.sidebar-pane row button.sidebar-button:hover,
+.nautilus-window .sidebar-pane placessidebar row button:hover {{
+    opacity: 1.0;
+    color: {text_primary};
+    background-color: {hover_subtle};
+}}
+
+/* 7. Sidebar Row Hover State */
+navigation-sidebar > row:hover:not(:selected):not(.heading),
+.navigation-sidebar > row:hover:not(:selected):not(.heading),
+listview.navigation-sidebar > row:hover:not(:selected):not(.heading),
+list.navigation-sidebar > row:hover:not(:selected):not(.heading),
+placessidebar row:hover:not(:selected):not(.heading),
+placessidebar list > row:hover:not(:selected):not(.heading),
+.sidebar-pane placessidebar row:hover:not(:selected):not(.heading),
+.sidebar-pane row:hover:not(:selected):not(.heading),
+stacksidebar row:hover:not(:selected):not(.heading),
+.sidebar row:hover:not(:selected):not(.heading),
+sidebar row:hover:not(:selected):not(.heading),
+.nautilus-window .sidebar-pane placessidebar row:hover:not(:selected):not(.heading),
+.nautilus-window placessidebar row:hover:not(:selected):not(.heading),
+.nautilus-window .navigation-sidebar > row:hover:not(:selected):not(.heading),
+#NautilusFileChooser placessidebar row:hover:not(:selected):not(.heading),
+#NautilusFileChooser .navigation-sidebar > row:hover:not(:selected):not(.heading) {{
     background-color: {sidebar_hover_bg};
     color: {text_primary};
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    box-shadow: none;
 }}
 
-.nautilus-window .sidebar-pane placessidebar row:hover label,
-.nautilus-window .sidebar-pane placessidebar row:hover image,
-.nautilus-window placessidebar row:hover label,
-.nautilus-window placessidebar row:hover image {{
-    color: {text_primary};
-}}
-
-/* Selected Sidebar Row */
+/* 8. Sidebar Row Selected State (Clean macOS 27 Inset Floating Pill) */
+navigation-sidebar > row:selected,
+.navigation-sidebar > row:selected,
+listview.navigation-sidebar > row:selected,
+list.navigation-sidebar > row:selected,
+placessidebar row:selected,
+placessidebar list > row:selected,
+.sidebar-pane placessidebar row:selected,
+.sidebar-pane row:selected,
+stacksidebar row:selected,
+.sidebar row:selected,
+sidebar row:selected,
 .nautilus-window .sidebar-pane placessidebar row:selected,
 .nautilus-window placessidebar row:selected,
 .nautilus-window .navigation-sidebar > row:selected,
 .nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
-#NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected {{
+#NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
+#NautilusFileChooser placessidebar row:selected,
+#NautilusFileChooser .navigation-sidebar > row:selected {{
     background-color: {sidebar_selected_bg};
     color: {text_primary};
-    font-weight: 500;
-    box-shadow: none;
-    outline: none;
+    font-weight: 600;
+    border-radius: 8px;
     border: none;
+    outline: none;
+    box-shadow: none;
 }}
 
+navigation-sidebar > row:selected label,
+.navigation-sidebar > row:selected label,
+listview.navigation-sidebar > row:selected label,
+list.navigation-sidebar > row:selected label,
+placessidebar row:selected label,
+placessidebar list > row:selected label,
+.sidebar-pane placessidebar row:selected label,
+.sidebar-pane row:selected label,
+stacksidebar row:selected label,
+.sidebar row:selected label,
+sidebar row:selected label,
 .nautilus-window .sidebar-pane placessidebar row:selected label,
-.nautilus-window .sidebar-pane placessidebar row:selected image,
 .nautilus-window placessidebar row:selected label,
-.nautilus-window placessidebar row:selected image,
 .nautilus-window .navigation-sidebar > row:selected label,
-.nautilus-window .navigation-sidebar > row:selected image {{
+#NautilusFileChooser placessidebar row:selected label,
+#NautilusFileChooser .navigation-sidebar > row:selected label {{
     color: {text_primary};
-    font-weight: 500;
+    font-weight: 600;
 }}
 
-/* Content Pane (Files View) */
+navigation-sidebar > row:selected:backdrop,
+.navigation-sidebar > row:selected:backdrop,
+placessidebar row:selected:backdrop,
+.sidebar-pane row:selected:backdrop,
+.nautilus-window .navigation-sidebar > row:selected:backdrop {{
+    opacity: 0.75;
+}}
+
+/* 9. Content Pane (Files View & General App Body) */
+navigation-split-view > widget.content-pane,
+overlay-split-view > widget.content-pane,
+split-view > widget.content-pane,
 .nautilus-window .content-pane,
 #NautilusFileChooser .content-pane {{
     background-color: @view_bg_color;
+}}
+
+navigation-split-view > widget.content-pane headerbar,
+overlay-split-view > widget.content-pane headerbar,
+split-view > widget.content-pane headerbar,
+.nautilus-window .content-pane headerbar,
+headerbar.titlebar.tweak-titlebar-right {{
+    background-color: @headerbar_bg_color;
+    border-bottom: 1px solid {border_color};
+    box-shadow: none;
 }}
 
 .nautilus-window .view,
@@ -1484,7 +1740,7 @@ def generate_nautilus_override(is_dark=True):
     color: @view_fg_color;
 }}
 
-/* Column Header Titles: Name, Size, Modified (Flat, clean Apple typography) */
+/* 10. Column Header Titles (Apple Flat Sans Typography) */
 columnview header,
 columnview header > button,
 columnview header button,
@@ -1537,7 +1793,7 @@ treeview.view > header > button:checked,
     color: {text_primary};
 }}
 
-/* List View Alternating Rows & Spacing: Full width, compact macOS height */
+/* 11. List View Alternating Rows */
 .nautilus-window .nautilus-list-view listview.view,
 #NautilusFileChooser .nautilus-list-view listview.view {{
     padding: 0;
@@ -1547,7 +1803,7 @@ treeview.view > header > button:checked,
 .nautilus-window .nautilus-list-view listview.view > row.activatable,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable {{
     padding: 0 4px;
-    min-height: 18px;
+    min-height: 20px;
     border-radius: 0;
     margin: 0;
     font-size: 12.5px;
@@ -1555,14 +1811,14 @@ treeview.view > header > button:checked,
 
 .nautilus-window .nautilus-list-view cell,
 #NautilusFileChooser .nautilus-list-view cell {{
-    min-height: 18px;
+    min-height: 20px;
     padding: 0;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable > cell > widget#NautilusViewCell,
 #NautilusFileChooser .nautilus-list-view listview.view > row.activatable > cell > widget#NautilusViewCell {{
     padding: 0 4px;
-    min-height: 18px;
+    min-height: 20px;
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:nth-child(even),
@@ -1583,11 +1839,8 @@ treeview.view > header > button:checked,
     background-image: none;
 }}
 
-/* Selected File Row */
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected,
-#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected,
-.nautilus-window .nautilus-grid-view child.activatable:selected,
-#NautilusFileChooser .nautilus-grid-view child.activatable:selected {{
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected {{
     background-color: @accent_bg_color;
     background-image: none;
     color: @accent_fg_color;
@@ -1596,19 +1849,40 @@ treeview.view > header > button:checked,
 }}
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
-.nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label,
-.nautilus-window .nautilus-grid-view child.activatable:selected label {{
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label {{
     color: #ffffff;
 }}
 
-/* Subtitle / Dim labels */
+/* 12. Grid View Items (Smooth Squircle Selection) */
+.nautilus-window .nautilus-grid-view child.activatable {{
+    border-radius: 10px;
+    padding: 4px;
+    transition: background-color 80ms ease;
+}}
+
+.nautilus-window .nautilus-grid-view child.activatable:hover:not(:selected) {{
+    background-color: {row_hover_bg};
+}}
+
+.nautilus-window .nautilus-grid-view child.activatable:selected,
+#NautilusFileChooser .nautilus-grid-view child.activatable:selected {{
+    background-color: alpha(@accent_bg_color, 0.22);
+    border-radius: 10px;
+    color: {text_primary};
+}}
+
+.nautilus-window .nautilus-grid-view child.activatable:selected label {{
+    color: {text_primary};
+    font-weight: 500;
+}}
+
+/* 13. Subtitle / Dim Labels & Stars */
 .nautilus-window .dim-label,
 .nautilus-window label.subtitle,
 .nautilus-window cell label:not(:first-child) {{
     color: {text_secondary};
 }}
 
-/* Star / Favorite Icon */
 .nautilus-window cell button.star image {{
     color: {text_secondary};
 }}
@@ -1617,7 +1891,7 @@ treeview.view > header > button:checked,
     color: #f5a623;
 }}
 
-/* Pathbar Container (Transparent: prevents stretched dark box across headerbar) */
+/* 14. Pathbar Capsule Dropdown */
 .nautilus-window .nautilus-pathbar,
 #NautilusFileChooser .nautilus-pathbar {{
     background: transparent;
@@ -1628,12 +1902,10 @@ treeview.view > header > button:checked,
     margin: 0 4px;
 }}
 
-/* Pathbar Location Dropdown Button (Apple macOS Compact Pill) */
 .nautilus-window .nautilus-pathbar button,
 #NautilusFileChooser .nautilus-pathbar button {{
     border-radius: 9999px;
-    background: transparent;
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: {path_btn_bg};
     border: none;
     padding: 2px 10px;
     min-height: 24px;
@@ -1641,15 +1913,16 @@ treeview.view > header > button:checked,
     font-weight: 500;
     color: {text_primary};
     box-shadow: none;
+    transition: background-color 80ms ease;
 }}
 
 .nautilus-window .nautilus-pathbar button:hover,
 #NautilusFileChooser .nautilus-pathbar button:hover {{
-    background-color: rgba(255, 255, 255, 0.14);
+    background-color: {path_btn_hover};
     box-shadow: none;
 }}
 
-/* History Navigation Capsule (< | >) */
+/* 15. History Navigation Capsule (< | >) */
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box,
@@ -1657,7 +1930,7 @@ treeview.view > header > button:checked,
     margin-left: 10px;
     padding: 2px;
     border-radius: 9999px;
-    background-color: rgba(255, 255, 255, 0.08);
+    background-color: {path_btn_bg};
     border: none;
     box-shadow: none;
 }}
@@ -1681,10 +1954,48 @@ treeview.view > header > button:checked,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
-    background-color: rgba(255, 255, 255, 0.10);
+    background-color: {path_btn_hover};
 }}
 
-/* Dialog & Window Bottom Action Bar (Save / Cancel / New Folder / Delete) */
+/* 16. Pill Search Entry (macOS 27 Top-Right Style) */
+entry.search,
+searchbar entry,
+searchentry,
+.nautilus-window searchbar entry,
+window.background.csd > dialog-host searchbar entry {{
+    border-radius: 9999px;
+    border: 1px solid {search_border};
+    background-color: {search_bg};
+    padding: 3px 12px;
+    min-height: 26px;
+    color: {text_primary};
+    box-shadow: none;
+}}
+
+entry.search:focus,
+searchbar entry:focus,
+searchentry:focus,
+.nautilus-window searchbar entry:focus {{
+    border-color: @accent_bg_color;
+    outline: 2px solid @accent_bg_color;
+    outline-offset: -1px;
+    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
+}}
+
+/* 17. Floating Bottom Statusbar / Path Capsule (macOS 27 Style) */
+.nautilus-window .floating-bar,
+floating-bar {{
+    border-radius: 9999px;
+    background-color: {path_floating_bg};
+    border: 1px solid {border_color};
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    padding: 4px 14px;
+    color: {text_primary};
+    font-size: 12px;
+    margin-bottom: 8px;
+}}
+
+/* 18. Dialog & Window Bottom Action Bar (Save / Cancel / New Folder / Delete) */
 .dialog-action-area,
 .response-area,
 actionbar,
@@ -2432,7 +2743,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     widgets_override = generate_widgets_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
     traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
     popover_override = generate_popover_override(is_dark=is_dark)
-    nautilus_override = generate_nautilus_override(is_dark=is_dark)
+    nautilus_override = generate_nautilus_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
     window_corners_override = generate_window_corners_override(is_dark=is_dark)
     rules_to_append = [widgets_override, window_corners_override, popover_override, nautilus_override, traffic_override]
     if is_glassy:
