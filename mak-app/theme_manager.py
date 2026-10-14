@@ -2712,6 +2712,10 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     entry_pad_x = TokenManager.get("geometry", "entries", "padding_x", default=8)
     focus_ring_w = TokenManager.get("geometry", "entries", "focus_ring_width", default=3)
 
+    color_well_height = TokenManager.get("geometry", "color_wells", "height", default=22)
+    color_well_radius = TokenManager.get("geometry", "color_wells", "corner_radius", default=4)
+    image_well_radius = TokenManager.get("geometry", "image_wells", "corner_radius", default=5)
+
     if not is_dark:
         border_col = TokenManager.get("colors", "light", "border", default="rgba(0, 0, 0, 0.12)")
         btn_bg = TokenManager.get("colors", "light", "btn_default_bg", default="rgba(0, 0, 0, 0.08)")
@@ -4061,6 +4065,45 @@ viewswitcher > button:checked {{
     box-shadow: {linked_checked_shadow};
     border-radius: 5px;
     font-weight: 500;
+}}
+
+/* 17. macOS Color Wells & Image Wells (apple/color wells/ & apple/image wells/) */
+colorbutton,
+button.color {{
+    padding: 2px 4px;
+    min-height: {color_well_height}px;
+    border-radius: {btn_radius}px;
+}}
+
+colorbutton colorswatch,
+button.color colorswatch,
+colorswatch {{
+    border-radius: {color_well_radius}px;
+    min-width: 28px;
+    min-height: 16px;
+    border: 1px solid {border_col};
+}}
+
+colorswatch:selected,
+colorswatch:focus {{
+    box-shadow: 0 0 0 2px @accent_bg_color;
+}}
+
+colorswatch.circular,
+button.color.circular {{
+    border-radius: 9999px;
+    min-width: 24px;
+    min-height: 24px;
+    padding: 0;
+}}
+
+picture,
+.image-well,
+frame.image-well,
+image.well {{
+    border-radius: {image_well_radius}px;
+    border: 1px solid {border_col};
+    padding: 2px;
 }}
 """
 

@@ -197,6 +197,17 @@ def build_gallery(family_filter=None):
 
         root.append(tb_box)
 
+    # 10. Color Wells & Image Wells
+    if not family_filter or family_filter in ["color_wells", "image_wells"]:
+        wells_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        color_btn = Gtk.ColorButton()
+        wells_box.append(color_btn)
+
+        img_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4, css_classes=["image-well"])
+        img_box.append(Gtk.Image(icon_name="image-x-generic-symbolic", pixel_size=32))
+        wells_box.append(img_box)
+        root.append(wells_box)
+
     return root
 
 def main():

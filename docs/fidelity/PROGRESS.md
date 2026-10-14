@@ -186,3 +186,14 @@
   - Rendered `qa/report/family_9_alerts_gtk4_dark.png`, `family_9_alerts_gtk4_light.png`, `family_9_alerts_gtk3_dark.png`, `family_9_alerts_gtk3_light.png`.
   - Side-by-side comparison verified at `qa/report/family_9_comparison.png`.
   - Token assertion tests passed across all 6 themes.
+
+### Family 10: Color Wells & Image Wells (PASSED)
+- **Tokens & Metrics Applied**:
+  - Color Button Height: **22px** control height (measured from `apple/color wells/11_mode_light__state_idle.png`).
+  - Swatch Radius: **4px** inner swatch radius, **5px** outer colorbutton container radius, **9999px** circular color pickers.
+  - Border & Selection: 1px subtle border, `@accent_bg_color` focus ring on selection.
+  - Image Well Radius: **5px** corner radius, 1px subtle container border, card background fill (measured from `apple/image wells/1_image_well.png`).
+- **Verification**:
+  - Rendered `qa/report/family_10_wells_gtk4_dark.png`, `family_10_wells_gtk4_light.png`, `family_10_wells_gtk3_dark.png`, `family_10_wells_gtk3_light.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_10_comparison.png`.
+  - Token assertion tests passed across all 6 themes.
