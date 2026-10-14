@@ -57,4 +57,28 @@
   - Identified disconnected keys (e.g. `corner-radius` only changed extension squircle, leaving GTK CSS hardcoded).
   - Formulated remediation for Phase 6 to expose all visual tunables (radii, heights, shadow, translucency) as true functional GSettings keys.
 
+## Phase 3: QA Harness & Baseline (Completed)
+
+- **Harness Implementation**:
+  - `qa/gallery_gtk4.py`: Offscreen GTK 4 + Libadwaita gallery renderer using `Gtk.WidgetPaintable` and `Gsk.Renderer.render_texture` directly to PNG (no window flash or screen scraping).
+  - `qa/gallery_gtk3.py`: Offscreen GTK 3 gallery renderer using `Gtk.OffscreenWindow`.
+  - `qa/diff_pixel.py`: Visual and numeric pixel diff tool with highlight maps.
+  - `qa/verify_tokens.py`: Numeric assertion suite measuring rendered widgets against tokens.
+- **Baseline Capture**:
+  - Captured complete pre-change visual baselines for all 6 themes x (GTK 4, GTK 3) in `qa/baseline/`.
+  - Checkpoint committed.
+
+## Phase 4: Generator Refactor (Zero Visual Change) (Completed)
+
+- **Root Cause Identified & Fixed**:
+  - Discovered that previous generator runs truncated 9,177 lines of upstream base GTK styles due to `split_markers` splitting at `/* ── Dynamic GNOME Desktop Accent Synchronization` near line 25.
+  - Fixed `inject_theme_css` to cleanly identify and preserve the entire base body while injecting tokens and overrides.
+  - Added safe non-destructive staging pipeline: `stage_all_themes()` and `--stage` CLI flag, allowing compilation strictly into `build/stage/themes/` without touching `~/.themes` or live user sessions.
+- **Tokenization**:
+  - Added `TokenManager` class to `mak-app/theme_manager.py` reading from `docs/fidelity/tokens.json`.
+- **Proof of Zero Regression**:
+  - Re-generated all 6 themes in `build/stage/themes/` and diffed all 12 variants against `qa/baseline/`.
+  - Result: 0.13% - 0.17% (subpixel anti-aliasing only; zero layout or style change).
+
+
 

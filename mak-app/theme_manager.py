@@ -2,8 +2,65 @@
 # Mak Theme Manager: Global Theme Synchronizer across Shell, GTK 2/3/4, and Flatpak
 
 import os
+import sys
+import json
 import subprocess
 import shutil
+
+class TokenManager:
+    """
+    Unified Design Token Manager for Mak.
+    Loads tokens from docs/fidelity/tokens.json with built-in fallbacks.
+    Central source of truth across GTK 4, GTK 3, GTK 2, and GNOME Shell.
+    """
+    _tokens = None
+
+    @classmethod
+    def load(cls):
+        if cls._tokens is not None:
+            return cls._tokens
+        repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        token_path = os.path.join(repo_root, "docs", "fidelity", "tokens.json")
+        if os.path.exists(token_path):
+            try:
+                with open(token_path, "r", encoding="utf-8") as f:
+                    cls._tokens = json.load(f)
+                    return cls._tokens
+            except Exception:
+                pass
+        cls._tokens = {
+            "geometry": {
+                "window": {"corner_radius": 14, "headerbar_standard_height": 52, "headerbar_compact_height": 38},
+                "traffic_lights": {"size": 14, "spacing": 8, "margin_left": 13},
+                "buttons": {"height_regular": 24, "corner_radius": 5, "capsule_corner_radius": 9999},
+                "segmented": {"height": 22, "container_radius": 6, "segment_radius": 5},
+                "entries": {"height_regular": 22, "corner_radius": 5, "focus_ring_width": 3},
+                "menus": {"row_height": 24, "item_radius": 4},
+                "popovers": {"corner_radius": 10},
+                "sidebars": {"row_height": 32, "corner_radius": 5},
+                "lists": {"row_height": 24, "column_header_height": 28},
+                "dialogs": {"corner_radius": 20, "button_height": 26, "button_radius": 9999},
+                "group_boxes": {"corner_radius": 10},
+                "color_wells": {"height": 22, "corner_radius": 4},
+                "notifications": {"corner_radius": 16, "padding": 14}
+            },
+            "colors": {
+                "traffic_close": "#ff5c60",
+                "traffic_minimize": "#fac800",
+                "traffic_maximize": "#35c759"
+            }
+        }
+        return cls._tokens
+
+    @classmethod
+    def get(cls, *keys, default=None):
+        data = cls.load()
+        for k in keys:
+            if isinstance(data, dict) and k in data:
+                data = data[k]
+            else:
+                return default
+        return data
 
 THEMES = {
     "dark": {
@@ -3623,46 +3680,42 @@ viewswitcher > button:checked {{
 """
 
 
-def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
+def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True, sync_repo=False):
     base_path = src_css_path + ".base"
     read_path = base_path if os.path.exists(base_path) else src_css_path
     try:
         with open(read_path, "r", encoding="utf-8") as f:
             content = f.read()
-        if not os.path.exists(base_path) and content:
-            with open(base_path, "w", encoding="utf-8") as bf:
-                bf.write(content)
     except Exception:
         content = ""
 
-    # Strip any previously injected blocks if read from a file that had them
-    split_markers = [
-        "/* ── Universal Mak Widgets & Control Metrics Override",
-        "/* ── Dynamic GNOME Desktop Accent Synchronization",
-        "/* === Mak Suite Refinements",
-    ]
-    for sm in split_markers:
-        if sm in content:
-            content = content.split(sm)[0]
+    # Correctly identify and preserve the upstream GTK base body
+    # Base body starts right after the initial palette / accent definitions
+    marker = "@define-color selected_bg_color"
+    if marker in content:
+        pos = content.find(marker)
+        eol = content.find("\n", pos)
+        base_start = eol + 1
+    elif "@define-color blue_1" in content:
+        base_start = content.find("@define-color blue_1")
+    else:
+        base_start = 0
 
-    color_keys = [
-        "window_bg_color", "window_fg_color", "view_bg_color", "view_fg_color",
-        "headerbar_bg_color", "headerbar_solid_bg", "headerbar_fg_color", "headerbar_border_color",
-        "sidebar_bg_color", "sidebar_fg_color", "secondary_sidebar_bg_color",
-        "card_bg_color", "card_fg_color", "dialog_bg_color", "dialog_fg_color",
-        "popover_bg_color", "popover_fg_color", "placeholder_text_color",
-        "accent_bg_color", "accent_fg_color", "accent_color",
-        "theme_selected_bg_color", "selected_bg_color"
+    # Find where Mak overrides start
+    override_markers = [
+        "/* ── Mak macOS Sonoma Refined Interactive Widgets",
+        "/* ── Universal Mak Widgets & Control Metrics Override",
+        "/* === Mak Suite Refinements",
+        "/* ── Mak Clean macOS Traffic Light Button Controls",
+        "/* ── Mak macOS Window Corner"
     ]
-    lines = content.splitlines()
-    filtered = []
-    for line in lines:
-        stripped = line.strip()
-        if any(stripped.startswith(f"@define-color {k} ") for k in color_keys):
-            continue
-        if "#9A57A3" in line or "#9a57a3" in line:
-            line = line.replace("#9A57A3", "@accent_bg_color").replace("#9a57a3", "@accent_bg_color")
-        filtered.append(line)
+    base_end = len(content)
+    for om in override_markers:
+        pos = content.find(om)
+        if pos != -1 and pos < base_end:
+            base_end = pos
+
+    base_body = content[base_start:base_end].strip()
 
     curr_acc = "blue"
     try:
@@ -3695,31 +3748,25 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     if is_glassy:
         rules_to_append.append(GLASSY_CONTAINER_RULES)
 
-    final_content = palette.strip() + "\n\n" + accent_css_override.strip() + "\n\n" + "\n".join(filtered) + "\n\n" + "\n\n".join(rules_to_append) + "\n"
+    final_content = palette.strip() + "\n\n" + accent_css_override.strip() + "\n\n" + base_body + "\n\n" + "\n\n".join(rules_to_append) + "\n"
+    os.makedirs(os.path.dirname(dst_css_path), exist_ok=True)
     with open(dst_css_path, "w", encoding="utf-8") as f:
         f.write(final_content)
 
-    if dst_css_path != src_css_path:
+    if sync_repo:
         try:
-            with open(src_css_path, "w", encoding="utf-8") as f:
-                f.write(final_content)
+            repo_themes_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "themes")
+            parts = os.path.normpath(src_css_path).split(os.sep)
+            if len(parts) >= 3:
+                t_name = parts[-3]
+                gtk_ver = parts[-2]
+                f_name = parts[-1]
+                repo_file = os.path.join(repo_themes_dir, t_name, gtk_ver, f_name)
+                if os.path.exists(os.path.dirname(repo_file)):
+                    with open(repo_file, "w", encoding="utf-8") as f:
+                        f.write(final_content)
         except Exception:
             pass
-
-    # Also sync to repository themes directory if matching theme exists
-    try:
-        repo_themes_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "themes")
-        parts = os.path.normpath(src_css_path).split(os.sep)
-        if len(parts) >= 3:
-            t_name = parts[-3]
-            gtk_ver = parts[-2]
-            f_name = parts[-1]
-            repo_file = os.path.join(repo_themes_dir, t_name, gtk_ver, f_name)
-            if os.path.exists(os.path.dirname(repo_file)):
-                with open(repo_file, "w", encoding="utf-8") as f:
-                    f.write(final_content)
-    except Exception:
-        pass
 
 
 def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_accent=None):
@@ -4298,9 +4345,77 @@ def sync_all_theme_directories():
                 if os.path.exists(base_css) or os.path.exists(src_css):
                     inject_theme_css(src_css, src_css, palette, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
+def stage_all_themes(stage_dir=None):
+    """
+    Safely compiles and stages all 6 macOS themes into a dedicated staging directory
+    (e.g. build/stage/themes) without modifying live system directories or restarting Nautilus.
+    """
+    repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    if stage_dir is None:
+        stage_dir = os.path.join(repo_root, "build", "stage", "themes")
+    os.makedirs(stage_dir, exist_ok=True)
+
+    repo_themes = os.path.join(repo_root, "themes")
+    palette_map = {
+        "dark": GRAPHITE_PALETTE_OVERRIDE,
+        "dark-glassy": GRAPHITE_GLASSY_PALETTE_OVERRIDE,
+        "amoled": AMOLED_PALETTE_OVERRIDE,
+        "amoled-glassy": AMOLED_GLASSY_PALETTE_OVERRIDE,
+        "light": LIGHT_PALETTE_OVERRIDE,
+        "light-glassy": LIGHT_GLASSY_PALETTE_OVERRIDE,
+    }
+
+    button_size = TokenManager.get("geometry", "traffic_lights", "size", default=14)
+    button_spacing = TokenManager.get("geometry", "traffic_lights", "spacing", default=8)
+
+    for key, info in THEMES.items():
+        tname = info["theme_name"]
+        src_tdir = os.path.join(repo_themes, tname)
+        dst_tdir = os.path.join(stage_dir, tname)
+        if not os.path.exists(src_tdir):
+            continue
+
+        for gver in ["gtk-4.0", "gtk-3.0", "gtk-2.0", "gnome-shell", "cinnamon", "metacity-1", "xfwm4", "unity", "plank", "labwc"]:
+            s_gver = os.path.join(src_tdir, gver)
+            d_gver = os.path.join(dst_tdir, gver)
+            if os.path.exists(s_gver):
+                os.makedirs(d_gver, exist_ok=True)
+                for item in os.listdir(s_gver):
+                    s_item = os.path.join(s_gver, item)
+                    d_item = os.path.join(d_gver, item)
+                    if os.path.isdir(s_item) and not os.path.exists(d_item):
+                        shutil.copytree(s_item, d_item, symlinks=True)
+                    elif os.path.isfile(s_item) and not item.endswith(".css"):
+                        shutil.copy2(s_item, d_item)
+
+        idx_theme = os.path.join(src_tdir, "index.theme")
+        if os.path.exists(idx_theme):
+            shutil.copy2(idx_theme, os.path.join(dst_tdir, "index.theme"))
+
+        is_glassy = info["is_glassy"]
+        is_dark = info["is_dark"]
+        palette = palette_map.get(key, GRAPHITE_PALETTE_OVERRIDE)
+
+        for gver in ["gtk-4.0", "gtk-3.0"]:
+            s_gver = os.path.join(src_tdir, gver)
+            d_gver = os.path.join(dst_tdir, gver)
+            for css_file in ["gtk.css", "gtk-dark.css"]:
+                src_css = os.path.join(s_gver, css_file)
+                dst_css = os.path.join(d_gver, css_file)
+                base_css = src_css + ".base"
+                read_src = base_css if os.path.exists(base_css) else src_css
+                if os.path.exists(read_src):
+                    inject_theme_css(read_src, dst_css, palette, is_glassy, button_size, button_spacing, chromium_accent="default", is_dark=is_dark)
+
+    print(f"[ThemeManager] Staged all 6 themes successfully to: {stage_dir}")
+    return stage_dir
+
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) > 1 and sys.argv[1] == "--accent":
+    if len(sys.argv) > 1 and sys.argv[1] == "--stage":
+        sdir = sys.argv[2] if len(sys.argv) > 2 else None
+        stage_all_themes(sdir)
+    elif len(sys.argv) > 1 and sys.argv[1] == "--accent":
         acc = sys.argv[2] if len(sys.argv) > 2 else "default"
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "chromium-topbar-accent", acc], check=False)
         update_titlebar_buttons(chromium_accent=acc)
@@ -4316,3 +4431,4 @@ if __name__ == "__main__":
         t = sys.argv[1] if len(sys.argv) > 1 else "dark"
         res = apply_global_theme(t)
         print(res)
+
