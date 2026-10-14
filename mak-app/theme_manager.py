@@ -2593,12 +2593,24 @@ actionbar button {{
 
 
 def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
+    btn_radius = TokenManager.get("geometry", "buttons", "corner_radius", default=5)
+    btn_capsule_radius = TokenManager.get("geometry", "buttons", "capsule_corner_radius", default=9999)
+    btn_height = TokenManager.get("geometry", "buttons", "height_regular", default=24)
+    btn_pad_x = TokenManager.get("geometry", "buttons", "padding_x_regular", default=12)
+    btn_pad_y = TokenManager.get("geometry", "buttons", "padding_y_regular", default=3)
+    btn_border_width = TokenManager.get("geometry", "buttons", "border_width", default=1)
+
+    seg_height = TokenManager.get("geometry", "segmented", "height", default=22)
+    seg_container_radius = TokenManager.get("geometry", "segmented", "container_radius", default=6)
+    seg_radius = TokenManager.get("geometry", "segmented", "segment_radius", default=5)
+    seg_pad = TokenManager.get("geometry", "segmented", "padding", default=2)
+
     if not is_dark:
-        btn_bg = "rgba(0, 0, 0, 0.05)"
-        btn_hover = "rgba(0, 0, 0, 0.09)"
-        btn_active = "rgba(0, 0, 0, 0.14)"
-        btn_border = "0.5px solid rgba(0, 0, 0, 0.08)"
-        btn_fg = "#1d1d1f"
+        btn_bg = TokenManager.get("colors", "light", "btn_default_bg", default="rgba(0, 0, 0, 0.08)")
+        btn_hover = TokenManager.get("colors", "light", "btn_default_hover", default="rgba(0, 0, 0, 0.12)")
+        btn_active = TokenManager.get("colors", "light", "btn_default_active", default="rgba(0, 0, 0, 0.18)")
+        btn_border = f"{btn_border_width}px solid {TokenManager.get('colors', 'light', 'border', default='rgba(0, 0, 0, 0.12)')}"
+        btn_fg = TokenManager.get("colors", "light", "text_primary", default="#1d1d1f")
         btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.08)"
         dim_label = "rgba(0, 0, 0, 0.50)"
         entry_bg = "#ffffff"
@@ -2613,11 +2625,11 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         pill_active = "rgba(0, 0, 0, 0.12)"
         pill_checked = "#ffffff"
         pill_checked_fg = "#1d1d1f"
-        linked_bg = "rgba(0, 0, 0, 0.05)"
-        linked_border = "1px solid rgba(0, 0, 0, 0.12)"
-        linked_shadow = "0 1px 3px rgba(0, 0, 0, 0.09), 0 0.5px 1px rgba(0, 0, 0, 0.04)"
-        linked_divider = "1px solid rgba(0, 0, 0, 0.09)"
-        linked_divider_color = "rgba(0, 0, 0, 0.09)"
+        linked_bg = "rgba(0, 0, 0, 0.06)"
+        linked_border = f"{btn_border_width}px solid rgba(0, 0, 0, 0.12)"
+        linked_shadow = "0 1px 2px rgba(0, 0, 0, 0.06)"
+        linked_divider = "1px solid rgba(0, 0, 0, 0.10)"
+        linked_divider_color = "rgba(0, 0, 0, 0.10)"
         linked_hover = "rgba(0, 0, 0, 0.06)"
         linked_active = "rgba(0, 0, 0, 0.12)"
         linked_checked = "#ffffff"
@@ -2626,18 +2638,23 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         search_bg = "rgba(0, 0, 0, 0.05)"
         dropdown_bg = "rgba(0, 0, 0, 0.05)"
         dropdown_border = "0.5px solid rgba(0, 0, 0, 0.08)"
-        destr_bg = "rgba(255, 59, 48, 0.12)"
-        destr_fg = "#d70015"
-        destr_hover = "rgba(255, 59, 48, 0.20)"
-        destr_active = "rgba(255, 59, 48, 0.30)"
+        sug_bg = TokenManager.get("colors", "light", "btn_prominent_bg", default="#0080f7")
+        sug_fg = TokenManager.get("colors", "light", "btn_prominent_fg", default="#ffffff")
+        sug_hover = "rgba(0, 110, 230, 0.90)"
+        sug_active = "rgba(0, 94, 196, 0.90)"
+        destr_bg = TokenManager.get("colors", "light", "btn_destructive_bg", default="#ff383c")
+        destr_fg = TokenManager.get("colors", "light", "btn_destructive_fg", default="#ffffff")
+        destr_hover = "rgba(224, 40, 44, 0.90)"
+        destr_active = "rgba(196, 30, 34, 0.90)"
         dialog_ring = "rgba(0, 0, 0, 0.12)"
     else:
-        btn_bg = "rgba(255, 255, 255, 0.10)"
-        btn_hover = "rgba(255, 255, 255, 0.16)"
-        btn_active = "rgba(255, 255, 255, 0.24)"
-        btn_border = "none"
-        btn_fg = "#ffffff"
-        btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.15)"
+        border_col = TokenManager.get("colors", "amoled" if is_amoled else "dark", "border", default="rgba(255, 255, 255, 0.12)")
+        btn_bg = TokenManager.get("colors", "dark", "btn_default_bg", default="rgba(255, 255, 255, 0.10)")
+        btn_hover = TokenManager.get("colors", "dark", "btn_default_hover", default="rgba(255, 255, 255, 0.15)")
+        btn_active = TokenManager.get("colors", "dark", "btn_default_active", default="rgba(255, 255, 255, 0.22)")
+        btn_border = f"{btn_border_width}px solid {border_col}"
+        btn_fg = TokenManager.get("colors", "dark", "text_primary", default="#f5f5f7")
+        btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.20)"
         dim_label = "rgba(255, 255, 255, 0.50)"
         entry_bg = "rgba(255, 255, 255, 0.06)"
         entry_border = "1px solid rgba(255, 255, 255, 0.08)"
@@ -2652,36 +2669,40 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         pill_checked = "rgba(255, 255, 255, 0.18)"
         pill_checked_fg = "#ffffff"
         linked_bg = "rgba(255, 255, 255, 0.08)"
-        linked_border = "1px solid rgba(255, 255, 255, 0.12)"
+        linked_border = f"{btn_border_width}px solid {border_col}"
         linked_shadow = "0 1px 3px rgba(0, 0, 0, 0.35), 0 0.5px 1px rgba(0, 0, 0, 0.20)"
         linked_divider = "1px solid rgba(255, 255, 255, 0.10)"
         linked_divider_color = "rgba(255, 255, 255, 0.10)"
         linked_hover = "rgba(255, 255, 255, 0.10)"
         linked_active = "rgba(255, 255, 255, 0.18)"
-        linked_checked = "rgba(255, 255, 255, 0.22)"
+        linked_checked = "rgba(255, 255, 255, 0.20)"
         linked_checked_fg = "#ffffff"
         linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(255, 255, 255, 0.12)"
         search_bg = "rgba(255, 255, 255, 0.08)"
         dropdown_bg = "rgba(255, 255, 255, 0.08)"
         dropdown_border = "none"
-        destr_bg = "rgba(255, 69, 58, 0.18)"
-        destr_fg = "#ff453a"
-        destr_hover = "rgba(255, 69, 58, 0.28)"
-        destr_active = "rgba(255, 69, 58, 0.38)"
+        sug_bg = TokenManager.get("colors", "dark", "btn_prominent_bg", default="#0a84ff")
+        sug_fg = TokenManager.get("colors", "dark", "btn_prominent_fg", default="#ffffff")
+        sug_hover = "rgba(0, 113, 227, 0.90)"
+        sug_active = "rgba(0, 98, 196, 0.90)"
+        destr_bg = TokenManager.get("colors", "dark", "btn_destructive_bg", default="#ff453a")
+        destr_fg = TokenManager.get("colors", "dark", "btn_destructive_fg", default="#ffffff")
+        destr_hover = "rgba(224, 52, 42, 0.90)"
+        destr_active = "rgba(194, 43, 34, 0.90)"
         dialog_ring = "rgba(255, 255, 255, 0.12)"
 
     return f"""
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
 /* 1. Universal In-Window Push Buttons (Dialogs, content pages, settings) */
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button) {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.pill) {{
     background-color: {btn_bg};
     background-image: none;
     border: {btn_border};
     color: {btn_fg};
-    border-radius: 9999px;
-    padding: 2px 12px;
-    min-height: 24px;
+    border-radius: {btn_radius}px;
+    padding: {btn_pad_y}px {btn_pad_x}px;
+    min-height: {btn_height}px;
     font-size: 13px;
     font-weight: 400;
     box-shadow: {btn_shadow};
@@ -2858,35 +2879,35 @@ button.flat:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.car
 }}
 
 /* 6. Action Buttons */
-button.suggested-action {{
-    background-color: @accent_bg_color;
-    color: @accent_fg_color;
+button.suggested-action:not(.circular):not(.pill) {{
+    background-color: {sug_bg};
+    color: {sug_fg};
     border: none;
-    border-radius: 9999px;
-    padding: 2px 14px;
-    min-height: 24px;
+    border-radius: {btn_radius}px;
+    padding: {btn_pad_y}px 14px;
+    min-height: {btn_height}px;
     font-size: 13px;
     font-weight: 500;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.20);
 }}
 
 button.suggested-action:hover {{
-    background-color: alpha(@accent_bg_color, 0.88);
+    background-color: {sug_hover};
     background-image: none;
 }}
 
 button.suggested-action:active {{
-    background-color: alpha(@accent_bg_color, 0.72);
+    background-color: {sug_active};
     background-image: none;
 }}
 
-button.destructive-action {{
+button.destructive-action:not(.circular):not(.pill) {{
     background-color: {destr_bg};
     color: {destr_fg};
     border: none;
-    border-radius: 9999px;
-    padding: 2px 14px;
-    min-height: 24px;
+    border-radius: {btn_radius}px;
+    padding: {btn_pad_y}px 14px;
+    min-height: {btn_height}px;
     font-size: 13px;
     font-weight: 500;
     transition: background-color 100ms ease;
@@ -2898,6 +2919,19 @@ button.destructive-action:hover {{
 
 button.destructive-action:active {{
     background-color: {destr_active};
+}}
+
+/* Dialog & Alert Action Buttons (Apple UI Kit 26px Capsule Geometry) */
+dialog button,
+window.dialog button,
+messagedialog button,
+adwdialog button,
+.dialog-action-area button,
+.response-area button {{
+    border-radius: {btn_capsule_radius}px;
+    min-height: 26px;
+    padding: 4px 18px;
+    font-weight: 500;
 }}
 
 /* 7. Dropdowns & Combo Boxes (In content views / forms) */
@@ -3248,9 +3282,9 @@ window.kgx headerbar .linked {{
     background-image: none;
     border: {linked_border};
     box-shadow: {linked_shadow};
-    border-radius: 9999px;
+    border-radius: {seg_container_radius}px;
     margin: 0 4px;
-    padding: 0;
+    padding: {seg_pad}px;
 }}
 
 /* Force all inner buttons to be seamless and flush at rest - NO double button */
@@ -3437,8 +3471,8 @@ headerbar splitbutton > button:dir(ltr),
 splitbutton > button:dir(ltr),
 headerbar splitbutton > menubutton > button:dir(rtl),
 splitbutton > menubutton > button:dir(rtl) {{
-    border-top-left-radius: 9999px;
-    border-bottom-left-radius: 9999px;
+    border-top-left-radius: {seg_radius}px;
+    border-bottom-left-radius: {seg_radius}px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }}
@@ -3495,8 +3529,8 @@ headerbar splitbutton > menubutton > button:dir(ltr),
 splitbutton > menubutton > button:dir(ltr),
 headerbar splitbutton > button:dir(rtl),
 splitbutton > button:dir(rtl) {{
-    border-top-right-radius: 9999px;
-    border-bottom-right-radius: 9999px;
+    border-top-right-radius: {seg_radius}px;
+    border-bottom-right-radius: {seg_radius}px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }}
@@ -3514,7 +3548,7 @@ headerbar box.linked > button:only-child,
 splitbutton > button:only-child,
 .linked > button:only-child,
 box.linked > button:only-child {{
-    border-radius: 9999px;
+    border-radius: {btn_radius}px;
 }}
 
 /* Clean hairline divider between adjacent buttons */
