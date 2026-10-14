@@ -168,6 +168,30 @@ def build_gallery_gtk3(family_filter=None):
         exp.add(Gtk.Label(label="Expanded disclosure content inside group box"))
         root.pack_start(exp, False, False, 0)
 
+    # 8. Alert Card Representation
+    if not family_filter or family_filter in ["alerts", "dialogs"]:
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        card.get_style_context().add_class("dialog")
+        card.get_style_context().add_class("card")
+        card.set_margin_top(8)
+        card.set_margin_bottom(8)
+        title_lbl = Gtk.Label(label="Save changes to document?")
+        title_lbl.get_style_context().add_class("heading")
+        card.pack_start(title_lbl, False, False, 0)
+        desc_lbl = Gtk.Label(label="Your changes will be lost if you don't save them.")
+        card.pack_start(desc_lbl, False, False, 0)
+        btn_row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
+        btn_row.set_halign(Gtk.Align.END)
+        dest = Gtk.Button(label="Don't Save")
+        dest.get_style_context().add_class("destructive-action")
+        btn_row.pack_start(dest, False, False, 0)
+        btn_row.pack_start(Gtk.Button(label="Cancel"), False, False, 0)
+        sug = Gtk.Button(label="Save")
+        sug.get_style_context().add_class("suggested-action")
+        btn_row.pack_start(sug, False, False, 0)
+        card.pack_start(btn_row, False, False, 0)
+        root.pack_start(card, False, False, 0)
+
     # 9. Toolbars & Actionbars
     if not family_filter or family_filter in ["toolbars", "actionbars"]:
         tb_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)

@@ -162,7 +162,7 @@ def build_gallery(family_filter=None):
 
     # 8. Alert Card Representation
     if not family_filter or family_filter in ["alerts", "dialogs"]:
-        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, css_classes=["card"])
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, css_classes=["dialog", "card"])
         card.set_margin_top(8)
         card.set_margin_bottom(8)
         title_lbl = Gtk.Label(label="Save changes to document?", css_classes=["heading"])
