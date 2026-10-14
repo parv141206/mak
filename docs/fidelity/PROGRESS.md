@@ -111,6 +111,20 @@
   - Isolated regression diff confirmed zero diff outside entries family widgets at `qa/report/family_3_entries_isolated_diff.png`.
   - Numeric token assertions passed via `qa/verify_tokens.py`.
 
+### Family 4: Pop-ups / Pull-downs / Combos (PASSED)
+- **Tokens & Metrics Applied**:
+  - Pop-up / Dropdown Button Radius: **5px** (was previously 9999px capsule in forms).
+  - Height: **24px** regular, padding **3px 10px** (measured from `apple/pop ups and pull down buttons/1_pop_up_button.png` and `apple/combo boxes/1_combo_box.png`).
+  - Dropdown Arrow: 12px chevron symbol with muted alpha label color.
+  - Universal Selector Coverage: Extended to all `dropdown > button`, `combobox button`, and `menubutton:not(.flat):not(.titlebutton) > button`.
+  - Focus Ring: **3px** outer glow ring.
+- **Verification**:
+  - Rendered `qa/report/family_4_combos_dark_gtk4.png`, `family_4_combos_light_gtk4.png`, `family_4_combos_dark_gtk3.png`, `family_4_combos_light_gtk3.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_4_comparison.png`.
+  - Isolated regression diff confirmed zero diff outside combos family widgets at `qa/report/family_4_combos_isolated_diff.png`.
+  - Numeric token assertions passed via `qa/verify_tokens.py`.
+
+
 
 
 
