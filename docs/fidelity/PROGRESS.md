@@ -82,6 +82,22 @@
   - Side-by-side comparison generated and inspected at `qa/report/family_1_comparison.png`.
   - Numeric token assertions passed via `qa/verify_tokens.py`.
 
+### Family 2: Buttons / Split / Segmented (PASSED)
+- **Tokens & Metrics Applied**:
+  - Push Button Radius: **5px** corner radius (was previously 9999px capsule!).
+  - Push Button Height: **24px** regular (measured from `apple/buttons/58_*`).
+  - Padding: **3px 12px** horizontal/vertical.
+  - Action Button Colors: Suggested `#0a84ff` (dark) / `#0080f7` (light), Destructive `#ff453a` (dark) / `#ff383c` (light).
+  - Segmented Controls / Linked Buttons: Container radius **6px**, padding **2px**, inner segment radius **5px**, height **22px** (from `apple/segmented controls/1_segmented_control.png`).
+  - Split Buttons: Directional radii with LTR/RTL support (`border-top-left-radius` / `border-bottom-left-radius` 5px on lead button, 0 on trail; flipped for RTL).
+  - Dialog / Alert Action Buttons: Preserved Apple UI kit **9999px** capsule radius and 26px height.
+- **Verification**:
+  - Rendered `qa/report/family_2_buttons_dark_gtk4.png`, `family_2_buttons_light_gtk4.png`, `family_2_buttons_dark_gtk3.png`, `family_2_buttons_light_gtk3.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_2_comparison.png`.
+  - Isolated regression diff confirmed zero diff outside button family widgets at `qa/report/family_2_buttons_isolated_diff.png`.
+  - Numeric token assertions passed via `qa/verify_tokens.py`.
+
+
 
 
 
