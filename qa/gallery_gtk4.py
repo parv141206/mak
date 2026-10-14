@@ -156,6 +156,10 @@ def build_gallery(family_filter=None):
         pg.add(row1)
         root.append(pg)
 
+        exp = Gtk.Expander(label="Advanced Settings")
+        exp.set_child(Gtk.Label(label="Expanded disclosure content inside group box"))
+        root.append(exp)
+
     # 8. Alert Card Representation
     if not family_filter or family_filter in ["alerts", "dialogs"]:
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8, css_classes=["card"])

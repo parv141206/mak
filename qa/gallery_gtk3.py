@@ -164,6 +164,10 @@ def build_gallery_gtk3(family_filter=None):
         frame.add(fb)
         root.pack_start(frame, False, False, 0)
 
+        exp = Gtk.Expander(label="Advanced Settings")
+        exp.add(Gtk.Label(label="Expanded disclosure content inside group box"))
+        root.pack_start(exp, False, False, 0)
+
     # 9. Toolbars & Actionbars
     if not family_filter or family_filter in ["toolbars", "actionbars"]:
         tb_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
