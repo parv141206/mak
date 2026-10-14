@@ -2842,7 +2842,11 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.circular
     box-shadow: none;
 }}
 
-/* Cards, Preference Row Buttons & Style Items (Preserve rounded rectangular geometry) */
+/* Cards, Group Boxes, Frames & Boxed Lists (Apple 10px Rounded Form Cards) */
+frame,
+frame > border,
+.boxed-list,
+preferencesgroup > box,
 .card,
 button.card,
 .card.activatable,
@@ -2850,15 +2854,60 @@ checkbutton.selection-mode,
 .style-item,
 .style-item button,
 flowboxchild.card,
-flowboxchild.style-item,
-row.activatable {{
-    border-radius: 12px;
+flowboxchild.style-item {{
+    border-radius: 10px;
+    background-color: @card_bg_color;
+    border: 1px solid {border_col};
+}}
+
+.boxed-list > row:first-child,
+preferencesgroup > box > row:first-child {{
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}}
+
+.boxed-list > row:last-child,
+preferencesgroup > box > row:last-child {{
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}}
+
+.boxed-list > row:not(:last-child),
+preferencesgroup > box > row:not(:last-child) {{
+    border-bottom: 1px solid {border_col};
+}}
+
+/* Disclosure Controls (apple/disclosure controls/) */
+expander > title,
+expander-widget > title {{
+    min-height: 24px;
+    padding: 3px 6px;
+    border-radius: 5px;
+    transition: background-color 80ms ease;
+}}
+
+expander > title:hover,
+expander-widget > title:hover {{
+    background-color: {hover_subtle};
+}}
+
+expander > title > arrow,
+expander arrow {{
+    min-width: 16px;
+    min-height: 16px;
+    color: {dim_label};
+    transition: transform 150ms ease;
+}}
+
+expander > title > arrow:checked,
+expander:checked arrow {{
+    color: @accent_bg_color;
 }}
 
 checkbutton.selection-mode:checked,
 .style-item:checked,
 button.card:checked {{
-    border-radius: 12px;
+    border-radius: 10px;
     outline: 2px solid @accent_bg_color;
     outline-offset: 2px;
     box-shadow: none;

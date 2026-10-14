@@ -165,6 +165,18 @@
   - Visual side-by-side comparison verified at `qa/report/family_7_comparison.png`.
   - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
 
+### Family 8: Group boxes / Forms / Disclosure (PASSED)
+- **Tokens & Metrics Applied**:
+  - Group Box / Card Radius: **10px** corner radius (was previously 12px, measured strictly from `apple/group boxes/1_group_box.png`).
+  - Card Border & Fill: **1px** solid subtle border, `@card_bg_color` background fill.
+  - Boxed List Row Radii: First row 10px top radii, last row 10px bottom radii, 1px internal dividers.
+  - Disclosure Controls: **16px** chevron symbol, 24px min-height, hover feedback, 90deg animation (from `apple/disclosure controls/4_state_idle_*`).
+- **Verification**:
+  - Rendered `qa/report/family_8_groupboxes_gtk4_dark.png`, `family_8_groupboxes_gtk4_light.png`, `family_8_groupboxes_gtk3_dark.png`, `family_8_groupboxes_gtk3_light.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_8_comparison.png`.
+  - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
+
+
 
 
 
