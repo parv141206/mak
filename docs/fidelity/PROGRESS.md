@@ -176,13 +176,13 @@
   - Visual side-by-side comparison verified at `qa/report/family_8_comparison.png`.
   - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
 
-
-
-
-
-
-
-
-
-
-
+### Family 9: Alerts & Dialogs (PASSED)
+- **Tokens & Metrics Applied**:
+  - Alert Card Radius: **20px** corner radius (measured strictly from `apple/alerts/12_bg.png`, was previously 18px / 12px).
+  - Action Button Geometry: **9999px** full capsule radius, **26px** control height, **3px 16px** padding (measured from `apple/alerts/5_mode_light__type_primary.png` and `9_mode_dark__type_primary.png`).
+  - Action Button Colors: Destructive `#ff453a` (dark) / `#ff383c` (light), Suggested `#0a84ff` (dark) / `#0080f7` (light), Secondary subtle border and fill.
+  - Multi-toolkit Selectors: Modern `adwdialog`, `adwalertdialog`, `messagedialog`, `window.dialog`, `alertdialog` across GTK4 and GTK3.
+- **Verification**:
+  - Rendered `qa/report/family_9_alerts_gtk4_dark.png`, `family_9_alerts_gtk4_light.png`, `family_9_alerts_gtk3_dark.png`, `family_9_alerts_gtk3_light.png`.
+  - Side-by-side comparison verified at `qa/report/family_9_comparison.png`.
+  - Token assertion tests passed across all 6 themes.

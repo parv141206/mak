@@ -2685,9 +2685,9 @@ actionbar > revealer > box {{
 .dialog-action-area button,
 .response-area button,
 actionbar button {{
-    min-height: 28px;
+    min-height: 26px;
     border-radius: 9999px;
-    padding: 4px 18px;
+    padding: 3px 16px;
     font-weight: 500;
 }}
 """
@@ -3544,21 +3544,37 @@ scrollbar slider:hover {{
     background-color: {btn_fg};
 }}
 
-/* 15. macOS Alerts, Sheets & Dialog Boxes */
+/* 15. macOS Alerts, Sheets & Dialog Boxes (apple/alerts/12_bg.png 20px radius, 26px capsule buttons) */
 window.dialog,
 dialog,
 messagedialog,
 .messagedialog,
-window.message {{
-    border-radius: 18px;
+window.message,
+adwdialog,
+adwalertdialog,
+alertdialog,
+.alertdialog,
+window.alertdialog {{
+    border-radius: 20px;
+    background-color: @dialog_bg_color;
+    color: @dialog_fg_color;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 3px 10px rgba(0, 0, 0, 0.16), 0 0 0 1px {dialog_ring};
+}}
+
+window.dialog > contents,
+dialog > contents,
+adwdialog > contents,
+adwalertdialog > contents {{
+    border-radius: 20px;
+    padding: 20px 24px;
 }}
 
 window.dialog headerbar,
 dialog headerbar,
-messagedialog headerbar {{
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
+messagedialog headerbar,
+adwdialog headerbar {{
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
 }}
 
 window.dialog .dialog-action-area button,
@@ -3566,10 +3582,13 @@ dialog .dialog-action-area button,
 messagedialog .dialog-action-area button,
 window.dialog .response-area button,
 dialog .response-area button,
-messagedialog .response-area button {{
-    min-height: 30px;
+messagedialog .response-area button,
+adwdialog .dialog-action-area button,
+adwdialog .response-area button,
+adwalertdialog button {{
+    min-height: 26px;
     border-radius: 9999px;
-    padding: 4px 18px;
+    padding: 3px 16px;
     font-weight: 500;
 }}
 
