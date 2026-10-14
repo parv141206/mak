@@ -209,3 +209,12 @@
 - **Verification Status**:
   - Headless `gnome-shell --devkit --headless` verified to compile and run extension and theme syntax without errors.
   - Per prompt guidelines, marked **UNVERIFIED** for live visual rendering until user tests in session.
+
+## Phase 6: Settings Panel (`mak-app`) (PASSED)
+- **Settings Bridge & Schema Alignment**:
+  - Compiled and validated GSettings schema `org.gnome.shell.extensions.mak.gschema.xml` strictly in project dir (`glib-compile-schemas --strict --dry-run mak-extension/schemas/`).
+  - Verified active settings bindings for all visual tunables: `corner-radius`, `titlebar-button-size`, `titlebar-button-spacing`, `menu-corner-radius`, `notification-radius`, `theme-mode`, and `accent-color`.
+- **Dynamic Generator Verification**:
+  - Implemented `qa/test_settings_effect.py` unit test suite asserting that flipping/updating each visual tunable directly changes the generated CSS output.
+  - Proved zero dead switches and zero hardcoded parameters across window corner radius, traffic light size/spacing, accent color injection, glassy container rules, and shell contrast/radii.
+  - All 5 settings effect assertions passed (`OK`).
