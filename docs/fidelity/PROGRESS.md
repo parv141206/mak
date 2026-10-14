@@ -218,3 +218,19 @@
   - Implemented `qa/test_settings_effect.py` unit test suite asserting that flipping/updating each visual tunable directly changes the generated CSS output.
   - Proved zero dead switches and zero hardcoded parameters across window corner radius, traffic light size/spacing, accent color injection, glassy container rules, and shell contrast/radii.
   - All 5 settings effect assertions passed (`OK`).
+
+## Phase 7: GTK 2 Verification (STAGED / UNVERIFIED)
+- **Status**:
+  - The theme generator copies and stages all GTK 2 assets and `gtkrc` configurations into `build/stage/themes/*/gtk-2.0/`.
+  - On the host environment (modern Arch Linux rolling), no GTK 2 runtime or demo application (`gtk-demo`, `gtk2-demo`) is present or discoverable via PyGObject.
+  - Per prompt guidelines, marked strictly **UNVERIFIED** (never fake a pass).
+
+## Phase 8: Adversarial Review & Deliverables (COMPLETED)
+- **Adversarial Checks**:
+  - Validated directional radii cascading with explicit `:dir(ltr)` and `:dir(rtl)` on split buttons, segmented controls, list rows, breadcrumbs, and search entries.
+  - Verified inactive window backdrop states (`:backdrop`), disabled states (`:disabled`), and maximized/tiled window borders.
+  - Tested light, dark, and AMOLED palettes across solid and glassy variants.
+- **Clean Deliverables**:
+  - `scripts/apply_staged.sh` created, verified executable and idempotent with dry-run support.
+  - Removed temporary debug files from `qa/report/`.
+  - Comprehensive final report published in `docs/fidelity/REPORT.md`.
