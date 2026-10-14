@@ -2642,8 +2642,8 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         linked_checked_fg = "#1d1d1f"
         linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.08)"
         search_bg = "rgba(0, 0, 0, 0.05)"
-        dropdown_bg = "rgba(0, 0, 0, 0.05)"
-        dropdown_border = "0.5px solid rgba(0, 0, 0, 0.08)"
+        dropdown_bg = TokenManager.get("colors", "light", "btn_default_bg", default="rgba(0, 0, 0, 0.08)")
+        dropdown_border = f"{btn_border_width}px solid {TokenManager.get('colors', 'light', 'border', default='rgba(0, 0, 0, 0.12)')}"
         sug_bg = TokenManager.get("colors", "light", "btn_prominent_bg", default="#0080f7")
         sug_fg = TokenManager.get("colors", "light", "btn_prominent_fg", default="#ffffff")
         sug_hover = "rgba(0, 110, 230, 0.90)"
@@ -2686,8 +2686,8 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         linked_checked_fg = "#ffffff"
         linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(255, 255, 255, 0.12)"
         search_bg = "rgba(255, 255, 255, 0.08)"
-        dropdown_bg = "rgba(255, 255, 255, 0.08)"
-        dropdown_border = "none"
+        dropdown_bg = TokenManager.get("colors", "dark", "btn_default_bg", default="rgba(255, 255, 255, 0.10)")
+        dropdown_border = f"{btn_border_width}px solid {border_col}"
         sug_bg = TokenManager.get("colors", "dark", "btn_prominent_bg", default="#0a84ff")
         sug_fg = TokenManager.get("colors", "dark", "btn_prominent_fg", default="#ffffff")
         sug_hover = "rgba(0, 113, 227, 0.90)"
@@ -2972,51 +2972,70 @@ adwdialog button,
     font-weight: 500;
 }}
 
-/* 7. Dropdowns & Combo Boxes (In content views / forms) */
+/* 7. Dropdowns, Combos & Pop-ups */
 dropdown,
 combobox,
 row.combo {{
-    border-radius: 9999px;
+    border-radius: {btn_radius}px;
 }}
 
+dropdown > button,
+combobox > box > button.combo,
+combobox button,
+row.combo dropdown > button,
 box.content dropdown > button,
 preferencespage dropdown > button,
 dialog dropdown > button,
-row.combo dropdown > button,
-combobox > box > button.combo,
-box.content menubutton:not(.flat) > button,
-preferencespage menubutton:not(.flat) > button {{
+menubutton:not(.flat):not(.titlebutton) > button {{
     background-color: {dropdown_bg};
     border: {dropdown_border};
     color: {btn_fg};
-    border-radius: 9999px;
+    border-radius: {btn_radius}px;
     padding: 3px 10px;
-    min-height: 24px;
+    min-height: {btn_height}px;
     box-shadow: {btn_shadow};
     transition: background-color 100ms ease;
 }}
 
+dropdown > button:hover,
+combobox > box > button.combo:hover,
+combobox button:hover,
+row.combo dropdown > button:hover,
 box.content dropdown > button:hover,
 preferencespage dropdown > button:hover,
 dialog dropdown > button:hover,
-row.combo dropdown > button:hover,
-combobox > box > button.combo:hover,
-box.content menubutton:not(.flat) > button:hover,
-preferencespage menubutton:not(.flat) > button:hover {{
+menubutton:not(.flat):not(.titlebutton) > button:hover {{
     background-color: {btn_hover};
+    color: {btn_fg};
 }}
 
+dropdown > button:active,
+combobox > box > button.combo:active,
+combobox button:active,
+row.combo dropdown > button:active,
 box.content dropdown > button:active,
 preferencespage dropdown > button:active,
 dialog dropdown > button:active,
-row.combo dropdown > button:active,
-combobox > box > button.combo:active,
-box.content menubutton:not(.flat) > button:active,
-preferencespage menubutton:not(.flat) > button:active {{
+menubutton:not(.flat):not(.titlebutton) > button:active {{
     background-color: {btn_active};
 }}
 
-headerbar dropdown > button {{
+dropdown > button:focus,
+dropdown > button:focus-within,
+combobox > box > button.combo:focus,
+combobox button:focus,
+row.combo dropdown > button:focus,
+box.content dropdown > button:focus,
+preferencespage dropdown > button:focus,
+dialog dropdown > button:focus,
+menubutton:not(.flat):not(.titlebutton) > button:focus {{
+    border-color: @accent_bg_color;
+    outline: none;
+    box-shadow: 0 0 0 {focus_ring_w}px {focus_ring};
+}}
+
+headerbar dropdown > button,
+headerbar menubutton.flat > button {{
     background-color: transparent;
     background-image: none;
     border: none;
@@ -3028,17 +3047,6 @@ combobox arrow {{
     color: {dim_label};
     min-width: 12px;
     min-height: 12px;
-}}
-
-box.content dropdown > button:focus,
-preferencespage dropdown > button:focus,
-dialog dropdown > button:focus,
-row.combo dropdown > button:focus,
-combobox > box > button.combo:focus {{
-    border-color: @accent_bg_color;
-    outline: 2px solid @accent_bg_color;
-    outline-offset: -1px;
-    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
 }}
 
 /* 8. Text Entries */
