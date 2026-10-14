@@ -1092,10 +1092,13 @@ class MakAppWindow(Adw.ApplicationWindow):
         menu_group.add(create_spin_row("Menu Glass Translucency", "Background darkness and glass opacity of menus", 0.2, 1.0, 0.05, self.bridge.get_menu_bg_opacity(), digits=2, on_change=self.bridge.set_menu_bg_opacity))
         menu_group.add(create_spin_row("Control Center Corner Radius", "Curvature radius for Quick Settings popup card", 12, 40, 2, self.bridge.get_quick_settings_radius(), digits=0, on_change=self.bridge.set_quick_settings_radius))
         menu_group.add(create_spin_row("Notification Banner Corner Radius", "Curvature radius for desktop notification cards", 8, 32, 1, self.bridge.get_notification_radius(), digits=0, on_change=self.bridge.set_notification_radius))
+        self._theme_page_ready = True
 
     def _on_theme_selected(self, btn, key):
         if btn.get_active():
             self._selected_theme = key
+            if getattr(self, "_theme_page_ready", False):
+                self._apply_current_theme()
 
     def _apply_current_theme(self, *args):
         selected = getattr(self, "_selected_theme", theme_manager.get_current_theme())

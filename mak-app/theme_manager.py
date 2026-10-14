@@ -658,23 +658,19 @@ button.maximize:focus,
 button.maximize:checked,
 button.minimize:focus,
 button.minimize:checked {{
-    min-width: {size}px !important;
-    min-height: {size}px !important;
-    max-width: {size}px !important;
-    max-height: {size}px !important;
-    width: {size}px !important;
-    height: {size}px !important;
-    padding: 0 !important;
-    margin: 0 {margin}px !important;
-    border-radius: 9999px !important;
-    background-color: transparent !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    background-size: {size}px {size}px !important;
-    -gtk-icon-shadow: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    outline: none !important;
+    min-width: {size}px;
+    min-height: {size}px;
+    padding: 0;
+    margin: 0 {margin}px;
+    border-radius: 9999px;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: {size}px {size}px;
+    -gtk-icon-shadow: none;
+    border: none;
+    box-shadow: none;
+    outline-style: none;
 }}
 
 /* Ensure button images/icons also do not repeat and stay centered */
@@ -1592,7 +1588,7 @@ stacksidebar {{
     border-radius: 0;
     box-shadow: none;
     background-image: none;
-    background-color: @headerbar_bg_color !important;
+    background-color: @headerbar_bg_color;
     border-right: 1px solid {border_color};
     border-left: none;
     border-top: none;
@@ -1847,8 +1843,8 @@ sidebar row:hover:not(:selected):not(.heading),
 .nautilus-window .navigation-sidebar > row:hover:not(:selected):not(.heading),
 #NautilusFileChooser placessidebar row:hover:not(:selected):not(.heading),
 #NautilusFileChooser .navigation-sidebar > row:hover:not(:selected):not(.heading) {{
-    background-color: {sidebar_hover_bg} !important;
-    color: {text_primary} !important;
+    background-color: {sidebar_hover_bg};
+    color: {text_primary};
     border-radius: 6px;
     margin: 1px 6px;
     padding: 3px 8px;
@@ -1874,8 +1870,8 @@ sidebar row:active:not(:selected):not(.heading),
 .nautilus-window .navigation-sidebar > row:active:not(:selected):not(.heading),
 #NautilusFileChooser placessidebar row:active:not(:selected):not(.heading),
 #NautilusFileChooser .navigation-sidebar > row:active:not(:selected):not(.heading) {{
-    background-color: {sidebar_selected_bg} !important;
-    color: {text_primary} !important;
+    background-color: {sidebar_selected_bg};
+    color: {text_primary};
     border-radius: 6px;
     margin: 1px 6px;
     padding: 3px 8px;
@@ -1910,8 +1906,8 @@ sidebar row:selected,
 #NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
 #NautilusFileChooser placessidebar row:selected,
 #NautilusFileChooser .navigation-sidebar > row:selected {{
-    background-color: {sidebar_selected_bg} !important;
-    color: {text_primary} !important;
+    background-color: {sidebar_selected_bg};
+    color: {text_primary};
     font-weight: 600;
     border-radius: 6px;
     margin: 1px 6px;
@@ -1947,8 +1943,8 @@ sidebar row:selected:hover,
 #NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected:hover,
 #NautilusFileChooser placessidebar row:selected:hover,
 #NautilusFileChooser .navigation-sidebar > row:selected:hover {{
-    background-color: {sidebar_selected_hover_bg} !important;
-    color: {text_primary} !important;
+    background-color: {sidebar_selected_hover_bg};
+    color: {text_primary};
     font-weight: 600;
     border-radius: 6px;
     margin: 1px 6px;
@@ -1983,8 +1979,8 @@ sidebar row:selected:active,
 #NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected:active,
 #NautilusFileChooser placessidebar row:selected:active,
 #NautilusFileChooser .navigation-sidebar > row:selected:active {{
-    background-color: {sidebar_selected_active_bg} !important;
-    color: {text_primary} !important;
+    background-color: {sidebar_selected_active_bg};
+    color: {text_primary};
     font-weight: 600;
     border-radius: 6px;
     margin: 1px 6px;
@@ -2062,7 +2058,7 @@ navigation-sidebar > row:selected:active label,
 .navigation-sidebar > row:selected:active label,
 placessidebar row:selected:active label,
 .sidebar-pane row:selected:active label {{
-    color: {text_primary} !important;
+    color: {text_primary};
 }}
 
 navigation-sidebar > row:selected label,
@@ -2115,7 +2111,7 @@ navigation-sidebar > row:selected:active image,
 .navigation-sidebar > row:selected:active image,
 placessidebar row:selected:active image,
 .sidebar-pane row:selected:active image {{
-    color: @accent_color !important;
+    color: @accent_color;
 }}
 
 navigation-sidebar > row:selected:backdrop,
@@ -3121,11 +3117,26 @@ messagedialog .response-area button {{
 
 
 def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
+    base_path = src_css_path + ".base"
+    read_path = base_path if os.path.exists(base_path) else src_css_path
     try:
-        with open(src_css_path, "r", encoding="utf-8") as f:
+        with open(read_path, "r", encoding="utf-8") as f:
             content = f.read()
+        if not os.path.exists(base_path) and content:
+            with open(base_path, "w", encoding="utf-8") as bf:
+                bf.write(content)
     except Exception:
         content = ""
+
+    # Strip any previously injected blocks if read from a file that had them
+    split_markers = [
+        "/* ── Universal Mak Widgets & Control Metrics Override",
+        "/* ── Dynamic GNOME Desktop Accent Synchronization",
+        "/* === Mak Suite Refinements",
+    ]
+    for sm in split_markers:
+        if sm in content:
+            content = content.split(sm)[0]
 
     color_keys = [
         "window_bg_color", "window_fg_color", "view_bg_color", "view_fg_color",
@@ -3180,6 +3191,28 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     final_content = palette.strip() + "\n\n" + accent_css_override.strip() + "\n\n" + "\n".join(filtered) + "\n\n" + "\n\n".join(rules_to_append) + "\n"
     with open(dst_css_path, "w", encoding="utf-8") as f:
         f.write(final_content)
+
+    if dst_css_path != src_css_path:
+        try:
+            with open(src_css_path, "w", encoding="utf-8") as f:
+                f.write(final_content)
+        except Exception:
+            pass
+
+    # Also sync to repository themes directory if matching theme exists
+    try:
+        repo_themes_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "themes")
+        parts = os.path.normpath(src_css_path).split(os.sep)
+        if len(parts) >= 3:
+            t_name = parts[-3]
+            gtk_ver = parts[-2]
+            f_name = parts[-1]
+            repo_file = os.path.join(repo_themes_dir, t_name, gtk_ver, f_name)
+            if os.path.exists(os.path.dirname(repo_file)):
+                with open(repo_file, "w", encoding="utf-8") as f:
+                    f.write(final_content)
+    except Exception:
+        pass
 
 
 def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_accent=None):
@@ -3342,46 +3375,46 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False):
 
         block = f"""\n\n{marker}
 .popup-menu-content {{
-    background-color: {bg_color} !important;
-    color: {fg_color} !important;
-    border: 1px solid {border_color} !important;
-    box-shadow: {shadow} !important;
-    border-radius: 12px !important;
+    background-color: {bg_color};
+    color: {fg_color};
+    border: 1px solid {border_color};
+    box-shadow: {shadow};
+    border-radius: 12px;
 }}
 
 .popup-menu-item {{
-    color: {fg_color} !important;
-    font-weight: 500 !important;
+    color: {fg_color};
+    font-weight: 500;
 }}
 
 .popup-menu-item StLabel {{
-    color: {fg_color} !important;
+    color: {fg_color};
 }}
 
 .popup-menu-item:hover,
 .popup-menu-item:active {{
-    background-color: {hover_bg} !important;
-    color: {fg_color} !important;
+    background-color: {hover_bg};
+    color: {fg_color};
 }}
 
 .popup-menu-item:selected {{
-    background-color: #007aff !important;
-    color: #ffffff !important;
+    background-color: #007aff;
+    color: #ffffff;
 }}
 
 .popup-menu-item:selected StLabel {{
-    color: #ffffff !important;
+    color: #ffffff;
 }}
 
 .notification-banner {{
-    background-color: {banner_bg} !important;
-    color: {fg_color} !important;
-    border: 1px solid {border_color} !important;
-    box-shadow: {shadow} !important;
+    background-color: {banner_bg};
+    color: {fg_color};
+    border: 1px solid {border_color};
+    box-shadow: {shadow};
 }}
 
 .notification-banner StLabel {{
-    color: {fg_color} !important;
+    color: {fg_color};
 }}
 """
         with open(css_path, "w", encoding="utf-8") as f:
@@ -3689,11 +3722,69 @@ def apply_global_theme(theme_key):
     except Exception as e:
         log.append(f"Error syncing application blur & glass: {e}")
 
+    # 10. Gracefully reload / restart Nautilus daemon so running file manager instances pick up new styles immediately
+    try:
+        subprocess.run(["nautilus", "-q"], check=False)
+        log.append("Reloaded Nautilus daemon (nautilus -q).")
+    except Exception as e:
+        log.append(f"Note on reloading Nautilus: {e}")
+
     return {
         "success": True,
         "theme": theme_name,
         "log": log
     }
+
+
+def sync_all_theme_directories():
+    """Synchronizes all 6 curated macOS theme variations in ~/.themes and repo themes/ with full macOS 27 styling."""
+    try:
+        res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-size"],
+                             capture_output=True, text=True)
+        button_size = int(res.stdout.strip())
+    except Exception:
+        button_size = 14
+
+    try:
+        res_sp = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-spacing"],
+                                capture_output=True, text=True)
+        button_spacing = int(res_sp.stdout.strip())
+    except Exception:
+        button_spacing = 8
+
+    try:
+        res_acc = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "chromium-topbar-accent"],
+                                 capture_output=True, text=True)
+        chromium_accent = res_acc.stdout.strip().strip("'\"")
+    except Exception:
+        chromium_accent = "default"
+
+    palette_map = {
+        "dark": GRAPHITE_PALETTE_OVERRIDE,
+        "dark-glassy": GRAPHITE_GLASSY_PALETTE_OVERRIDE,
+        "amoled": AMOLED_PALETTE_OVERRIDE,
+        "amoled-glassy": AMOLED_GLASSY_PALETTE_OVERRIDE,
+        "light": LIGHT_PALETTE_OVERRIDE,
+        "light-glassy": LIGHT_GLASSY_PALETTE_OVERRIDE,
+    }
+
+    for key, info in THEMES.items():
+        theme_name = info["theme_name"]
+        is_glassy = info["is_glassy"]
+        is_dark = info["is_dark"]
+        palette = palette_map.get(key, GRAPHITE_PALETTE_OVERRIDE)
+        source_dir = os.path.join(THEMES_DIR, theme_name)
+        if not os.path.exists(source_dir):
+            continue
+        for gver in ["gtk-4.0", "gtk-3.0"]:
+            gdir = os.path.join(source_dir, gver)
+            if not os.path.exists(gdir):
+                continue
+            for css_file in ["gtk.css", "gtk-dark.css"]:
+                src_css = os.path.join(gdir, css_file)
+                base_css = src_css + ".base"
+                if os.path.exists(base_css) or os.path.exists(src_css):
+                    inject_theme_css(src_css, src_css, palette, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
 
 if __name__ == "__main__":
     import sys
