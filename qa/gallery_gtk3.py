@@ -217,6 +217,18 @@ def build_gallery_gtk3(family_filter=None):
 
         root.pack_start(tb_box, False, False, 0)
 
+    # 10. Color Wells & Image Wells
+    if not family_filter or family_filter in ["color_wells", "image_wells"]:
+        wells_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        color_btn = Gtk.ColorButton()
+        wells_box.pack_start(color_btn, False, False, 0)
+
+        img_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        img_box.get_style_context().add_class("image-well")
+        img_box.pack_start(Gtk.Image.new_from_icon_name("image-x-generic-symbolic", Gtk.IconSize.DIALOG), False, False, 0)
+        wells_box.pack_start(img_box, False, False, 0)
+        root.pack_start(wells_box, False, False, 0)
+
     return root
 
 def main():
