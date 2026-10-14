@@ -97,6 +97,21 @@
   - Isolated regression diff confirmed zero diff outside button family widgets at `qa/report/family_2_buttons_isolated_diff.png`.
   - Numeric token assertions passed via `qa/verify_tokens.py`.
 
+### Family 3: Text Fields / Search / Steppers (PASSED)
+- **Tokens & Metrics Applied**:
+  - Standard Entry Radius: **5px** (measured from `apple/text fields/1_text_field.png`).
+  - Standard Entry Height: **22px** regular, padding **2px 8px**.
+  - Focus Ring: **3px** outer glow (`rgba(0, 128, 247, 0.50)` light, `rgba(10, 132, 255, 0.60)` dark).
+  - Search Fields: **9999px** capsule radius, **22px** height, internal clear/search icons (from `apple/search fields/2_search_field.png`).
+  - Steppers / SpinButtons: **5px** container radius, **22px** height, **4px** inner button radius with chevron symbols (from `apple/steppers/1_stepper_no_field.png`).
+  - Password Entry: Inherits **22px** height and **5px** radius.
+- **Verification**:
+  - Rendered `qa/report/family_3_entries_dark_gtk4.png`, `family_3_entries_light_gtk4.png`, `family_3_entries_dark_gtk3.png`, `family_3_entries_light_gtk3.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_3_comparison.png`.
+  - Isolated regression diff confirmed zero diff outside entries family widgets at `qa/report/family_3_entries_isolated_diff.png`.
+  - Numeric token assertions passed via `qa/verify_tokens.py`.
+
+
 
 
 
