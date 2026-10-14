@@ -2605,6 +2605,11 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     seg_radius = TokenManager.get("geometry", "segmented", "segment_radius", default=5)
     seg_pad = TokenManager.get("geometry", "segmented", "padding", default=2)
 
+    entry_radius = TokenManager.get("geometry", "entries", "corner_radius", default=5)
+    entry_height = TokenManager.get("geometry", "entries", "height_regular", default=22)
+    entry_pad_x = TokenManager.get("geometry", "entries", "padding_x", default=8)
+    focus_ring_w = TokenManager.get("geometry", "entries", "focus_ring_width", default=3)
+
     if not is_dark:
         btn_bg = TokenManager.get("colors", "light", "btn_default_bg", default="rgba(0, 0, 0, 0.08)")
         btn_hover = TokenManager.get("colors", "light", "btn_default_hover", default="rgba(0, 0, 0, 0.12)")
@@ -2613,9 +2618,10 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         btn_fg = TokenManager.get("colors", "light", "text_primary", default="#1d1d1f")
         btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.08)"
         dim_label = "rgba(0, 0, 0, 0.50)"
-        entry_bg = "#ffffff"
-        entry_border = "1px solid rgba(0, 0, 0, 0.12)"
+        entry_bg = TokenManager.get("colors", "light", "entry_bg", default="#ffffff")
+        entry_border = f"{btn_border_width}px solid {TokenManager.get('colors', 'light', 'entry_border', default='rgba(0, 0, 0, 0.15)')}"
         entry_border_hover = "rgba(0, 0, 0, 0.22)"
+        focus_ring = TokenManager.get("colors", "light", "focus_ring", default="rgba(0, 128, 247, 0.50)")
         hover_subtle = "rgba(0, 0, 0, 0.06)"
         active_subtle = "rgba(0, 0, 0, 0.12)"
         switch_off_bg = "rgba(0, 0, 0, 0.15)"
@@ -2656,9 +2662,10 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         btn_fg = TokenManager.get("colors", "dark", "text_primary", default="#f5f5f7")
         btn_shadow = "0 0.5px 1px rgba(0, 0, 0, 0.20)"
         dim_label = "rgba(255, 255, 255, 0.50)"
-        entry_bg = "rgba(255, 255, 255, 0.06)"
-        entry_border = "1px solid rgba(255, 255, 255, 0.08)"
+        entry_bg = TokenManager.get("colors", "amoled" if is_amoled else "dark", "entry_bg", default="rgba(255, 255, 255, 0.08)")
+        entry_border = f"{btn_border_width}px solid {TokenManager.get('colors', 'dark', 'entry_border', default='rgba(255, 255, 255, 0.15)')}"
         entry_border_hover = "rgba(255, 255, 255, 0.18)"
+        focus_ring = TokenManager.get("colors", "dark", "focus_ring", default="rgba(10, 132, 255, 0.60)")
         hover_subtle = "rgba(255, 255, 255, 0.10)"
         active_subtle = "rgba(255, 255, 255, 0.18)"
         switch_off_bg = "rgba(255, 255, 255, 0.18)"
@@ -2758,21 +2765,52 @@ button.circular {{
     box-shadow: none;
 }}
 
-/* Compact SpinButtons */
+/* Compact SpinButtons (Apple UI kit stepper fidelity) */
 spinbutton {{
-    min-height: 24px;
+    min-height: {entry_height}px;
     padding: 0;
-    border-radius: 9999px;
+    border-radius: {entry_radius}px;
+    background-color: {entry_bg};
+    border: {entry_border};
+}}
+
+spinbutton:focus,
+spinbutton:focus-within {{
+    border-color: @accent_bg_color;
+    outline: none;
+    box-shadow: 0 0 0 {focus_ring_w}px {focus_ring};
+}}
+
+spinbutton > text,
+spinbutton > entry {{
+    min-height: {entry_height}px;
+    padding: 2px {entry_pad_x}px;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: {btn_fg};
 }}
 
 spinbutton > button,
 spinbutton button {{
-    min-width: 22px;
-    min-height: 22px;
-    padding: 0;
-    border-radius: 9999px;
+    min-width: 18px;
+    min-height: 18px;
+    padding: 1px 4px;
+    border-radius: 4px;
     border: none;
     box-shadow: none;
+    background-color: transparent;
+    color: {btn_fg};
+}}
+
+spinbutton > button:hover,
+spinbutton button:hover {{
+    background-color: {hover_subtle};
+}}
+
+spinbutton > button:active,
+spinbutton button:active {{
+    background-color: {active_subtle};
 }}
 
 /* 2. macOS Headerbar & Titlebar Icon Buttons (Flat, borderless at rest, subtle rounded pill on hover) */
@@ -3004,47 +3042,62 @@ combobox > box > button.combo:focus {{
 }}
 
 /* 8. Text Entries */
-entry {{
+entry,
+passwordentry {{
     background-color: {entry_bg};
     border: {entry_border};
-    border-radius: 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: {entry_radius}px;
+    padding: 2px {entry_pad_x}px;
+    min-height: {entry_height}px;
     color: {btn_fg};
     caret-color: @accent_bg_color;
     box-shadow: none;
     transition: border-color 120ms ease, box-shadow 120ms ease;
 }}
 
-entry:hover {{
+entry:hover,
+passwordentry:hover {{
     border-color: {entry_border_hover};
 }}
 
 entry:focus,
-entry:focus-within {{
+entry:focus-within,
+passwordentry:focus,
+passwordentry:focus-within {{
     border-color: @accent_bg_color;
-    outline: 2px solid @accent_bg_color;
-    outline-offset: -1px;
-    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
+    outline: none;
+    box-shadow: 0 0 0 {focus_ring_w}px {focus_ring};
 }}
 
 entry.search,
+searchentry,
 searchbar entry,
 headerbar searchbar entry {{
     border-radius: 9999px;
-    border: none;
+    border: {entry_border};
     background-color: {search_bg};
-    padding: 3px 12px;
-    min-height: 24px;
+    padding: 2px 10px;
+    min-height: {entry_height}px;
+    color: {btn_fg};
     box-shadow: none;
 }}
 
+entry.search:hover,
+searchentry:hover,
+searchbar entry:hover,
+headerbar searchbar entry:hover {{
+    border-color: {entry_border_hover};
+}}
+
 entry.search:focus,
+entry.search:focus-within,
+searchentry:focus,
+searchentry:focus-within,
 searchbar entry:focus,
 headerbar searchbar entry:focus {{
-    outline: 2px solid @accent_bg_color;
-    outline-offset: -1px;
-    box-shadow: 0 0 0 3px alpha(@accent_bg_color, 0.35);
+    border-color: @accent_bg_color;
+    outline: none;
+    box-shadow: 0 0 0 {focus_ring_w}px {focus_ring};
 }}
 
 /* 9. Switches */
