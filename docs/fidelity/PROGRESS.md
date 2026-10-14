@@ -124,6 +124,22 @@
   - Isolated regression diff confirmed zero diff outside combos family widgets at `qa/report/family_4_combos_isolated_diff.png`.
   - Numeric token assertions passed via `qa/verify_tokens.py`.
 
+### Family 5: Menus & Popovers (PASSED)
+- **Tokens & Metrics Applied**:
+  - Popover Radius: **10px** corner radius, **6px** padding (measured from `apple/popovers/1_popover.png`, `5_mode_dark.png`).
+  - Popover Shadow: `0 8px 20px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.12)` (dark), `0 6px 18px rgba(0, 0, 0, 0.10)` (light), `0 8px 22px rgba(0, 0, 0, 0.45)` (AMOLED).
+  - Popover Menu Radius: **8px** container radius, **4px** padding (from `apple/menus/2_mode_light.png`, `5_mode_dark.png`).
+  - Menu Item Row Height: **24px** (measured from `apple/menus/106_*`, `111_*`).
+  - Item Selection Radius: **4px** pill radius.
+  - Item Selection Fill: `@accent_bg_color` (`#0069f9` dark / `#0165e2` light), text `#ffffff`.
+  - Menu Separators: **1px** min-height, **4px 6px** margin, subtle translucent border color.
+  - Universal Unification: Synchronized `popover`, `.popover`, `popover.menu`, `menu`, `.menu`, and `modelbutton` / `menuitem.button.flat` across GTK 4 and GTK 3.
+- **Verification**:
+  - Rendered `qa/report/family_5_menus_gtk4_dark.png`, `family_5_menus_gtk4_light.png`, `family_5_menus_gtk3_dark.png`, `family_5_menus_gtk3_light.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_5_comparison.png`.
+  - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
+
+
 
 
 

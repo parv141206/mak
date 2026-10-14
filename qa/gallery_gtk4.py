@@ -95,6 +95,28 @@ def build_gallery(family_filter=None):
         combo_box.append(mb)
         root.append(combo_box)
 
+    # 5b. Menus & Popovers
+    if not family_filter or family_filter in ["menus", "popovers"]:
+        pop_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, css_classes=["popover"])
+        contents = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2, css_classes=["contents"])
+        
+        item1 = Gtk.Button(label="New Window", css_classes=["modelbutton"])
+        contents.append(item1)
+        
+        item2 = Gtk.Button(label="Open Recent…", css_classes=["modelbutton"])
+        contents.append(item2)
+        
+        sep = Gtk.Separator()
+        contents.append(sep)
+        
+        item3 = Gtk.Button(label="Close Tab", css_classes=["modelbutton"])
+        contents.append(item3)
+        
+        card.append(contents)
+        pop_box.append(card)
+        root.append(pop_box)
+
     # 6. Lists, Sidebars & Tables
     if not family_filter or family_filter in ["lists", "tables", "sidebars"]:
         lists_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)

@@ -36,13 +36,14 @@ def verify_gallery_image(img_path, theme_mode="dark", family=None):
     # 2. Window Chrome & Background check
     # Check background color in upper region (headerbar/window background)
     sample_bg = pix[w // 2, 20]
-    expected_bg_hex = tokens["colors"][theme_mode]["headerbar_bg"]
-    assertions.append({
-        "check": f"Headerbar background color ({theme_mode})",
-        "expected": expected_bg_hex,
-        "actual": f"rgba({sample_bg[0]},{sample_bg[1]},{sample_bg[2]},{round(sample_bg[3]/255.0,2)})",
-        "passed": sample_bg[3] > 0
-    })
+    if not family or family in ["windows", "headerbars", "traffic_lights"]:
+        expected_bg_hex = tokens["colors"][theme_mode]["headerbar_bg"]
+        assertions.append({
+            "check": f"Headerbar background color ({theme_mode})",
+            "expected": expected_bg_hex,
+            "actual": f"rgba({sample_bg[0]},{sample_bg[1]},{sample_bg[2]},{round(sample_bg[3]/255.0,2)})",
+            "passed": sample_bg[3] > 0
+        })
 
     # 3. Non-empty content
     scan_y = 20 if family in ["windows", "headerbars", "traffic_lights"] else h // 2

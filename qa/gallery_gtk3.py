@@ -97,6 +97,30 @@ def build_gallery_gtk3(family_filter=None):
         cb_box.pack_start(mb, False, False, 0)
         root.pack_start(cb_box, False, False, 0)
 
+    # 5b. Menus & Popovers
+    if not family_filter or family_filter in ["menus", "popovers"]:
+        pop_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
+        m_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
+        m_box.get_style_context().add_class("menu")
+        
+        mi1 = Gtk.ModelButton()
+        mi1.set_property("text", "New Window")
+        m_box.pack_start(mi1, False, False, 0)
+        
+        mi2 = Gtk.ModelButton()
+        mi2.set_property("text", "Open Recent…")
+        m_box.pack_start(mi2, False, False, 0)
+        
+        sep = Gtk.Separator()
+        m_box.pack_start(sep, False, False, 0)
+        
+        mi3 = Gtk.ModelButton()
+        mi3.set_property("text", "Close Tab")
+        m_box.pack_start(mi3, False, False, 0)
+        
+        pop_box.pack_start(m_box, False, False, 0)
+        root.pack_start(pop_box, False, False, 0)
+
     # 6. Lists & Tables
     if not family_filter or family_filter in ["lists", "tables", "sidebars"]:
         lists_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=16)
