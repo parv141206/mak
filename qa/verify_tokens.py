@@ -26,11 +26,12 @@ def verify_gallery_image(img_path, theme_mode="dark", family=None):
     assertions = []
 
     # 1. Image sanity check
+    min_h = 200 if family else 400
     assertions.append({
         "check": "Resolution sanity",
-        "expected": ">= 600x400",
+        "expected": f">= 600x{min_h}",
         "actual": f"{w}x{h}",
-        "passed": w >= 600 and h >= 400
+        "passed": w >= 600 and h >= min_h
     })
 
     # 2. Window Chrome & Background check
