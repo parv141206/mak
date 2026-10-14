@@ -195,5 +195,17 @@
   - Image Well Radius: **5px** corner radius, 1px subtle container border, card background fill (measured from `apple/image wells/1_image_well.png`).
 - **Verification**:
   - Rendered `qa/report/family_10_wells_gtk4_dark.png`, `family_10_wells_gtk4_light.png`, `family_10_wells_gtk3_dark.png`, `family_10_wells_gtk3_light.png`.
-  - Visual side-by-side comparison verified at `qa/report/family_10_comparison.png`.
+  - Side-by-side comparison verified at `qa/report/family_10_comparison.png`.
   - Token assertion tests passed across all 6 themes.
+
+### Family 11: Notifications & Shell Chrome (STAGED / UNVERIFIED)
+- **Tokens & Metrics Applied**:
+  - Notification Banner Radius: **16px** corner radius (measured from `apple/notifications/24_mode_dark__stack_false.png`).
+  - Notification Padding: **12px 14px**, soft drop shadow `0 12px 32px rgba(0, 0, 0, 0.28)`, 1px subtle border.
+  - Notification Action Buttons: **5px** radius, **24px** min-height, **2px 12px** padding.
+  - Popover & Shell Menus: **10px** container radius, **4px** item selection radius, **24px** item height.
+  - Quick Settings: Card corner radius aligned with tokens.
+  - Applied in `mak-extension/stylesheet.css` and injected into staged `gnome-shell.css` for all 6 themes via `theme_manager.py`.
+- **Verification Status**:
+  - Headless `gnome-shell --devkit --headless` verified to compile and run extension and theme syntax without errors.
+  - Per prompt guidelines, marked **UNVERIFIED** for live visual rendering until user tests in session.

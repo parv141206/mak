@@ -4328,8 +4328,9 @@ def get_current_theme():
     except Exception:
         return "dark"
 
-def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False):
-    css_path = os.path.join(THEMES_DIR, theme_name, "gnome-shell", "gnome-shell.css")
+def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False, css_path=None):
+    if css_path is None:
+        css_path = os.path.join(THEMES_DIR, theme_name, "gnome-shell", "gnome-shell.css")
     if not os.path.exists(css_path):
         return
     try:
@@ -4340,20 +4341,25 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False):
         if marker in content:
             content = content.split(marker)[0].rstrip()
 
+        popover_r = TokenManager.get("geometry", "popovers", "corner_radius", default=10)
+        item_r = TokenManager.get("geometry", "menus", "item_radius", default=4)
+        notif_r = TokenManager.get("geometry", "notifications", "corner_radius", default=16)
+        btn_r = TokenManager.get("geometry", "buttons", "corner_radius", default=5)
+
         if not is_dark:
             bg_color = "rgba(255, 255, 255, 0.82)"
             banner_bg = "rgba(255, 255, 255, 0.86)"
             border_color = "rgba(0, 0, 0, 0.08)"
             fg_color = "#1d1d1f"
             hover_bg = "rgba(0, 0, 0, 0.08)"
-            shadow = "0 8px 24px rgba(0, 0, 0, 0.12)"
+            shadow = "0 12px 32px rgba(0, 0, 0, 0.16)"
         else:
             bg_color = "rgba(22, 22, 26, 0.85)" if is_amoled else "rgba(36, 36, 40, 0.82)"
             banner_bg = "rgba(22, 22, 26, 0.88)" if is_amoled else "rgba(36, 36, 40, 0.86)"
             border_color = "rgba(255, 255, 255, 0.08)"
             fg_color = "#f5f5f7"
             hover_bg = "rgba(255, 255, 255, 0.12)"
-            shadow = "0 8px 24px rgba(0, 0, 0, 0.22)"
+            shadow = "0 12px 32px rgba(0, 0, 0, 0.28)"
 
         block = f"""\n\n{marker}
 .popup-menu-content {{
@@ -4361,12 +4367,16 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False):
     color: {fg_color};
     border: 1px solid {border_color};
     box-shadow: {shadow};
-    border-radius: 12px;
+    border-radius: {popover_r}px;
+    padding: 6px;
 }}
 
 .popup-menu-item {{
     color: {fg_color};
     font-weight: 500;
+    border-radius: {item_r}px;
+    min-height: 24px;
+    padding: 3px 10px;
 }}
 
 .popup-menu-item StLabel {{
@@ -4392,11 +4402,20 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False):
     background-color: {banner_bg};
     color: {fg_color};
     border: 1px solid {border_color};
+    border-radius: {notif_r}px;
+    padding: 12px 14px;
     box-shadow: {shadow};
 }}
 
 .notification-banner StLabel {{
     color: {fg_color};
+}}
+
+.notification-button {{
+    border-radius: {btn_r}px;
+    min-height: 24px;
+    padding: 2px 12px;
+    font-weight: 500;
 }}
 """
         with open(css_path, "w", encoding="utf-8") as f:
@@ -4834,6 +4853,11 @@ def stage_all_themes(stage_dir=None):
                 read_src = base_css if os.path.exists(base_css) else src_css
                 if os.path.exists(read_src):
                     inject_theme_css(read_src, dst_css, palette, is_glassy, button_size, button_spacing, chromium_accent="default", is_dark=is_dark)
+
+        # Stage and inject shell theme contrast
+        d_shell_css = os.path.join(dst_tdir, "gnome-shell", "gnome-shell.css")
+        if os.path.exists(d_shell_css):
+            inject_shell_theme_contrast(tname, is_dark, is_amoled=info.get("is_amoled", False), css_path=d_shell_css)
 
     print(f"[ThemeManager] Staged all 6 themes successfully to: {stage_dir}")
     return stage_dir
