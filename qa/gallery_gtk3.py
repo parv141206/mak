@@ -141,6 +141,8 @@ def build_gallery_gtk3(family_filter=None):
         std_list = Gtk.ListBox()
         for i in range(4):
             r = Gtk.ListBoxRow()
+            if i % 2 == 1:
+                r.get_style_context().add_class("alt-row")
             b = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
             b.pack_start(Gtk.Label(label=f"Table Item {i+1}"), False, False, 0)
             r.add(b)

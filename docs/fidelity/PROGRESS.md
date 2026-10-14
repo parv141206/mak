@@ -139,6 +139,22 @@
   - Visual side-by-side comparison verified at `qa/report/family_5_comparison.png`.
   - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
 
+### Family 6: Lists, Tables & Sidebars (PASSED)
+- **Tokens & Metrics Applied**:
+  - Sidebar Row Height: **32px** regular, **28px** compact (measured from `apple/sidebars/82_size_medium_*`, `70_size_small_*`).
+  - Sidebar Row Selection: **5px** floating pill radius, **1px 8px** margin, **4px 10px** padding.
+  - Sidebar Glyphs: **16px** SF-Symbols accent icons.
+  - List & Table Row Height: **24px** regular, **20px** compact/tree (measured from `apple/lists and tables/28_level_0_*`).
+  - Column Header Height: **28px**, **3px 10px** padding (measured from `apple/lists and tables/23_column_header.png`).
+  - Active Row Selection: `@accent_bg_color` (`#0165e2` / `#0069f9`), text `#ffffff`.
+  - Inactive Window Selection: `rgba(0, 0, 0, 0.14)` (light) / `rgba(255, 255, 255, 0.14)` (dark/AMOLED) backdrop fill.
+  - Alternating Zebra Rows: `rgba(0, 0, 0, 0.05)` (light) / `rgba(255, 255, 255, 0.04)` (dark/AMOLED) alternating row tint (from `apple/lists and tables/98_level_0_*`).
+- **Verification**:
+  - Rendered `qa/report/family_6_sidebars_gtk4_dark.png`, `family_6_sidebars_gtk4_light.png`, `family_6_sidebars_gtk3_dark.png`, `family_6_sidebars_gtk3_light.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_6_comparison.png`.
+  - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
+
+
 
 
 

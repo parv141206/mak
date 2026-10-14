@@ -1913,10 +1913,10 @@ sidebar row,
 .nautilus-window .navigation-sidebar > row,
 #NautilusFileChooser placessidebar row,
 #NautilusFileChooser .navigation-sidebar > row {{
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: 5px;
+    margin: 1px 8px;
+    padding: 4px 10px;
+    min-height: 32px;
     font-size: 13px;
     font-weight: 500;
     color: {text_sidebar};
@@ -2020,10 +2020,10 @@ sidebar row:hover:not(:selected):not(.heading),
 #NautilusFileChooser .navigation-sidebar > row:hover:not(:selected):not(.heading) {{
     background-color: {sidebar_hover_bg};
     color: {text_primary};
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: 5px;
+    margin: 1px 8px;
+    padding: 4px 10px;
+    min-height: 32px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -2047,10 +2047,10 @@ sidebar row:active:not(:selected):not(.heading),
 #NautilusFileChooser .navigation-sidebar > row:active:not(:selected):not(.heading) {{
     background-color: {sidebar_selected_bg};
     color: {text_primary};
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: 5px;
+    margin: 1px 8px;
+    padding: 4px 10px;
+    min-height: 32px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -2084,10 +2084,10 @@ sidebar row:selected,
     background-color: {sidebar_selected_bg};
     color: {text_primary};
     font-weight: 600;
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: 5px;
+    margin: 1px 8px;
+    padding: 4px 10px;
+    min-height: 32px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -2121,10 +2121,10 @@ sidebar row:selected:hover,
     background-color: {sidebar_selected_hover_bg};
     color: {text_primary};
     font-weight: 600;
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: 5px;
+    margin: 1px 8px;
+    padding: 4px 10px;
+    min-height: 32px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -2157,10 +2157,10 @@ sidebar row:selected:active,
     background-color: {sidebar_selected_active_bg};
     color: {text_primary};
     font-weight: 600;
-    border-radius: 6px;
-    margin: 1px 6px;
-    padding: 3px 8px;
-    min-height: 24px;
+    border-radius: 5px;
+    margin: 1px 8px;
+    padding: 4px 10px;
+    min-height: 32px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -2356,8 +2356,8 @@ columnview header cell > button {{
     background-color: transparent;
     background-image: none;
     box-shadow: none;
-    padding: 2px 8px;
-    min-height: 22px;
+    padding: 3px 10px;
+    min-height: 28px;
 }}
 
 columnview header > button:hover,
@@ -2755,6 +2755,8 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         destr_hover = "rgba(224, 40, 44, 0.90)"
         destr_active = "rgba(196, 30, 34, 0.90)"
         dialog_ring = "rgba(0, 0, 0, 0.12)"
+        list_inactive_selected = "rgba(0, 0, 0, 0.14)"
+        zebra_bg = "rgba(0, 0, 0, 0.05)"
     else:
         border_col = TokenManager.get("colors", "amoled" if is_amoled else "dark", "border", default="rgba(255, 255, 255, 0.12)")
         btn_bg = TokenManager.get("colors", "dark", "btn_default_bg", default="rgba(255, 255, 255, 0.10)")
@@ -2799,6 +2801,8 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         destr_hover = "rgba(224, 52, 42, 0.90)"
         destr_active = "rgba(194, 43, 34, 0.90)"
         dialog_ring = "rgba(255, 255, 255, 0.12)"
+        list_inactive_selected = "rgba(255, 255, 255, 0.14)"
+        zebra_bg = "rgba(255, 255, 255, 0.04)"
 
     return f"""
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
@@ -3289,17 +3293,39 @@ scale slider {{
     border: 1px solid rgba(0, 0, 0, 0.12);
 }}
 
-/* 12. Interactive List Rows */
+/* 12. Interactive List Rows, Columnviews & Treeviews */
+listview > row,
+columnview row,
+columnview.view > listview > row,
+treeview.view,
+treeview.view > row,
+list > row {{
+    min-height: 24px;
+    padding: 2px 10px;
+    border-radius: 4px;
+    transition: background-color 80ms ease, color 80ms ease;
+}}
+
+listview.compact > row,
+columnview.compact row,
+treeview.compact,
+treeview.view.compact {{
+    min-height: 20px;
+    padding: 1px 8px;
+}}
+
 list > row.activatable:hover:not(:selected),
 listview > row.activatable:hover:not(:selected),
 columnview row:hover:not(:selected),
-columnview.view > listview > row:hover:not(:selected) {{
+columnview.view > listview > row:hover:not(:selected),
+treeview.view:hover:not(:selected) {{
     background-color: {hover_subtle};
 }}
 
 list > row.activatable:active,
 listview > row.activatable:active,
-columnview row:active {{
+columnview row:active,
+treeview.view:active {{
     background-color: {active_subtle};
 }}
 
@@ -3310,9 +3336,31 @@ listview > row.activatable:selected:hover,
 columnview row:selected,
 columnview row:selected:hover,
 columnview.view > listview > row:selected,
-columnview.view > listview > row:selected:hover {{
+columnview.view > listview > row:selected:hover,
+treeview.view:selected,
+treeview.view:selected:hover {{
     background-color: @accent_bg_color;
-    color: @accent_fg_color;
+    color: #ffffff;
+}}
+
+/* Inactive window selection (14% alpha per Apple UI kit) */
+list > row.activatable:selected:backdrop,
+listview > row.activatable:selected:backdrop,
+columnview row:selected:backdrop,
+columnview.view > listview > row:selected:backdrop,
+treeview.view:selected:backdrop {{
+    background-color: {list_inactive_selected};
+    color: {btn_fg};
+}}
+
+/* Alternating zebra rows (5% alpha per Apple UI kit) */
+list > row.alt-row:not(:selected),
+listview > row.alt-row:not(:selected),
+columnview row.alt-row:not(:selected),
+treeview.view:nth-child(even):not(:selected),
+columnview.view > listview > row:nth-child(even):not(:selected),
+list > row:nth-child(even):not(:selected) {{
+    background-color: {zebra_bg};
 }}
 
 list > row.activatable:selected label,
@@ -3322,8 +3370,17 @@ listview > row.activatable:selected:hover label,
 columnview row:selected label,
 columnview row:selected:hover label,
 columnview.view > listview > row:selected label,
-columnview.view > listview > row:selected:hover label {{
+columnview.view > listview > row:selected:hover label,
+treeview.view:selected label {{
     color: #ffffff;
+}}
+
+list > row.activatable:selected:backdrop label,
+listview > row.activatable:selected:backdrop label,
+columnview row:selected:backdrop label,
+columnview.view > listview > row:selected:backdrop label,
+treeview.view:selected:backdrop label {{
+    color: {btn_fg};
 }}
 
 /* 13. Stack Switchers / Segmented Controls */
