@@ -154,6 +154,18 @@
   - Visual side-by-side comparison verified at `qa/report/family_6_comparison.png`.
   - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
 
+### Family 7: Toolbars & Actionbars (PASSED)
+- **Tokens & Metrics Applied**:
+  - Unified Topbar Chrome: Toolbars, headerbars, and searchbars unified with `@headerbar_bg_color` and `@headerbar_fg_color`.
+  - Separators: **1px** width, **16px** height vertical divider line (measured from `apple/toolbars/424_separator.png`, `430_separator.png`).
+  - Actionbars: Bottom window and dialog action areas unified with 1px top border line and 6px 14px padding.
+  - Toolbar Buttons: Flat default with 5px radius, 24px height, hover and active subtle states, `@accent_bg_color` when checked/toggled.
+- **Verification**:
+  - Rendered `qa/report/family_7_toolbars_gtk4_dark.png`, `family_7_toolbars_gtk4_light.png`, `family_7_toolbars_gtk3_dark.png`, `family_7_toolbars_gtk3_light.png`.
+  - Visual side-by-side comparison verified at `qa/report/family_7_comparison.png`.
+  - Token assertion tests passed across all 6 themes (Light/Dark/Amoled x solid/glassy).
+
+
 
 
 

@@ -2713,6 +2713,7 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     focus_ring_w = TokenManager.get("geometry", "entries", "focus_ring_width", default=3)
 
     if not is_dark:
+        border_col = TokenManager.get("colors", "light", "border", default="rgba(0, 0, 0, 0.12)")
         btn_bg = TokenManager.get("colors", "light", "btn_default_bg", default="rgba(0, 0, 0, 0.08)")
         btn_hover = TokenManager.get("colors", "light", "btn_default_hover", default="rgba(0, 0, 0, 0.12)")
         btn_active = TokenManager.get("colors", "light", "btn_default_active", default="rgba(0, 0, 0, 0.18)")
@@ -3381,6 +3382,66 @@ columnview row:selected:backdrop label,
 columnview.view > listview > row:selected:backdrop label,
 treeview.view:selected:backdrop label {{
     color: {btn_fg};
+}}
+
+/* 12b. Unified Toolbars, Searchbars, Actionbars & 16px Separators */
+toolbar,
+.toolbar,
+searchbar,
+searchbar > revealer > box,
+actionbar,
+actionbar > revealer > box {{
+    background-color: @headerbar_bg_color;
+    color: @headerbar_fg_color;
+    border: none;
+}}
+
+actionbar,
+actionbar > revealer > box {{
+    border-top: 1px solid {border_col};
+    padding: 6px 14px;
+}}
+
+toolbar separator,
+.toolbar separator,
+headerbar separator,
+actionbar separator {{
+    min-height: 16px;
+    min-width: 1px;
+    margin: 4px 6px;
+    background-color: {border_col};
+    border: none;
+    box-shadow: none;
+}}
+
+toolbar button:not(.suggested-action):not(.destructive-action),
+.toolbar button:not(.suggested-action):not(.destructive-action) {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 5px;
+    min-height: 24px;
+    padding: 3px 8px;
+    color: {btn_fg};
+    transition: background-color 80ms ease, color 80ms ease;
+}}
+
+toolbar button:not(.suggested-action):not(.destructive-action):hover,
+.toolbar button:not(.suggested-action):not(.destructive-action):hover {{
+    background-color: {hover_subtle};
+}}
+
+toolbar button:not(.suggested-action):not(.destructive-action):active,
+.toolbar button:not(.suggested-action):not(.destructive-action):active {{
+    background-color: {active_subtle};
+}}
+
+toolbar button:not(.suggested-action):not(.destructive-action):checked,
+.toolbar button:not(.suggested-action):not(.destructive-action):checked {{
+    background-color: @accent_bg_color;
+    color: #ffffff;
 }}
 
 /* 13. Stack Switchers / Segmented Controls */
