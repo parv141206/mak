@@ -1106,7 +1106,7 @@ window.tiled:backdrop {{
     box-shadow: inset 0 0 0 1px {border_maximized_backdrop};
 }}
 
-/* Compact macOS Unified Titlebar Height (38px) */
+/* Compact macOS Unified Titlebar Height (38px) - Flush & Clean */
 headerbar,
 headerbar.default-decoration,
 .titlebar,
@@ -1117,6 +1117,14 @@ window.background headerbar {{
     min-height: 38px;
     padding-top: 2px;
     padding-bottom: 2px;
+    border-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}}
+
+/* Standalone top-level floating CSD headerbars inherit window curvature */
+window.csd:not(.maximized):not(.tiled) > headerbar:first-child,
+window.solid-csd:not(.maximized):not(.tiled) > headerbar:first-child {{
     border-top-left-radius: 16px;
     border-top-right-radius: 16px;
 }}
@@ -1152,8 +1160,9 @@ window.tiled.csd headerbar,
 window.tiled headerbar,
 window.background.tiled .titlebar,
 window.tiled .titlebar {{
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
+    border-radius: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
 }}
 
 window.background.maximized > contents,
@@ -1165,11 +1174,11 @@ window.background.maximized > widget,
 window.maximized > widget,
 window.background.maximized > box,
 window.maximized > box {{
-    border-radius: 16px;
+    border-radius: 0;
 }}
 
 window.background.chromium headerbar.header-bar.titlebar {{
-    border-radius: 16px 16px 0 0;
+    border-radius: 0;
 }}
 
 /* True Fullscreen Only */
@@ -1525,18 +1534,25 @@ stacksidebar:dir(rtl) {{
     border-right: none;
 }}
 
-/* 4. Anchor Content Pane Flush With Divider */
+/* 4. Anchor Content Pane Flush With Divider & Zero Radius Cutout */
 navigation-split-view > widget.content-pane,
 overlay-split-view > widget.content-pane,
 split-view > widget.content-pane,
 navigation-split-view .content-pane,
 overlay-split-view .content-pane,
 split-view .content-pane,
+navigation-split-view > widget:not(.sidebar-pane),
+navigation-view-page,
+toolbarview,
+toolbarview > revealer,
+toolbarview > revealer > windowhandle,
+toolbarview > revealer > windowhandle > box,
 .nautilus-window .content-pane,
 #NautilusFileChooser .content-pane,
 .content-pane {{
     margin: 0;
     border-radius: 0;
+    border-top-left-radius: 0;
     box-shadow: none;
     background-color: @view_bg_color;
 }}
@@ -1547,11 +1563,19 @@ split-view > widget.content-pane headerbar,
 navigation-split-view .content-pane headerbar,
 overlay-split-view .content-pane headerbar,
 split-view .content-pane headerbar,
+navigation-split-view > widget:not(.sidebar-pane) headerbar,
+navigation-view-page headerbar,
+toolbarview headerbar,
+leaflet headerbar,
+flap headerbar,
 .nautilus-window .content-pane headerbar,
 #NautilusFileChooser .content-pane headerbar,
 headerbar.titlebar.tweak-titlebar-right {{
+    border-radius: 0;
     border-top-left-radius: 0;
-    border-top-right-radius: 16px;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
     border-bottom: 1px solid {border_color};
     background-color: @headerbar_bg_color;
 }}
@@ -1613,7 +1637,17 @@ placessidebar row:not(.activatable):hover {{
     background-color: transparent;
 }}
 
-/* 5. Inset Floating Rounded Pill Sidebar Rows (macOS 27 Signature Look) */
+/* 5. Inset Floating Rounded Pill Sidebar Rows (macOS 27 Signature Look - Compact & Sleek) */
+navigation-sidebar,
+.navigation-sidebar {{
+    padding: 4px;
+}}
+
+navigation-sidebar > row + row,
+.navigation-sidebar > row + row {{
+    margin-top: 1px;
+}}
+
 navigation-sidebar > row,
 .navigation-sidebar > row,
 listview.navigation-sidebar > row,
@@ -1633,10 +1667,10 @@ sidebar row,
 .nautilus-window .navigation-sidebar > row,
 #NautilusFileChooser placessidebar row,
 #NautilusFileChooser .navigation-sidebar > row {{
-    border-radius: 8px;
-    margin: 1.5px 8px;
-    padding: 4px 10px;
-    min-height: 28px;
+    border-radius: 6px;
+    margin: 1px 6px;
+    padding: 3px 8px;
+    min-height: 24px;
     font-size: 13px;
     font-weight: 500;
     color: {text_sidebar};
@@ -1645,6 +1679,31 @@ sidebar row,
     box-shadow: none;
     background-color: transparent;
     transition: background-color 100ms ease, color 100ms ease;
+}}
+
+navigation-sidebar > row > box,
+.navigation-sidebar > row > box,
+listview.navigation-sidebar > row > box,
+list.navigation-sidebar > row > box,
+.sidebar-pane row > box {{
+    min-height: 20px;
+    padding: 0;
+    margin: 0;
+}}
+
+navigation-sidebar > row label,
+.navigation-sidebar > row label,
+listview.navigation-sidebar > row label,
+list.navigation-sidebar > row label,
+placessidebar row label,
+.sidebar-pane row label,
+stacksidebar row label,
+.sidebar row label,
+sidebar row label {{
+    font-size: 13px;
+    font-weight: 500;
+    padding: 0;
+    margin: 0;
 }}
 
 /* 6. Sidebar SF-Symbols Vibrant Accent Glyphs */
@@ -1676,8 +1735,8 @@ placessidebar row button.image-button,
 .nautilus-window .sidebar-pane placessidebar row button {{
     border-radius: 9999px;
     padding: 2px 4px;
-    min-height: 20px;
-    min-width: 20px;
+    min-height: 18px;
+    min-width: 18px;
     color: {text_muted};
     background: transparent;
     border: none;
@@ -1715,7 +1774,10 @@ sidebar row:hover:not(:selected):not(.heading),
 #NautilusFileChooser .navigation-sidebar > row:hover:not(:selected):not(.heading) {{
     background-color: {sidebar_hover_bg};
     color: {text_primary};
-    border-radius: 8px;
+    border-radius: 6px;
+    margin: 1px 6px;
+    padding: 3px 8px;
+    min-height: 24px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -1749,8 +1811,10 @@ sidebar row:selected,
     background-color: {sidebar_selected_bg};
     color: {text_primary};
     font-weight: 600;
-    border-radius: 8px;
-    margin: 1.5px 8px;
+    border-radius: 6px;
+    margin: 1px 6px;
+    padding: 3px 8px;
+    min-height: 24px;
     border: none;
     outline: none;
     box-shadow: none;
@@ -2358,9 +2422,9 @@ window.kgx headerbar .linked {{
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 9999px;
+    border-radius: 7px;
     margin: 0 3px;
-    padding: 2px;
+    padding: 1px;
 }}
 
 headerbar splitbutton > button,
@@ -2375,10 +2439,10 @@ headerbar viewswitcher > button,
 .kgx-window headerbar splitbutton > menubutton > button,
 window.kgx headerbar splitbutton > button,
 window.kgx headerbar splitbutton > menubutton > button {{
-    min-height: 22px;
-    min-width: 22px;
-    padding: 2px 8px;
-    border-radius: 9999px;
+    min-height: 20px;
+    min-width: 20px;
+    padding: 2px 6px;
+    border-radius: 5px;
     background: transparent;
     background-color: transparent;
     background-image: none;
