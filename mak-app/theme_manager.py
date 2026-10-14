@@ -102,7 +102,7 @@ GRAPHITE_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #2c2c2e;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color #222224;
+@define-color sidebar_bg_color #2c2c2e;
 @define-color sidebar_fg_color #f5f5f7;
 @define-color secondary_sidebar_bg_color #1a1a1c;
 @define-color card_bg_color #2c2c2e;
@@ -124,7 +124,7 @@ GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #2c2c2e;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color rgba(30, 30, 34, 0.65);
+@define-color sidebar_bg_color rgba(44, 44, 48, 0.75);
 @define-color sidebar_fg_color #f5f5f7;
 @define-color secondary_sidebar_bg_color rgba(26, 26, 30, 0.60);
 @define-color card_bg_color rgba(48, 48, 54, 0.68);
@@ -146,7 +146,7 @@ AMOLED_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #1e1e21;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.10);
-@define-color sidebar_bg_color #161618;
+@define-color sidebar_bg_color #1e1e21;
 @define-color sidebar_fg_color #f5f5f7;
 @define-color secondary_sidebar_bg_color #111113;
 @define-color card_bg_color #1e1e22;
@@ -168,7 +168,7 @@ AMOLED_GLASSY_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #1e1e21;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.10);
-@define-color sidebar_bg_color rgba(22, 22, 24, 0.70);
+@define-color sidebar_bg_color rgba(30, 30, 33, 0.78);
 @define-color sidebar_fg_color #f5f5f7;
 @define-color secondary_sidebar_bg_color rgba(17, 17, 19, 0.65);
 @define-color card_bg_color rgba(30, 30, 34, 0.72);
@@ -189,7 +189,7 @@ LIGHT_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #ebebef;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.12);
-@define-color sidebar_bg_color #ebebf0;
+@define-color sidebar_bg_color #ebebef;
 @define-color sidebar_fg_color #1d1d1f;
 @define-color secondary_sidebar_bg_color #e4e4e9;
 @define-color card_bg_color #ffffff;
@@ -211,7 +211,7 @@ LIGHT_GLASSY_PALETTE_OVERRIDE = """
 @define-color headerbar_solid_bg #ebebef;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.12);
-@define-color sidebar_bg_color rgba(232, 232, 237, 0.68);
+@define-color sidebar_bg_color rgba(235, 235, 239, 0.78);
 @define-color sidebar_fg_color #1d1d1f;
 @define-color secondary_sidebar_bg_color rgba(226, 226, 231, 0.62);
 @define-color card_bg_color rgba(255, 255, 255, 0.75);
@@ -613,25 +613,68 @@ window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebu
 window.background.csd windowcontrols button,
 window.background.csd windowcontrols button:hover,
 window.background.csd windowcontrols button:active,
+window.background.csd windowcontrols button:focus,
+window.background.csd windowcontrols button:checked,
 window.background.csd windowcontrols button:backdrop,
 window.background.csd windowcontrols button:backdrop:hover,
+window.background.csd windowcontrols > button,
+window.background.csd windowcontrols > button:hover,
+window.background.csd windowcontrols > button:active,
+window.background.csd windowcontrols > button:focus,
+window.background.csd windowcontrols > button:checked,
+window.background.csd windowcontrols > button:backdrop,
+window.background.csd windowcontrols > button:backdrop:hover,
 window.background.csd windowcontrols button.titlebutton,
 window.background.csd windowcontrols button.titlebutton:hover,
 window.background.csd windowcontrols button.titlebutton:active,
+window.background.csd windowcontrols button.titlebutton:focus,
+window.background.csd windowcontrols button.titlebutton:checked,
 window.background.csd windowcontrols button.titlebutton:backdrop,
-window.background.csd windowcontrols button.titlebutton:backdrop:hover {{
-    min-width: {size}px;
-    min-height: {size}px;
-    padding: 0;
-    margin: 0 {margin}px;
-    border-radius: 9999px;
-    background-color: transparent;
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: {size}px {size}px;
-    -gtk-icon-shadow: none;
-    border: none;
-    box-shadow: none;
+window.background.csd windowcontrols button.titlebutton:backdrop:hover,
+windowcontrols > button,
+windowcontrols > button:hover,
+windowcontrols > button:active,
+windowcontrols > button:focus,
+windowcontrols > button:checked,
+windowcontrols > button:backdrop,
+headerbar windowcontrols > button,
+headerbar windowcontrols > button:hover,
+headerbar windowcontrols > button:active,
+headerbar windowcontrols > button:focus,
+headerbar windowcontrols > button:checked,
+headerbar windowcontrols > button:backdrop,
+.titlebar windowcontrols > button,
+.titlebar windowcontrols > button:hover,
+.titlebar windowcontrols > button:active,
+.titlebar windowcontrols > button:focus,
+.titlebar windowcontrols > button:checked,
+headerbar button.titlebutton:focus,
+headerbar button.titlebutton:checked,
+button.titlebutton:focus,
+button.titlebutton:checked,
+button.close:focus,
+button.close:checked,
+button.maximize:focus,
+button.maximize:checked,
+button.minimize:focus,
+button.minimize:checked {{
+    min-width: {size}px !important;
+    min-height: {size}px !important;
+    max-width: {size}px !important;
+    max-height: {size}px !important;
+    width: {size}px !important;
+    height: {size}px !important;
+    padding: 0 !important;
+    margin: 0 {margin}px !important;
+    border-radius: 9999px !important;
+    background-color: transparent !important;
+    background-repeat: no-repeat !important;
+    background-position: center center !important;
+    background-size: {size}px {size}px !important;
+    -gtk-icon-shadow: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
 }}
 
 /* Ensure button images/icons also do not repeat and stay centered */
@@ -1292,31 +1335,51 @@ row.combo popover list > row {{
 }}
 
 popover modelbutton:hover,
+popover modelbutton:active,
 popover modelbutton:focus,
 popover.menu modelbutton:hover,
+popover.menu modelbutton:active,
 popover.menu modelbutton:focus,
 popover listview > row:hover,
+popover listview > row:active,
 popover list > row:hover,
+popover list > row:active,
 row.combo popover listview > row:hover,
-row.combo popover list > row:hover {{
+row.combo popover listview > row:active,
+row.combo popover list > row:hover,
+row.combo popover list > row:active {{
     background-color: @accent_bg_color;
     color: #ffffff;
 }}
 
 popover modelbutton:hover label,
+popover modelbutton:active label,
 popover.menu modelbutton:hover label,
+popover.menu modelbutton:active label,
 popover listview > row:hover label,
+popover listview > row:active label,
 popover list > row:hover label,
+popover list > row:active label,
 row.combo popover listview > row:hover label,
+row.combo popover listview > row:active label,
 row.combo popover list > row:hover label,
+row.combo popover list > row:active label,
 popover modelbutton:hover image,
+popover modelbutton:active image,
 popover.menu modelbutton:hover image,
+popover.menu modelbutton:active image,
 popover listview > row:hover image,
+popover listview > row:active image,
 popover list > row:hover image,
+popover list > row:active image,
 row.combo popover listview > row:hover image,
+row.combo popover listview > row:active image,
 row.combo popover list > row:hover image,
+row.combo popover list > row:active image,
 popover modelbutton:hover accelerator,
-popover.menu modelbutton:hover accelerator {{
+popover modelbutton:active accelerator,
+popover.menu modelbutton:hover accelerator,
+popover.menu modelbutton:active accelerator {{
     color: #ffffff;
 }}
 
@@ -1367,8 +1430,10 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
     if not is_dark:
         if is_glassy:
             border_color = "rgba(0, 0, 0, 0.08)"
-            sidebar_selected_bg = "rgba(0, 0, 0, 0.09)"
+            sidebar_selected_bg = "rgba(0, 0, 0, 0.08)"
             sidebar_hover_bg = "rgba(0, 0, 0, 0.045)"
+            sidebar_selected_hover_bg = "rgba(0, 0, 0, 0.12)"
+            sidebar_selected_active_bg = "rgba(0, 0, 0, 0.16)"
             search_bg = "rgba(0, 0, 0, 0.05)"
             search_border = "rgba(0, 0, 0, 0.08)"
             path_floating_bg = "rgba(255, 255, 255, 0.82)"
@@ -1379,6 +1444,8 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
             border_color = "rgba(0, 0, 0, 0.08)"
             sidebar_selected_bg = "rgba(0, 0, 0, 0.08)"
             sidebar_hover_bg = "rgba(0, 0, 0, 0.04)"
+            sidebar_selected_hover_bg = "rgba(0, 0, 0, 0.12)"
+            sidebar_selected_active_bg = "rgba(0, 0, 0, 0.16)"
             search_bg = "rgba(0, 0, 0, 0.05)"
             search_border = "rgba(0, 0, 0, 0.08)"
             path_floating_bg = "rgba(255, 255, 255, 0.92)"
@@ -1397,6 +1464,8 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
                 border_color = "rgba(255, 255, 255, 0.08)"
                 sidebar_selected_bg = "rgba(255, 255, 255, 0.14)"
                 sidebar_hover_bg = "rgba(255, 255, 255, 0.07)"
+                sidebar_selected_hover_bg = "rgba(255, 255, 255, 0.20)"
+                sidebar_selected_active_bg = "rgba(255, 255, 255, 0.24)"
                 search_bg = "rgba(255, 255, 255, 0.07)"
                 search_border = "rgba(255, 255, 255, 0.08)"
                 path_floating_bg = "rgba(24, 24, 28, 0.85)"
@@ -1407,6 +1476,8 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
                 border_color = "rgba(255, 255, 255, 0.07)"
                 sidebar_selected_bg = "rgba(255, 255, 255, 0.13)"
                 sidebar_hover_bg = "rgba(255, 255, 255, 0.06)"
+                sidebar_selected_hover_bg = "rgba(255, 255, 255, 0.19)"
+                sidebar_selected_active_bg = "rgba(255, 255, 255, 0.23)"
                 search_bg = "rgba(255, 255, 255, 0.06)"
                 search_border = "rgba(255, 255, 255, 0.07)"
                 path_floating_bg = "rgba(24, 24, 28, 0.92)"
@@ -1419,6 +1490,8 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
                 border_color = "rgba(255, 255, 255, 0.09)"
                 sidebar_selected_bg = "rgba(255, 255, 255, 0.14)"
                 sidebar_hover_bg = "rgba(255, 255, 255, 0.07)"
+                sidebar_selected_hover_bg = "rgba(255, 255, 255, 0.19)"
+                sidebar_selected_active_bg = "rgba(255, 255, 255, 0.23)"
                 search_bg = "rgba(255, 255, 255, 0.08)"
                 search_border = "rgba(255, 255, 255, 0.09)"
                 path_floating_bg = "rgba(36, 36, 40, 0.85)"
@@ -1429,6 +1502,8 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
                 border_color = "rgba(255, 255, 255, 0.08)"
                 sidebar_selected_bg = "rgba(255, 255, 255, 0.12)"
                 sidebar_hover_bg = "rgba(255, 255, 255, 0.06)"
+                sidebar_selected_hover_bg = "rgba(255, 255, 255, 0.18)"
+                sidebar_selected_active_bg = "rgba(255, 255, 255, 0.22)"
                 search_bg = "rgba(255, 255, 255, 0.07)"
                 search_border = "rgba(255, 255, 255, 0.08)"
                 path_floating_bg = "rgba(36, 36, 40, 0.92)"
@@ -1517,7 +1592,7 @@ stacksidebar {{
     border-radius: 0;
     box-shadow: none;
     background-image: none;
-    background-color: @sidebar_bg_color;
+    background-color: @headerbar_bg_color !important;
     border-right: 1px solid {border_color};
     border-left: none;
     border-top: none;
@@ -1755,7 +1830,7 @@ placessidebar row button.image-button:hover,
     background-color: {hover_subtle};
 }}
 
-/* 7. Sidebar Row Hover State */
+/* 7. Sidebar Row Hover & Active State */
 navigation-sidebar > row:hover:not(:selected):not(.heading),
 .navigation-sidebar > row:hover:not(:selected):not(.heading),
 listview.navigation-sidebar > row:hover:not(:selected):not(.heading),
@@ -1772,8 +1847,8 @@ sidebar row:hover:not(:selected):not(.heading),
 .nautilus-window .navigation-sidebar > row:hover:not(:selected):not(.heading),
 #NautilusFileChooser placessidebar row:hover:not(:selected):not(.heading),
 #NautilusFileChooser .navigation-sidebar > row:hover:not(:selected):not(.heading) {{
-    background-color: {sidebar_hover_bg};
-    color: {text_primary};
+    background-color: {sidebar_hover_bg} !important;
+    color: {text_primary} !important;
     border-radius: 6px;
     margin: 1px 6px;
     padding: 3px 8px;
@@ -1783,7 +1858,34 @@ sidebar row:hover:not(:selected):not(.heading),
     box-shadow: none;
 }}
 
-/* 8. Sidebar Row Selected State (Clean macOS 27 Inset Floating Pill) */
+navigation-sidebar > row:active:not(:selected):not(.heading),
+.navigation-sidebar > row:active:not(:selected):not(.heading),
+listview.navigation-sidebar > row:active:not(:selected):not(.heading),
+list.navigation-sidebar > row:active:not(:selected):not(.heading),
+placessidebar row:active:not(:selected):not(.heading),
+placessidebar list > row:active:not(:selected):not(.heading),
+.sidebar-pane placessidebar row:active:not(:selected):not(.heading),
+.sidebar-pane row:active:not(:selected):not(.heading),
+stacksidebar row:active:not(:selected):not(.heading),
+.sidebar row:active:not(:selected):not(.heading),
+sidebar row:active:not(:selected):not(.heading),
+.nautilus-window .sidebar-pane placessidebar row:active:not(:selected):not(.heading),
+.nautilus-window placessidebar row:active:not(:selected):not(.heading),
+.nautilus-window .navigation-sidebar > row:active:not(:selected):not(.heading),
+#NautilusFileChooser placessidebar row:active:not(:selected):not(.heading),
+#NautilusFileChooser .navigation-sidebar > row:active:not(:selected):not(.heading) {{
+    background-color: {sidebar_selected_bg} !important;
+    color: {text_primary} !important;
+    border-radius: 6px;
+    margin: 1px 6px;
+    padding: 3px 8px;
+    min-height: 24px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}}
+
+/* 8. Sidebar Row Selected State (Clean macOS Inset Floating Pill) */
 .sidebar-pane .navigation-sidebar:not(.view) > row:selected,
 .sidebar-pane .navigation-sidebar > row:selected,
 .content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected,
@@ -1808,8 +1910,8 @@ sidebar row:selected,
 #NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
 #NautilusFileChooser placessidebar row:selected,
 #NautilusFileChooser .navigation-sidebar > row:selected {{
-    background-color: {sidebar_selected_bg};
-    color: {text_primary};
+    background-color: {sidebar_selected_bg} !important;
+    color: {text_primary} !important;
     font-weight: 600;
     border-radius: 6px;
     margin: 1px 6px;
@@ -1820,6 +1922,98 @@ sidebar row:selected,
     box-shadow: none;
 }}
 
+/* 8b. Selected Row Hover & Active State (Fix disappearing text / background) */
+.sidebar-pane .navigation-sidebar:not(.view) > row:selected:hover,
+.sidebar-pane .navigation-sidebar > row:selected:hover,
+.content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected:hover,
+navigation-split-view > widget.sidebar-pane .navigation-sidebar > row:selected:hover,
+overlay-split-view > widget.sidebar-pane .navigation-sidebar > row:selected:hover,
+split-view > widget.sidebar-pane .navigation-sidebar > row:selected:hover,
+navigation-sidebar > row:selected:hover,
+.navigation-sidebar > row:selected:hover,
+listview.navigation-sidebar > row:selected:hover,
+list.navigation-sidebar > row:selected:hover,
+placessidebar row:selected:hover,
+placessidebar list > row:selected:hover,
+.sidebar-pane placessidebar row:selected:hover,
+.sidebar-pane row:selected:hover,
+stacksidebar row:selected:hover,
+.sidebar row:selected:hover,
+sidebar row:selected:hover,
+.nautilus-window .sidebar-pane placessidebar row:selected:hover,
+.nautilus-window placessidebar row:selected:hover,
+.nautilus-window .navigation-sidebar > row:selected:hover,
+.nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected:hover,
+#NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected:hover,
+#NautilusFileChooser placessidebar row:selected:hover,
+#NautilusFileChooser .navigation-sidebar > row:selected:hover {{
+    background-color: {sidebar_selected_hover_bg} !important;
+    color: {text_primary} !important;
+    font-weight: 600;
+    border-radius: 6px;
+    margin: 1px 6px;
+    padding: 3px 8px;
+    min-height: 24px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}}
+
+.sidebar-pane .navigation-sidebar:not(.view) > row:selected:active,
+.sidebar-pane .navigation-sidebar > row:selected:active,
+.content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected:active,
+navigation-split-view > widget.sidebar-pane .navigation-sidebar > row:selected:active,
+overlay-split-view > widget.sidebar-pane .navigation-sidebar > row:selected:active,
+split-view > widget.sidebar-pane .navigation-sidebar > row:selected:active,
+navigation-sidebar > row:selected:active,
+.navigation-sidebar > row:selected:active,
+listview.navigation-sidebar > row:selected:active,
+list.navigation-sidebar > row:selected:active,
+placessidebar row:selected:active,
+placessidebar list > row:selected:active,
+.sidebar-pane placessidebar row:selected:active,
+.sidebar-pane row:selected:active,
+stacksidebar row:selected:active,
+.sidebar row:selected:active,
+sidebar row:selected:active,
+.nautilus-window .sidebar-pane placessidebar row:selected:active,
+.nautilus-window placessidebar row:selected:active,
+.nautilus-window .navigation-sidebar > row:selected:active,
+.nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected:active,
+#NautilusFileChooser .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected:active,
+#NautilusFileChooser placessidebar row:selected:active,
+#NautilusFileChooser .navigation-sidebar > row:selected:active {{
+    background-color: {sidebar_selected_active_bg} !important;
+    color: {text_primary} !important;
+    font-weight: 600;
+    border-radius: 6px;
+    margin: 1px 6px;
+    padding: 3px 8px;
+    min-height: 24px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+}}
+
+/* Labels and text across selected, hover, and active states */
+navigation-sidebar > row label,
+.navigation-sidebar > row label,
+listview.navigation-sidebar > row label,
+list.navigation-sidebar > row label,
+placessidebar row label,
+.sidebar-pane row label,
+stacksidebar row label,
+.sidebar row label,
+sidebar row label,
+navigation-sidebar > row:hover label,
+.navigation-sidebar > row:hover label,
+listview.navigation-sidebar > row:hover label,
+list.navigation-sidebar > row:hover label,
+placessidebar row:hover label,
+.sidebar-pane row:hover label,
+stacksidebar row:hover label,
+.sidebar row:hover label,
+sidebar row:hover label,
 .sidebar-pane .navigation-sidebar:not(.view) > row:selected label,
 .sidebar-pane .navigation-sidebar > row:selected label,
 .content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected label,
@@ -1841,11 +2035,52 @@ sidebar row:selected label,
 .nautilus-window placessidebar row:selected label,
 .nautilus-window .navigation-sidebar > row:selected label,
 #NautilusFileChooser placessidebar row:selected label,
-#NautilusFileChooser .navigation-sidebar > row:selected label {{
-    color: {text_primary};
+#NautilusFileChooser .navigation-sidebar > row:selected label,
+.sidebar-pane .navigation-sidebar:not(.view) > row:selected:hover label,
+.sidebar-pane .navigation-sidebar > row:selected:hover label,
+.content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected:hover label,
+navigation-split-view > widget.sidebar-pane .navigation-sidebar > row:selected:hover label,
+overlay-split-view > widget.sidebar-pane .navigation-sidebar > row:selected:hover label,
+split-view > widget.sidebar-pane .navigation-sidebar > row:selected:hover label,
+navigation-sidebar > row:selected:hover label,
+.navigation-sidebar > row:selected:hover label,
+listview.navigation-sidebar > row:selected:hover label,
+list.navigation-sidebar > row:selected:hover label,
+placessidebar row:selected:hover label,
+placessidebar list > row:selected:hover label,
+.sidebar-pane placessidebar row:selected:hover label,
+.sidebar-pane row:selected:hover label,
+stacksidebar row:selected:hover label,
+.sidebar row:selected:hover label,
+sidebar row:selected:hover label,
+.nautilus-window .sidebar-pane placessidebar row:selected:hover label,
+.nautilus-window placessidebar row:selected:hover label,
+.nautilus-window .navigation-sidebar > row:selected:hover label,
+#NautilusFileChooser placessidebar row:selected:hover label,
+#NautilusFileChooser .navigation-sidebar > row:selected:hover label,
+navigation-sidebar > row:selected:active label,
+.navigation-sidebar > row:selected:active label,
+placessidebar row:selected:active label,
+.sidebar-pane row:selected:active label {{
+    color: {text_primary} !important;
+}}
+
+navigation-sidebar > row:selected label,
+.navigation-sidebar > row:selected label,
+placessidebar row:selected label,
+.sidebar-pane row:selected label,
+navigation-sidebar > row:selected:hover label,
+.navigation-sidebar > row:selected:hover label,
+placessidebar row:selected:hover label,
+.sidebar-pane row:selected:hover label,
+navigation-sidebar > row:selected:active label,
+.navigation-sidebar > row:selected:active label,
+placessidebar row:selected:active label,
+.sidebar-pane row:selected:active label {{
     font-weight: 600;
 }}
 
+/* Icons across selected, hover, and active states */
 .sidebar-pane .navigation-sidebar:not(.view) > row:selected image,
 .sidebar-pane .navigation-sidebar > row:selected image,
 .content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected image,
@@ -1865,8 +2100,22 @@ stacksidebar row:selected image,
 .nautilus-window placessidebar row:selected image,
 .nautilus-window .navigation-sidebar > row:selected image,
 #NautilusFileChooser placessidebar row:selected image,
-#NautilusFileChooser .navigation-sidebar > row:selected image {{
-    color: @accent_color;
+#NautilusFileChooser .navigation-sidebar > row:selected image,
+navigation-sidebar > row:selected:hover image,
+.navigation-sidebar > row:selected:hover image,
+listview.navigation-sidebar > row:selected:hover image,
+list.navigation-sidebar > row:selected:hover image,
+placessidebar row:selected:hover image,
+placessidebar list > row:selected:hover image,
+.sidebar-pane row:selected:hover image,
+stacksidebar row:selected:hover image,
+.sidebar row:selected:hover image,
+.nautilus-window .navigation-sidebar > row:selected:hover image,
+navigation-sidebar > row:selected:active image,
+.navigation-sidebar > row:selected:active image,
+placessidebar row:selected:active image,
+.sidebar-pane row:selected:active image {{
+    color: @accent_color !important;
 }}
 
 navigation-sidebar > row:selected:backdrop,
@@ -1874,7 +2123,7 @@ navigation-sidebar > row:selected:backdrop,
 placessidebar row:selected:backdrop,
 .sidebar-pane row:selected:backdrop,
 .nautilus-window .navigation-sidebar > row:selected:backdrop {{
-    opacity: 0.75;
+    opacity: 0.85;
 }}
 
 /* 9. Content Pane (Files View & General App Body) */
@@ -2082,7 +2331,9 @@ treeview.view > header > button:checked,
 }}
 
 .nautilus-window .nautilus-pathbar button:hover,
-#NautilusFileChooser .nautilus-pathbar button:hover {{
+.nautilus-window .nautilus-pathbar button:active,
+#NautilusFileChooser .nautilus-pathbar button:hover,
+#NautilusFileChooser .nautilus-pathbar button:active {{
     background-color: {path_btn_hover};
     box-shadow: none;
 }}
@@ -2117,9 +2368,21 @@ treeview.view > header > button:checked,
 
 .nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
+.nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:active,
+.nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:active,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
-#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:active,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:active {{
     background-color: {path_btn_hover};
+}}
+
+.nautilus-window headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:disabled,
+.nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:disabled,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:disabled,
+#NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:disabled {{
+    opacity: 0.35;
+    background-color: transparent;
 }}
 
 /* 16. Pill Search Entry (macOS 27 Top-Right Style) */
@@ -3050,6 +3313,82 @@ def get_current_theme():
     except Exception:
         return "dark"
 
+def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False):
+    css_path = os.path.join(THEMES_DIR, theme_name, "gnome-shell", "gnome-shell.css")
+    if not os.path.exists(css_path):
+        return
+    try:
+        with open(css_path, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        marker = "/* ── Mak Shell Contrast & Liquid Glass Refraction Tuning ── */"
+        if marker in content:
+            content = content.split(marker)[0].rstrip()
+
+        if not is_dark:
+            bg_color = "rgba(255, 255, 255, 0.82)"
+            banner_bg = "rgba(255, 255, 255, 0.86)"
+            border_color = "rgba(0, 0, 0, 0.08)"
+            fg_color = "#1d1d1f"
+            hover_bg = "rgba(0, 0, 0, 0.08)"
+            shadow = "0 8px 24px rgba(0, 0, 0, 0.12)"
+        else:
+            bg_color = "rgba(22, 22, 26, 0.85)" if is_amoled else "rgba(36, 36, 40, 0.82)"
+            banner_bg = "rgba(22, 22, 26, 0.88)" if is_amoled else "rgba(36, 36, 40, 0.86)"
+            border_color = "rgba(255, 255, 255, 0.08)"
+            fg_color = "#f5f5f7"
+            hover_bg = "rgba(255, 255, 255, 0.12)"
+            shadow = "0 8px 24px rgba(0, 0, 0, 0.22)"
+
+        block = f"""\n\n{marker}
+.popup-menu-content {{
+    background-color: {bg_color} !important;
+    color: {fg_color} !important;
+    border: 1px solid {border_color} !important;
+    box-shadow: {shadow} !important;
+    border-radius: 12px !important;
+}}
+
+.popup-menu-item {{
+    color: {fg_color} !important;
+    font-weight: 500 !important;
+}}
+
+.popup-menu-item StLabel {{
+    color: {fg_color} !important;
+}}
+
+.popup-menu-item:hover,
+.popup-menu-item:active {{
+    background-color: {hover_bg} !important;
+    color: {fg_color} !important;
+}}
+
+.popup-menu-item:selected {{
+    background-color: #007aff !important;
+    color: #ffffff !important;
+}}
+
+.popup-menu-item:selected StLabel {{
+    color: #ffffff !important;
+}}
+
+.notification-banner {{
+    background-color: {banner_bg} !important;
+    color: {fg_color} !important;
+    border: 1px solid {border_color} !important;
+    box-shadow: {shadow} !important;
+}}
+
+.notification-banner StLabel {{
+    color: {fg_color} !important;
+}}
+"""
+        with open(css_path, "w", encoding="utf-8") as f:
+            f.write(content + block)
+    except Exception as e:
+        print(f"Error injecting shell theme contrast: {e}")
+
 def apply_global_theme(theme_key):
     """
     Applies the chosen theme globally across:
@@ -3067,6 +3406,7 @@ def apply_global_theme(theme_key):
     theme_name = theme_info["theme_name"]
     color_scheme = theme_info["color_scheme"]
     is_dark = theme_info["is_dark"]
+    is_amoled = "amoled" in theme_key.lower()
     curr_acc = "blue"
     try:
         res = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"],
@@ -3092,8 +3432,9 @@ def apply_global_theme(theme_key):
 
     # 2. GNOME Shell Theme
     try:
+        inject_shell_theme_contrast(theme_name, is_dark=is_dark, is_amoled=is_amoled)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.user-theme", "name", theme_name], check=True)
-        log.append(f"Set GNOME Shell theme to '{theme_name}'.")
+        log.append(f"Set GNOME Shell theme to '{theme_name}' and injected contrast styling.")
     except Exception as e:
         log.append(f"Error setting Shell theme: {e}")
 
@@ -3331,7 +3672,20 @@ def apply_global_theme(theme_key):
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "enable-application-glass", "false"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-glass-all-windows", "false"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-content-opacity", "1.0"], check=False)
-        log.append(f"Set application blur & glass to {'enabled (translucent)' if is_glassy else 'disabled (solid opaque)'}.")
+
+        # Intelligent slight theme tint for menus, notifications & popups (white for light, obsidian for dark)
+        if not is_dark:
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.popup", "style-popup", "1"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.popup", "preserve-shell-theme", "true"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.popup", "brightness", "0.95"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.panel", "style-panel", "1"], check=False)
+        else:
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.popup", "style-popup", "2"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.popup", "preserve-shell-theme", "true"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.popup", "brightness", "0.65"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.panel", "style-panel", "2"], check=False)
+
+        log.append(f"Set application blur & glass to {'enabled (translucent)' if is_glassy else 'disabled (solid opaque)'} with {'light' if not is_dark else 'dark'} popup styling.")
     except Exception as e:
         log.append(f"Error syncing application blur & glass: {e}")
 
