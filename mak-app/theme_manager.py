@@ -1436,7 +1436,26 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
     return f"""
 /* ── macOS 27 "Golden Gate" Finder & Universal System Sidebar ────────────── */
 
-/* 1. Seamless Top-Left Sidebar Titlebar (Eliminate separator above sidebar) */
+/* 1. Eliminate Adwaita Floating Overlay Shadows, Dimming & Outlines */
+overlay-split-view > shadow,
+overlay-split-view > shadow.left,
+overlay-split-view > shadow.right,
+overlay-split-view > shadow.up,
+overlay-split-view > shadow.down,
+overlay-split-view > dimming,
+overlay-split-view > border,
+navigation-split-view > shadow,
+navigation-split-view > dimming,
+navigation-split-view > border {{
+    background: none;
+    background-image: none;
+    box-shadow: none;
+    border: none;
+    min-width: 0;
+    min-height: 0;
+}}
+
+/* 2. Seamless Top-Left Sidebar Titlebar (Eliminate separator above sidebar) */
 navigation-split-view > widget.sidebar-pane headerbar,
 overlay-split-view > widget.sidebar-pane headerbar,
 split-view > widget.sidebar-pane headerbar,
@@ -1449,6 +1468,8 @@ split-view .sidebar-pane headerbar,
 .nautilus-window headerbar.flat,
 headerbar.titlebar.tweak-titlebar-left,
 headerbar.titlebar.tweak-titlebar-left:backdrop {{
+    border-top-left-radius: 16px;
+    border-top-right-radius: 0;
     background: transparent;
     background-color: transparent;
     background-image: none;
@@ -1457,7 +1478,7 @@ headerbar.titlebar.tweak-titlebar-left:backdrop {{
     box-shadow: none;
 }}
 
-/* 2. Unified Sidebar Pane Container & Hairline Vertical Divider */
+/* 3. Anchored Sidebar Pane: Completely Eliminate Floating Island Geometry & Margin */
 navigation-split-view > widget.sidebar-pane,
 overlay-split-view > widget.sidebar-pane,
 split-view > widget.sidebar-pane,
@@ -1473,12 +1494,25 @@ split-view .sidebar-pane,
 #NautilusFileChooser .sidebar-pane:dir(rtl),
 #NautilusFileChooser .sidebar-pane:backdrop,
 .sidebar-pane,
+.sidebar-pane:dir(ltr),
+.sidebar-pane:dir(rtl),
+.content-pane .sidebar-pane,
+.content-pane .sidebar-pane:dir(ltr),
+.content-pane .sidebar-pane:dir(rtl),
+.sidebar-pane .content-pane,
+.sidebar-pane .content-pane:dir(ltr),
+.sidebar-pane .content-pane:dir(rtl),
 placessidebar,
 stacksidebar {{
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background-image: none;
     background-color: @sidebar_bg_color;
     border-right: 1px solid {border_color};
     border-left: none;
-    box-shadow: none;
+    border-top: none;
+    border-bottom: none;
 }}
 
 navigation-split-view > widget.sidebar-pane:dir(rtl),
@@ -1491,7 +1525,38 @@ stacksidebar:dir(rtl) {{
     border-right: none;
 }}
 
-/* 3. Transparent Sidebar Background Containers */
+/* 4. Anchor Content Pane Flush With Divider */
+navigation-split-view > widget.content-pane,
+overlay-split-view > widget.content-pane,
+split-view > widget.content-pane,
+navigation-split-view .content-pane,
+overlay-split-view .content-pane,
+split-view .content-pane,
+.nautilus-window .content-pane,
+#NautilusFileChooser .content-pane,
+.content-pane {{
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background-color: @view_bg_color;
+}}
+
+navigation-split-view > widget.content-pane headerbar,
+overlay-split-view > widget.content-pane headerbar,
+split-view > widget.content-pane headerbar,
+navigation-split-view .content-pane headerbar,
+overlay-split-view .content-pane headerbar,
+split-view .content-pane headerbar,
+.nautilus-window .content-pane headerbar,
+#NautilusFileChooser .content-pane headerbar,
+headerbar.titlebar.tweak-titlebar-right {{
+    border-top-left-radius: 0;
+    border-top-right-radius: 16px;
+    border-bottom: 1px solid {border_color};
+    background-color: @headerbar_bg_color;
+}}
+
+/* 5. Transparent Sidebar Background Containers */
 .nautilus-window .sidebar-pane placessidebar,
 #NautilusFileChooser .sidebar-pane placessidebar,
 .nautilus-window placessidebar,
@@ -1657,6 +1722,12 @@ sidebar row:hover:not(:selected):not(.heading),
 }}
 
 /* 8. Sidebar Row Selected State (Clean macOS 27 Inset Floating Pill) */
+.sidebar-pane .navigation-sidebar:not(.view) > row:selected,
+.sidebar-pane .navigation-sidebar > row:selected,
+.content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected,
+navigation-split-view > widget.sidebar-pane .navigation-sidebar > row:selected,
+overlay-split-view > widget.sidebar-pane .navigation-sidebar > row:selected,
+split-view > widget.sidebar-pane .navigation-sidebar > row:selected,
 navigation-sidebar > row:selected,
 .navigation-sidebar > row:selected,
 listview.navigation-sidebar > row:selected,
@@ -1679,11 +1750,18 @@ sidebar row:selected,
     color: {text_primary};
     font-weight: 600;
     border-radius: 8px;
+    margin: 1.5px 8px;
     border: none;
     outline: none;
     box-shadow: none;
 }}
 
+.sidebar-pane .navigation-sidebar:not(.view) > row:selected label,
+.sidebar-pane .navigation-sidebar > row:selected label,
+.content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected label,
+navigation-split-view > widget.sidebar-pane .navigation-sidebar > row:selected label,
+overlay-split-view > widget.sidebar-pane .navigation-sidebar > row:selected label,
+split-view > widget.sidebar-pane .navigation-sidebar > row:selected label,
 navigation-sidebar > row:selected label,
 .navigation-sidebar > row:selected label,
 listview.navigation-sidebar > row:selected label,
@@ -1702,6 +1780,29 @@ sidebar row:selected label,
 #NautilusFileChooser .navigation-sidebar > row:selected label {{
     color: {text_primary};
     font-weight: 600;
+}}
+
+.sidebar-pane .navigation-sidebar:not(.view) > row:selected image,
+.sidebar-pane .navigation-sidebar > row:selected image,
+.content-pane .sidebar-pane .navigation-sidebar:not(.view) > row:selected image,
+navigation-split-view > widget.sidebar-pane .navigation-sidebar > row:selected image,
+overlay-split-view > widget.sidebar-pane .navigation-sidebar > row:selected image,
+split-view > widget.sidebar-pane .navigation-sidebar > row:selected image,
+navigation-sidebar > row:selected image,
+.navigation-sidebar > row:selected image,
+listview.navigation-sidebar > row:selected image,
+list.navigation-sidebar > row:selected image,
+placessidebar row:selected image,
+placessidebar list > row:selected image,
+.sidebar-pane row:selected image,
+stacksidebar row:selected image,
+.sidebar row:selected image,
+.nautilus-window .sidebar-pane placessidebar row:selected image,
+.nautilus-window placessidebar row:selected image,
+.nautilus-window .navigation-sidebar > row:selected image,
+#NautilusFileChooser placessidebar row:selected image,
+#NautilusFileChooser .navigation-sidebar > row:selected image {{
+    color: @accent_color;
 }}
 
 navigation-sidebar > row:selected:backdrop,
