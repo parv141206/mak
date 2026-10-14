@@ -142,15 +142,19 @@ export class MenuStyleController {
 
         const isLiquidGlass = this._settings.get_boolean('blur-liquid-glass');
         if (isLiquidGlass) {
-            menuOpacity = isLight ? 0.62 : 0.58;
+            menuOpacity = isLight ? 0.80 : (isAmoled ? 0.88 : 0.82);
             borderStrokeColor = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.16)';
             boxShadow = isLight
-                ? '0 6px 18px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)'
-                : '0 10px 24px rgba(0, 0, 0, 0.28), 0 2px 6px rgba(0, 0, 0, 0.14)';
+                ? '0 10px 28px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.06)'
+                : '0 12px 32px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.18)';
             qsBoxShadow = isLight
-                ? '0 8px 22px rgba(0, 0, 0, 0.10), 0 2px 5px rgba(0, 0, 0, 0.05)'
-                : '0 12px 28px rgba(0, 0, 0, 0.32), 0 2px 8px rgba(0, 0, 0, 0.16)';
+                ? '0 12px 30px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08)'
+                : '0 14px 36px rgba(0, 0, 0, 0.45), 0 2px 10px rgba(0, 0, 0, 0.22)';
         }
+
+        const frostedGlassBg = isLight
+            ? 'rgba(255, 255, 255, 0.80)'
+            : (isAmoled ? 'rgba(18, 18, 22, 0.88)' : 'rgba(30, 30, 34, 0.82)');
 
         const borderCss = `${borderWidth > 0 ? borderWidth : 1}px solid ${borderStrokeColor}`;
 
@@ -470,13 +474,34 @@ export class MenuStyleController {
 .liquid-glass-transparent .quick-toggle-menu,
 .liquid-glass-transparent.quick-toggle-menu,
 .liquid-glass-qs-root .quick-toggle-menu,
-.liquid-glass-qs-root.quick-toggle-menu,
-.liquid-glass-transparent .popup-menu-content,
-.liquid-glass-qs-root .popup-menu-content {
+.liquid-glass-qs-root.quick-toggle-menu {
     border: none !important;
     background-color: transparent !important;
     background-image: none !important;
     box-shadow: none !important;
+}
+
+.liquid-glass-transparent .popup-menu-content,
+.liquid-glass-qs-root .popup-menu-content,
+.liquid-glass-transparent.popup-menu .popup-menu-content,
+.popup-menu.liquid-glass-transparent .popup-menu-content,
+.liquid-glass-transparent.popup-menu,
+.popup-menu.liquid-glass-transparent {
+    border: ${borderCss} !important;
+    background-color: ${frostedGlassBg} !important;
+    box-shadow: ${boxShadow} !important;
+}
+
+.liquid-glass-transparent.notification-banner,
+.liquid-glass-transparent .notification-banner,
+.liquid-glass-transparent.message,
+.liquid-glass-transparent .message,
+.liquid-glass-transparent .message-box,
+.notification-banner.liquid-glass-transparent,
+.notification-banner.liquid-glass-transparent-keep-border {
+    border: ${borderCss} !important;
+    background-color: ${frostedGlassBg} !important;
+    box-shadow: ${qsBoxShadow} !important;
 }
 
 .quick-settings StLabel,

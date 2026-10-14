@@ -1688,27 +1688,17 @@
     box-shadow: none !important;
 }
 
-/* Shell boxpointer, quick settings and notifications while glass is active */
+/* Shell boxpointer and quick settings while glass is active (outer wrappers transparent, card contents styled by appearance controller) */
 .liquid-glass-transparent .popup-menu-boxpointer,
-.liquid-glass-transparent .popup-menu-content,
 .liquid-glass-transparent .quick-settings,
 .liquid-glass-transparent .quick-toggle-menu,
 .liquid-glass-transparent.quick-settings,
 .liquid-glass-transparent.quick-toggle-menu,
 .liquid-glass-qs-root .popup-menu-boxpointer,
-.liquid-glass-qs-root .popup-menu-content,
 .liquid-glass-qs-root .quick-settings,
 .liquid-glass-qs-root .quick-toggle-menu,
 .liquid-glass-qs-root.quick-settings,
-.liquid-glass-qs-root.quick-toggle-menu,
-.liquid-glass-transparent.popup-menu,
-.liquid-glass-transparent.notification-banner,
-.liquid-glass-transparent .notification-banner,
-.liquid-glass-transparent.message,
-.liquid-glass-transparent .message,
-.liquid-glass-transparent .message-box,
-.notification-banner.liquid-glass-transparent,
-.notification-banner.liquid-glass-transparent-keep-border {
+.liquid-glass-qs-root.quick-toggle-menu {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;
