@@ -2004,3 +2004,32 @@
 .liquid-glass-launcher .lg-launcher-detail {
     font-size: 9.5pt;
 }
+
+/* ── Apple macOS Notifications & Shell Chrome Fidelity Pass ── */
+#message-tray .notification-banner,
+.notification-banner {
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+#message-tray .notification-banner .notification-button,
+.notification-banner .notification-button {
+    border-radius: 5px;
+    min-height: 24px;
+    padding: 2px 12px;
+    font-weight: 500;
+}
+
+.popup-menu .popup-menu-content,
+.popup-menu-content {
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.popup-menu .popup-menu-item,
+.popup-menu-item {
+    border-radius: 4px;
+    min-height: 24px;
+    padding: 3px 10px;
+}
