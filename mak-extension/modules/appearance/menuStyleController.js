@@ -142,19 +142,19 @@ export class MenuStyleController {
 
         const isLiquidGlass = this._settings.get_boolean('blur-liquid-glass');
         if (isLiquidGlass) {
-            menuOpacity = isLight ? 0.80 : (isAmoled ? 0.88 : 0.82);
-            borderStrokeColor = isLight ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.16)';
+            menuOpacity = isLight ? 0.30 : (isAmoled ? 0.38 : 0.34);
+            borderStrokeColor = isLight ? 'rgba(0, 0, 0, 0.10)' : 'rgba(255, 255, 255, 0.15)';
             boxShadow = isLight
-                ? '0 10px 28px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 0, 0, 0.06)'
-                : '0 12px 32px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.18)';
+                ? '0 10px 28px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.05)'
+                : '0 12px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.15)';
             qsBoxShadow = isLight
-                ? '0 12px 30px rgba(0, 0, 0, 0.16), 0 2px 6px rgba(0, 0, 0, 0.08)'
-                : '0 14px 36px rgba(0, 0, 0, 0.45), 0 2px 10px rgba(0, 0, 0, 0.22)';
+                ? '0 12px 30px rgba(0, 0, 0, 0.14), 0 2px 6px rgba(0, 0, 0, 0.06)'
+                : '0 14px 36px rgba(0, 0, 0, 0.40), 0 2px 10px rgba(0, 0, 0, 0.18)';
         }
 
         const frostedGlassBg = isLight
-            ? 'rgba(255, 255, 255, 0.80)'
-            : (isAmoled ? 'rgba(18, 18, 22, 0.88)' : 'rgba(30, 30, 34, 0.82)');
+            ? 'rgba(255, 255, 255, 0.28)'
+            : (isAmoled ? 'rgba(18, 18, 22, 0.36)' : 'rgba(30, 30, 34, 0.32)');
 
         const borderCss = `${borderWidth > 0 ? borderWidth : 1}px solid ${borderStrokeColor}`;
 

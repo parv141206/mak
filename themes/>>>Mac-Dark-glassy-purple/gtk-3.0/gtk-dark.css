@@ -12580,21 +12580,40 @@ scale slider {
 }
 
 /* 12. Interactive List Rows */
-list > row.activatable:hover,
-listview > row.activatable:hover,
-columnview row:hover {
+list > row.activatable:hover:not(:selected),
+listview > row.activatable:hover:not(:selected),
+columnview row:hover:not(:selected),
+columnview.view > listview > row:hover:not(:selected) {
     background-color: rgba(255, 255, 255, 0.10);
 }
 
 list > row.activatable:active,
-listview > row.activatable:active {
+listview > row.activatable:active,
+columnview row:active {
     background-color: rgba(255, 255, 255, 0.18);
 }
 
 list > row.activatable:selected,
-listview > row.activatable:selected {
+list > row.activatable:selected:hover,
+listview > row.activatable:selected,
+listview > row.activatable:selected:hover,
+columnview row:selected,
+columnview row:selected:hover,
+columnview.view > listview > row:selected,
+columnview.view > listview > row:selected:hover {
     background-color: @accent_bg_color;
     color: @accent_fg_color;
+}
+
+list > row.activatable:selected label,
+list > row.activatable:selected:hover label,
+listview > row.activatable:selected label,
+listview > row.activatable:selected:hover label,
+columnview row:selected label,
+columnview row:selected:hover label,
+columnview.view > listview > row:selected label,
+columnview.view > listview > row:selected:hover label {
+    color: #ffffff;
 }
 
 /* 13. Stack Switchers / Segmented Controls */
@@ -12716,72 +12735,128 @@ window.kgx headerbar .linked {
     background-image: none;
     border: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 0.5px 1px rgba(0, 0, 0, 0.20);
-    border-radius: 6px;
+    border-radius: 9999px;
     margin: 0 4px;
     padding: 0;
 }
 
-/* Force all inner buttons to be seamless and flush at rest */
+/* Force all inner buttons to be seamless and flush at rest - NO double button */
+window headerbar splitbutton button,
 window headerbar splitbutton > button,
 window headerbar splitbutton > button.flat,
+window headerbar splitbutton menubutton,
+window headerbar splitbutton > menubutton,
+window headerbar splitbutton menubutton > button,
 window headerbar splitbutton > menubutton > button,
 window headerbar splitbutton > menubutton > button.flat,
+window headerbar .linked button,
 window headerbar .linked > button,
 window headerbar .linked > button.flat,
+window headerbar .linked menubutton,
+window headerbar .linked > menubutton,
+window headerbar .linked menubutton > button,
 window headerbar .linked > menubutton > button,
 window headerbar .linked > menubutton > button.flat,
+window headerbar box.linked button,
 window headerbar box.linked > button,
 window headerbar box.linked > button.flat,
+window headerbar box.linked menubutton,
+window headerbar box.linked > menubutton,
+window headerbar box.linked menubutton > button,
 window headerbar box.linked > menubutton > button,
 window headerbar box.linked > menubutton > button.flat,
+window headerbar stackswitcher button,
 window headerbar stackswitcher > button,
 window headerbar stackswitcher > button.flat,
+window headerbar viewswitcher button,
 window headerbar viewswitcher > button,
 window headerbar viewswitcher > button.flat,
+window splitbutton button,
 window splitbutton > button,
 window splitbutton > button.flat,
+window splitbutton menubutton,
+window splitbutton > menubutton,
+window splitbutton menubutton > button,
 window splitbutton > menubutton > button,
 window splitbutton > menubutton > button.flat,
+window .linked button,
 window .linked > button,
 window .linked > button.flat,
+window .linked menubutton,
+window .linked > menubutton,
+window .linked menubutton > button,
 window .linked > menubutton > button,
 window .linked > menubutton > button.flat,
+window box.linked button,
 window box.linked > button,
 window box.linked > button.flat,
+window box.linked menubutton,
+window box.linked > menubutton,
+window box.linked menubutton > button,
 window box.linked > menubutton > button,
 window box.linked > menubutton > button.flat,
+window stackswitcher button,
 window stackswitcher > button,
-window stackswitcher > button.flat,
+window viewswitcher button,
 window viewswitcher > button,
-window viewswitcher > button.flat,
+headerbar splitbutton button,
 headerbar splitbutton > button,
 headerbar splitbutton > button.flat,
+headerbar splitbutton menubutton,
+headerbar splitbutton > menubutton,
+headerbar splitbutton menubutton > button,
 headerbar splitbutton > menubutton > button,
 headerbar splitbutton > menubutton > button.flat,
+headerbar .linked button,
 headerbar .linked > button,
 headerbar .linked > button.flat,
+headerbar .linked menubutton,
+headerbar .linked > menubutton,
+headerbar .linked menubutton > button,
 headerbar .linked > menubutton > button,
 headerbar .linked > menubutton > button.flat,
+headerbar box.linked button,
 headerbar box.linked > button,
 headerbar box.linked > button.flat,
+headerbar box.linked menubutton,
+headerbar box.linked > menubutton,
+headerbar box.linked menubutton > button,
 headerbar box.linked > menubutton > button,
 headerbar box.linked > menubutton > button.flat,
+headerbar stackswitcher button,
+headerbar stackswitcher > button,
+headerbar viewswitcher button,
+headerbar viewswitcher > button,
+splitbutton button,
 splitbutton > button,
 splitbutton > button.flat,
+splitbutton menubutton,
+splitbutton > menubutton,
+splitbutton menubutton > button,
 splitbutton > menubutton > button,
 splitbutton > menubutton > button.flat,
+.linked button,
 .linked > button,
 .linked > button.flat,
+.linked menubutton,
+.linked > menubutton,
+.linked menubutton > button,
 .linked > menubutton > button,
 .linked > menubutton > button.flat,
+box.linked button,
 box.linked > button,
 box.linked > button.flat,
+box.linked menubutton,
+box.linked > menubutton,
+box.linked menubutton > button,
 box.linked > menubutton > button,
 box.linked > menubutton > button.flat,
+stackswitcher button,
 stackswitcher > button,
-stackswitcher > button.flat,
+viewswitcher button,
 viewswitcher > button,
-viewswitcher > button.flat {
+.kgx-window headerbar splitbutton button,
+window.kgx headerbar splitbutton button {
     min-height: 22px;
     min-width: 22px;
     padding: 2px 8px;
@@ -12792,25 +12867,30 @@ viewswitcher > button.flat {
     background-image: none;
     border: none;
     box-shadow: none;
+    outline: none;
     color: #ffffff;
     transition: background-color 80ms ease, color 80ms ease;
 }
 
-/* First button rounded left flush with container */
+/* First button rounded left flush with capsule container */
 window headerbar splitbutton > button:first-child,
 window headerbar splitbutton > button.flat:first-child,
+window headerbar splitbutton > menubutton:first-child,
 window headerbar splitbutton > menubutton:first-child > button,
 window headerbar splitbutton > menubutton:first-child > button.flat,
 window headerbar .linked > button:first-child,
 window headerbar .linked > button.flat:first-child,
+window headerbar .linked > menubutton:first-child,
 window headerbar .linked > menubutton:first-child > button,
 window headerbar box.linked > button:first-child,
 window headerbar box.linked > button.flat:first-child,
+window headerbar box.linked > menubutton:first-child,
 window headerbar box.linked > menubutton:first-child > button,
 window headerbar stackswitcher > button:first-child,
 window headerbar viewswitcher > button:first-child,
 window splitbutton > button:first-child,
 window splitbutton > button.flat:first-child,
+window splitbutton > menubutton:first-child,
 window splitbutton > menubutton:first-child > button,
 window .linked > button:first-child,
 window .linked > button.flat:first-child,
@@ -12819,17 +12899,21 @@ window stackswitcher > button:first-child,
 window viewswitcher > button:first-child,
 headerbar splitbutton > button:first-child,
 headerbar splitbutton > button.flat:first-child,
+headerbar splitbutton > menubutton:first-child,
 headerbar splitbutton > menubutton:first-child > button,
 headerbar .linked > button:first-child,
 headerbar .linked > button.flat:first-child,
+headerbar .linked > menubutton:first-child,
 headerbar .linked > menubutton:first-child > button,
 headerbar box.linked > button:first-child,
 headerbar box.linked > button.flat:first-child,
+headerbar box.linked > menubutton:first-child,
 headerbar box.linked > menubutton:first-child > button,
 headerbar stackswitcher > button:first-child,
 headerbar viewswitcher > button:first-child,
 splitbutton > button:first-child,
 splitbutton > button.flat:first-child,
+splitbutton > menubutton:first-child,
 splitbutton > menubutton:first-child > button,
 .linked > button:first-child,
 .linked > button.flat:first-child,
@@ -12840,27 +12924,31 @@ headerbar splitbutton > button:dir(ltr),
 splitbutton > button:dir(ltr),
 headerbar splitbutton > menubutton > button:dir(rtl),
 splitbutton > menubutton > button:dir(rtl) {
-    border-top-left-radius: 5px;
-    border-bottom-left-radius: 5px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-/* Last button rounded right flush with container */
+/* Last button rounded right flush with capsule container */
 window headerbar splitbutton > button:last-child,
 window headerbar splitbutton > button.flat:last-child,
+window headerbar splitbutton > menubutton:last-child,
 window headerbar splitbutton > menubutton:last-child > button,
 window headerbar splitbutton > menubutton:last-child > button.flat,
 window headerbar .linked > button:last-child,
 window headerbar .linked > button.flat:last-child,
+window headerbar .linked > menubutton:last-child,
 window headerbar .linked > menubutton:last-child > button,
 window headerbar box.linked > button:last-child,
 window headerbar box.linked > button.flat:last-child,
+window headerbar box.linked > menubutton:last-child,
 window headerbar box.linked > menubutton:last-child > button,
 window headerbar stackswitcher > button:last-child,
 window headerbar viewswitcher > button:last-child,
 window splitbutton > button:last-child,
 window splitbutton > button.flat:last-child,
+window splitbutton > menubutton:last-child,
 window splitbutton > menubutton:last-child > button,
 window .linked > button:last-child,
 window .linked > button.flat:last-child,
@@ -12869,17 +12957,21 @@ window stackswitcher > button:last-child,
 window viewswitcher > button:last-child,
 headerbar splitbutton > button:last-child,
 headerbar splitbutton > button.flat:last-child,
+headerbar splitbutton > menubutton:last-child,
 headerbar splitbutton > menubutton:last-child > button,
 headerbar .linked > button:last-child,
 headerbar .linked > button.flat:last-child,
+headerbar .linked > menubutton:last-child,
 headerbar .linked > menubutton:last-child > button,
 headerbar box.linked > button:last-child,
 headerbar box.linked > button.flat:last-child,
+headerbar box.linked > menubutton:last-child,
 headerbar box.linked > menubutton:last-child > button,
 headerbar stackswitcher > button:last-child,
 headerbar viewswitcher > button:last-child,
 splitbutton > button:last-child,
 splitbutton > button.flat:last-child,
+splitbutton > menubutton:last-child,
 splitbutton > menubutton:last-child > button,
 .linked > button:last-child,
 .linked > button.flat:last-child,
@@ -12890,8 +12982,8 @@ headerbar splitbutton > menubutton > button:dir(ltr),
 splitbutton > menubutton > button:dir(ltr),
 headerbar splitbutton > button:dir(rtl),
 splitbutton > button:dir(rtl) {
-    border-top-right-radius: 5px;
-    border-bottom-right-radius: 5px;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
@@ -12909,7 +13001,7 @@ headerbar box.linked > button:only-child,
 splitbutton > button:only-child,
 .linked > button:only-child,
 box.linked > button:only-child {
-    border-radius: 5px;
+    border-radius: 9999px;
 }
 
 /* Clean hairline divider between adjacent buttons */
@@ -14044,16 +14136,28 @@ columnview header,
 columnview header > button,
 columnview header button,
 columnview.view > header > button,
+columnview.view header button,
 treeview.view > header > button,
 .nautilus-window columnview header,
 .nautilus-window columnview header > button,
 .nautilus-window columnview header button,
-.nautilus-window columnview header button label {
+.nautilus-window columnview header button label,
+.nautilus-window .nautilus-list-view columnview header,
+.nautilus-window .nautilus-list-view columnview header button,
+.nautilus-window .nautilus-list-view header button,
+.nautilus-list-view header,
+.nautilus-list-view header button,
+columnview title,
+columnview header cell,
+columnview header cell button,
+columnview header cell > button {
     color: rgba(255, 255, 255, 0.50);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.3px;
     border: none;
+    border-radius: 0;
+    border-image: none;
     background: transparent;
     background-color: transparent;
     background-image: none;
@@ -14065,12 +14169,17 @@ treeview.view > header > button,
 columnview header > button:hover,
 columnview header button:hover,
 columnview.view > header > button:hover,
+columnview.view header button:hover,
 treeview.view > header > button:hover,
-.nautilus-window columnview header button:hover {
+.nautilus-window columnview header button:hover,
+.nautilus-window .nautilus-list-view header button:hover,
+.nautilus-list-view header button:hover {
     background: transparent;
     background-color: transparent;
     background-image: none;
     border: none;
+    border-radius: 0;
+    border-image: none;
     box-shadow: none;
     color: #f5f5f7;
 }
@@ -14080,14 +14189,22 @@ columnview header button:active,
 columnview header button:checked,
 columnview.view > header > button:active,
 columnview.view > header > button:checked,
+columnview.view header button:active,
+columnview.view header button:checked,
 treeview.view > header > button:active,
 treeview.view > header > button:checked,
 .nautilus-window columnview header button:active,
-.nautilus-window columnview header button:checked {
+.nautilus-window columnview header button:checked,
+.nautilus-window .nautilus-list-view header button:active,
+.nautilus-window .nautilus-list-view header button:checked,
+.nautilus-list-view header button:active,
+.nautilus-list-view header button:checked {
     background: transparent;
     background-color: transparent;
     background-image: none;
     border: none;
+    border-radius: 0;
+    border-image: none;
     box-shadow: none;
     color: #f5f5f7;
 }
@@ -14139,7 +14256,9 @@ treeview.view > header > button:checked,
 }
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected,
-#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected {
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected:hover,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected:hover {
     background-color: @accent_bg_color;
     background-image: none;
     color: @accent_fg_color;
@@ -14148,7 +14267,13 @@ treeview.view > header > button:checked,
 }
 
 .nautilus-window .nautilus-list-view listview.view > row.activatable:selected label,
-.nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label {
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected .dim-label,
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected:hover label,
+.nautilus-window .nautilus-list-view listview.view > row.activatable:selected:hover .dim-label,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected label,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected .dim-label,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected:hover label,
+#NautilusFileChooser .nautilus-list-view listview.view > row.activatable:selected:hover .dim-label {
     color: #ffffff;
 }
 
@@ -14190,9 +14315,13 @@ treeview.view > header > button:checked,
     color: #f5a623;
 }
 
-/* 14. Pathbar Capsule Dropdown */
+/* 14. Pathbar Transparent Buttons (Plain Text at Rest) */
 .nautilus-window .nautilus-pathbar,
-#NautilusFileChooser .nautilus-pathbar {
+#NautilusFileChooser .nautilus-pathbar,
+filechooser .path-bar,
+filechooser pathbar,
+.path-bar,
+pathbar {
     background: transparent;
     background-color: transparent;
     border: none;
@@ -14202,11 +14331,20 @@ treeview.view > header > button:checked,
 }
 
 .nautilus-window .nautilus-pathbar button,
-#NautilusFileChooser .nautilus-pathbar button {
+#NautilusFileChooser .nautilus-pathbar button,
+filechooser .path-bar button,
+filechooser pathbar button,
+filechooser stack button,
+.path-bar button,
+pathbar button,
+headerbar .path-bar button,
+headerbar pathbar button {
     border-radius: 9999px;
-    background-color: rgba(255, 255, 255, 0.09);
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
     border: none;
-    padding: 2px 10px;
+    padding: 2px 8px;
     min-height: 24px;
     font-size: 13px;
     font-weight: 500;
@@ -14218,8 +14356,15 @@ treeview.view > header > button:checked,
 .nautilus-window .nautilus-pathbar button:hover,
 .nautilus-window .nautilus-pathbar button:active,
 #NautilusFileChooser .nautilus-pathbar button:hover,
-#NautilusFileChooser .nautilus-pathbar button:active {
-    background-color: rgba(255, 255, 255, 0.15);
+#NautilusFileChooser .nautilus-pathbar button:active,
+filechooser .path-bar button:hover,
+filechooser pathbar button:hover,
+filechooser stack button:hover,
+.path-bar button:hover,
+pathbar button:hover,
+headerbar .path-bar button:hover,
+headerbar pathbar button:hover {
+    background-color: rgba(255, 255, 255, 0.09);
     box-shadow: none;
 }
 
