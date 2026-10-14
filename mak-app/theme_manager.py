@@ -1304,22 +1304,30 @@ window.fullscreen.csd headerbar {{
 
 WINDOW_CORNERS_CSS_OVERRIDE = generate_window_corners_override(True)
 
-def generate_popover_override(is_dark=True):
-    border_color = "rgba(255, 255, 255, 0.10)" if is_dark else "rgba(0, 0, 0, 0.08)"
+def generate_popover_override(is_dark=True, is_glassy=False, is_amoled=False):
+    border_color = (
+        "rgba(255, 255, 255, 0.08)" if is_amoled
+        else "rgba(255, 255, 255, 0.10)" if is_dark
+        else "rgba(0, 0, 0, 0.08)"
+    )
     hover_bg = "rgba(255, 255, 255, 0.10)" if is_dark else "rgba(0, 0, 0, 0.05)"
     selected_bg = "rgba(255, 255, 255, 0.16)" if is_dark else "rgba(0, 0, 0, 0.08)"
     text_color = "#f5f5f7" if is_dark else "#1d1d1f"
     shadow = (
-        "0 8px 18px rgba(0, 0, 0, 0.20), 0 2px 6px rgba(0, 0, 0, 0.10)"
+        "0 8px 22px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.20)"
+        if is_amoled
+        else "0 8px 20px rgba(0, 0, 0, 0.22), 0 2px 6px rgba(0, 0, 0, 0.12)"
         if is_dark
-        else "0 6px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04)"
+        else "0 6px 18px rgba(0, 0, 0, 0.10), 0 1px 4px rgba(0, 0, 0, 0.05)"
     )
 
     return f"""
-/* ── Clean macOS Translucent Popover & Dropdown Cards ────────────────────── */
+/* ── Clean macOS Menus & Translucent Popovers ────────────────────────────── */
 popover,
+.popover,
 popover.background,
 popover.menu,
+.popover.menu,
 popover.menu.background,
 popover.menu:backdrop,
 popover:backdrop {{
@@ -1331,15 +1339,42 @@ popover:backdrop {{
 }}
 
 popover > contents,
+.popover > .contents,
+.popover > contents,
 popover.menu > contents,
+.popover.menu > contents,
 popover.menu.background > contents,
-popover contents {{
+popover contents,
+.popover .contents {{
     background-color: @popover_bg_color;
     color: @popover_fg_color;
     border-radius: 10px;
     border: 1px solid {border_color};
     box-shadow: {shadow};
-    padding: 3px;
+    padding: 6px;
+    margin: 0;
+}}
+
+popover.menu > contents,
+.popover.menu > contents,
+popover.menu contents,
+.popover.menu .contents {{
+    border-radius: 8px;
+    padding: 4px;
+}}
+
+/* GTK 3 Menu styling */
+menu,
+.menu,
+.background.csd > menu,
+.background.popup > menu,
+window.popup.background.csd > menu {{
+    background-color: @popover_bg_color;
+    color: @popover_fg_color;
+    border-radius: 8px;
+    border: 1px solid {border_color};
+    box-shadow: {shadow};
+    padding: 4px;
     margin: 0;
 }}
 
@@ -1374,27 +1409,67 @@ popover.menu > contents > scrolledwindow > viewport > stack > box {{
     margin: 0;
 }}
 
+/* Menu items & modelbuttons */
 popover modelbutton,
+.popover modelbutton,
 popover.menu modelbutton,
+.popover.menu modelbutton,
+popover .modelbutton,
+.popover .modelbutton,
+popover.menu .modelbutton,
+.popover.menu .modelbutton,
+popover contents button,
+.popover .contents button,
+popover > contents > button,
+.popover > .contents > button,
 popover listview > row,
 popover list > row,
 row.combo popover listview > row,
-row.combo popover list > row {{
-    border-radius: 5px;
+row.combo popover list > row,
+menu > menuitem,
+.menu > menuitem,
+menuitem.button.flat,
+modelbutton,
+modelbutton.flat,
+.modelbutton {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 4px;
     min-height: 24px;
-    padding: 4px 8px;
-    margin: 1px 3px;
+    padding: 3px 8px;
+    margin: 1px 2px;
     color: {text_color};
     font-size: 13px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
 popover modelbutton:hover,
+.popover modelbutton:hover,
 popover modelbutton:active,
+.popover modelbutton:active,
 popover modelbutton:focus,
+.popover modelbutton:focus,
 popover.menu modelbutton:hover,
+.popover.menu modelbutton:hover,
 popover.menu modelbutton:active,
+.popover.menu modelbutton:active,
 popover.menu modelbutton:focus,
+.popover.menu modelbutton:focus,
+popover .modelbutton:hover,
+.popover .modelbutton:hover,
+popover .modelbutton:active,
+.popover .modelbutton:active,
+popover contents button:hover,
+.popover .contents button:hover,
+popover contents button:active,
+.popover .contents button:active,
+popover > contents > button:hover,
+.popover > .contents > button:hover,
+popover > contents > button:active,
+.popover > .contents > button:active,
 popover listview > row:hover,
 popover listview > row:active,
 popover list > row:hover,
@@ -1402,8 +1477,29 @@ popover list > row:active,
 row.combo popover listview > row:hover,
 row.combo popover listview > row:active,
 row.combo popover list > row:hover,
-row.combo popover list > row:active {{
+row.combo popover list > row:active,
+menu > menuitem:hover,
+.menu > menuitem:hover,
+menu > menuitem:active,
+.menu > menuitem:active,
+menu > menuitem:selected,
+.menu > menuitem:selected,
+menuitem.button.flat:hover,
+menuitem.button.flat:active,
+menuitem.button.flat:selected,
+modelbutton:hover,
+modelbutton:active,
+modelbutton:selected,
+modelbutton.flat:hover,
+modelbutton.flat:active,
+modelbutton.flat:selected,
+.modelbutton:hover,
+.modelbutton:active,
+.modelbutton:selected,
+.modelbutton.selected {{
+    background: @accent_bg_color;
     background-color: @accent_bg_color;
+    background-image: none;
     color: #ffffff;
 }}
 
@@ -1434,7 +1530,11 @@ row.combo popover list > row:active image,
 popover modelbutton:hover accelerator,
 popover modelbutton:active accelerator,
 popover.menu modelbutton:hover accelerator,
-popover.menu modelbutton:active accelerator {{
+popover.menu modelbutton:active accelerator,
+menu > menuitem:hover label,
+menu > menuitem:active label,
+menu > menuitem:hover > arrow,
+menu > menuitem:active > arrow {{
     color: #ffffff;
 }}
 
@@ -1474,8 +1574,10 @@ popover image {{
     color: inherit;
 }}
 
-popover separator {{
-    margin: 4px 2px;
+popover separator,
+menu > separator {{
+    margin: 4px 6px;
+    min-height: 1px;
     background-color: {border_color};
 }}
 """
@@ -2702,7 +2804,7 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
 /* 1. Universal In-Window Push Buttons (Dialogs, content pages, settings) */
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.pill) {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.pill):not(.modelbutton) {{
     background-color: {btn_bg};
     background-image: none;
     border: {btn_border};
@@ -2716,16 +2818,16 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):hover {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.modelbutton):hover {{
     background-color: {btn_hover};
     color: {btn_fg};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):active {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.modelbutton):active {{
     background-color: {btn_active};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):checked {{
+button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.modelbutton):checked {{
     background-color: @accent_bg_color;
     color: @accent_fg_color;
 }}
@@ -3838,7 +3940,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     is_amoled = "amoled" in dst_css_path.lower() or "amoled" in palette.lower()
     widgets_override = generate_widgets_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
     traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
-    popover_override = generate_popover_override(is_dark=is_dark)
+    popover_override = generate_popover_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
     nautilus_override = generate_nautilus_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
     window_corners_override = generate_window_corners_override(is_dark=is_dark)
     rules_to_append = [widgets_override, window_corners_override, popover_override, nautilus_override, traffic_override]
