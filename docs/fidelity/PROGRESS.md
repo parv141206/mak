@@ -68,17 +68,20 @@
   - Captured complete pre-change visual baselines for all 6 themes x (GTK 4, GTK 3) in `qa/baseline/`.
   - Checkpoint committed.
 
-## Phase 4: Generator Refactor (Zero Visual Change) (Completed)
+## Phase 5: Component Family Passes
 
-- **Root Cause Identified & Fixed**:
-  - Discovered that previous generator runs truncated 9,177 lines of upstream base GTK styles due to `split_markers` splitting at `/* ── Dynamic GNOME Desktop Accent Synchronization` near line 25.
-  - Fixed `inject_theme_css` to cleanly identify and preserve the entire base body while injecting tokens and overrides.
-  - Added safe non-destructive staging pipeline: `stage_all_themes()` and `--stage` CLI flag, allowing compilation strictly into `build/stage/themes/` without touching `~/.themes` or live user sessions.
-- **Tokenization**:
-  - Added `TokenManager` class to `mak-app/theme_manager.py` reading from `docs/fidelity/tokens.json`.
-- **Proof of Zero Regression**:
-  - Re-generated all 6 themes in `build/stage/themes/` and diffed all 12 variants against `qa/baseline/`.
-  - Result: 0.13% - 0.17% (subpixel anti-aliasing only; zero layout or style change).
+### Family 1: Windows, Headerbars & Traffic Lights (PASSED)
+- **Tokens & Metrics Applied**:
+  - Window Corner Radius: **14px** (from `apple/windows/110_*` and `1_window_bg.png`).
+  - Traffic Light Size: **14px** circular button with 8px spacing and 13px left margin.
+  - Traffic Light Colors: Close `#ff5c60`, Minimize `#fac800`, Maximize `#35c759`.
+  - Inactive Window Controls: Light mode `rgba(0, 0, 0, 0.13)`, Dark/AMOLED mode `rgba(255, 255, 255, 0.17)`.
+  - Chrome Palettes: Dark `#242426`, Light `#ececf0`, AMOLED `#000000` (window/view) & `#0a0a0c` (headerbar/sidebar).
+- **Verification**:
+  - Rendered `qa/report/family_1_windows_dark_gtk4.png` and `family_1_windows_light_gtk4.png`.
+  - Side-by-side comparison generated and inspected at `qa/report/family_1_comparison.png`.
+  - Numeric token assertions passed via `qa/verify_tokens.py`.
+
 
 
 

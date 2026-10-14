@@ -151,17 +151,17 @@ THEMES = {
 
 GRAPHITE_PALETTE_OVERRIDE = """
 /* ── Mak macOS Sonoma Graphite Frosted Palette ────────────────────────────── */
-@define-color window_bg_color #2c2c2e;
+@define-color window_bg_color #242426;
 @define-color window_fg_color #f5f5f7;
 @define-color view_bg_color #1c1c1e;
 @define-color view_fg_color #f5f5f7;
-@define-color headerbar_bg_color #2c2c2e;
-@define-color headerbar_solid_bg #2c2c2e;
+@define-color headerbar_bg_color #242426;
+@define-color headerbar_solid_bg #242426;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color #2c2c2e;
+@define-color sidebar_bg_color #242426;
 @define-color sidebar_fg_color #f5f5f7;
-@define-color secondary_sidebar_bg_color #2c2c2e;
+@define-color secondary_sidebar_bg_color #242426;
 @define-color card_bg_color #2c2c2e;
 @define-color card_fg_color #f5f5f7;
 @define-color dialog_bg_color #28282a;
@@ -173,82 +173,81 @@ GRAPHITE_PALETTE_OVERRIDE = """
 
 GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
 /* ── Mak macOS Sonoma Graphite Glass Frosted Translucent Palette ─────────── */
-@define-color window_bg_color rgba(44, 44, 48, 0.75);
+@define-color window_bg_color rgba(36, 36, 38, 0.75);
 @define-color window_fg_color #f5f5f7;
-@define-color view_bg_color rgba(28, 28, 32, 0.68);
+@define-color view_bg_color rgba(28, 28, 30, 0.68);
 @define-color view_fg_color #f5f5f7;
-@define-color headerbar_bg_color rgba(44, 44, 48, 0.75);
-@define-color headerbar_solid_bg #2c2c2e;
+@define-color headerbar_bg_color rgba(36, 36, 38, 0.75);
+@define-color headerbar_solid_bg #242426;
 @define-color headerbar_fg_color #ffffff;
 @define-color headerbar_border_color rgba(255, 255, 255, 0.12);
-@define-color sidebar_bg_color rgba(44, 44, 48, 0.75);
+@define-color sidebar_bg_color rgba(36, 36, 38, 0.75);
 @define-color sidebar_fg_color #f5f5f7;
-@define-color secondary_sidebar_bg_color rgba(44, 44, 48, 0.75);
-@define-color card_bg_color rgba(48, 48, 54, 0.68);
+@define-color secondary_sidebar_bg_color rgba(36, 36, 38, 0.75);
+@define-color card_bg_color rgba(44, 44, 48, 0.72);
 @define-color card_fg_color #f5f5f7;
 @define-color dialog_bg_color rgba(40, 40, 46, 0.82);
 @define-color dialog_fg_color #f5f5f7;
-@define-color popover_bg_color rgba(40, 40, 46, 0.82);
+@define-color popover_bg_color rgba(44, 44, 48, 0.82);
 @define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
 AMOLED_PALETTE_OVERRIDE = """
-/* ── Mak macOS Deep Obsidian Dark Palette (Sleek Deep Dark, Non-Void) ────────── */
-@define-color window_bg_color #1e1e21;
+/* ── Mak macOS Deep Obsidian Dark Palette (Pitch Black AMOLED) ────────────── */
+@define-color window_bg_color #000000;
 @define-color window_fg_color #f5f5f7;
-@define-color view_bg_color #131315;
+@define-color view_bg_color #000000;
 @define-color view_fg_color #f5f5f7;
-@define-color headerbar_bg_color #1e1e21;
-@define-color headerbar_solid_bg #1e1e21;
+@define-color headerbar_bg_color #0a0a0c;
+@define-color headerbar_solid_bg #0a0a0c;
 @define-color headerbar_fg_color #ffffff;
-@define-color headerbar_border_color rgba(255, 255, 255, 0.10);
-@define-color sidebar_bg_color #1e1e21;
+@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
+@define-color sidebar_bg_color #0a0a0c;
 @define-color sidebar_fg_color #f5f5f7;
-@define-color secondary_sidebar_bg_color #1e1e21;
-@define-color card_bg_color #1e1e22;
+@define-color secondary_sidebar_bg_color #0a0a0c;
+@define-color card_bg_color #121214;
 @define-color card_fg_color #f5f5f7;
-@define-color dialog_bg_color #1a1a1d;
+@define-color dialog_bg_color #121214;
 @define-color dialog_fg_color #f5f5f7;
-@define-color popover_bg_color #1e1e22;
+@define-color popover_bg_color #141416;
 @define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
 AMOLED_GLASSY_PALETTE_OVERRIDE = """
 /* ── Mak macOS Deep Obsidian Glass Translucent Palette ────────────────────── */
-@define-color window_bg_color rgba(30, 30, 33, 0.78);
+@define-color window_bg_color rgba(10, 10, 12, 0.82);
 @define-color window_fg_color #f5f5f7;
-@define-color view_bg_color rgba(19, 19, 21, 0.72);
+@define-color view_bg_color rgba(0, 0, 0, 0.75);
 @define-color view_fg_color #f5f5f7;
-@define-color headerbar_bg_color rgba(30, 30, 33, 0.78);
-@define-color headerbar_solid_bg #1e1e21;
+@define-color headerbar_bg_color rgba(10, 10, 12, 0.82);
+@define-color headerbar_solid_bg #0a0a0c;
 @define-color headerbar_fg_color #ffffff;
-@define-color headerbar_border_color rgba(255, 255, 255, 0.10);
-@define-color sidebar_bg_color rgba(30, 30, 33, 0.78);
+@define-color headerbar_border_color rgba(255, 255, 255, 0.12);
+@define-color sidebar_bg_color rgba(10, 10, 12, 0.82);
 @define-color sidebar_fg_color #f5f5f7;
-@define-color secondary_sidebar_bg_color rgba(30, 30, 33, 0.78);
-@define-color card_bg_color rgba(30, 30, 34, 0.72);
-@define-color dialog_bg_color rgba(26, 26, 29, 0.85);
-@define-color dialog_fg_color #f5f5f7;
-@define-color popover_bg_color rgba(26, 26, 29, 0.85);
+@define-color secondary_sidebar_bg_color rgba(10, 10, 12, 0.82);
+@define-color card_bg_color rgba(18, 18, 22, 0.75);
+@define-color dialog_bg_color rgba(18, 18, 22, 0.85);
+@define-color popover_bg_color rgba(18, 18, 22, 0.88);
 @define-color popover_fg_color #f5f5f7;
 @define-color placeholder_text_color rgba(255, 255, 255, 0.45);
 """
 
 LIGHT_PALETTE_OVERRIDE = """
 /* ── Mak macOS Crisp Apple Light Palette ─────────────────────────────────── */
-@define-color window_bg_color #ebebef;
+@define-color window_bg_color #ececf0;
 @define-color window_fg_color #1d1d1f;
 @define-color view_bg_color #ffffff;
 @define-color view_fg_color #1d1d1f;
-@define-color headerbar_bg_color #ebebef;
-@define-color headerbar_solid_bg #ebebef;
+@define-color headerbar_bg_color #ececf0;
+@define-color headerbar_solid_bg #ececf0;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.10);
-@define-color sidebar_bg_color #ebebef;
+@define-color sidebar_bg_color #ececf0;
 @define-color sidebar_fg_color #1d1d1f;
-@define-color secondary_sidebar_bg_color #ebebef;
+@define-color secondary_sidebar_bg_color #ececf0;
 @define-color card_bg_color #ffffff;
 @define-color card_fg_color #1d1d1f;
 @define-color dialog_bg_color #ebebef;
@@ -260,22 +259,22 @@ LIGHT_PALETTE_OVERRIDE = """
 
 LIGHT_GLASSY_PALETTE_OVERRIDE = """
 /* ── Mak macOS Crisp Apple Frosted Glass Translucent Palette ──────────────── */
-@define-color window_bg_color rgba(235, 235, 239, 0.78);
+@define-color window_bg_color rgba(236, 236, 240, 0.78);
 @define-color window_fg_color #1d1d1f;
-@define-color view_bg_color rgba(255, 255, 255, 0.75);
+@define-color view_bg_color rgba(255, 255, 255, 0.72);
 @define-color view_fg_color #1d1d1f;
-@define-color headerbar_bg_color rgba(235, 235, 239, 0.78);
-@define-color headerbar_solid_bg #ebebef;
+@define-color headerbar_bg_color rgba(236, 236, 240, 0.78);
+@define-color headerbar_solid_bg #ececf0;
 @define-color headerbar_fg_color #1d1d1f;
 @define-color headerbar_border_color rgba(0, 0, 0, 0.10);
-@define-color sidebar_bg_color rgba(235, 235, 239, 0.78);
+@define-color sidebar_bg_color rgba(236, 236, 240, 0.78);
 @define-color sidebar_fg_color #1d1d1f;
-@define-color secondary_sidebar_bg_color rgba(235, 235, 239, 0.78);
+@define-color secondary_sidebar_bg_color rgba(236, 236, 240, 0.78);
 @define-color card_bg_color rgba(255, 255, 255, 0.78);
 @define-color card_fg_color #1d1d1f;
 @define-color dialog_bg_color rgba(235, 235, 239, 0.85);
 @define-color dialog_fg_color #1d1d1f;
-@define-color popover_bg_color rgba(255, 255, 255, 0.82);
+@define-color popover_bg_color rgba(255, 255, 255, 0.85);
 @define-color popover_fg_color #1d1d1f;
 @define-color placeholder_text_color rgba(0, 0, 0, 0.45);
 """
@@ -425,7 +424,8 @@ def generate_traffic_lights_override(button_size=14, button_spacing=8, chromium_
     spacing = max(0, min(24, int(button_spacing)))
     margin = max(0, round(spacing / 2))
     chrome_size = max(11, min(12, int(button_size) - 2))
-    backdrop_bg = "rgba(255, 255, 255, 0.22)" if is_dark else "rgba(0, 0, 0, 0.18)"
+    backdrop_bg = "rgba(255, 255, 255, 0.17)" if is_dark else "rgba(0, 0, 0, 0.13)"
+    margin_left = TokenManager.get("geometry", "traffic_lights", "margin_left", default=13)
 
     if chromium_accent is None:
         try:
@@ -454,7 +454,7 @@ headerbar windowcontrols.start,
 .titlebar windowcontrols.start,
 headerbar windowcontrols:first-child,
 .titlebar windowcontrols:first-child {{
-    margin-left: 12px;
+    margin-left: {margin_left}px;
     margin-right: 18px;
 }}
 
@@ -1141,6 +1141,8 @@ headerbar:backdrop button:not(.suggested-action):not(.destructive-action):not(.c
 TRAFFIC_LIGHTS_OVERRIDE = generate_traffic_lights_override(14, 8)
 
 def generate_window_corners_override(is_dark=True):
+    window_radius = TokenManager.get("geometry", "window", "corner_radius", default=14)
+    header_h = TokenManager.get("geometry", "window", "headerbar_compact_height", default=38)
     window_shadow = (
         "0 10px 28px rgba(0, 0, 0, 0.22), 0 3px 10px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.08)"
         if is_dark
@@ -1154,14 +1156,14 @@ def generate_window_corners_override(is_dark=True):
     border_maximized = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.12)"
     border_maximized_backdrop = "rgba(255, 255, 255, 0.08)" if is_dark else "rgba(0, 0, 0, 0.08)"
     return f"""
-/* ── Mak macOS Window Corner & Geometry Consistency (16px) ──────────────── */
+/* ── Mak macOS Window Corner & Geometry Consistency ({window_radius}px) ──────────────── */
 window,
 window.background,
 window.csd,
 window.background.csd,
 window.background.solid-csd,
 window.solid-csd {{
-    border-radius: 16px;
+    border-radius: {window_radius}px;
 }}
 
 window.csd:not(.fullscreen):not(.tiled):not(.maximized),
@@ -1190,7 +1192,7 @@ window.csd.tiled-right,
 window.background.tiled,
 window.tiled {{
     box-shadow: inset 0 0 0 1px {border_maximized};
-    border-radius: 16px;
+    border-radius: {window_radius}px;
 }}
 
 window.csd.maximized:backdrop,
