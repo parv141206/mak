@@ -164,6 +164,31 @@ def build_gallery_gtk3(family_filter=None):
         frame.add(fb)
         root.pack_start(frame, False, False, 0)
 
+    # 9. Toolbars & Actionbars
+    if not family_filter or family_filter in ["toolbars", "actionbars"]:
+        tb_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        tb = Gtk.Toolbar()
+        ti1 = Gtk.ToolButton.new_from_stock("gtk-new")
+        ti2 = Gtk.ToolButton.new_from_stock("gtk-open")
+        sep = Gtk.SeparatorToolItem()
+        ti3 = Gtk.ToolButton.new_from_stock("gtk-save")
+        tb.insert(ti1, -1)
+        tb.insert(ti2, -1)
+        tb.insert(sep, -1)
+        tb.insert(ti3, -1)
+        tb_box.pack_start(tb, False, False, 0)
+
+        ab = Gtk.ActionBar()
+        dis_btn = Gtk.Button(label="Discard")
+        dis_btn.get_style_context().add_class("destructive-action")
+        ab.pack_start(dis_btn)
+        app_btn = Gtk.Button(label="Apply")
+        app_btn.get_style_context().add_class("suggested-action")
+        ab.pack_end(app_btn)
+        tb_box.pack_start(ab, False, False, 0)
+
+        root.pack_start(tb_box, False, False, 0)
+
     return root
 
 def main():

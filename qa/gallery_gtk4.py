@@ -172,6 +172,27 @@ def build_gallery(family_filter=None):
         card.append(btn_row)
         root.append(card)
 
+    # 9. Toolbars & Actionbars
+    if not family_filter or family_filter in ["toolbars", "actionbars"]:
+        tb_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
+        tb = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6, css_classes=["toolbar"])
+        b1 = Gtk.Button(icon_name="document-new-symbolic")
+        b2 = Gtk.Button(icon_name="document-open-symbolic")
+        sep = Gtk.Separator()
+        b3 = Gtk.Button(icon_name="document-save-symbolic")
+        tb.append(b1)
+        tb.append(b2)
+        tb.append(sep)
+        tb.append(b3)
+        tb_box.append(tb)
+
+        ab = Gtk.ActionBar()
+        ab.pack_start(Gtk.Button(label="Discard", css_classes=["destructive-action"]))
+        ab.pack_end(Gtk.Button(label="Apply", css_classes=["suggested-action"]))
+        tb_box.append(ab)
+
+        root.append(tb_box)
+
     return root
 
 def main():
