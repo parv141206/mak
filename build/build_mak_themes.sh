@@ -13,27 +13,27 @@ mkdir -p "$STAGE_DIR"
 
 # 1. Dark Solid
 echo "-> Building Dark Solid..."
-"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c dark -o solid >/dev/null
+"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c dark -o solid --round >/dev/null
 
 # 2. Dark Glassy (blur)
 echo "-> Building Dark Glassy..."
-"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c dark -o normal -b >/dev/null
+"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c dark -o normal -b --round >/dev/null
 
 # 3. Light Solid
 echo "-> Building Light Solid..."
-"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c light -o solid >/dev/null
+"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c light -o solid --round >/dev/null
 
 # 4. Light Glassy (blur)
 echo "-> Building Light Glassy..."
-"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c light -o normal -b >/dev/null
+"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac" -t "$ACCENTS" -c light -o normal -b --round >/dev/null
 
 # 5. AMOLED Solid
 echo "-> Building AMOLED Solid..."
-"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac-Dark-Amoled" -t "$ACCENTS" -c dark -o solid --darker >/dev/null
+"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac-Dark-Amoled" -t "$ACCENTS" -c dark -o solid --darker --round >/dev/null
 
 # 6. AMOLED Glassy (blur)
 echo "-> Building AMOLED Glassy..."
-"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac-Dark-Amoled" -t "$ACCENTS" -c dark -o normal --darker -b >/dev/null
+"$MACTAHOE_DIR/install.sh" -d "$STAGE_DIR" -n ">>>Mac-Dark-Amoled" -t "$ACCENTS" -c dark -o normal --darker -b --round >/dev/null
 
 # Remove hdpi / xhdpi duplicates to keep it clean and fast
 rm -rf "$STAGE_DIR"/*-hdpi "$STAGE_DIR"/*-xhdpi

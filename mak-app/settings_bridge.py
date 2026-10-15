@@ -52,6 +52,7 @@ class MakSettingsBridge:
         self.bms_panel = load_settings("org.gnome.shell.extensions.blur-my-shell.panel")
         self.bms_popup = load_settings("org.gnome.shell.extensions.blur-my-shell.popup")
         self.bms_apps = load_settings("org.gnome.shell.extensions.blur-my-shell.applications")
+        self.bms_dock = load_settings("org.gnome.shell.extensions.blur-my-shell.dash-to-dock")
 
     # ── Safe Getter / Setter Utilities ─────────────────────────────────────
     @staticmethod
@@ -786,11 +787,30 @@ class MakSettingsBridge:
     def get_blur_panel(self): return self._get_b("blur-panel", None, None, True)
     def set_blur_panel(self, v): self._set_b("blur-panel", None, None, v)
 
-    def get_blur_dock(self): return self._get_b("blur-dock", self.dock, "dock-blur", True)
+    def get_blur_dock(self):
+        if self.bms_dock and self._has_key(self.bms_dock, "blur"):
+            return self.bms_dock.get_boolean("blur")
+        return self._get_b("blur-dock", self.dock, "dock-blur", True)
+
     def set_blur_dock(self, v):
         self._set_b("blur-dock", self.dock, "dock-blur", v)
         if self.mak:
             try: self.mak.set_boolean("dock-blur", bool(v))
+            except Exception: pass
+        if self.bms_dock and self._has_key(self.bms_dock, "blur"):
+            try: self.bms_dock.set_boolean("blur", bool(v))
+            except Exception: pass
+
+    def get_dock_blur_sigma(self):
+        if self.bms_dock and self._has_key(self.bms_dock, "sigma"):
+            return self.bms_dock.get_int("sigma")
+        return 30
+
+    def set_dock_blur_sigma(self, v):
+        if self.bms_dock and self._has_key(self.bms_dock, "sigma"):
+            try:
+                self.bms_dock.set_boolean("customize", True)
+                self.bms_dock.set_int("sigma", int(v))
             except Exception: pass
 
     def get_blur_overview(self): return self._get_b("blur-overview", None, None, True)

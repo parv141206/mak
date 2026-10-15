@@ -5372,17 +5372,18 @@ def apply_global_theme(theme_key):
         else:
             tuple_str = "(1.0, 1.0, 1.0, 0.16)"
 
-        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 24>, 'smoothing': <0.8>, 'borderColor': <{tuple_str}>, 'enabled': <true>}}"
+        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': false}}>, 'borderRadius': <uint32 16>, 'smoothing': <0.8>, 'borderColor': <{tuple_str}>, 'enabled': <true>}}"
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "global-rounded-corner-settings", new_val], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "0"], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libadwaita-app", "true"], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libhandy-app", "true"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "1"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libadwaita-app", "false"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libhandy-app", "false"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-border-color", w_border], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-border-width", "0"], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "skip-libadwaita-app", "true"], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "skip-libhandy-app", "true"], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-radius", "24"], check=False)
-        log.append(f"Updated window corner settings (radius 24, smoothing 0.8, border-width 0, skip-libadwaita true).")
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-border-width", "1"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "skip-libadwaita-app", "false"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "skip-libhandy-app", "false"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "unround-maximized", "false"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-radius", "16"], check=False)
+        log.append(f"Updated window corner settings (radius 16, smoothing 0.8, border-width 1, keep-maximized true, skip-libadwaita false).")
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")
 

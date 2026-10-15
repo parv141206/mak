@@ -308,6 +308,11 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         pill_group.add(create_spin_row("Dock Pill Corner Radius", "Curvature rounding radius for dock background", 0, 40, 1, self.bridge.get_dock_radius(), digits=0, on_change=self.bridge.set_dock_radius))
         pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor (0 = fully transparent)", 0.0, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
+        sw_dock_blur = Adw.SwitchRow(title="Dock Background Frosted Blur", subtitle="Enable Gaussian glass blur behind dock pill")
+        sw_dock_blur.set_active(self.bridge.get_blur_dock())
+        sw_dock_blur.connect("notify::active", lambda s, p: self.bridge.set_blur_dock(s.get_active()))
+        pill_group.add(sw_dock_blur)
+        pill_group.add(create_spin_row("Dock Blur Strength (Sigma)", "Gaussian blur sigma/strength behind the dock pill", 0, 100, 5, self.bridge.get_dock_blur_sigma(), digits=0, on_change=self.bridge.set_dock_blur_sigma))
         pill_group.add(create_spin_row("Pill Border Outline Width", "Glass border stroke thickness in pixels", 0, 6, 1, self.bridge.get_dock_border_width(), digits=0, on_change=self.bridge.set_dock_border_width))
         pill_group.add(create_color_row("Dock Border Outline Color", "Customize color and transparency of the dock glass border outline", self.bridge.get_dock_border_color(), on_change=self.bridge.set_dock_border_color))
         pill_group.add(create_spin_row("Refraction Edge Bending", "Physical Snell-law optical bending scale along dock glass curved rim", 0.0, 1.0, 0.02, self.bridge.get_dock_edge_bending(), digits=2, on_change=self.bridge.set_dock_edge_bending))
@@ -827,6 +832,8 @@ class MakAppWindow(Adw.ApplicationWindow):
             sw.set_active(getter())
             sw.connect("notify::active", lambda s, p, fn=setter: fn(s.get_active()))
             surf_group.add(sw)
+
+        surf_group.add(create_spin_row("Dock Blur Strength (Sigma)", "Gaussian blur sigma/strength behind the dock pill", 0, 100, 5, self.bridge.get_dock_blur_sigma(), digits=0, on_change=self.bridge.set_dock_blur_sigma))
 
         # ── Liquid Glass Optical Refraction Shader ──
         liq_group = Adw.PreferencesGroup(
