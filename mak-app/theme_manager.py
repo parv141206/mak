@@ -449,6 +449,12 @@ headerbar windowcontrols,
     box-shadow: none;
 }}
 
+window.background.chromium windowcontrols,
+window.background.brave windowcontrols,
+window.background.chromium headerbar windowcontrols,
+window.background.brave headerbar windowcontrols,
+window.background.chromium .titlebar windowcontrols,
+window.background.brave .titlebar windowcontrols,
 windowcontrols.start,
 headerbar windowcontrols.start,
 .titlebar windowcontrols.start,
@@ -1068,26 +1074,40 @@ window.background.brave windowcontrols button.maximize:active {{
 }}
 
 /* ── Inactive / Backdrop window traffic lights (Chromium, Chrome, Brave & Electron) ── */
-window.background.chromium headerbar windowcontrols button:backdrop,
-window.background.chromium headerbar.header-bar.titlebar windowcontrols button:backdrop,
-window.background.chromium headerbar.header-bar.titlebar button:backdrop,
-window.background.chromium headerbar.header-bar.titlebar button.titlebutton:backdrop,
-window.background.chromium headerbar.titlebar button.titlebutton:backdrop,
-window.background.chromium headerbar button.titlebutton:backdrop,
-window.background.chromium button.titlebutton:backdrop,
-window.background.chromium windowcontrols button:backdrop,
-window.background.brave headerbar windowcontrols button:backdrop,
-window.background.brave headerbar.header-bar.titlebar windowcontrols button:backdrop,
-window.background.brave headerbar.header-bar.titlebar button:backdrop,
-window.background.brave headerbar.header-bar.titlebar button.titlebutton:backdrop,
-window.background.brave headerbar.titlebar button.titlebutton:backdrop,
-window.background.brave button.titlebutton:backdrop,
-window.background.brave windowcontrols button:backdrop {{
-    background-color: {backdrop_bg};
-    background-image: none;
-    border: 1px solid rgba(0, 0, 0, 0.10);
-    box-shadow: none;
-    opacity: 0.70;
+/* Keep authentic vibrant colors even when webview is focused; dim softly only on inactive window */
+window.background.chromium windowcontrols button.close,
+window.background.brave windowcontrols button.close,
+window.background.chromium button.titlebutton.close,
+window.background.brave button.titlebutton.close {{
+    background-color: #ff5f56;
+}}
+
+window.background.chromium windowcontrols button.minimize,
+window.background.brave windowcontrols button.minimize,
+window.background.chromium button.titlebutton.minimize,
+window.background.brave button.titlebutton.minimize {{
+    background-color: #ffbd2e;
+}}
+
+window.background.chromium windowcontrols button.maximize,
+window.background.brave windowcontrols button.maximize,
+window.background.chromium button.titlebutton.maximize,
+window.background.brave button.titlebutton.maximize {{
+    background-color: #27c93f;
+}}
+
+window.background.chromium:backdrop windowcontrols button:not(:hover),
+window.background.brave:backdrop windowcontrols button:not(:hover),
+window.background.chromium:backdrop button.titlebutton:not(:hover),
+window.background.brave:backdrop button.titlebutton:not(:hover) {{
+    opacity: 0.60;
+}}
+
+window.background.chromium windowcontrols button:hover,
+window.background.brave windowcontrols button:hover,
+window.background.chromium:backdrop windowcontrols button:hover,
+window.background.brave:backdrop windowcontrols button:hover {{
+    opacity: 1.0;
 }}
 
 /* ── Native GTK Window Controls in Inactive / Backdrop State ── */
@@ -1105,24 +1125,6 @@ windowcontrols button:backdrop:hover,
 headerbar windowcontrols button:backdrop:hover,
 .titlebar windowcontrols button:backdrop:hover {{
     opacity: 1.0;
-}}
-
-window.background.chromium windowcontrols button.close:backdrop:hover,
-window.background.brave windowcontrols button.close:backdrop:hover {{
-    opacity: 1.0;
-    background-color: #ff5f56;
-}}
-
-window.background.chromium windowcontrols button.minimize:backdrop:hover,
-window.background.brave windowcontrols button.minimize:backdrop:hover {{
-    opacity: 1.0;
-    background-color: #ffbd2e;
-}}
-
-window.background.chromium windowcontrols button.maximize:backdrop:hover,
-window.background.brave windowcontrols button.maximize:backdrop:hover {{
-    opacity: 1.0;
-    background-color: #27c93f;
 }}
 
 headerbar:backdrop label.title,
@@ -3596,9 +3598,8 @@ adwalertdialog button {{
     font-weight: 500;
 }}
 
-/* 16. Headerbar Segmented Controls, Split Buttons & Linked Controls (Seamless macOS style with shadows) */
-window headerbar splitbutton,
-window .titlebar splitbutton,
+/* 16. Segmented Controls (.linked, stackswitcher, viewswitcher) & Split Buttons (AdwSplitButton) */
+/* Segmented Control Capsule Container (macOS pill container) */
 window headerbar .linked,
 window .titlebar .linked,
 window headerbar box.linked,
@@ -3607,13 +3608,10 @@ window headerbar stackswitcher,
 window .titlebar stackswitcher,
 window headerbar viewswitcher,
 window .titlebar viewswitcher,
-window splitbutton,
 window .linked,
 window box.linked,
 window stackswitcher,
 window viewswitcher,
-headerbar splitbutton,
-.titlebar splitbutton,
 headerbar .linked,
 .titlebar .linked,
 headerbar box.linked,
@@ -3622,13 +3620,10 @@ headerbar stackswitcher,
 .titlebar stackswitcher,
 headerbar viewswitcher,
 .titlebar viewswitcher,
-splitbutton,
 .linked,
 box.linked,
 stackswitcher,
 viewswitcher,
-.kgx-window headerbar splitbutton,
-window.kgx headerbar splitbutton,
 .kgx-window headerbar .linked,
 window.kgx headerbar .linked {{
     background-color: {linked_bg};
@@ -3640,127 +3635,41 @@ window.kgx headerbar .linked {{
     padding: {seg_pad}px;
 }}
 
-/* Force all inner buttons to be seamless and flush at rest - NO double button */
-window headerbar splitbutton button,
-window headerbar splitbutton > button,
-window headerbar splitbutton > button.flat,
-window headerbar splitbutton menubutton,
-window headerbar splitbutton > menubutton,
-window headerbar splitbutton menubutton > button,
-window headerbar splitbutton > menubutton > button,
-window headerbar splitbutton > menubutton > button.flat,
-window headerbar .linked button,
+/* Inner buttons of Segmented Controls - seamless flush at rest */
 window headerbar .linked > button,
 window headerbar .linked > button.flat,
-window headerbar .linked menubutton,
-window headerbar .linked > menubutton,
-window headerbar .linked menubutton > button,
-window headerbar .linked > menubutton > button,
-window headerbar .linked > menubutton > button.flat,
-window headerbar box.linked button,
 window headerbar box.linked > button,
 window headerbar box.linked > button.flat,
-window headerbar box.linked menubutton,
-window headerbar box.linked > menubutton,
-window headerbar box.linked menubutton > button,
-window headerbar box.linked > menubutton > button,
-window headerbar box.linked > menubutton > button.flat,
-window headerbar stackswitcher button,
 window headerbar stackswitcher > button,
 window headerbar stackswitcher > button.flat,
-window headerbar viewswitcher button,
 window headerbar viewswitcher > button,
 window headerbar viewswitcher > button.flat,
-window splitbutton button,
-window splitbutton > button,
-window splitbutton > button.flat,
-window splitbutton menubutton,
-window splitbutton > menubutton,
-window splitbutton menubutton > button,
-window splitbutton > menubutton > button,
-window splitbutton > menubutton > button.flat,
-window .linked button,
 window .linked > button,
 window .linked > button.flat,
-window .linked menubutton,
-window .linked > menubutton,
-window .linked menubutton > button,
-window .linked > menubutton > button,
-window .linked > menubutton > button.flat,
-window box.linked button,
 window box.linked > button,
 window box.linked > button.flat,
-window box.linked menubutton,
-window box.linked > menubutton,
-window box.linked menubutton > button,
-window box.linked > menubutton > button,
-window box.linked > menubutton > button.flat,
-window stackswitcher button,
 window stackswitcher > button,
-window viewswitcher button,
+window stackswitcher > button.flat,
 window viewswitcher > button,
-headerbar splitbutton button,
-headerbar splitbutton > button,
-headerbar splitbutton > button.flat,
-headerbar splitbutton menubutton,
-headerbar splitbutton > menubutton,
-headerbar splitbutton menubutton > button,
-headerbar splitbutton > menubutton > button,
-headerbar splitbutton > menubutton > button.flat,
-headerbar .linked button,
+window viewswitcher > button.flat,
 headerbar .linked > button,
 headerbar .linked > button.flat,
-headerbar .linked menubutton,
-headerbar .linked > menubutton,
-headerbar .linked menubutton > button,
-headerbar .linked > menubutton > button,
-headerbar .linked > menubutton > button.flat,
-headerbar box.linked button,
 headerbar box.linked > button,
 headerbar box.linked > button.flat,
-headerbar box.linked menubutton,
-headerbar box.linked > menubutton,
-headerbar box.linked menubutton > button,
-headerbar box.linked > menubutton > button,
-headerbar box.linked > menubutton > button.flat,
-headerbar stackswitcher button,
 headerbar stackswitcher > button,
-headerbar viewswitcher button,
+headerbar stackswitcher > button.flat,
 headerbar viewswitcher > button,
-splitbutton button,
-splitbutton > button,
-splitbutton > button.flat,
-splitbutton menubutton,
-splitbutton > menubutton,
-splitbutton menubutton > button,
-splitbutton > menubutton > button,
-splitbutton > menubutton > button.flat,
-.linked button,
+headerbar viewswitcher > button.flat,
 .linked > button,
 .linked > button.flat,
-.linked menubutton,
-.linked > menubutton,
-.linked menubutton > button,
-.linked > menubutton > button,
-.linked > menubutton > button.flat,
-box.linked button,
 box.linked > button,
 box.linked > button.flat,
-box.linked menubutton,
-box.linked > menubutton,
-box.linked menubutton > button,
-box.linked > menubutton > button,
-box.linked > menubutton > button.flat,
-stackswitcher button,
 stackswitcher > button,
-viewswitcher button,
-viewswitcher > button,
-.kgx-window headerbar splitbutton button,
-window.kgx headerbar splitbutton button {{
+viewswitcher > button {{
     min-height: 22px;
     min-width: 22px;
     padding: 2px 8px;
-    border-radius: 0;
+    border-radius: {seg_radius}px;
     margin: 0;
     background: transparent;
     background-color: transparent;
@@ -3769,269 +3678,42 @@ window.kgx headerbar splitbutton button {{
     box-shadow: none;
     outline: none;
     color: {btn_fg};
+    font-size: 13px;
+    font-weight: 400;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-/* First button rounded left flush with capsule container */
-window headerbar splitbutton > button:first-child,
-window headerbar splitbutton > button.flat:first-child,
-window headerbar splitbutton > menubutton:first-child,
-window headerbar splitbutton > menubutton:first-child > button,
-window headerbar splitbutton > menubutton:first-child > button.flat,
-window headerbar .linked > button:first-child,
-window headerbar .linked > button.flat:first-child,
-window headerbar .linked > menubutton:first-child,
-window headerbar .linked > menubutton:first-child > button,
-window headerbar box.linked > button:first-child,
-window headerbar box.linked > button.flat:first-child,
-window headerbar box.linked > menubutton:first-child,
-window headerbar box.linked > menubutton:first-child > button,
-window headerbar stackswitcher > button:first-child,
-window headerbar viewswitcher > button:first-child,
-window splitbutton > button:first-child,
-window splitbutton > button.flat:first-child,
-window splitbutton > menubutton:first-child,
-window splitbutton > menubutton:first-child > button,
-window .linked > button:first-child,
-window .linked > button.flat:first-child,
-window box.linked > button:first-child,
-window stackswitcher > button:first-child,
-window viewswitcher > button:first-child,
-headerbar splitbutton > button:first-child,
-headerbar splitbutton > button.flat:first-child,
-headerbar splitbutton > menubutton:first-child,
-headerbar splitbutton > menubutton:first-child > button,
-headerbar .linked > button:first-child,
-headerbar .linked > button.flat:first-child,
-headerbar .linked > menubutton:first-child,
-headerbar .linked > menubutton:first-child > button,
-headerbar box.linked > button:first-child,
-headerbar box.linked > button.flat:first-child,
-headerbar box.linked > menubutton:first-child,
-headerbar box.linked > menubutton:first-child > button,
-headerbar stackswitcher > button:first-child,
-headerbar viewswitcher > button:first-child,
-splitbutton > button:first-child,
-splitbutton > button.flat:first-child,
-splitbutton > menubutton:first-child,
-splitbutton > menubutton:first-child > button,
-.linked > button:first-child,
-.linked > button.flat:first-child,
-box.linked > button:first-child,
-stackswitcher > button:first-child,
-viewswitcher > button:first-child,
-headerbar splitbutton > button:dir(ltr),
-splitbutton > button:dir(ltr),
-headerbar splitbutton > menubutton > button:dir(rtl),
-splitbutton > menubutton > button:dir(rtl) {{
-    border-top-left-radius: {seg_radius}px;
-    border-bottom-left-radius: {seg_radius}px;
-    border-top-right-radius: 0;
-    border-bottom-right-radius: 0;
-}}
-
-/* Last button rounded right flush with capsule container */
-window headerbar splitbutton > button:last-child,
-window headerbar splitbutton > button.flat:last-child,
-window headerbar splitbutton > menubutton:last-child,
-window headerbar splitbutton > menubutton:last-child > button,
-window headerbar splitbutton > menubutton:last-child > button.flat,
-window headerbar .linked > button:last-child,
-window headerbar .linked > button.flat:last-child,
-window headerbar .linked > menubutton:last-child,
-window headerbar .linked > menubutton:last-child > button,
-window headerbar box.linked > button:last-child,
-window headerbar box.linked > button.flat:last-child,
-window headerbar box.linked > menubutton:last-child,
-window headerbar box.linked > menubutton:last-child > button,
-window headerbar stackswitcher > button:last-child,
-window headerbar viewswitcher > button:last-child,
-window splitbutton > button:last-child,
-window splitbutton > button.flat:last-child,
-window splitbutton > menubutton:last-child,
-window splitbutton > menubutton:last-child > button,
-window .linked > button:last-child,
-window .linked > button.flat:last-child,
-window box.linked > button:last-child,
-window stackswitcher > button:last-child,
-window viewswitcher > button:last-child,
-headerbar splitbutton > button:last-child,
-headerbar splitbutton > button.flat:last-child,
-headerbar splitbutton > menubutton:last-child,
-headerbar splitbutton > menubutton:last-child > button,
-headerbar .linked > button:last-child,
-headerbar .linked > button.flat:last-child,
-headerbar .linked > menubutton:last-child,
-headerbar .linked > menubutton:last-child > button,
-headerbar box.linked > button:last-child,
-headerbar box.linked > button.flat:last-child,
-headerbar box.linked > menubutton:last-child,
-headerbar box.linked > menubutton:last-child > button,
-headerbar stackswitcher > button:last-child,
-headerbar viewswitcher > button:last-child,
-splitbutton > button:last-child,
-splitbutton > button.flat:last-child,
-splitbutton > menubutton:last-child,
-splitbutton > menubutton:last-child > button,
-.linked > button:last-child,
-.linked > button.flat:last-child,
-box.linked > button:last-child,
-stackswitcher > button:last-child,
-viewswitcher > button:last-child,
-headerbar splitbutton > menubutton > button:dir(ltr),
-splitbutton > menubutton > button:dir(ltr),
-headerbar splitbutton > button:dir(rtl),
-splitbutton > button:dir(rtl) {{
-    border-top-right-radius: {seg_radius}px;
-    border-bottom-right-radius: {seg_radius}px;
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
-}}
-
-/* Only child */
-window headerbar splitbutton > button:only-child,
-window headerbar splitbutton > menubutton:only-child > button,
-window headerbar .linked > button:only-child,
-window headerbar box.linked > button:only-child,
-window splitbutton > button:only-child,
-window .linked > button:only-child,
-headerbar splitbutton > button:only-child,
-headerbar .linked > button:only-child,
-headerbar box.linked > button:only-child,
-splitbutton > button:only-child,
-.linked > button:only-child,
-box.linked > button:only-child {{
-    border-radius: {btn_radius}px;
-}}
-
-/* Clean hairline divider between adjacent buttons */
-window headerbar splitbutton > button + button,
-window headerbar splitbutton > button + menubutton > button,
-window headerbar splitbutton > menubutton + button,
-window headerbar .linked > button + button,
-window headerbar .linked > button + menubutton > button,
-window headerbar .linked > menubutton + button,
-window headerbar box.linked > button + button,
-window headerbar box.linked > button + menubutton > button,
-window headerbar box.linked > menubutton + button,
-window headerbar stackswitcher > button + button,
-window headerbar viewswitcher > button + button,
-window splitbutton > button + button,
-window splitbutton > button + menubutton > button,
-window splitbutton > menubutton + button,
-window .linked > button + button,
-window .linked > button + menubutton > button,
-window .linked > menubutton + button,
-window box.linked > button + button,
-window box.linked > button + menubutton > button,
-window box.linked > menubutton + button,
-headerbar splitbutton > button + button,
-headerbar splitbutton > button + menubutton > button,
-headerbar splitbutton > menubutton + button,
-headerbar .linked > button + button,
-headerbar .linked > button + menubutton > button,
-headerbar .linked > menubutton + button,
-headerbar box.linked > button + button,
-headerbar box.linked > button + menubutton > button,
-headerbar box.linked > menubutton + button,
-headerbar stackswitcher > button + button,
-headerbar viewswitcher > button + button,
-splitbutton > button + button,
-splitbutton > button + menubutton > button,
-splitbutton > menubutton + button,
-.linked > button + button,
-.linked > button + menubutton > button,
-.linked > menubutton + button,
-box.linked > button + button,
-box.linked > button + menubutton > button,
-box.linked > menubutton + button,
-stackswitcher > button + button,
-viewswitcher > button + button {{
-    border-left: {linked_divider};
-}}
-
-/* Splitbutton separator widget */
-window headerbar splitbutton > separator,
-window splitbutton > separator,
-headerbar splitbutton > separator,
-splitbutton > separator {{
-    min-width: 1px;
-    min-height: 1px;
-    background-color: {linked_divider_color};
-    margin: 3px 0;
-    padding: 0;
-    border: none;
-}}
-
-/* Hover state on segment button */
-window headerbar splitbutton > button:hover,
-window headerbar splitbutton > button.flat:hover,
-window headerbar splitbutton > menubutton > button:hover,
-window headerbar splitbutton > menubutton > button.flat:hover,
-window headerbar .linked > button:hover,
-window headerbar .linked > button.flat:hover,
-window headerbar .linked > menubutton > button:hover,
-window headerbar box.linked > button:hover,
-window headerbar box.linked > button.flat:hover,
-window headerbar box.linked > menubutton > button:hover,
-window headerbar stackswitcher > button:hover,
-window headerbar viewswitcher > button:hover,
-window splitbutton > button:hover,
-window splitbutton > button.flat:hover,
-window splitbutton > menubutton > button:hover,
-window .linked > button:hover,
-window .linked > button.flat:hover,
-window box.linked > button:hover,
-headerbar splitbutton > button:hover,
-headerbar splitbutton > menubutton > button:hover,
-headerbar .linked > button:hover,
-headerbar .linked > menubutton > button:hover,
-headerbar box.linked > button:hover,
-headerbar box.linked > menubutton > button:hover,
-headerbar stackswitcher > button:hover,
-headerbar viewswitcher > button:hover,
-splitbutton > button:hover,
-splitbutton > menubutton > button:hover,
-.linked > button:hover,
-.linked > menubutton > button:hover,
-box.linked > button:hover,
-box.linked > menubutton > button:hover,
-stackswitcher > button:hover,
-viewswitcher > button:hover {{
+/* Segmented Control Hover */
+window headerbar .linked > button:hover:not(:checked),
+window headerbar box.linked > button:hover:not(:checked),
+window headerbar stackswitcher > button:hover:not(:checked),
+window headerbar viewswitcher > button:hover:not(:checked),
+window .linked > button:hover:not(:checked),
+window box.linked > button:hover:not(:checked),
+headerbar .linked > button:hover:not(:checked),
+headerbar box.linked > button:hover:not(:checked),
+headerbar stackswitcher > button:hover:not(:checked),
+headerbar viewswitcher > button:hover:not(:checked),
+.linked > button:hover:not(:checked),
+box.linked > button:hover:not(:checked),
+stackswitcher > button:hover:not(:checked),
+viewswitcher > button:hover:not(:checked) {{
     background-color: {linked_hover};
     color: {btn_fg};
     box-shadow: none;
 }}
 
-/* Active state on segment button */
-window headerbar splitbutton > button:active,
-window headerbar splitbutton > button.flat:active,
-window headerbar splitbutton > menubutton > button:active,
-window headerbar .linked > button:active,
-window headerbar .linked > button.flat:active,
-window headerbar .linked > menubutton > button:active,
-window headerbar box.linked > button:active,
-window headerbar box.linked > button.flat:active,
-window headerbar box.linked > menubutton > button:active,
-window splitbutton > button:active,
-window splitbutton > button.flat:active,
-window splitbutton > menubutton > button:active,
-window .linked > button:active,
-window .linked > button.flat:active,
-headerbar splitbutton > button:active,
-headerbar splitbutton > menubutton > button:active,
-headerbar .linked > button:active,
-headerbar .linked > menubutton > button:active,
-headerbar box.linked > button:active,
-headerbar box.linked > menubutton > button:active,
-splitbutton > button:active,
-splitbutton > menubutton > button:active,
-.linked > button:active,
-.linked > menubutton > button:active,
-box.linked > button:active,
-box.linked > menubutton > button:active,
-stackswitcher > button:active,
-viewswitcher > button:active {{
+/* Segmented Control Active / Pressed */
+window headerbar .linked > button:active:not(:checked),
+window headerbar box.linked > button:active:not(:checked),
+window .linked > button:active:not(:checked),
+window box.linked > button:active:not(:checked),
+headerbar .linked > button:active:not(:checked),
+headerbar box.linked > button:active:not(:checked),
+.linked > button:active:not(:checked),
+box.linked > button:active:not(:checked),
+stackswitcher > button:active:not(:checked),
+viewswitcher > button:active:not(:checked) {{
     background-color: {linked_active};
     color: {btn_fg};
     box-shadow: none;
@@ -4044,9 +3726,6 @@ window headerbar box.linked > button:checked,
 window headerbar box.linked > button.flat:checked,
 window headerbar stackswitcher > button:checked,
 window headerbar viewswitcher > button:checked,
-window splitbutton > button:checked,
-window splitbutton > button.flat:checked,
-window splitbutton > menubutton > button:checked,
 window .linked > button:checked,
 window .linked > button.flat:checked,
 window box.linked > button:checked,
@@ -4054,8 +3733,6 @@ headerbar .linked > button:checked,
 headerbar box.linked > button:checked,
 headerbar stackswitcher > button:checked,
 headerbar viewswitcher > button:checked,
-splitbutton > button:checked,
-splitbutton > menubutton > button:checked,
 .linked > button:checked,
 box.linked > button:checked,
 stackswitcher > button:checked,
@@ -4063,8 +3740,165 @@ viewswitcher > button:checked {{
     background-color: {linked_checked};
     color: {linked_checked_fg};
     box-shadow: {linked_checked_shadow};
-    border-radius: 5px;
+    border-radius: {seg_radius}px;
     font-weight: 500;
+}}
+
+/* Subtle hairline divider between adjacent unselected segments */
+.linked > button:not(:checked) + button:not(:checked),
+box.linked > button:not(:checked) + button:not(:checked),
+stackswitcher > button:not(:checked) + button:not(:checked),
+viewswitcher > button:not(:checked) + button:not(:checked) {{
+    border-left: {linked_divider};
+}}
+
+/* ── Split Buttons (AdwSplitButton - Single unified control, NO outer container box) ── */
+splitbutton,
+window headerbar splitbutton,
+window .titlebar splitbutton,
+window splitbutton,
+headerbar splitbutton,
+.titlebar splitbutton,
+.kgx-window headerbar splitbutton,
+window.kgx headerbar splitbutton {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    margin: 0 4px;
+    padding: 0;
+}}
+
+headerbar splitbutton,
+.titlebar splitbutton,
+window headerbar splitbutton,
+window .titlebar splitbutton {{
+    margin-top: 6px;
+    margin-bottom: 6px;
+}}
+
+splitbutton > button,
+splitbutton > menubutton > button,
+headerbar splitbutton > button,
+headerbar splitbutton > menubutton > button,
+window splitbutton > button,
+window splitbutton > menubutton > button {{
+    min-height: 22px;
+    padding: 2px 8px;
+    margin: 0;
+    color: {btn_fg};
+    font-size: 13px;
+    transition: background-color 80ms ease, color 80ms ease;
+}}
+
+/* Standard split button push styling outside headerbars */
+splitbutton:not(.flat) > button,
+splitbutton:not(.flat) > menubutton > button,
+window splitbutton:not(.flat) > button,
+window splitbutton:not(.flat) > menubutton > button {{
+    background-color: {btn_bg};
+    background-image: none;
+    border: {btn_border};
+    box-shadow: {btn_shadow};
+}}
+
+splitbutton:not(.flat) > button:hover,
+splitbutton:not(.flat) > menubutton > button:hover {{
+    background-color: {btn_hover};
+}}
+
+splitbutton:not(.flat) > button:active,
+splitbutton:not(.flat) > menubutton > button:active {{
+    background-color: {btn_active};
+}}
+
+/* Flat headerbar splitbutton (e.g. GNOME Console / Safari new tab button) */
+headerbar splitbutton > button,
+headerbar splitbutton > menubutton > button,
+headerbar splitbutton > button.flat,
+headerbar splitbutton > menubutton > button.flat,
+splitbutton.flat > button,
+splitbutton.flat > menubutton > button {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+}}
+
+headerbar splitbutton > button:hover,
+headerbar splitbutton > menubutton > button:hover,
+splitbutton.flat > button:hover,
+splitbutton.flat > menubutton > button:hover {{
+    background-color: {hover_subtle};
+}}
+
+headerbar splitbutton > button:active,
+headerbar splitbutton > menubutton > button:active,
+splitbutton.flat > button:active,
+splitbutton.flat > menubutton > button:active {{
+    background-color: {active_subtle};
+}}
+
+/* Split button LTR Directional Radii */
+splitbutton > button:dir(ltr),
+splitbutton > button:first-child:dir(ltr),
+headerbar splitbutton > button:dir(ltr),
+headerbar splitbutton > button:first-child:dir(ltr) {{
+    border-top-left-radius: {seg_radius}px;
+    border-bottom-left-radius: {seg_radius}px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}}
+
+splitbutton > menubutton > button:dir(ltr),
+splitbutton > menubutton:last-child > button:dir(ltr),
+headerbar splitbutton > menubutton > button:dir(ltr),
+headerbar splitbutton > menubutton:last-child > button:dir(ltr) {{
+    border-top-right-radius: {seg_radius}px;
+    border-bottom-right-radius: {seg_radius}px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+}}
+
+/* Split button RTL Directional Radii */
+splitbutton > button:dir(rtl),
+splitbutton > button:first-child:dir(rtl),
+headerbar splitbutton > button:dir(rtl),
+headerbar splitbutton > button:first-child:dir(rtl) {{
+    border-top-right-radius: {seg_radius}px;
+    border-bottom-right-radius: {seg_radius}px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-left: none;
+}}
+
+splitbutton > menubutton > button:dir(rtl),
+splitbutton > menubutton:last-child > button:dir(rtl),
+headerbar splitbutton > menubutton > button:dir(rtl),
+headerbar splitbutton > menubutton:last-child > button:dir(rtl) {{
+    border-top-left-radius: {seg_radius}px;
+    border-bottom-left-radius: {seg_radius}px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+}}
+
+/* Splitbutton separator */
+window headerbar splitbutton > separator,
+window splitbutton > separator,
+headerbar splitbutton > separator,
+splitbutton > separator {{
+    min-width: 1px;
+    min-height: 14px;
+    background-color: {linked_divider_color};
+    margin: 3px 0;
+    padding: 0;
+    border: none;
 }}
 
 /* 17. macOS Color Wells & Image Wells (apple/color wells/ & apple/image wells/) */
@@ -4409,6 +4243,40 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False, css_path=N
 
 .notification-banner StLabel {{
     color: {fg_color};
+}}
+
+.notification-banner .message,
+.notification-banner .message-box,
+.notification-banner .message-content,
+.notification-banner .message-header,
+.notification-banner .message-body,
+.notification-banner .message-header-content,
+.notification-banner .message-title,
+.notification-banner StBoxLayout,
+.notification-banner StBin {{
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}}
+
+.notification-banner .message-close-button,
+.notification-banner .message .message-header .message-close-button {{
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 9999px !important;
+    padding: 2px !important;
+    min-height: 18px !important;
+    min-width: 18px !important;
+    color: {fg_color} !important;
+    opacity: 0.65 !important;
+}}
+
+.notification-banner .message-close-button:hover,
+.notification-banner .message .message-header .message-close-button:hover {{
+    background-color: {hover_bg} !important;
+    opacity: 1.0 !important;
 }}
 
 .notification-button {{
