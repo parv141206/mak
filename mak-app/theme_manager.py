@@ -4767,25 +4767,14 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     except Exception:
         content = ""
 
-    # Correctly identify and preserve the upstream GTK base body
-    # Base body starts right after the initial palette / accent definitions
-    marker = "@define-color selected_bg_color"
-    if marker in content:
-        pos = content.find(marker)
-        eol = content.find("\n", pos)
-        base_start = eol + 1
-    elif "@define-color blue_1" in content:
-        base_start = content.find("@define-color blue_1")
-    else:
-        base_start = 0
-
-    # Find where Mak overrides start
+    # Strip any legacy overrides if present in old files
     override_markers = [
         "/* ── Mak macOS Sonoma Refined Interactive Widgets",
         "/* ── Universal Mak Widgets & Control Metrics Override",
         "/* === Mak Suite Refinements",
         "/* ── Mak Clean macOS Traffic Light Button Controls",
-        "/* ── Mak macOS Window Corner"
+        "/* ── Mak macOS Window Corner",
+        "/* ── Mak Dynamic Customizations"
     ]
     base_end = len(content)
     for om in override_markers:
@@ -4793,43 +4782,49 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         if pos != -1 and pos < base_end:
             base_end = pos
 
-    base_body = content[base_start:base_end].strip()
+    content = content[:base_end].strip()
 
-    curr_acc = "blue"
-    try:
-        res = subprocess.run(["gsettings", "get", "org.gnome.desktop.interface", "accent-color"],
-                             capture_output=True, text=True)
-        curr_acc = res.stdout.strip().strip("'\"") or "blue"
-    except Exception:
-        curr_acc = "blue"
+    custom_rules = []
+    # 1. Chromium headerbar accent
+    if chromium_accent and chromium_accent != "default":
+        acc_info = CHROMIUM_ACCENT_PALETTES.get(chromium_accent)
+        if acc_info:
+            color = acc_info["dark"] if is_dark else acc_info["light"]
+            custom_rules.append(f"""
+/* ── Mak Chromium Topbar Accent ─────────────────────────────────── */
+window.background.chromium,
+window.background.chromium headerbar.header-bar.titlebar,
+window.background.chromium headerbar.titlebar {{
+    background-color: {color} !important;
+}}
+""")
 
-    acc_info = GNOME_ACCENT_PALETTES.get(curr_acc, GNOME_ACCENT_PALETTES["blue"])
-    acc_bg = acc_info["bg"]
-    acc_fg = acc_info["fg"]
+    # 2. Button size and spacing (only if non-default)
+    if (button_size and button_size != 14) or (button_spacing and button_spacing != 8):
+        bs = button_size or 14
+        sp = button_spacing or 8
+        half_sp = sp // 2
+        custom_rules.append(f"""
+/* ── Mak Traffic Light Metrics ──────────────────────────────────── */
+headerbar windowcontrols button.close,
+headerbar windowcontrols button.maximize,
+headerbar windowcontrols button.minimize,
+windowcontrols button.close,
+windowcontrols button.maximize,
+windowcontrols button.minimize {{
+    min-width: {bs}px !important;
+    min-height: {bs}px !important;
+    background-size: {bs}px {bs}px !important;
+    margin: 0 {half_sp}px !important;
+}}
+""")
 
-    accent_css_override = f"""
-/* ── Dynamic GNOME Desktop Accent Synchronization ─────────────────────── */
-@define-color accent_color {acc_bg};
-@define-color accent_bg_color {acc_bg};
-@define-color accent_fg_color {acc_fg};
-@define-color theme_selected_bg_color {acc_bg};
-@define-color selected_bg_color {acc_bg};
-"""
+    if custom_rules:
+        content = content + "\n\n/* ── Mak Dynamic Customizations ─────────────────────────────────── */\n" + "\n".join(custom_rules) + "\n"
 
-    is_amoled = "amoled" in dst_css_path.lower() or "amoled" in palette.lower()
-    widgets_override = generate_widgets_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
-    traffic_override = generate_traffic_lights_override(button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
-    popover_override = generate_popover_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
-    nautilus_override = generate_nautilus_override(is_dark=is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
-    window_corners_override = generate_window_corners_override(is_dark=is_dark)
-    rules_to_append = [widgets_override, window_corners_override, popover_override, nautilus_override, traffic_override]
-    if is_glassy:
-        rules_to_append.append(GLASSY_CONTAINER_RULES)
-
-    final_content = palette.strip() + "\n\n" + accent_css_override.strip() + "\n\n" + base_body + "\n\n" + "\n\n".join(rules_to_append) + "\n"
     os.makedirs(os.path.dirname(dst_css_path), exist_ok=True)
     with open(dst_css_path, "w", encoding="utf-8") as f:
-        f.write(final_content)
+        f.write(content)
 
     if sync_repo:
         try:
@@ -4842,7 +4837,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
                 repo_file = os.path.join(repo_themes_dir, t_name, gtk_ver, f_name)
                 if os.path.exists(os.path.dirname(repo_file)):
                     with open(repo_file, "w", encoding="utf-8") as f:
-                        f.write(final_content)
+                        f.write(content)
         except Exception:
             pass
 
@@ -5176,6 +5171,11 @@ def apply_global_theme(theme_key):
         palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
 
         is_glassy = theme_info["is_glassy"]
+        if is_glassy:
+            try:
+                subprocess.run(["dconf", "write", "/org/gnome/shell/extensions/blur-my-shell/applications/blur", "true"], check=False)
+            except Exception:
+                pass
         try:
             res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-size"],
                                  capture_output=True, text=True)
