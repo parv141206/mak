@@ -142,14 +142,18 @@ def build_qa_window():
 
     # Column Headers Strip
     col_hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, css_classes=["columnview", "header"])
-    col_name = Gtk.Button(label="Name ▲", css_classes=["flat"])
+    col_name = Gtk.Button(label="Name ▲")
     col_name.set_hexpand(True)
-    col_size = Gtk.Button(label="Size", css_classes=["flat"])
+    col_name.set_can_focus(False)
+    col_size = Gtk.Button(label="Size")
     col_size.set_size_request(100, -1)
-    col_kind = Gtk.Button(label="Kind", css_classes=["flat"])
+    col_size.set_can_focus(False)
+    col_kind = Gtk.Button(label="Kind")
     col_kind.set_size_request(120, -1)
-    col_date = Gtk.Button(label="Date Modified", css_classes=["flat"])
+    col_kind.set_can_focus(False)
+    col_date = Gtk.Button(label="Date Modified")
     col_date.set_size_request(150, -1)
+    col_date.set_can_focus(False)
 
     col_hdr.append(col_name)
     col_hdr.append(col_size)
