@@ -33,7 +33,7 @@ class TokenManager:
                 "window": {"corner_radius": 14, "headerbar_standard_height": 52, "headerbar_compact_height": 38},
                 "traffic_lights": {"size": 14, "spacing": 8, "margin_left": 13},
                 "buttons": {"height_regular": 24, "corner_radius": 5, "capsule_corner_radius": 9999},
-                "segmented": {"height": 22, "container_radius": 6, "segment_radius": 5},
+                "segmented": {"height": 22, "container_radius": 9999, "segment_radius": 9999},
                 "entries": {"height_regular": 22, "corner_radius": 5, "focus_ring_width": 3},
                 "menus": {"row_height": 24, "item_radius": 4},
                 "popovers": {"corner_radius": 10},
@@ -588,28 +588,48 @@ window.background.brave popover label {{
 
 /* ── Universal Traffic Lights Base Properties ── */
 windowcontrols button,
+windowcontrols button:backdrop,
 headerbar windowcontrols button,
+headerbar windowcontrols button:backdrop,
 .titlebar windowcontrols button,
+.titlebar windowcontrols button:backdrop,
 window.background.csd windowcontrols button,
+window.background.csd windowcontrols button:backdrop,
 window.background.csd headerbar windowcontrols button,
+window.background.csd headerbar windowcontrols button:backdrop,
 windowcontrols > button,
+windowcontrols > button:backdrop,
 headerbar windowcontrols > button,
+headerbar windowcontrols > button:backdrop,
 .titlebar windowcontrols > button,
+.titlebar windowcontrols > button:backdrop,
 button.titlebutton,
+button.titlebutton:backdrop,
 headerbar button.titlebutton,
+headerbar button.titlebutton:backdrop,
 button.close,
+button.close:backdrop,
 button.minimize,
+button.minimize:backdrop,
 button.maximize,
+button.maximize:backdrop,
 headerbar.header-bar.titlebar windowcontrols button,
+headerbar.header-bar.titlebar windowcontrols button:backdrop,
 headerbar.header-bar.titlebar button.titlebutton,
+headerbar.header-bar.titlebar button.titlebutton:backdrop,
 window.background.chromium headerbar windowcontrols button,
+window.background.chromium headerbar windowcontrols button:backdrop,
 window.background.chromium windowcontrols button,
+window.background.chromium windowcontrols button:backdrop,
 window.background.brave headerbar windowcontrols button,
-window.background.brave windowcontrols button {{
+window.background.brave headerbar windowcontrols button:backdrop,
+window.background.brave windowcontrols button,
+window.background.brave windowcontrols button:backdrop {{
     background-color: transparent;
     background-image: none;
     border: none;
     box-shadow: none;
+    border-radius: 9999px;
     padding: 0;
     margin-left: {margin}px;
     margin-right: {margin}px;
@@ -624,21 +644,28 @@ window.background.brave windowcontrols button {{
 
 /* Universally suppress GNOME symbolic icons (x, -, +) */
 windowcontrols button image,
+windowcontrols button:backdrop image,
 windowcontrols button label,
 windowcontrols button widget,
 headerbar windowcontrols button image,
+headerbar windowcontrols button:backdrop image,
 headerbar windowcontrols button label,
 headerbar windowcontrols button widget,
 .titlebar windowcontrols button image,
+.titlebar windowcontrols button:backdrop image,
 .titlebar windowcontrols button label,
 .titlebar windowcontrols button widget,
 button.titlebutton image,
+button.titlebutton:backdrop image,
 button.titlebutton label,
 button.close image,
+button.close:backdrop image,
 button.close label,
 button.minimize image,
+button.minimize:backdrop image,
 button.minimize label,
 button.maximize image,
+button.maximize:backdrop image,
 button.maximize label,
 headerbar.header-bar.titlebar windowcontrols button image,
 headerbar.header-bar.titlebar button.titlebutton image,
@@ -651,26 +678,45 @@ window.background.brave headerbar windowcontrols button image {{
     min-height: 0;
     margin: 0;
     padding: 0;
+    -gtk-icon-transform: scale(0);
+    font-size: 0px;
 }}
 
 /* ── Close Button (Red: #ff5c60) ── */
 window.background.csd windowcontrols button.close,
+window.background.csd windowcontrols button.close:backdrop,
 window.background.csd headerbar windowcontrols button.close,
+window.background.csd headerbar windowcontrols button.close:backdrop,
 windowcontrols button.close,
+windowcontrols button.close:backdrop,
 headerbar windowcontrols button.close,
+headerbar windowcontrols button.close:backdrop,
 .titlebar windowcontrols button.close,
+.titlebar windowcontrols button.close:backdrop,
 windowcontrols > button.close,
+windowcontrols > button.close:backdrop,
 headerbar windowcontrols > button.close,
+headerbar windowcontrols > button.close:backdrop,
 .titlebar windowcontrols > button.close,
+.titlebar windowcontrols > button.close:backdrop,
 button.titlebutton.close,
+button.titlebutton.close:backdrop,
 headerbar button.titlebutton.close,
+headerbar button.titlebutton.close:backdrop,
 button.close,
+button.close:backdrop,
 headerbar.header-bar.titlebar windowcontrols button.close,
+headerbar.header-bar.titlebar windowcontrols button.close:backdrop,
 headerbar.header-bar.titlebar button.close,
+headerbar.header-bar.titlebar button.close:backdrop,
 window.background.chromium headerbar windowcontrols button.close,
+window.background.chromium headerbar windowcontrols button.close:backdrop,
 window.background.chromium windowcontrols button.close,
+window.background.chromium windowcontrols button.close:backdrop,
 window.background.brave headerbar windowcontrols button.close,
-window.background.brave windowcontrols button.close {{
+window.background.brave headerbar windowcontrols button.close:backdrop,
+window.background.brave windowcontrols button.close,
+window.background.brave windowcontrols button.close:backdrop {{
     background-image: radial-gradient(circle at center, #ff5c60 0px, #ff5c60 5.5px, {hairline} 5.5px, {hairline} 6.5px, transparent 7px);
     background-repeat: no-repeat;
     background-position: center;
@@ -678,16 +724,27 @@ window.background.brave windowcontrols button.close {{
 }}
 
 window.background.csd windowcontrols button.close:hover,
+window.background.csd windowcontrols button.close:backdrop:hover,
 window.background.csd headerbar windowcontrols button.close:hover,
+window.background.csd headerbar windowcontrols button.close:backdrop:hover,
 windowcontrols button.close:hover,
+windowcontrols button.close:backdrop:hover,
 headerbar windowcontrols button.close:hover,
+headerbar windowcontrols button.close:backdrop:hover,
 .titlebar windowcontrols button.close:hover,
+.titlebar windowcontrols button.close:backdrop:hover,
 windowcontrols > button.close:hover,
+windowcontrols > button.close:backdrop:hover,
 headerbar windowcontrols > button.close:hover,
+headerbar windowcontrols > button.close:backdrop:hover,
 .titlebar windowcontrols > button.close:hover,
+.titlebar windowcontrols > button.close:backdrop:hover,
 button.titlebutton.close:hover,
+button.titlebutton.close:backdrop:hover,
 headerbar button.titlebutton.close:hover,
+headerbar button.titlebutton.close:backdrop:hover,
 button.close:hover,
+button.close:backdrop:hover,
 window.background.chromium headerbar windowcontrols button.close:hover,
 window.background.chromium windowcontrols button.close:hover,
 window.background.brave headerbar windowcontrols button.close:hover,
@@ -699,16 +756,27 @@ window.background.brave windowcontrols button.close:hover {{
 }}
 
 window.background.csd windowcontrols button.close:active,
+window.background.csd windowcontrols button.close:backdrop:active,
 window.background.csd headerbar windowcontrols button.close:active,
+window.background.csd headerbar windowcontrols button.close:backdrop:active,
 windowcontrols button.close:active,
+windowcontrols button.close:backdrop:active,
 headerbar windowcontrols button.close:active,
+headerbar windowcontrols button.close:backdrop:active,
 .titlebar windowcontrols button.close:active,
+.titlebar windowcontrols button.close:backdrop:active,
 windowcontrols > button.close:active,
+windowcontrols > button.close:backdrop:active,
 headerbar windowcontrols > button.close:active,
+headerbar windowcontrols > button.close:backdrop:active,
 .titlebar windowcontrols > button.close:active,
+.titlebar windowcontrols > button.close:backdrop:active,
 button.titlebutton.close:active,
+button.titlebutton.close:backdrop:active,
 headerbar button.titlebutton.close:active,
+headerbar button.titlebutton.close:backdrop:active,
 button.close:active,
+button.close:backdrop:active,
 window.background.chromium headerbar windowcontrols button.close:active,
 window.background.chromium windowcontrols button.close:active,
 window.background.brave headerbar windowcontrols button.close:active,
@@ -721,22 +789,39 @@ window.background.brave windowcontrols button.close:active {{
 
 /* ── Minimize Button (Yellow: #fac800) ── */
 window.background.csd windowcontrols button.minimize,
+window.background.csd windowcontrols button.minimize:backdrop,
 window.background.csd headerbar windowcontrols button.minimize,
+window.background.csd headerbar windowcontrols button.minimize:backdrop,
 windowcontrols button.minimize,
+windowcontrols button.minimize:backdrop,
 headerbar windowcontrols button.minimize,
+headerbar windowcontrols button.minimize:backdrop,
 .titlebar windowcontrols button.minimize,
+.titlebar windowcontrols button.minimize:backdrop,
 windowcontrols > button.minimize,
+windowcontrols > button.minimize:backdrop,
 headerbar windowcontrols > button.minimize,
+headerbar windowcontrols > button.minimize:backdrop,
 .titlebar windowcontrols > button.minimize,
+.titlebar windowcontrols > button.minimize:backdrop,
 button.titlebutton.minimize,
+button.titlebutton.minimize:backdrop,
 headerbar button.titlebutton.minimize,
+headerbar button.titlebutton.minimize:backdrop,
 button.minimize,
+button.minimize:backdrop,
 headerbar.header-bar.titlebar windowcontrols button.minimize,
+headerbar.header-bar.titlebar windowcontrols button.minimize:backdrop,
 headerbar.header-bar.titlebar button.minimize,
+headerbar.header-bar.titlebar button.minimize:backdrop,
 window.background.chromium headerbar windowcontrols button.minimize,
+window.background.chromium headerbar windowcontrols button.minimize:backdrop,
 window.background.chromium windowcontrols button.minimize,
+window.background.chromium windowcontrols button.minimize:backdrop,
 window.background.brave headerbar windowcontrols button.minimize,
-window.background.brave windowcontrols button.minimize {{
+window.background.brave headerbar windowcontrols button.minimize:backdrop,
+window.background.brave windowcontrols button.minimize,
+window.background.brave windowcontrols button.minimize:backdrop {{
     background-image: radial-gradient(circle at center, #fac800 0px, #fac800 5.5px, {hairline} 5.5px, {hairline} 6.5px, transparent 7px);
     background-repeat: no-repeat;
     background-position: center;
@@ -744,16 +829,27 @@ window.background.brave windowcontrols button.minimize {{
 }}
 
 window.background.csd windowcontrols button.minimize:hover,
+window.background.csd windowcontrols button.minimize:backdrop:hover,
 window.background.csd headerbar windowcontrols button.minimize:hover,
+window.background.csd headerbar windowcontrols button.minimize:backdrop:hover,
 windowcontrols button.minimize:hover,
+windowcontrols button.minimize:backdrop:hover,
 headerbar windowcontrols button.minimize:hover,
+headerbar windowcontrols button.minimize:backdrop:hover,
 .titlebar windowcontrols button.minimize:hover,
+.titlebar windowcontrols button.minimize:backdrop:hover,
 windowcontrols > button.minimize:hover,
+windowcontrols > button.minimize:backdrop:hover,
 headerbar windowcontrols > button.minimize:hover,
+headerbar windowcontrols > button.minimize:backdrop:hover,
 .titlebar windowcontrols > button.minimize:hover,
+.titlebar windowcontrols > button.minimize:backdrop:hover,
 button.titlebutton.minimize:hover,
+button.titlebutton.minimize:backdrop:hover,
 headerbar button.titlebutton.minimize:hover,
+headerbar button.titlebutton.minimize:backdrop:hover,
 button.minimize:hover,
+button.minimize:backdrop:hover,
 window.background.chromium headerbar windowcontrols button.minimize:hover,
 window.background.chromium windowcontrols button.minimize:hover,
 window.background.brave headerbar windowcontrols button.minimize:hover,
@@ -765,16 +861,27 @@ window.background.brave windowcontrols button.minimize:hover {{
 }}
 
 window.background.csd windowcontrols button.minimize:active,
+window.background.csd windowcontrols button.minimize:backdrop:active,
 window.background.csd headerbar windowcontrols button.minimize:active,
+window.background.csd headerbar windowcontrols button.minimize:backdrop:active,
 windowcontrols button.minimize:active,
+windowcontrols button.minimize:backdrop:active,
 headerbar windowcontrols button.minimize:active,
+headerbar windowcontrols button.minimize:backdrop:active,
 .titlebar windowcontrols button.minimize:active,
+.titlebar windowcontrols button.minimize:backdrop:active,
 windowcontrols > button.minimize:active,
+windowcontrols > button.minimize:backdrop:active,
 headerbar windowcontrols > button.minimize:active,
+headerbar windowcontrols > button.minimize:backdrop:active,
 .titlebar windowcontrols > button.minimize:active,
+.titlebar windowcontrols > button.minimize:backdrop:active,
 button.titlebutton.minimize:active,
+button.titlebutton.minimize:backdrop:active,
 headerbar button.titlebutton.minimize:active,
+headerbar button.titlebutton.minimize:backdrop:active,
 button.minimize:active,
+button.minimize:backdrop:active,
 window.background.chromium headerbar windowcontrols button.minimize:active,
 window.background.chromium windowcontrols button.minimize:active,
 window.background.brave headerbar windowcontrols button.minimize:active,
@@ -787,22 +894,39 @@ window.background.brave windowcontrols button.minimize:active {{
 
 /* ── Maximize / Zoom Button (Green: #35c759) ── */
 window.background.csd windowcontrols button.maximize,
+window.background.csd windowcontrols button.maximize:backdrop,
 window.background.csd headerbar windowcontrols button.maximize,
+window.background.csd headerbar windowcontrols button.maximize:backdrop,
 windowcontrols button.maximize,
+windowcontrols button.maximize:backdrop,
 headerbar windowcontrols button.maximize,
+headerbar windowcontrols button.maximize:backdrop,
 .titlebar windowcontrols button.maximize,
+.titlebar windowcontrols button.maximize:backdrop,
 windowcontrols > button.maximize,
+windowcontrols > button.maximize:backdrop,
 headerbar windowcontrols > button.maximize,
+headerbar windowcontrols > button.maximize:backdrop,
 .titlebar windowcontrols > button.maximize,
+.titlebar windowcontrols > button.maximize:backdrop,
 button.titlebutton.maximize,
+button.titlebutton.maximize:backdrop,
 headerbar button.titlebutton.maximize,
+headerbar button.titlebutton.maximize:backdrop,
 button.maximize,
+button.maximize:backdrop,
 headerbar.header-bar.titlebar windowcontrols button.maximize,
+headerbar.header-bar.titlebar windowcontrols button.maximize:backdrop,
 headerbar.header-bar.titlebar button.maximize,
+headerbar.header-bar.titlebar button.maximize:backdrop,
 window.background.chromium headerbar windowcontrols button.maximize,
+window.background.chromium headerbar windowcontrols button.maximize:backdrop,
 window.background.chromium windowcontrols button.maximize,
+window.background.chromium windowcontrols button.maximize:backdrop,
 window.background.brave headerbar windowcontrols button.maximize,
-window.background.brave windowcontrols button.maximize {{
+window.background.brave headerbar windowcontrols button.maximize:backdrop,
+window.background.brave windowcontrols button.maximize,
+window.background.brave windowcontrols button.maximize:backdrop {{
     background-image: radial-gradient(circle at center, #35c759 0px, #35c759 5.5px, {hairline} 5.5px, {hairline} 6.5px, transparent 7px);
     background-repeat: no-repeat;
     background-position: center;
@@ -810,16 +934,27 @@ window.background.brave windowcontrols button.maximize {{
 }}
 
 window.background.csd windowcontrols button.maximize:hover,
+window.background.csd windowcontrols button.maximize:backdrop:hover,
 window.background.csd headerbar windowcontrols button.maximize:hover,
+window.background.csd headerbar windowcontrols button.maximize:backdrop:hover,
 windowcontrols button.maximize:hover,
+windowcontrols button.maximize:backdrop:hover,
 headerbar windowcontrols button.maximize:hover,
+headerbar windowcontrols button.maximize:backdrop:hover,
 .titlebar windowcontrols button.maximize:hover,
+.titlebar windowcontrols button.maximize:backdrop:hover,
 windowcontrols > button.maximize:hover,
+windowcontrols > button.maximize:backdrop:hover,
 headerbar windowcontrols > button.maximize:hover,
+headerbar windowcontrols > button.maximize:backdrop:hover,
 .titlebar windowcontrols > button.maximize:hover,
+.titlebar windowcontrols > button.maximize:backdrop:hover,
 button.titlebutton.maximize:hover,
+button.titlebutton.maximize:backdrop:hover,
 headerbar button.titlebutton.maximize:hover,
+headerbar button.titlebutton.maximize:backdrop:hover,
 button.maximize:hover,
+button.maximize:backdrop:hover,
 window.background.chromium headerbar windowcontrols button.maximize:hover,
 window.background.chromium windowcontrols button.maximize:hover,
 window.background.brave headerbar windowcontrols button.maximize:hover,
@@ -831,16 +966,27 @@ window.background.brave windowcontrols button.maximize:hover {{
 }}
 
 window.background.csd windowcontrols button.maximize:active,
+window.background.csd windowcontrols button.maximize:backdrop:active,
 window.background.csd headerbar windowcontrols button.maximize:active,
+window.background.csd headerbar windowcontrols button.maximize:backdrop:active,
 windowcontrols button.maximize:active,
+windowcontrols button.maximize:backdrop:active,
 headerbar windowcontrols button.maximize:active,
+headerbar windowcontrols button.maximize:backdrop:active,
 .titlebar windowcontrols button.maximize:active,
+.titlebar windowcontrols button.maximize:backdrop:active,
 windowcontrols > button.maximize:active,
+windowcontrols > button.maximize:backdrop:active,
 headerbar windowcontrols > button.maximize:active,
+headerbar windowcontrols > button.maximize:backdrop:active,
 .titlebar windowcontrols > button.maximize:active,
+.titlebar windowcontrols > button.maximize:backdrop:active,
 button.titlebutton.maximize:active,
+button.titlebutton.maximize:backdrop:active,
 headerbar button.titlebutton.maximize:active,
+headerbar button.titlebutton.maximize:backdrop:active,
 button.maximize:active,
+button.maximize:backdrop:active,
 window.background.chromium headerbar windowcontrols button.maximize:active,
 window.background.chromium windowcontrols button.maximize:active,
 window.background.brave headerbar windowcontrols button.maximize:active,
@@ -865,6 +1011,9 @@ window.background.brave:backdrop windowcontrols button:not(:hover),
 window.background.chromium:backdrop button.titlebutton:not(:hover),
 window.background.brave:backdrop button.titlebutton:not(:hover) {{
     opacity: 0.55;
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
 }}
 
 windowcontrols button:hover,
@@ -1430,6 +1579,13 @@ def generate_nautilus_override(is_dark=True, is_glassy=False, is_amoled=False):
         alt_row_bg = "rgba(255, 255, 255, 0.02)"
         row_hover_bg = "rgba(255, 255, 255, 0.06)"
         active_subtle = "rgba(255, 255, 255, 0.18)"
+
+    linked_bg = "#ffffff" if not is_dark else ("#18181a" if is_amoled else "rgba(255, 255, 255, 0.10)")
+    linked_border = f"1px solid {border_color}"
+    linked_shadow = "0 1px 2px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.04)" if not is_dark else "0 1px 3px rgba(0, 0, 0, 0.30)"
+    linked_divider = f"1px solid {border_color}"
+    linked_hover = "rgba(0, 0, 0, 0.06)" if not is_dark else "rgba(255, 255, 255, 0.10)"
+    linked_active = "rgba(0, 0, 0, 0.12)" if not is_dark else "rgba(255, 255, 255, 0.18)"
 
     return f"""
 /* ── macOS 27 "Golden Gate" Finder & Universal System Sidebar ────────────── */
@@ -2360,7 +2516,31 @@ headerbar nautilus-path-bar button:hover {{
     box-shadow: none;
 }}
 
-/* 15. History Navigation Controls (< and >) (apple/toolbars/ Apple Finder Style) */
+/* 15. History Navigation Controls (< and >) - Authentic Apple macOS 27 Capsule Pill */
+NautilusHistoryControls,
+.navigation-controls,
+headerbar .navigation-controls,
+.nautilus-window headerbar .navigation-controls,
+#NautilusFileChooser headerbar .navigation-controls {{
+    background-color: {linked_bg};
+    background-image: none;
+    border: {linked_border};
+    box-shadow: {linked_shadow};
+    border-radius: 9999px;
+    padding: 2px;
+    margin: 0 4px;
+}}
+
+NautilusHistoryControls > box {{
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+}}
+
 NautilusHistoryControls button,
 NautilusHistoryControls #back_button,
 NautilusHistoryControls #forward_button,
@@ -2371,10 +2551,11 @@ headerbar .navigation-controls button,
 .nautilus-window headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button {{
-    min-height: 24px;
-    min-width: 24px;
+    min-height: 22px;
+    min-width: 26px;
     padding: 2px 6px;
-    border-radius: 5px;
+    margin: 0;
+    border-radius: 9999px;
     background: transparent;
     background-color: transparent;
     background-image: none;
@@ -2395,7 +2576,7 @@ headerbar .navigation-controls button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > stack > widget > box > button:hover,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:hover {{
     background: transparent;
-    background-color: {hover_subtle};
+    background-color: {linked_hover};
     border: none;
     box-shadow: none;
 }}
@@ -2424,6 +2605,25 @@ headerbar .navigation-controls button:disabled,
 #NautilusFileChooser headerbar > windowhandle > box > widget > box.start > box > stack > widget > box > button:disabled {{
     opacity: 0.35;
     background-color: transparent;
+}}
+
+/* Hairline divider between < and > */
+NautilusHistoryControls button + button,
+NautilusHistoryControls #back_button + #forward_button,
+.navigation-controls button + button {{
+    border-left: {linked_divider};
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+}}
+
+NautilusHistoryControls button:first-child,
+.navigation-controls button:first-child {{
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }}
 
 /* 16. Pill Search Entry (macOS 27 Top-Right Style) */
@@ -2495,8 +2695,8 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     btn_border_width = TokenManager.get("geometry", "buttons", "border_width", default=1)
 
     seg_height = TokenManager.get("geometry", "segmented", "height", default=22)
-    seg_container_radius = TokenManager.get("geometry", "segmented", "container_radius", default=6)
-    seg_radius = TokenManager.get("geometry", "segmented", "segment_radius", default=5)
+    seg_container_radius = TokenManager.get("geometry", "segmented", "container_radius", default=9999)
+    seg_radius = TokenManager.get("geometry", "segmented", "segment_radius", default=9999)
     seg_pad = TokenManager.get("geometry", "segmented", "padding", default=2)
 
     entry_radius = TokenManager.get("geometry", "entries", "corner_radius", default=5)
@@ -2530,16 +2730,16 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         pill_active = "rgba(0, 0, 0, 0.12)"
         pill_checked = "#ffffff"
         pill_checked_fg = "#1d1d1f"
-        linked_bg = "rgba(0, 0, 0, 0.06)"
-        linked_border = f"{btn_border_width}px solid rgba(0, 0, 0, 0.12)"
-        linked_shadow = "0 1px 2px rgba(0, 0, 0, 0.06)"
+        linked_bg = "#ffffff"
+        linked_border = f"{btn_border_width}px solid rgba(0, 0, 0, 0.10)"
+        linked_shadow = "0 1px 2px rgba(0, 0, 0, 0.05), 0 0 1px rgba(0, 0, 0, 0.04)"
         linked_divider = "1px solid rgba(0, 0, 0, 0.10)"
         linked_divider_color = "rgba(0, 0, 0, 0.10)"
         linked_hover = "rgba(0, 0, 0, 0.06)"
         linked_active = "rgba(0, 0, 0, 0.12)"
-        linked_checked = "#ffffff"
+        linked_checked = "rgba(0, 0, 0, 0.10)"
         linked_checked_fg = "#1d1d1f"
-        linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.08)"
+        linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.08)"
         search_bg = "rgba(0, 0, 0, 0.05)"
         dropdown_bg = TokenManager.get("colors", "light", "btn_default_bg", default="rgba(0, 0, 0, 0.08)")
         dropdown_border = f"{btn_border_width}px solid {TokenManager.get('colors', 'light', 'border', default='rgba(0, 0, 0, 0.12)')}"
@@ -2576,16 +2776,16 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
         pill_active = "rgba(255, 255, 255, 0.16)"
         pill_checked = "rgba(255, 255, 255, 0.18)"
         pill_checked_fg = "#ffffff"
-        linked_bg = "rgba(255, 255, 255, 0.08)"
+        linked_bg = "#18181a" if is_amoled else ("rgba(255, 255, 255, 0.08)" if is_glassy else "rgba(255, 255, 255, 0.10)")
         linked_border = f"{btn_border_width}px solid {border_col}"
-        linked_shadow = "0 1px 3px rgba(0, 0, 0, 0.35), 0 0.5px 1px rgba(0, 0, 0, 0.20)"
-        linked_divider = "1px solid rgba(255, 255, 255, 0.10)"
-        linked_divider_color = "rgba(255, 255, 255, 0.10)"
+        linked_shadow = "0 1px 3px rgba(0, 0, 0, 0.30)"
+        linked_divider = f"1px solid {border_col}"
+        linked_divider_color = border_col
         linked_hover = "rgba(255, 255, 255, 0.10)"
         linked_active = "rgba(255, 255, 255, 0.18)"
         linked_checked = "rgba(255, 255, 255, 0.20)"
         linked_checked_fg = "#ffffff"
-        linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(255, 255, 255, 0.12)"
+        linked_checked_shadow = "0 1px 2px rgba(0, 0, 0, 0.30)"
         search_bg = "rgba(255, 255, 255, 0.08)"
         dropdown_bg = TokenManager.get("colors", "dark", "btn_default_bg", default="rgba(255, 255, 255, 0.10)")
         dropdown_border = f"{btn_border_width}px solid {border_col}"
@@ -2604,8 +2804,34 @@ def generate_widgets_override(is_dark=True, is_glassy=False, is_amoled=False):
     return f"""
 /* ── Mak macOS Sonoma Refined Interactive Widgets & States ────────────────── */
 
+/* Universal macOS Titlebar & Headerbar Styling */
+headerbar,
+.titlebar,
+window headerbar,
+window.csd headerbar,
+window.background.csd headerbar,
+window.background headerbar {{
+    background: @headerbar_bg_color;
+    background-color: @headerbar_bg_color;
+    background-image: none;
+    border-bottom: 1px solid {border_col};
+    box-shadow: none;
+    color: @headerbar_fg_color;
+}}
+
+
+
 /* 1. Universal In-Window Push Buttons (Dialogs, content pages, settings) */
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.pill):not(.modelbutton):not(.nautilus-path-button):not(.path-button) {{
+dialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+adwdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+adwalertdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+messagedialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+window.dialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+preferencespage button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+preferencesgroup button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+.content-pane button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.nautilus-path-button),
+box.content button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action),
+.boxed-list button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action) {{
     background-color: {btn_bg};
     background-image: none;
     border: {btn_border};
@@ -2619,16 +2845,34 @@ button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):no
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.modelbutton):not(.nautilus-path-button):not(.path-button):hover {{
+.content-pane button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover,
+box.content button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover,
+preferencespage button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover,
+dialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover,
+adwdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover,
+adwalertdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover,
+messagedialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):hover {{
     background-color: {btn_hover};
     color: {btn_fg};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.modelbutton):not(.nautilus-path-button):not(.path-button):active {{
+.content-pane button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active,
+box.content button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active,
+preferencespage button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active,
+dialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active,
+adwdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active,
+adwalertdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active,
+messagedialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):active {{
     background-color: {btn_active};
 }}
 
-button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):not(.link):not(.image-button):not(.circular):not(.style-item):not(.card):not(checkbutton):not(.color-palette-item):not(.color-button):not(.modelbutton):not(.nautilus-path-button):not(.path-button):checked {{
+.content-pane button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked,
+box.content button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked,
+preferencespage button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked,
+dialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked,
+adwdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked,
+adwalertdialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked,
+messagedialog button:not(.titlebutton):not(.close):not(.minimize):not(.maximize):not(.flat):not(.suggested-action):not(.destructive-action):checked {{
     background-color: @accent_bg_color;
     color: @accent_fg_color;
 }}
@@ -3559,25 +3803,28 @@ adwalertdialog button {{
     font-weight: 500;
 }}
 
-/* Nautilus & Standard History Navigation Controls (< >) - pure flat borderless */
+/* Nautilus & Standard History Navigation Controls (< >) - Authentic macOS 27 Capsule Pill */
 NautilusHistoryControls,
-NautilusHistoryControls.linked,
-NautilusHistoryControls.box,
+NautilusHistoryControls > box,
 .navigation-controls,
-.navigation-controls.linked,
-headerbar NautilusHistoryControls,
-headerbar NautilusHistoryControls.linked,
 headerbar .navigation-controls,
-headerbar .navigation-controls.linked,
-.nautilus-window NautilusHistoryControls,
-.nautilus-window .navigation-controls {{
-    background: transparent;
-    background-color: transparent;
+.nautilus-window headerbar .navigation-controls,
+#NautilusFileChooser headerbar .navigation-controls {{
+    background-color: {linked_bg};
     background-image: none;
+    border: {linked_border};
+    box-shadow: {linked_shadow};
+    border-radius: 9999px;
+    padding: 2px;
+    margin: 0 4px;
+}}
+
+NautilusHistoryControls > box {{
+    background: transparent;
     border: none;
     box-shadow: none;
     padding: 0;
-    margin: 0 4px;
+    margin: 0;
 }}
 
 NautilusHistoryControls button,
@@ -3593,11 +3840,13 @@ NautilusHistoryControls #forward_button,
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 5px;
-    padding: 3px 6px;
-    min-height: 24px;
-    min-width: 24px;
+    border-radius: 9999px;
+    padding: 2px 6px;
+    min-height: 22px;
+    min-width: 26px;
+    margin: 0;
     color: {btn_fg};
+    transition: background-color 80ms ease;
 }}
 
 NautilusHistoryControls button:hover,
@@ -3606,8 +3855,7 @@ NautilusHistoryControls #forward_button:hover,
 .navigation-controls button:hover,
 .nautilus-window NautilusHistoryControls button:hover,
 .nautilus-window .navigation-controls button:hover {{
-    background-color: {hover_subtle};
-    background-image: none;
+    background-color: {linked_hover};
     border: none;
     box-shadow: none;
 }}
@@ -3619,39 +3867,56 @@ NautilusHistoryControls #forward_button:active,
 .nautilus-window NautilusHistoryControls button:active,
 .nautilus-window .navigation-controls button:active {{
     background-color: {active_subtle};
-    background-image: none;
     border: none;
     box-shadow: none;
 }}
 
+NautilusHistoryControls button + button,
+NautilusHistoryControls #back_button + #forward_button,
+.navigation-controls button + button {{
+    border-left: {linked_divider};
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
+}}
+
+NautilusHistoryControls button:first-child,
+.navigation-controls button:first-child {{
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}}
+
 /* 16. Segmented Controls (.linked, stackswitcher, viewswitcher) & Split Buttons (AdwSplitButton) */
 /* Segmented Control Capsule Container (macOS pill container) */
-window headerbar .linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-window .titlebar .linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-window headerbar box.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-window .titlebar box.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
+window headerbar .linked:not(.path-bar):not(nautilus-path-bar),
+window .titlebar .linked:not(.path-bar):not(nautilus-path-bar),
+window headerbar box.linked:not(.path-bar):not(nautilus-path-bar),
+window .titlebar box.linked:not(.path-bar):not(nautilus-path-bar),
 window headerbar stackswitcher,
 window .titlebar stackswitcher,
 window headerbar viewswitcher,
 window .titlebar viewswitcher,
-window .linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-window box.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
+window .linked:not(.path-bar):not(nautilus-path-bar),
+window box.linked:not(.path-bar):not(nautilus-path-bar),
 window stackswitcher,
 window viewswitcher,
-headerbar .linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-.titlebar .linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-headerbar box.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-.titlebar box.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
+headerbar .linked:not(.path-bar):not(nautilus-path-bar),
+.titlebar .linked:not(.path-bar):not(nautilus-path-bar),
+headerbar box.linked:not(.path-bar):not(nautilus-path-bar),
+.titlebar box.linked:not(.path-bar):not(nautilus-path-bar),
 headerbar stackswitcher,
 .titlebar stackswitcher,
 headerbar viewswitcher,
 .titlebar viewswitcher,
-.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
-box.linked:not(NautilusHistoryControls):not(.navigation-controls):not(.path-bar):not(nautilus-path-bar),
+.linked:not(.path-bar):not(nautilus-path-bar),
+box.linked:not(.path-bar):not(nautilus-path-bar),
 stackswitcher,
 viewswitcher,
-.kgx-window headerbar .linked:not(NautilusHistoryControls):not(.navigation-controls),
-window.kgx headerbar .linked:not(NautilusHistoryControls):not(.navigation-controls) {{
+.kgx-window headerbar .linked,
+window.kgx headerbar .linked {{
     background-color: {linked_bg};
     background-image: none;
     border: {linked_border};
@@ -3748,153 +4013,310 @@ viewswitcher > button:active:not(:checked) {{
 /* Selected / Checked Segment (Elevated macOS Segment Plate) */
 window headerbar .linked > button:checked,
 window headerbar .linked > button.flat:checked,
+window headerbar .linked > button.toggle:checked,
+window headerbar .linked > togglebutton:checked,
 window headerbar box.linked > button:checked,
 window headerbar box.linked > button.flat:checked,
+window headerbar box.linked > button.toggle:checked,
+window headerbar box.linked > togglebutton:checked,
 window headerbar stackswitcher > button:checked,
 window headerbar viewswitcher > button:checked,
 window .linked > button:checked,
 window .linked > button.flat:checked,
+window .linked > button.toggle:checked,
+window .linked > togglebutton:checked,
 window box.linked > button:checked,
 headerbar .linked > button:checked,
+headerbar .linked > button.toggle:checked,
+headerbar .linked > togglebutton:checked,
 headerbar box.linked > button:checked,
+headerbar box.linked > button.toggle:checked,
+headerbar box.linked > togglebutton:checked,
 headerbar stackswitcher > button:checked,
 headerbar viewswitcher > button:checked,
 .linked > button:checked,
+.linked > button.toggle:checked,
+.linked > togglebutton:checked,
 box.linked > button:checked,
+box.linked > button.toggle:checked,
+box.linked > togglebutton:checked,
 stackswitcher > button:checked,
 viewswitcher > button:checked {{
     background-color: {linked_checked};
     color: {linked_checked_fg};
     box-shadow: {linked_checked_shadow};
-    border-radius: {seg_radius}px;
+    border-radius: 9999px;
+    border: none;
     font-weight: 500;
 }}
 
 /* Subtle hairline divider between adjacent unselected segments */
 .linked > button:not(:checked) + button:not(:checked),
+.linked > button.toggle:not(:checked) + button.toggle:not(:checked),
 box.linked > button:not(:checked) + button:not(:checked),
+box.linked > button.toggle:not(:checked) + button.toggle:not(:checked),
+headerbar .linked > button:not(:checked) + button:not(:checked),
+headerbar .linked > button.toggle:not(:checked) + button.toggle:not(:checked),
+headerbar box.linked > button:not(:checked) + button:not(:checked),
+headerbar box.linked > button.toggle:not(:checked) + button.toggle:not(:checked),
 stackswitcher > button:not(:checked) + button:not(:checked),
 viewswitcher > button:not(:checked) + button:not(:checked) {{
     border-left: {linked_divider};
 }}
 
-/* ── Split Buttons (AdwSplitButton - Single unified control, NO outer container box) ── */
-splitbutton,
-window headerbar splitbutton,
-window .titlebar splitbutton,
-window splitbutton,
-headerbar splitbutton,
-.titlebar splitbutton,
-.kgx-window headerbar splitbutton,
-window.kgx headerbar splitbutton {{
+
+/* ── macOS 27 Apple HIG Toolbar Capsules, Controls & Backdrop Consistency ── */
+/* 1. Neutralize all rogue backgrounds/borders on buttons inside headerbars and capsules (excluding traffic lights) */
+headerbar button:not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+headerbar button:backdrop:not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+.titlebar button:not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+.titlebar button:backdrop:not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+window headerbar button:not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+window headerbar button:backdrop:not(.titlebutton):not(.close):not(.minimize):not(.maximize),
+headerbar menubutton > button,
+headerbar menubutton > button:backdrop,
+headerbar menubutton.flat > button,
+headerbar menubutton.flat > button:backdrop,
+headerbar splitbutton > button,
+headerbar splitbutton > button:focus,
+headerbar splitbutton > button:focus-visible,
+headerbar splitbutton > button:focus-within,
+headerbar splitbutton > button:backdrop,
+headerbar splitbutton > menubutton > button,
+headerbar splitbutton > menubutton > button:focus,
+headerbar splitbutton > menubutton > button:focus-visible,
+headerbar splitbutton > menubutton > button:backdrop,
+splitbutton > button,
+splitbutton > button:focus,
+splitbutton > button:focus-visible,
+splitbutton > button:focus-within,
+splitbutton > button:backdrop,
+splitbutton > menubutton > button,
+splitbutton > menubutton > button:focus,
+splitbutton > menubutton > button:focus-visible,
+splitbutton > menubutton > button:backdrop,
+window headerbar splitbutton > button,
+window headerbar splitbutton > button:focus,
+window headerbar splitbutton > button:focus-visible,
+window headerbar splitbutton > button:focus-within,
+window headerbar splitbutton > button:backdrop,
+window headerbar splitbutton > menubutton > button,
+window headerbar splitbutton > menubutton > button:focus,
+window headerbar splitbutton > menubutton > button:focus-visible,
+window headerbar splitbutton > menubutton > button:backdrop,
+headerbar .linked > button,
+headerbar .linked > button:backdrop,
+headerbar box.linked > button,
+headerbar box.linked > button:backdrop,
+.linked > button,
+.linked > button:backdrop,
+box.linked > button,
+box.linked > button:backdrop,
+viewswitcher > button,
+viewswitcher > button:backdrop,
+headerbar viewswitcher > button,
+headerbar viewswitcher > button:backdrop {{
     background: transparent;
     background-color: transparent;
     background-image: none;
     border: none;
     box-shadow: none;
-    border-radius: 0;
-    margin: 0 4px;
-    padding: 0;
+    color: {btn_fg};
 }}
 
+/* 2. Elevated Capsule Containers in Headerbars */
+window headerbar .linked:not(.path-bar):not(nautilus-path-bar),
+window headerbar box.linked:not(.path-bar):not(nautilus-path-bar),
+window headerbar stackswitcher,
+window headerbar viewswitcher,
+headerbar .linked:not(.path-bar):not(nautilus-path-bar),
+headerbar box.linked:not(.path-bar):not(nautilus-path-bar),
+headerbar stackswitcher,
+headerbar viewswitcher,
+.linked:not(.path-bar):not(nautilus-path-bar),
+box.linked:not(.path-bar):not(nautilus-path-bar),
+stackswitcher,
+viewswitcher,
+NautilusHistoryControls,
+.navigation-controls,
+headerbar .navigation-controls,
 headerbar splitbutton,
 .titlebar splitbutton,
 window headerbar splitbutton,
-window .titlebar splitbutton {{
-    margin-top: 6px;
-    margin-bottom: 6px;
+window .titlebar splitbutton,
+splitbutton {{
+    background-color: {linked_bg};
+    background-image: none;
+    border: {linked_border};
+    box-shadow: {linked_shadow};
+    border-radius: 9999px;
+    margin: 0 4px;
+    padding: 2px;
 }}
 
-splitbutton > button,
-splitbutton > menubutton > button,
+window headerbar .linked:backdrop,
+window headerbar box.linked:backdrop,
+headerbar .linked:backdrop,
+headerbar box.linked:backdrop,
+.linked:backdrop,
+box.linked:backdrop,
+stackswitcher:backdrop,
+viewswitcher:backdrop,
+headerbar viewswitcher:backdrop,
+headerbar splitbutton:backdrop,
+window headerbar splitbutton:backdrop,
+splitbutton:backdrop,
+NautilusHistoryControls:backdrop,
+.navigation-controls:backdrop {{
+    background-color: {linked_bg};
+    background-image: none;
+    border: {linked_border};
+    box-shadow: {linked_shadow};
+    opacity: 0.90;
+}}
+
+/* 3. Inner buttons of Toolbar Capsules */
+headerbar .linked > button,
+headerbar .linked > button.toggle,
+headerbar box.linked > button,
+headerbar box.linked > button.toggle,
+headerbar viewswitcher > button,
+headerbar viewswitcher > button.toggle,
+.linked > button,
+.linked > button.toggle,
+box.linked > button,
+box.linked > button.toggle,
+viewswitcher > button,
+viewswitcher > button.toggle,
 headerbar splitbutton > button,
 headerbar splitbutton > menubutton > button,
-window splitbutton > button,
-window splitbutton > menubutton > button {{
+splitbutton > button,
+splitbutton > menubutton > button,
+NautilusHistoryControls button,
+.navigation-controls button {{
     min-height: 22px;
+    min-width: 22px;
     padding: 2px 8px;
+    border-radius: 9999px;
     margin: 0;
+    background: transparent;
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
     color: {btn_fg};
-    font-size: 13px;
     transition: background-color 80ms ease, color 80ms ease;
 }}
 
-/* Standard split button push styling strictly outside headerbars */
-box.content splitbutton:not(.flat) > button,
-box.content splitbutton:not(.flat) > menubutton > button,
-preferencespage splitbutton:not(.flat) > button,
-preferencespage splitbutton:not(.flat) > menubutton > button,
-dialog splitbutton:not(.flat) > button,
-dialog splitbutton:not(.flat) > menubutton > button {{
-    background-color: {btn_bg};
-    background-image: none;
-    border: {btn_border};
-    box-shadow: {btn_shadow};
+/* 4. Active / Checked Inset Capsule Pill (Apple macOS HIG) */
+headerbar .linked > button:checked,
+headerbar .linked > button:checked:backdrop,
+headerbar .linked > button.toggle:checked,
+headerbar .linked > button.toggle:checked:backdrop,
+headerbar box.linked > button:checked,
+headerbar box.linked > button:checked:backdrop,
+headerbar box.linked > button.toggle:checked,
+headerbar box.linked > button.toggle:checked:backdrop,
+headerbar viewswitcher > button:checked,
+headerbar viewswitcher > button:checked:backdrop,
+headerbar viewswitcher > button.toggle:checked,
+headerbar viewswitcher > button.toggle:checked:backdrop,
+.linked > button:checked,
+.linked > button:checked:backdrop,
+.linked > button.toggle:checked,
+.linked > button.toggle:checked:backdrop,
+box.linked > button:checked,
+box.linked > button:checked:backdrop,
+box.linked > button.toggle:checked,
+box.linked > button.toggle:checked:backdrop,
+viewswitcher > button:checked,
+viewswitcher > button:checked:backdrop,
+viewswitcher > button.toggle:checked,
+viewswitcher > button.toggle:checked:backdrop,
+stackswitcher > button:checked,
+stackswitcher > button:checked:backdrop {{
+    background-color: {linked_checked};
+    color: {linked_checked_fg};
+    box-shadow: {linked_checked_shadow};
+    border-radius: 9999px;
+    border: none;
+    font-weight: 500;
 }}
 
-box.content splitbutton:not(.flat) > button:hover,
-box.content splitbutton:not(.flat) > menubutton > button:hover,
-preferencespage splitbutton:not(.flat) > button:hover,
-preferencespage splitbutton:not(.flat) > menubutton > button:hover {{
-    background-color: {btn_hover};
-}}
-
-box.content splitbutton:not(.flat) > button:active,
-box.content splitbutton:not(.flat) > menubutton > button:active,
-preferencespage splitbutton:not(.flat) > button:active,
-preferencespage splitbutton:not(.flat) > menubutton > button:active {{
-    background-color: {btn_active};
-}}
-
-/* Flat headerbar splitbutton (apple/toolbars/ Safari / Finder view mode) */
-headerbar splitbutton > button,
-headerbar splitbutton > menubutton > button,
-headerbar splitbutton:not(.flat) > button,
-headerbar splitbutton:not(.flat) > menubutton > button,
-headerbar splitbutton > button.flat,
-headerbar splitbutton > menubutton > button.flat,
-.titlebar splitbutton > button,
-.titlebar splitbutton > menubutton > button,
-.titlebar splitbutton:not(.flat) > button,
-.titlebar splitbutton:not(.flat) > menubutton > button,
-splitbutton.flat > button,
-splitbutton.flat > menubutton > button {{
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
+/* 5. Hover and Pressed States */
+headerbar .linked > button:hover:not(:checked),
+headerbar box.linked > button:hover:not(:checked),
+headerbar viewswitcher > button:hover:not(:checked),
+.linked > button:hover:not(:checked),
+box.linked > button:hover:not(:checked),
+viewswitcher > button:hover:not(:checked),
+headerbar splitbutton > button:hover,
+headerbar splitbutton > menubutton > button:hover,
+splitbutton > button:hover,
+splitbutton > menubutton > button:hover,
+NautilusHistoryControls button:hover,
+.navigation-controls button:hover {{
+    background-color: {linked_hover};
     border: none;
     box-shadow: none;
 }}
 
-headerbar splitbutton > button:hover,
-headerbar splitbutton > menubutton > button:hover,
-headerbar splitbutton:not(.flat) > button:hover,
-headerbar splitbutton:not(.flat) > menubutton > button:hover,
-.titlebar splitbutton > button:hover,
-.titlebar splitbutton > menubutton > button:hover,
-splitbutton.flat > button:hover,
-splitbutton.flat > menubutton > button:hover {{
-    background-color: {hover_subtle};
-}}
-
+headerbar .linked > button:active:not(:checked),
+headerbar box.linked > button:active:not(:checked),
+headerbar viewswitcher > button:active:not(:checked),
+.linked > button:active:not(:checked),
+box.linked > button:active:not(:checked),
+viewswitcher > button:active:not(:checked),
 headerbar splitbutton > button:active,
 headerbar splitbutton > menubutton > button:active,
-headerbar splitbutton:not(.flat) > button:active,
-headerbar splitbutton:not(.flat) > menubutton > button:active,
-.titlebar splitbutton > button:active,
-.titlebar splitbutton > menubutton > button:active,
-splitbutton.flat > button:active,
-splitbutton.flat > menubutton > button:active {{
-    background-color: {active_subtle};
+splitbutton > button:active,
+splitbutton > menubutton > button:active,
+NautilusHistoryControls button:active,
+.navigation-controls button:active {{
+    background-color: {linked_active};
+    border: none;
+    box-shadow: none;
 }}
 
-/* Split button LTR Directional Radii */
+/* 6. Hairline Dividers Between Adjacent Unchecked Segments */
+headerbar .linked > button:not(:checked) + button:not(:checked),
+headerbar .linked > button.toggle:not(:checked) + button.toggle:not(:checked),
+headerbar box.linked > button:not(:checked) + button:not(:checked),
+headerbar box.linked > button.toggle:not(:checked) + button.toggle:not(:checked),
+headerbar viewswitcher > button:not(:checked) + button:not(:checked),
+headerbar viewswitcher > button.toggle:not(:checked) + button.toggle:not(:checked),
+.linked > button:not(:checked) + button:not(:checked),
+.linked > button.toggle:not(:checked) + button.toggle:not(:checked),
+box.linked > button:not(:checked) + button:not(:checked),
+box.linked > button.toggle:not(:checked) + button.toggle:not(:checked),
+viewswitcher > button:not(:checked) + button:not(:checked),
+viewswitcher > button.toggle:not(:checked) + button.toggle:not(:checked),
+stackswitcher > button:not(:checked) + button:not(:checked),
+NautilusHistoryControls button + button,
+.navigation-controls button + button {{
+    border-left: {linked_divider};
+}}
+
+/* 7. Splitbutton Hairline Separator */
+window headerbar splitbutton > separator,
+window splitbutton > separator,
+headerbar splitbutton > separator,
+splitbutton > separator {{
+    min-width: 1px;
+    min-height: 14px;
+    background-color: {linked_divider_color};
+    margin: 2px 0;
+    padding: 0;
+    border: none;
+}}
+
+/* 8. Directional Radii inside Split Buttons */
 splitbutton > button:dir(ltr),
 splitbutton > button:first-child:dir(ltr),
 headerbar splitbutton > button:dir(ltr),
 headerbar splitbutton > button:first-child:dir(ltr) {{
-    border-top-left-radius: {seg_radius}px;
-    border-bottom-left-radius: {seg_radius}px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: none;
@@ -3904,20 +4326,19 @@ splitbutton > menubutton > button:dir(ltr),
 splitbutton > menubutton:last-child > button:dir(ltr),
 headerbar splitbutton > menubutton > button:dir(ltr),
 headerbar splitbutton > menubutton:last-child > button:dir(ltr) {{
-    border-top-right-radius: {seg_radius}px;
-    border-bottom-right-radius: {seg_radius}px;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: none;
 }}
 
-/* Split button RTL Directional Radii */
 splitbutton > button:dir(rtl),
 splitbutton > button:first-child:dir(rtl),
 headerbar splitbutton > button:dir(rtl),
 headerbar splitbutton > button:first-child:dir(rtl) {{
-    border-top-right-radius: {seg_radius}px;
-    border-bottom-right-radius: {seg_radius}px;
+    border-top-right-radius: 9999px;
+    border-bottom-right-radius: 9999px;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-left: none;
@@ -3927,24 +4348,11 @@ splitbutton > menubutton > button:dir(rtl),
 splitbutton > menubutton:last-child > button:dir(rtl),
 headerbar splitbutton > menubutton > button:dir(rtl),
 headerbar splitbutton > menubutton:last-child > button:dir(rtl) {{
-    border-top-left-radius: {seg_radius}px;
-    border-bottom-left-radius: {seg_radius}px;
+    border-top-left-radius: 9999px;
+    border-bottom-left-radius: 9999px;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
     border-right: none;
-}}
-
-/* Splitbutton separator */
-window headerbar splitbutton > separator,
-window splitbutton > separator,
-headerbar splitbutton > separator,
-splitbutton > separator {{
-    min-width: 1px;
-    min-height: 14px;
-    background-color: {linked_divider_color};
-    margin: 3px 0;
-    padding: 0;
-    border: none;
 }}
 
 /* 17. macOS Color Wells & Image Wells (apple/color wells/ & apple/image wells/) */
