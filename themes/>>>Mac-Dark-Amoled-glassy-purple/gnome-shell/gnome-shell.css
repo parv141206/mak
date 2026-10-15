@@ -5291,3 +5291,94 @@ StWidget.focused .app-grid-running-dot {
 .popup-menu-player-icons-icon {
   background: rgba(255, 255, 255, 0.1) !important;
 }
+
+/* ── Mak Shell Contrast & Liquid Glass Refraction Tuning ── */
+.popup-menu-content {
+    background-color: rgba(36, 36, 40, 0.82);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+    border-radius: 10px;
+    padding: 6px;
+}
+
+.popup-menu-item {
+    color: #f5f5f7;
+    font-weight: 500;
+    border-radius: 4px;
+    min-height: 24px;
+    padding: 3px 10px;
+}
+
+.popup-menu-item StLabel {
+    color: #f5f5f7;
+}
+
+.popup-menu-item:hover,
+.popup-menu-item:active {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: #f5f5f7;
+}
+
+.popup-menu-item:selected {
+    background-color: #007aff;
+    color: #ffffff;
+}
+
+.popup-menu-item:selected StLabel {
+    color: #ffffff;
+}
+
+.notification-banner {
+    background-color: rgba(36, 36, 40, 0.86);
+    color: #f5f5f7;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+}
+
+.notification-banner StLabel {
+    color: #f5f5f7;
+}
+
+.notification-banner .message,
+.notification-banner .message-box,
+.notification-banner .message-content,
+.notification-banner .message-header,
+.notification-banner .message-body,
+.notification-banner .message-header-content,
+.notification-banner .message-title,
+.notification-banner StBoxLayout,
+.notification-banner StBin {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+}
+
+.notification-banner .message-close-button,
+.notification-banner .message .message-header .message-close-button {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 9999px;
+    padding: 2px;
+    min-height: 18px;
+    min-width: 18px;
+    color: #f5f5f7;
+    opacity: 0.65;
+}
+
+.notification-banner .message-close-button:hover,
+.notification-banner .message .message-header .message-close-button:hover {
+    background-color: rgba(255, 255, 255, 0.12);
+    opacity: 1.0;
+}
+
+.notification-button {
+    border-radius: 5px;
+    min-height: 24px;
+    padding: 2px 12px;
+    font-weight: 500;
+}
