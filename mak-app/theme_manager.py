@@ -6,6 +6,7 @@ import sys
 import json
 import subprocess
 import shutil
+import re
 
 class TokenManager:
     """
@@ -4795,7 +4796,7 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
 window.background.chromium,
 window.background.chromium headerbar.header-bar.titlebar,
 window.background.chromium headerbar.titlebar {{
-    background-color: {color} !important;
+    background-color: {color};
 }}
 """)
 
@@ -4812,10 +4813,10 @@ headerbar windowcontrols button.minimize,
 windowcontrols button.close,
 windowcontrols button.maximize,
 windowcontrols button.minimize {{
-    min-width: {bs}px !important;
-    min-height: {bs}px !important;
-    background-size: {bs}px {bs}px !important;
-    margin: 0 {half_sp}px !important;
+    min-width: {bs}px;
+    min-height: {bs}px;
+    background-size: {bs}px {bs}px;
+    margin: 0 {half_sp}px;
 }}
 """)
 
@@ -5371,13 +5372,17 @@ def apply_global_theme(theme_key):
         else:
             tuple_str = "(1.0, 1.0, 1.0, 0.16)"
 
-        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 16>, 'smoothing': <0.8>, 'borderColor': <{tuple_str}>, 'enabled': <true>}}"
+        new_val = f"{{'padding': <{{'left': uint32 0, 'right': 0, 'top': 0, 'bottom': 0}}>, 'keepRoundedCorners': <{{'maximized': true, 'fullscreen': true}}>, 'borderRadius': <uint32 24>, 'smoothing': <0.8>, 'borderColor': <{tuple_str}>, 'enabled': <true>}}"
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "global-rounded-corner-settings", new_val], check=False)
-        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "1"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "border-width", "0"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libadwaita-app", "true"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.rounded-window-corners-reborn", "skip-libhandy-app", "true"], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-border-color", w_border], check=False)
-        log.append(f"Updated window corner settings (radius 16, smoothing 0.8, border {w_border}, skip-libadwaita true).")
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-border-width", "0"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "skip-libadwaita-app", "true"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "skip-libhandy-app", "true"], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "corner-radius", "24"], check=False)
+        log.append(f"Updated window corner settings (radius 24, smoothing 0.8, border-width 0, skip-libadwaita true).")
     except Exception as e:
         log.append(f"Error updating window corners border: {e}")
 
