@@ -234,3 +234,33 @@
   - `scripts/apply_staged.sh` created, verified executable and idempotent with dry-run support.
   - Removed temporary debug files from `qa/report/`.
   - Comprehensive final report published in `docs/fidelity/REPORT.md`.
+
+## Escalation Pass: Direct Resolution of Real-World Desktop Defects (PASSED)
+
+### Issue 1: Double-Boxed "Russian Doll" Split & Linked Buttons (User Screenshot 0)
+- **Root Cause**: `theme_manager.py` grouped `splitbutton` directly with `.linked` and `.stackswitcher`, giving the outer `splitbutton` widget a capsule container card (`{linked_bg}`, `{linked_border}`, `{seg_pad}px`). In libadwaita (`AdwSplitButton`), the child buttons simultaneously rendered their own button borders, creating an outer box enclosing two inner boxes with gaps.
+- **Fix**:
+  - Completely separated `splitbutton` from `.linked` in Section 16 of `theme_manager.py`.
+  - Styled `splitbutton` container as completely transparent (`background: transparent; border: none; box-shadow: none; padding: 0;`).
+  - Implemented authentic macOS split button geometry: left button has left rounded corners (`border-top-left-radius` / `border-bottom-left-radius` 5px, right radius 0, `border-right: none`), right button has right rounded corners (`border-top-right-radius` / `border-bottom-right-radius` 5px, left radius 0, `border-left: none`), with a 1px vertical hairline divider between them.
+  - Implemented flat headerbar styling (Console / Safari style) with subtle hover pills (`{hover_subtle}`).
+  - Handled explicit `:dir(ltr)` and `:dir(rtl)` directional flipping.
+- **Verification**: Rendered `qa/report/stage_splitbutton_dark.png`, `stage_splitbutton_light.png`, and headerbar splitbutton `/tmp/hb_splitbutton_dark.png`. Double-box completely eliminated.
+
+### Issue 2: Dead / Washed-out Traffic Lights & Margins in Chromium/Brave/Electron (User Screenshot 1)
+- **Root Cause**: Chromium queries GTK header button states with `:backdrop` whenever a web page or omnibox has keyboard focus. Aggressive `windowcontrols button:backdrop` rules in `theme_manager.py` matched this and wiped out the red, yellow, and green colors, setting `background-color: {backdrop_bg}` (dead flat grey). Furthermore, Chromium lacks `.start` on its `windowcontrols`, causing left margins to be skipped.
+- **Fix**:
+  - Replaced flat grey backdrop overrides with rules preserving authentic Apple colors (`#ff5f56`, `#ffbd2e`, `#27c93f`) on `windowcontrols button.close`, `.minimize`, `.maximize` in Chromium and Brave.
+  - Softened inactive window state to subtle opacity reduction (`opacity: 0.60`) only when the window itself is backdrop (`window.background.chromium:backdrop:not(:hover)`).
+  - Explicitly added 13px left margin and 18px right margin to Chromium, Brave, and generic `windowcontrols` without requiring `.start`.
+  - Eliminated invalid `auto` values from GTK CSS margins to achieve zero parser warnings.
+- **Verification**: Staged and verified across all themes.
+
+### Issue 3: Frankenstein Two-Tone Notification Banner (User Screenshot 2)
+- **Root Cause**: In GNOME Shell, `.notification-banner` wraps internal `.message`, `.message-box`, `.message-content`, and `.message-header` containers. While `menuStyleController.js` and `theme_manager.py` styled the outer banner, upstream Adwaita shell styles applied solid `#54545a` backgrounds to inner `.message` elements, creating a stark rectangular card inside a dark frosted glass banner. Upstream close button rules also forced a chunky dark circle.
+- **Fix**:
+  - Enforced transparency across all internal notification containers: `.notification-banner .message`, `.message-box`, `.message-content`, `.message-header`, `.message-body`, `.message-header-content`, `StBoxLayout`, `StBin` set to `background-color: transparent !important; background-image: none !important; border: none !important; box-shadow: none !important;` in `menuStyleController.js`, `stylesheet.css`, and `theme_manager.py`.
+  - Redesigned close button: transparent at rest, 18px circular pill, translucent hover (`rgba(255, 255, 255, 0.15)`), eliminating the solid circle.
+  - Aligned the entire notification toast to Apple's single unified frosted card spec (`apple/notifications/24_mode_dark__stack_false.png` and `32_mode_light__stack_false.png`).
+- **Verification**: Validated in `menuStyleController.js`, `stylesheet.css`, and staged `gnome-shell.css`.
+

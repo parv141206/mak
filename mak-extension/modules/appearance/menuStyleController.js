@@ -649,6 +649,39 @@ export class MenuStyleController {
     color: ${textColor} !important;
 }
 
+.notification-banner .message,
+.notification-banner .message-box,
+.notification-banner .message-content,
+.notification-banner .message-header,
+.notification-banner .message-body,
+.notification-banner .message-header-content,
+.notification-banner StBoxLayout,
+.notification-banner StBin {
+    background-color: transparent !important;
+    background-image: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.notification-banner .message-close-button,
+.notification-banner .message .message-header .message-close-button {
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 9999px !important;
+    padding: 2px !important;
+    min-height: 18px !important;
+    min-width: 18px !important;
+    color: ${textColor} !important;
+    opacity: 0.65 !important;
+}
+
+.notification-banner .message-close-button:hover,
+.notification-banner .message .message-header .message-close-button:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    opacity: 1.0 !important;
+}
+
 /* ── Modal Dialogs ────────────────────────────────────────────────────────── */
 .modal-dialog {
     border-radius: ${Math.max(16, radius + 4)}px !important;
