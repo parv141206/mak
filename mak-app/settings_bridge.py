@@ -418,8 +418,57 @@ class MakSettingsBridge:
     def get_topbar_transparency(self): return self._get_d("topbar-transparency", None, None, 0.35)
     def set_topbar_transparency(self, v): self._set_d("topbar-transparency", None, None, v)
 
+    def get_topbar_style_mode(self):
+        m = self._get_s("topbar-style-mode", None, None, "")
+        if m in ["transparent", "frosted", "opaque"]:
+            return m
+        if self.get_topbar_opaque():
+            return "opaque"
+        if self.get_topbar_transparent():
+            return "transparent"
+        return "transparent"
+
+    def set_topbar_style_mode(self, mode):
+        self._set_s("topbar-style-mode", None, None, mode)
+        if mode == "transparent":
+            self._set_b("topbar-transparent", None, None, True)
+            self._set_b("topbar-opaque", None, None, False)
+            self._set_d("topbar-transparency", None, None, 0.0)
+        elif mode == "opaque":
+            self._set_b("topbar-transparent", None, None, False)
+            self._set_b("topbar-opaque", None, None, True)
+            self._set_d("topbar-transparency", None, None, 1.0)
+        else: # frosted
+            self._set_b("topbar-transparent", None, None, False)
+            self._set_b("topbar-opaque", None, None, False)
+            current_alpha = self._get_d("topbar-transparency", None, None, 0.35)
+            if current_alpha >= 0.98 or current_alpha <= 0.02:
+                self._set_d("topbar-transparency", None, None, 0.35)
+
+    def get_topbar_transparent(self):
+        return self._get_b("topbar-transparent", None, None, True)
+
+    def set_topbar_transparent(self, v):
+        self._set_b("topbar-transparent", None, None, v)
+        if v:
+            self._set_b("topbar-opaque", None, None, False)
+            self._set_s("topbar-style-mode", None, None, "transparent")
+            self._set_d("topbar-transparency", None, None, 0.0)
+        else:
+            self._set_s("topbar-style-mode", None, None, "frosted")
+            self._set_d("topbar-transparency", None, None, 0.35)
+
     def get_topbar_opaque(self): return self._get_b("topbar-opaque", None, None, False)
-    def set_topbar_opaque(self, v): self._set_b("topbar-opaque", None, None, v)
+    def set_topbar_opaque(self, v):
+        self._set_b("topbar-opaque", None, None, v)
+        if v:
+            self._set_b("topbar-transparent", None, None, False)
+            self._set_s("topbar-style-mode", None, None, "opaque")
+            self._set_d("topbar-transparency", None, None, 1.0)
+        else:
+            self._set_s("topbar-style-mode", None, None, "transparent")
+            self._set_b("topbar-transparent", None, None, True)
+            self._set_d("topbar-transparency", None, None, 0.0)
 
     def get_topbar_pill_style(self): return self._get_b("topbar-pill-style", None, None, True)
     def set_topbar_pill_style(self, v): self._set_b("topbar-pill-style", None, None, v)
@@ -441,6 +490,12 @@ class MakSettingsBridge:
 
     def get_topbar_caffeine(self): return self._get_b("topbar-caffeine", None, None, True)
     def set_topbar_caffeine(self, v): self._set_b("topbar-caffeine", None, None, v)
+
+    def get_topbar_power_saver(self): return self._get_b("topbar-power-saver", None, None, True)
+    def set_topbar_power_saver(self, v): self._set_b("topbar-power-saver", None, None, v)
+
+    def get_power_saver_active(self): return self._get_b("power-saver-active", None, None, False)
+    def set_power_saver_active(self, v): self._set_b("power-saver-active", None, None, v)
 
     def get_topbar_scratchpad(self): return self._get_b("topbar-scratchpad", None, None, True)
     def set_topbar_scratchpad(self, v): self._set_b("topbar-scratchpad", None, None, v)
@@ -982,6 +1037,25 @@ class MakSettingsBridge:
 
     def set_app_glass_level(self, v):
         self._set_d("app-glass-level", None, None, float(v))
+        if self.liquid_glass and self._has_key(self.liquid_glass, "application-displacement-scale"):
+            try:
+                disp = max(1.0, float(v) * 32.0)
+                self.liquid_glass.set_double("application-displacement-scale", disp)
+            except Exception: pass
+
+    def get_app_chroma(self):
+        return self._get_d("app-chroma-strength", self.liquid_glass, "application-chroma-strength", 0.20)
+
+    def set_app_chroma(self, v):
+        val = max(0.0, min(1.5, float(v)))
+        self._set_d("app-chroma-strength", self.liquid_glass, "application-chroma-strength", val)
+
+    def get_app_edge_reflection(self):
+        return self._get_d("app-edge-reflection", self.liquid_glass, "application-edge-reflection", 0.25)
+
+    def set_app_edge_reflection(self, v):
+        val = max(0.0, min(1.0, float(v)))
+        self._set_d("app-edge-reflection", self.liquid_glass, "application-edge-reflection", val)
 
     def get_app_tint_color(self):
         return self._get_s("app-tint-color", self.liquid_glass, "application-tint-color", "#ffffff")

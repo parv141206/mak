@@ -5414,8 +5414,27 @@ def apply_global_theme(theme_key):
                 if res_s.returncode == 0:
                     app_tint_strength = float(res_s.stdout.strip())
             except Exception: pass
+            app_refr = 0.50
+            app_chroma = 0.20
+            app_refl = 0.25
+            try:
+                res_lvl = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-glass-level"], capture_output=True, text=True)
+                if res_lvl.returncode == 0:
+                    app_refr = float(res_lvl.stdout.strip())
+            except Exception: pass
+            try:
+                res_chr = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-chroma-strength"], capture_output=True, text=True)
+                if res_chr.returncode == 0:
+                    app_chroma = float(res_chr.stdout.strip())
+            except Exception: pass
+            try:
+                res_ref = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-edge-reflection"], capture_output=True, text=True)
+                if res_ref.returncode == 0:
+                    app_refl = float(res_ref.stdout.strip())
+            except Exception: pass
 
             raw_op = int(round(app_opacity * 255.0))
+            disp_scale = max(1.0, app_refr * 32.0)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "true"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", str(raw_op)], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "sigma", str(app_radius)], check=False)
@@ -5425,6 +5444,9 @@ def apply_global_theme(theme_key):
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-blur-radius", str(app_radius)], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-tint-color", app_tint_color], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-tint-strength", str(app_tint_strength)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-displacement-scale", str(disp_scale)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-chroma-strength", str(app_chroma)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-edge-reflection", str(app_refl)], check=False)
         else:
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "false"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "255"], check=False)

@@ -804,7 +804,7 @@ void main() {
     // Chromatic aberration as dispersion: blue bends more than red, by a
     // fraction of the refraction, so the colours part only where the glass
     // bends the backdrop and most where it bends it most.
-    vec2 chromaVec = disp * clamp(chroma_strength, 0.0, 1.0);
+    vec2 chromaVec = disp * clamp(chroma_strength, 0.0, 2.5);
     vec2 uvG = refractedUv;
 
     // Below a hundredth of a pixel the three channels sample the same texels,
