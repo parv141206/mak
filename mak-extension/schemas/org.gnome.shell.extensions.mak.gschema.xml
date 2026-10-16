@@ -634,6 +634,23 @@
       <description>Gaussian blur radius for the top panel.</description>
     </key>
 
+    <key type="s" name="topbar-style-mode">
+      <choices>
+        <choice value='transparent'/>
+        <choice value='frosted'/>
+        <choice value='opaque'/>
+      </choices>
+      <default>'transparent'</default>
+      <summary>Top Bar Appearance Mode</summary>
+      <description>Top bar visual style: 'transparent' (crystal-clear see-through), 'frosted' (macOS frosted glass blur), or 'opaque' (solid background).</description>
+    </key>
+
+    <key type="b" name="topbar-transparent">
+      <default>true</default>
+      <summary>Transparent Top Bar Mode</summary>
+      <description>Make top bar 100% transparent and see-through over the wallpaper.</description>
+    </key>
+
     <key type="d" name="topbar-transparency">
       <default>0.35</default>
       <range min="0.0" max="1.0"/>
@@ -717,6 +734,18 @@
       <default>0</default>
       <summary>Caffeine Duration</summary>
       <description>Keep-awake duration in minutes (0 = indefinitely).</description>
+    </key>
+
+    <key type="b" name="topbar-power-saver">
+      <default>true</default>
+      <summary>Enable Eco Power Saver</summary>
+      <description>Shows custom managed extreme Eco Power Saver button in top bar.</description>
+    </key>
+
+    <key type="b" name="power-saver-active">
+      <default>false</default>
+      <summary>Eco Power Saver Active State</summary>
+      <description>Whether extreme battery saving optimizations are currently engaged.</description>
     </key>
 
     <key type="b" name="topbar-scratchpad">
@@ -1224,9 +1253,23 @@
 
     <key type="d" name="app-glass-level">
       <default>0.50</default>
-      <range min="0.0" max="1.0"/>
+      <range min="0.0" max="3.0"/>
       <summary>Application Glass Refraction</summary>
-      <description>Optical refraction depth and bevel intensity for application windows.</description>
+      <description>Optical refraction depth, Snell-law bending, and bevel displacement intensity for application windows.</description>
+    </key>
+
+    <key type="d" name="app-chroma-strength">
+      <default>0.20</default>
+      <range min="0.0" max="1.5"/>
+      <summary>Application Chroma Feel</summary>
+      <description>Prism RGB color fringe splitting (chromatic dispersion feel) along application window edges.</description>
+    </key>
+
+    <key type="d" name="app-edge-reflection">
+      <default>0.25</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Application Glass Edge Reflection</summary>
+      <description>Specular reflection and rim highlight intensity along application window glass edges.</description>
     </key>
 
     <key type="s" name="app-tint-color">

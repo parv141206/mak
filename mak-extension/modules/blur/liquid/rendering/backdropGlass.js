@@ -304,6 +304,18 @@ export const GlassActor = GObject.registerClass(class GlassActor extends Clutter
 
     setCornerRadius(radius) { this._renderer.setCornerRadius(radius); }
 
+    setDisplacementScale(scale) { this._renderer.setDisplacementScale(scale); }
+
+    setChromaStrength(strength) { this._renderer.setChromaStrength(strength); }
+
+    setIor(ior) { this._renderer.setIor(ior); }
+
+    setMaxZ(maxZ) { this._renderer.setMaxZ(maxZ); }
+
+    setSpecularIntensity(intensity) { this._renderer.setSpecularIntensity(intensity); }
+
+    setRimIntensity(intensity) { this._renderer.setRimIntensity(intensity); }
+
     setAnimationScale(scale) { this._renderer.setAnimationScale(scale); }
 
     // The glass's size in shader space; normally its own size.

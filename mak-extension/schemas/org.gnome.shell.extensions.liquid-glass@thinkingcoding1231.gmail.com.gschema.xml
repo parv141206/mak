@@ -579,6 +579,21 @@
       <summary>Saturation</summary>
       <description>Adjusts the saturation of the glass effect behind application windows.</description>
     </key>
+    <key name="application-displacement-scale" type="d">
+      <default>16.0</default>
+      <summary>Displacement scale for application windows</summary>
+      <description>Refraction bending strength in pixels along application window edges.</description>
+    </key>
+    <key name="application-chroma-strength" type="d">
+      <default>0.15</default>
+      <summary>Chromatic aberration strength for application windows</summary>
+      <description>RGB color dispersion (chroma feel) along application window refraction borders.</description>
+    </key>
+    <key name="application-edge-reflection" type="d">
+      <default>0.20</default>
+      <summary>Edge specular reflection for application windows</summary>
+      <description>Specular reflection and rim highlights along application window glass edges.</description>
+    </key>
     <!-- The desktop's own right-click menu. It is configured separately from
          application windows, with smaller corners and a more opaque body so
          it stays readable. -->

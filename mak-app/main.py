@@ -644,6 +644,14 @@ class MakAppWindow(Adw.ApplicationWindow):
         caff_row.connect("notify::active", lambda s, p: self.bridge.set_topbar_caffeine(s.get_active()))
         ind_group.add(caff_row)
 
+        power_saver_row = Adw.SwitchRow(
+            title="Eco Power Saver Indicator",
+            subtitle="Custom managed battery optimizer in top bar with 1-click CPU throttle, shader pause, dimming & service control"
+        )
+        power_saver_row.set_active(self.bridge.get_topbar_power_saver())
+        power_saver_row.connect("notify::active", lambda s, p: self.bridge.set_topbar_power_saver(s.get_active()))
+        ind_group.add(power_saver_row)
+
         notes_row = Adw.SwitchRow(
             title="Quick Notes / Scratchpad Popover",
             subtitle="macOS-styled floating notepad popover with live autosave, stats, and 1-click copy"
@@ -690,8 +698,73 @@ class MakAppWindow(Adw.ApplicationWindow):
         bat_group.add(bat_color_row)
 
         # Panel Appearance
-        pan_group = Adw.PreferencesGroup(title="Panel Styling and Frosted Blur")
+        pan_group = Adw.PreferencesGroup(title="Panel Styling and Transparency Mode")
         page.add(pan_group)
+
+        style_row = Adw.ComboRow(
+            title="Top Bar Style Mode",
+            subtitle="Choose appearance: Crystal-Clear Transparent, Frosted Glass, or Solid Opaque"
+        )
+        style_model = Gtk.StringList.new([
+            "Transparent (Clear Glass)",
+            "Frosted Glass (Translucent)",
+            "Solid Opaque"
+        ])
+        style_row.set_model(style_model)
+        style_keys = ["transparent", "frosted", "opaque"]
+        current_style = self.bridge.get_topbar_style_mode()
+        current_s_idx = style_keys.index(current_style) if current_style in style_keys else 0
+        style_row.set_selected(current_s_idx)
+
+        topbar_trans = Adw.SwitchRow(
+            title="Transparent Top Bar Mode",
+            subtitle="Make top bar 100% see-through and clear over the desktop wallpaper"
+        )
+        topbar_trans.set_active(self.bridge.get_topbar_transparent())
+
+        topbar_opaque = Adw.SwitchRow(
+            title="Opaque Top Bar",
+            subtitle="Make top bar 100% solid and opaque (disables transparent mode)"
+        )
+        topbar_opaque.set_active(self.bridge.get_topbar_opaque())
+
+        def on_style_combo_changed(row, _param):
+            idx = row.get_selected()
+            selected = style_keys[idx]
+            self.bridge.set_topbar_style_mode(selected)
+            topbar_trans.set_active(selected == "transparent")
+            topbar_opaque.set_active(selected == "opaque")
+
+        style_row.connect("notify::selected", on_style_combo_changed)
+
+        def on_trans_toggled(switch, _param):
+            active = switch.get_active()
+            if active:
+                self.bridge.set_topbar_transparent(True)
+                style_row.set_selected(0)
+                topbar_opaque.set_active(False)
+            elif style_row.get_selected() == 0:
+                self.bridge.set_topbar_transparent(False)
+                style_row.set_selected(1)
+
+        topbar_trans.connect("notify::active", on_trans_toggled)
+
+        def on_opaque_toggled(switch, _param):
+            active = switch.get_active()
+            if active:
+                self.bridge.set_topbar_opaque(True)
+                style_row.set_selected(2)
+                topbar_trans.set_active(False)
+            else:
+                self.bridge.set_topbar_opaque(False)
+                style_row.set_selected(0)
+                topbar_trans.set_active(True)
+
+        topbar_opaque.connect("notify::active", on_opaque_toggled)
+
+        pan_group.add(style_row)
+        pan_group.add(topbar_trans)
+        pan_group.add(topbar_opaque)
 
         blur_en = Adw.SwitchRow(title="Frosted Glass Blur", subtitle="Dynamic blurred glass surface behind top menu bar")
         blur_en.set_active(self.bridge.get_topbar_blur())
@@ -699,15 +772,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         pan_group.add(blur_en)
 
         pan_group.add(create_spin_row("Blur Radius", "Frosted glass blur radius in pixels", 5, 100, 5, self.bridge.get_topbar_blur_radius(), digits=0, on_change=self.bridge.set_topbar_blur_radius))
-        pan_group.add(create_spin_row("Panel Transparency", "Background translucency factor", 0.0, 1.0, 0.05, self.bridge.get_topbar_transparency(), digits=2, on_change=self.bridge.set_topbar_transparency))
-
-        topbar_opaque = Adw.SwitchRow(
-            title="Opaque Top Bar",
-            subtitle="Specifically make top bar 100% solid and opaque while leaving dock, menus, and popups translucent and blurry"
-        )
-        topbar_opaque.set_active(self.bridge.get_topbar_opaque())
-        topbar_opaque.connect("notify::active", lambda s, p: self.bridge.set_topbar_opaque(s.get_active()))
-        pan_group.add(topbar_opaque)
+        pan_group.add(create_spin_row("Frosted Background Opacity", "Translucency factor in Frosted Glass mode (0.0 = clear, 1.0 = solid)", 0.0, 1.0, 0.05, self.bridge.get_topbar_transparency(), digits=2, on_change=self.bridge.set_topbar_transparency))
 
         pill_style = Adw.SwitchRow(title="macOS Pill Button Style", subtitle="Format top bar indicator buttons as smooth pills")
         pill_style.set_active(self.bridge.get_topbar_pill_style())
@@ -1147,7 +1212,9 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         app_group.add(create_spin_row("Application Blur Radius", "Gaussian blur radius in pixels behind application windows", 0, 100, 1, self.bridge.get_app_blur_radius(), digits=0, on_change=self.bridge.set_app_blur_radius))
         app_group.add(create_spin_row("Application Window Opacity", "Translucency factor for window surfaces in glassy mode", 0.50, 1.0, 0.02, self.bridge.get_app_opacity(), digits=2, on_change=self.bridge.set_app_opacity))
-        app_group.add(create_spin_row("Application Glass Refraction", "Optical refraction depth and bevel intensity for application glass", 0.0, 1.0, 0.05, self.bridge.get_app_glass_level(), digits=2, on_change=self.bridge.set_app_glass_level))
+        app_group.add(create_spin_row("Application Glass Refraction", "Optical refraction Snell-law bending and displacement intensity (0.5 = normal, 1.0+ = deep refraction)", 0.0, 3.0, 0.05, self.bridge.get_app_glass_level(), digits=2, on_change=self.bridge.set_app_glass_level))
+        app_group.add(create_spin_row("Application Chroma Feel", "Prism RGB color fringe splitting (chromatic dispersion feel) along window edges", 0.0, 1.5, 0.02, self.bridge.get_app_chroma(), digits=2, on_change=self.bridge.set_app_chroma))
+        app_group.add(create_spin_row("Application Glass Reflection", "Specular rim reflection and sheen highlights along window borders", 0.0, 1.0, 0.05, self.bridge.get_app_edge_reflection(), digits=2, on_change=self.bridge.set_app_edge_reflection))
         app_group.add(create_color_row("Application Glass Tint Color", "Color tint layer blended over translucent window glass", self.bridge.get_app_tint_color(), as_hex=True, on_change=self.bridge.set_app_tint_color))
         app_group.add(create_spin_row("Application Tint Strength", "Opacity and saturation factor for the application tint layer", 0.0, 1.0, 0.02, self.bridge.get_app_tint_strength(), digits=2, on_change=self.bridge.set_app_tint_strength))
         app_group.add(create_spin_row("Application Window Corner Radius", "Curvature radius in pixels for application window corners", 0, 40, 1, self.bridge.get_app_corner_radius(), digits=0, on_change=self.bridge.set_app_corner_radius))

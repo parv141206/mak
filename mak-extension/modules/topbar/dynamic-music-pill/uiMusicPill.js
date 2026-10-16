@@ -301,10 +301,12 @@ export const MusicPill = GObject.registerClass(
                 this._applyStyle(this._displayedColor.r, this._displayedColor.g, this._displayedColor.b);
             }, this);
             this._settings.connectObject('changed::hide-text', () => this._updateDimensions(), this);
-            this._settings.connectObject('changed::music-pill-enabled', () => {
-                if (!this._settings.get_boolean('music-pill-enabled'))
-                    this._ensureHidden();
-            }, this);
+            if (this._settings.settings_schema?.has_key('music-pill-enabled')) {
+                this._settings.connectObject('changed::music-pill-enabled', () => {
+                    if (!this._settings.get_boolean('music-pill-enabled'))
+                        this._ensureHidden();
+                }, this);
+            }
             this._settings.connectObject('changed::pill-dynamic-width', () => { this._updateDimensions(); if (this._isActiveState) this._body.ease({ width: this._targetWidth, duration: 300, mode: Clutter.AnimationMode.EASE_OUT_QUAD }); }, this);
             this._settings.connectObject('changed::inline-artist', () => this._updateTextDisplay(true), this);
             this._settings.connectObject('changed::use-custom-colors', () => { this._applyStyle(this._displayedColor.r, this._displayedColor.g, this._displayedColor.b); this._updateDimensions(); }, this);
@@ -967,7 +969,7 @@ export const MusicPill = GObject.registerClass(
 
         updateDisplay(title, artist, artUrl, status, busName, isSkipActive, player = null) {
             if (!this.get_parent()) return;
-            if (!this._settings.get_boolean('music-pill-enabled')) {
+            if (this._settings.settings_schema?.has_key('music-pill-enabled') && !this._settings.get_boolean('music-pill-enabled')) {
                 this._ensureHidden();
                 return;
             }

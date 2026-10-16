@@ -233,6 +233,21 @@ export class LiquidGlassController {
             this._liquidSettings.set_string('application-tint-color', appTintColor);
             this._liquidSettings.set_double('application-tint-strength', Math.max(0.0, Math.min(1.0, appTintStrength)));
 
+            const appGlassLevel = getDbl('app-glass-level', 0.50);
+            const appChroma = getDbl('app-chroma-strength', 0.20);
+            const appReflection = getDbl('app-edge-reflection', 0.25);
+            const appDisp = Math.max(1.0, appGlassLevel * 32.0);
+
+            if (this._liquidSettings.settings_schema?.has_key('application-displacement-scale')) {
+                this._liquidSettings.set_double('application-displacement-scale', appDisp);
+            }
+            if (this._liquidSettings.settings_schema?.has_key('application-chroma-strength')) {
+                this._liquidSettings.set_double('application-chroma-strength', appChroma);
+            }
+            if (this._liquidSettings.settings_schema?.has_key('application-edge-reflection')) {
+                this._liquidSettings.set_double('application-edge-reflection', appReflection);
+            }
+
             // Blacklist Chrome, Brave, VS Code, Electron to preserve solid web rendering & authentic traffic lights
             const targetBlacklist = [
                 'google-chrome*',
@@ -264,6 +279,9 @@ export class LiquidGlassController {
             const topbarBlur = this._makSettings.get_boolean('topbar-blur');
             const blurPanel = this._makSettings.get_boolean('blur-panel');
             const topbarOpaque = this._makSettings.get_boolean('topbar-opaque');
+            const topbarTransparent = getBool('topbar-transparent', false);
+            const topbarStyleMode = getStr('topbar-style-mode', '');
+            const isTopTransparent = topbarTransparent || topbarStyleMode === 'transparent';
             const topbarPill = this._makSettings.get_boolean('topbar-pill-style');
             const topbarBlurRad = this._makSettings.get_int('topbar-blur-radius');
             const topbarTrans = this._makSettings.get_double('topbar-transparency');
@@ -271,7 +289,7 @@ export class LiquidGlassController {
             const topbarTintColor = getStr('topbar-tint-color', '#ffffff');
             const topbarTintStrength = getDbl('topbar-tint-strength', 0.08);
 
-            if (!topbarBlur || !blurPanel || topbarOpaque) {
+            if (!topbarBlur || !blurPanel || topbarOpaque || isTopTransparent) {
                 this._liquidSettings.set_string('top-bar-style', 'off');
             } else {
                 this._liquidSettings.set_string('top-bar-style', 'pill');
@@ -405,6 +423,8 @@ export class LiquidGlassController {
             'topbar-blur-radius',
             'topbar-transparency',
             'topbar-opaque',
+            'topbar-transparent',
+            'topbar-style-mode',
             'topbar-pill-style',
             'topbar-tint-color',
             'topbar-tint-strength',
@@ -433,7 +453,9 @@ export class LiquidGlassController {
             'app-opacity',
             'app-tint-color',
             'app-tint-strength',
-            'app-glass-level'
+            'app-glass-level',
+            'app-chroma-strength',
+            'app-edge-reflection'
         ]) {
             const id = this._makSettings.connect(`changed::${key}`, sync);
             this._makSettingsIds.push(id);

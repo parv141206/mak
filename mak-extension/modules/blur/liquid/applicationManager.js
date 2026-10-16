@@ -114,7 +114,7 @@ export class ApplicationManager {
                     this._startFrameSync();
             });
             for (const suffix of ['tint-color', 'tint-strength', 'blur-radius', 'corner-radius',
-                'brightness', 'contrast', 'saturation'])
+                'brightness', 'contrast', 'saturation', 'displacement-scale', 'chroma-strength', 'edge-reflection'])
                 connectSetting(this._profileKey(profile, suffix), () => this._updateEffectParams());
             connectSetting(this._profileKey(profile, 'content-opacity'), () => this._updateWindowOpacities());
         }
@@ -311,6 +311,22 @@ export class ApplicationManager {
         glass.setBrightness(this._settings.get_double(k('brightness')));
         glass.setContrast(this._settings.get_double(k('contrast')));
         glass.setSaturation(this._settings.get_double(k('saturation')));
+
+        if (this._settings.settings_schema?.has_key(k('displacement-scale'))) {
+            const disp = this._settings.get_double(k('displacement-scale'));
+            glass.setDisplacementScale(disp);
+            glass.setMaxZ(Math.max(10.0, disp * 4.5));
+            glass.setIor(1.4 + Math.min(1.5, disp * 0.05));
+        }
+        if (this._settings.settings_schema?.has_key(k('chroma-strength'))) {
+            glass.setChromaStrength(this._settings.get_double(k('chroma-strength')));
+        }
+        if (this._settings.settings_schema?.has_key(k('edge-reflection'))) {
+            const refl = this._settings.get_double(k('edge-reflection'));
+            glass.setSurfaceLightEnabled(refl > 0.01);
+            glass.setSpecularIntensity(refl);
+            glass.setRimIntensity(refl * 0.85);
+        }
     }
 
     // The sync runs from the stage's 'before-update', i.e. only on frames the

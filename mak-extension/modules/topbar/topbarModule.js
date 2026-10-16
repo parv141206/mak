@@ -25,6 +25,7 @@ const { CaffeineButton } = await import(`./caffeineButton.js?v=${_uid}`);
 const { NotesButton } = await import(`./notesButton.js?v=${_uid}`);
 const { DynamicIsland } = await import(`./dynamicIsland.js?v=${_uid}`);
 const { MacBatteryController } = await import(`./macBattery.js?v=${_uid}`);
+const { PowerSaverButton } = await import(`./powerSaverButton.js?v=${_uid}`);
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: `MakAppTitleButton_${_uid}` },
@@ -212,6 +213,11 @@ export class TopBarModule {
             this._enableCaffeineButton();
         }
 
+        // 6b2. Eco Power Saver Button (🌿 / ⚡)
+        if (this._settings.get_boolean('topbar-power-saver')) {
+            this._enablePowerSaverButton();
+        }
+
         // 6c. Notes Scratchpad Button (📝)
         if (this._settings.get_boolean('topbar-scratchpad')) {
             this._enableNotesButton();
@@ -288,6 +294,10 @@ export class TopBarModule {
                 if (this._settings.get_boolean('topbar-caffeine')) this._enableCaffeineButton();
                 else this._disableCaffeineButton();
                 this._applyRightBoxOrder();
+            } else if (key === 'topbar-power-saver') {
+                if (this._settings.get_boolean('topbar-power-saver')) this._enablePowerSaverButton();
+                else this._disablePowerSaverButton();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-scratchpad') {
                 if (this._settings.get_boolean('topbar-scratchpad')) this._enableNotesButton();
                 else this._disableNotesButton();
@@ -320,8 +330,10 @@ export class TopBarModule {
             } else if (key === 'topbar-media-pill') {
                 if (this._settings.get_boolean('topbar-media-pill')) this._enableMediaPill();
                 else this._disableMediaPill();
-            } else if (key === 'topbar-transparency' || key === 'topbar-opaque' || key === 'global-opacity' ||
-                       key === 'topbar-blur' || key === 'topbar-blur-radius' || key === 'blur-panel') {
+            } else if (key === 'topbar-transparency' || key === 'topbar-opaque' ||
+                       key === 'topbar-transparent' || key === 'topbar-style-mode' ||
+                       key === 'global-opacity' || key === 'topbar-blur' ||
+                       key === 'topbar-blur-radius' || key === 'blur-panel') {
                 this._applyPanelTransparency();
             }
         });
@@ -453,6 +465,29 @@ export class TopBarModule {
         if (this._caffeineBtn) {
             try { this._caffeineBtn.destroy(); } catch (e) {}
             this._caffeineBtn = null;
+        }
+    }
+
+    async _enablePowerSaverButton() {
+        if (this._powerSaverBtn) return;
+        try {
+            let Cls = PowerSaverButton;
+            try {
+                const mod = await import(`./powerSaverButton.js?v=${Date.now()}`);
+                if (mod && mod.PowerSaverButton) Cls = mod.PowerSaverButton;
+            } catch (e) {}
+            this._powerSaverBtn = new Cls(this._extension);
+            Main.panel.addToStatusArea('MakPowerSaver', this._powerSaverBtn, 3, 'right');
+            this._applyRightBoxOrder();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add PowerSaver button:', err);
+        }
+    }
+
+    _disablePowerSaverButton() {
+        if (this._powerSaverBtn) {
+            try { this._powerSaverBtn.destroy(); } catch (e) {}
+            this._powerSaverBtn = null;
         }
     }
 
@@ -651,6 +686,7 @@ export class TopBarModule {
             'MakBluetoothBattery',
             'quickSettings',
             'MakCaffeine',
+            'MakPowerSaver',
             'MakNotes',
             'MakClipboard',
             'MakSpotlight',
@@ -704,18 +740,23 @@ export class TopBarModule {
     _applyPanelTransparency() {
         try {
             const isOpaque = this._settings.get_boolean('topbar-opaque');
-            let alpha = isOpaque ? 1.0 : this._settings.get_double('topbar-transparency');
+            const isTransparent = this._settings.settings_schema?.has_key('topbar-transparent')
+                ? this._settings.get_boolean('topbar-transparent')
+                : false;
+            let styleMode = this._settings.settings_schema?.has_key('topbar-style-mode')
+                ? this._settings.get_string('topbar-style-mode')
+                : '';
+
+            if (!styleMode) {
+                if (isTransparent) styleMode = 'transparent';
+                else if (isOpaque) styleMode = 'opaque';
+                else styleMode = 'frosted';
+            }
+
             const colorScheme = this._interfaceSettings ? this._interfaceSettings.get_string('color-scheme') : '';
             const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
             const isLight = (colorScheme === 'prefer-light') || gtkTheme.toLowerCase().includes('light');
             const isAmoled = gtkTheme.toLowerCase().includes('amoled');
-
-            if (isOpaque) {
-                Main.panel.add_style_class_name('opaque-panel');
-                Main.panel.remove_style_class_name('transparent-panel');
-            } else {
-                Main.panel.remove_style_class_name('opaque-panel');
-            }
 
             if (isAmoled) {
                 Main.panel.add_style_class_name('amoled-mode');
@@ -725,16 +766,32 @@ export class TopBarModule {
 
             if (isLight) {
                 Main.panel.add_style_class_name('light-mode');
-                const r = 246, g = 246, b = 248;
-                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)}) !important;`;
-                Main.panel.set_style(style);
             } else {
                 Main.panel.remove_style_class_name('light-mode');
-                const r = isAmoled ? 0 : 32;
-                const g = isAmoled ? 0 : 32;
-                const b = isAmoled ? 0 : 36;
-                const style = `background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)}) !important;`;
-                Main.panel.set_style(style);
+            }
+
+            if (styleMode === 'transparent' || (isTransparent && !isOpaque)) {
+                Main.panel.add_style_class_name('transparent-panel');
+                Main.panel.remove_style_class_name('opaque-panel');
+                Main.panel.set_style('background-color: transparent !important; box-shadow: none !important; border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;');
+            } else if (styleMode === 'opaque' || isOpaque) {
+                Main.panel.add_style_class_name('opaque-panel');
+                Main.panel.remove_style_class_name('transparent-panel');
+                const r = isLight ? 246 : (isAmoled ? 0 : 32);
+                const g = isLight ? 246 : (isAmoled ? 0 : 32);
+                const b = isLight ? 248 : (isAmoled ? 0 : 36);
+                Main.panel.set_style(`background-color: rgb(${r}, ${g}, ${b}) !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;`);
+            } else {
+                // Frosted Glass mode
+                Main.panel.remove_style_class_name('opaque-panel');
+                Main.panel.remove_style_class_name('transparent-panel');
+                let rawAlpha = this._settings.get_double('topbar-transparency');
+                // If previous opaque setting left rawAlpha at 1.0, use frosted default 0.35
+                let alpha = (rawAlpha >= 0.98) ? 0.35 : Math.max(0.0, rawAlpha);
+                const r = isLight ? 246 : (isAmoled ? 18 : 32);
+                const g = isLight ? 246 : (isAmoled ? 18 : 32);
+                const b = isLight ? 248 : (isAmoled ? 22 : 36);
+                Main.panel.set_style(`background-color: rgba(${r}, ${g}, ${b}, ${alpha.toFixed(3)}) !important; border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;`);
             }
         } catch (e) {
             console.warn('[Mak TopBar] Could not apply panel transparency:', e.message);
@@ -773,6 +830,7 @@ export class TopBarModule {
         this._disableDynamicIsland();
         this._disableNotesButton();
         this._disableCaffeineButton();
+        this._disablePowerSaverButton();
         this._disableMacBattery();
         this._disableControlCenterButton();
         this._disableMakQuickSettingsButton();

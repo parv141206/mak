@@ -197,6 +197,36 @@ export class GlassRenderer {
         this._repaintIfDirty();
     }
 
+    setDisplacementScale(scale) {
+        this.uniforms.set('displacement_scale', scale);
+        this._repaintIfDirty();
+    }
+
+    setChromaStrength(strength) {
+        this.uniforms.set('chroma_strength', strength);
+        this._repaintIfDirty();
+    }
+
+    setIor(ior) {
+        this.uniforms.set('ior', ior);
+        this._repaintIfDirty();
+    }
+
+    setMaxZ(maxZ) {
+        this.uniforms.set('max_z', maxZ);
+        this._repaintIfDirty();
+    }
+
+    setSpecularIntensity(intensity) {
+        this.uniforms.set('specular_intensity', intensity);
+        this._repaintIfDirty();
+    }
+
+    setRimIntensity(intensity) {
+        this.uniforms.set('rim_intensity', intensity);
+        this._repaintIfDirty();
+    }
+
     setAnimationScale(scale) {
         if (this.material.setAnimationScale(scale))
             this._repaintIfDirty();
