@@ -20,6 +20,7 @@ const { UserSwitcherController } = await import(`./userSwitcher.js?v=${_uid}`);
 const { MenuStyleController } = await import(`../appearance/menuStyleController.js?v=${_uid}`);
 const { WindowCornersModule } = await import(`../window-corners/cornersModule.js?v=${_uid}`);
 const { BlurModule } = await import(`../blur/blurModule.js?v=${_uid}`);
+const { ClipboardButton } = await import(`./clipboardButton.js?v=${_uid}`);
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: `MakAppTitleButton_${_uid}` },
@@ -130,6 +131,7 @@ export class TopBarModule {
         this._spotlightBtn = null;
         this._controlCenterBtn = null;
         this._makQuickSettingsBtn = null;
+        this._clipboardBtn = null;
         this._panelBlurEffect = null;
         this._clockMoved = false;
         this._origBannerAlignment = null;
@@ -199,6 +201,11 @@ export class TopBarModule {
             this._enableSpotlightButton();
         }
 
+        // 7b. Clipboard Button (📋)
+        if (this._settings.get_boolean('topbar-clipboard')) {
+            this._enableClipboardButton();
+        }
+
         // 8. Control Center Button (Dual Sliders ⚎)
         if (this._settings.get_boolean('topbar-control-center')) {
             this._enableControlCenterButton();
@@ -254,6 +261,10 @@ export class TopBarModule {
             } else if (key === 'topbar-spotlight-button') {
                 if (this._settings.get_boolean('topbar-spotlight-button')) this._enableSpotlightButton();
                 else this._disableSpotlightButton();
+                this._applyRightBoxOrder();
+            } else if (key === 'topbar-clipboard') {
+                if (this._settings.get_boolean('topbar-clipboard')) this._enableClipboardButton();
+                else this._disableClipboardButton();
                 this._applyRightBoxOrder();
             } else if (key === 'topbar-control-center') {
                 if (this._settings.get_boolean('topbar-control-center')) this._enableControlCenterButton();
@@ -385,6 +396,31 @@ export class TopBarModule {
         }
     }
 
+    async _enableClipboardButton() {
+        if (this._clipboardBtn) return;
+        try {
+            let Cls = ClipboardButton;
+            try {
+                const mod = await import(`./clipboardButton.js?v=${Date.now()}`);
+                if (mod && mod.ClipboardButton) Cls = mod.ClipboardButton;
+            } catch (err) {
+                // fallback to static import
+            }
+            this._clipboardBtn = new Cls(this._extension);
+            Main.panel.addToStatusArea('MakClipboard', this._clipboardBtn, 4, 'right');
+            this._applyRightBoxOrder();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Clipboard button:', err);
+        }
+    }
+
+    _disableClipboardButton() {
+        if (this._clipboardBtn) {
+            try { this._clipboardBtn.destroy(); } catch (e) {}
+            this._clipboardBtn = null;
+        }
+    }
+
     _enableControlCenterButton() {
         if (this._controlCenterBtn) return;
         try {
@@ -488,6 +524,7 @@ export class TopBarModule {
             'keyboard',
             'MakBluetoothBattery',
             'quickSettings',
+            'MakClipboard',
             'MakSpotlight',
             'MakControlCenter',
             'MakQuickSettings',
@@ -607,6 +644,7 @@ export class TopBarModule {
 
         this._disableControlCenterButton();
         this._disableMakQuickSettingsButton();
+        this._disableClipboardButton();
         this._disableSpotlightButton();
         this._disableBluetoothBattery();
         this._disableUserSwitcher();

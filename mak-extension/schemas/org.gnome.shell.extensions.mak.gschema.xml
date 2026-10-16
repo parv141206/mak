@@ -683,6 +683,24 @@
       <description>Show compact Mak settings and theme switcher widget in top bar.</description>
     </key>
 
+    <key type="b" name="topbar-clipboard">
+      <default>true</default>
+      <summary>Enable Clipboard History in Top Bar</summary>
+      <description>Shows a quick clipboard history button with searchable popup in the top bar.</description>
+    </key>
+
+    <key type="i" name="clipboard-history-size">
+      <default>30</default>
+      <summary>Maximum Clipboard History Size</summary>
+      <description>The maximum number of recent copied snippets to retain in history.</description>
+    </key>
+
+    <key type="b" name="clipboard-save-history">
+      <default>true</default>
+      <summary>Persist Clipboard History</summary>
+      <description>Save clipboard items across sessions.</description>
+    </key>
+
     <key type="b" name="topbar-siri-button">
       <default>false</default>
       <summary>Siri Orb Button</summary>

@@ -2033,3 +2033,197 @@
     min-height: 24px;
     padding: 3px 10px;
 }
+
+/* ── Mak Clipboard History Popup ─────────────────────────────────────────── */
+.mak-clipboard-button {
+    padding: 0 4px;
+}
+
+.mak-clipboard-panel-icon {
+    icon-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mak-clipboard-menu {
+    min-width: 330px;
+    max-width: 380px;
+    padding: 0;
+}
+
+.mak-clipboard-container {
+    padding: 10px 12px;
+    spacing: 8px;
+}
+
+.mak-clipboard-header {
+    padding: 2px 4px 6px 4px;
+}
+
+.mak-clipboard-header-title-box {
+    spacing: 6px;
+}
+
+.mak-clipboard-clear-box {
+    spacing: 4px;
+}
+
+.mak-clipboard-header-icon {
+    icon-size: 16px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.mak-clipboard-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.mak-clipboard-count-badge {
+    background-color: rgba(255, 255, 255, 0.12);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 9999px;
+    padding: 1px 7px;
+}
+
+.mak-clipboard-clear-btn {
+    border-radius: 6px;
+    padding: 2px 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition-duration: 150ms;
+}
+
+.mak-clipboard-clear-btn:hover {
+    background-color: rgba(255, 59, 48, 0.25);
+    color: #ff453a;
+}
+
+.mak-clipboard-clear-icon {
+    icon-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.mak-clipboard-clear-text {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.mak-clipboard-search-box {
+    margin: 2px 0 6px 0;
+}
+
+.mak-clipboard-search-entry {
+    background-color: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 8px;
+    padding: 5px 8px;
+    color: #ffffff;
+    font-size: 12px;
+    selection-background-color: rgba(99, 102, 241, 0.6);
+    selected-color: #ffffff;
+}
+
+.mak-clipboard-search-entry:focus {
+    border-color: rgba(99, 102, 241, 0.6);
+    background-color: rgba(255, 255, 255, 0.12);
+}
+
+.mak-clipboard-search-icon {
+    icon-size: 14px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.mak-clipboard-scroll-view {
+    max-height: 330px;
+    min-height: 100px;
+}
+
+.mak-clipboard-items-box {
+    spacing: 4px;
+}
+
+.mak-clipboard-item-row {
+    border-radius: 8px;
+    padding: 6px 8px;
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid transparent;
+    transition-duration: 120ms;
+}
+
+.mak-clipboard-item-row:hover,
+.mak-clipboard-item-row:focus {
+    background-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.14);
+}
+
+.mak-clipboard-item-row:active {
+    background-color: rgba(255, 255, 255, 0.18);
+}
+
+.mak-clipboard-item-content {
+    spacing: 8px;
+}
+
+.mak-clipboard-item-text-box {
+    spacing: 2px;
+}
+
+.mak-clipboard-item-index {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.35);
+    min-width: 14px;
+    text-align: center;
+}
+
+.mak-clipboard-item-text {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 500;
+}
+
+.mak-clipboard-item-meta {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.mak-clipboard-item-del-btn {
+    border-radius: 9999px;
+    padding: 3px;
+    opacity: 0.4;
+    transition-duration: 150ms;
+}
+
+.mak-clipboard-item-del-btn:hover {
+    opacity: 1.0;
+    background-color: rgba(255, 59, 48, 0.3);
+    color: #ff453a;
+}
+
+.mak-clipboard-item-del-icon {
+    icon-size: 12px;
+}
+
+.mak-clipboard-empty-box {
+    padding: 28px 16px;
+    spacing: 8px;
+}
+
+.mak-clipboard-empty-icon {
+    icon-size: 32px;
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.mak-clipboard-empty-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mak-clipboard-empty-sub {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+    text-align: center;
+}

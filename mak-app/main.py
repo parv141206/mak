@@ -621,6 +621,21 @@ class MakAppWindow(Adw.ApplicationWindow):
         mak_widget.connect("notify::active", lambda s, p: self.bridge.set_topbar_mak_menu(s.get_active()))
         ind_group.add(mak_widget)
 
+        clip_row = Adw.SwitchRow(
+            title="Clipboard History Menu Bar Indicator",
+            subtitle="Searchable macOS clipboard history popup card with quick copy and item management"
+        )
+        clip_row.set_active(self.bridge.get_topbar_clipboard())
+        clip_row.connect("notify::active", lambda s, p: self.bridge.set_topbar_clipboard(s.get_active()))
+        ind_group.add(clip_row)
+
+        ind_group.add(create_spin_row(
+            "Max Clipboard History Items",
+            "Maximum number of copied text snippets and code blocks to store",
+            5, 100, 5, self.bridge.get_clipboard_history_size(), digits=0,
+            on_change=self.bridge.set_clipboard_history_size
+        ))
+
         # Panel Appearance
         pan_group = Adw.PreferencesGroup(title="Panel Styling and Frosted Blur")
         page.add(pan_group)

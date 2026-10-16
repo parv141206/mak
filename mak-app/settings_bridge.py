@@ -433,6 +433,12 @@ class MakSettingsBridge:
     def get_topbar_mak_menu(self): return self._get_b("topbar-mak-menu", None, None, True)
     def set_topbar_mak_menu(self, v): self._set_b("topbar-mak-menu", None, None, v)
 
+    def get_topbar_clipboard(self): return self._get_b("topbar-clipboard", None, None, True)
+    def set_topbar_clipboard(self, v): self._set_b("topbar-clipboard", None, None, v)
+
+    def get_clipboard_history_size(self): return self._get_i("clipboard-history-size", None, None, 30)
+    def set_clipboard_history_size(self, v): self._set_i("clipboard-history-size", None, None, int(v))
+
     # Top Bar, Control Center & Menu Item Colors
     def get_topbar_text_color(self): return self._get_s("topbar-text-color", None, None, "#ffffff")
     def set_topbar_text_color(self, v): self._set_s("topbar-text-color", None, None, str(v))
