@@ -43,14 +43,26 @@ function computeConfig(s, mak = null) {
     const headroom = Math.max(0, renderSize - iconSize + hoverLift - iconTopAtRest) + 10;
     const position = mak ? mak.get_string('dock-position') : s.get_string('dock-position');
     const vertical = position === 'left' || position === 'right';
-    const autoHideMode = s.get_string('auto-hide-mode');
+    const autoHideMode = (mak && mak.settings_schema?.has_key('auto-hide-mode')) ? mak.get_string('auto-hide-mode') : s.get_string('auto-hide-mode');
 
-    const blurRadius = mak ? mak.get_int('blur-sigma') : 30;
+    const dockBlurRadius = mak ? (mak.settings_schema?.has_key('dock-blur-radius') ? mak.get_int('dock-blur-radius') : (mak.settings_schema?.has_key('blur-sigma') ? mak.get_int('blur-sigma') : 24)) : 24;
+    const blurRadius = dockBlurRadius;
     const blurBrightness = mak ? mak.get_double('blur-brightness') : 0.75;
-    const dockBlur = mak ? (mak.get_boolean('dock-blur') && mak.get_boolean('blur-dock') && mak.get_boolean('blur-enabled')) : true;
+    const dockBlur = mak ? (mak.get_boolean('dock-blur') && (mak.settings_schema?.has_key('blur-dock') ? mak.get_boolean('blur-dock') : true)) : true;
     const bgOpacity = mak ? mak.get_double('background-opacity') : s.get_double('background-opacity');
-    const dockRadius = mak ? mak.get_int('dock-radius') : s.get_int('dock-radius');
-    const pillColor = mak ? mak.get_string('pill-color') : s.get_string('pill-color');
+    const dockRadius = mak ? (mak.get_int('dock-radius') || (mak.settings_schema?.has_key('dock-corner-radius') ? mak.get_int('dock-corner-radius') : 24)) : s.get_int('dock-radius');
+    const dockTintColor = mak ? (mak.settings_schema?.has_key('dock-tint-color') ? mak.get_string('dock-tint-color') : '#ffffff') : '#ffffff';
+    const dockTintStrength = mak ? (mak.settings_schema?.has_key('dock-tint-strength') ? mak.get_double('dock-tint-strength') : 0.12) : 0.12;
+    let pillColor = mak ? mak.get_string('pill-color') : s.get_string('pill-color');
+    if (dockTintColor && dockTintColor !== '#ffffff' && dockTintColor !== 'default') {
+        const hex = dockTintColor.trim().replace(/^#/, '');
+        if (hex.length === 6) {
+            const r = parseInt(hex.substring(0, 2), 16);
+            const g = parseInt(hex.substring(2, 4), 16);
+            const b = parseInt(hex.substring(4, 6), 16);
+            pillColor = `rgba(${r}, ${g}, ${b}, ${(0.10 + dockTintStrength * 0.20).toFixed(2)})`;
+        }
+    }
     const borderColor = mak ? mak.get_string('border-color') : s.get_string('border-color');
     const borderWidth = mak ? mak.get_int('border-width') : s.get_int('border-width');
     const liquidGlass = mak ? mak.get_boolean('blur-liquid-glass') : false;
@@ -239,7 +251,7 @@ export class SettingsManager {
 
     _onMakChanged(key) {
         this._pendingKeys.add(key);
-        if (STRUCTURAL_KEYS.has(key) || key === 'dock-position' || key === 'dock-alignment' || key === 'dock-radius' || key === 'multi-monitor' || key === 'auto-shrink-to-fit') {
+        if (STRUCTURAL_KEYS.has(key) || GEOMETRY_KEYS.has(key) || key === 'dock-position' || key === 'dock-alignment' || key === 'dock-radius' || key === 'multi-monitor' || key === 'auto-shrink-to-fit' || key === 'auto-hide-mode') {
             this._pendingStructural = true;
         }
         this._retryCount = 0;

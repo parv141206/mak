@@ -43,16 +43,16 @@ def create_spin_row(title, subtitle, lower, upper, step, val, digits=0, on_chang
         row.connect("notify::value", _on_val_changed)
     return row
 
-def create_color_row(title, subtitle, cur_rgba_str, on_change=None):
+def create_color_row(title, subtitle, cur_rgba_str, as_hex=False, on_change=None):
     """Creates an Adw.ActionRow equipped with a native interactive Gtk.ColorDialogButton."""
     row = Adw.ActionRow(title=title, subtitle=subtitle)
     try:
         dialog = Gtk.ColorDialog.new()
-        dialog.set_with_alpha(True)
+        dialog.set_with_alpha(not as_hex)
         btn = Gtk.ColorDialogButton.new(dialog)
         btn.set_valign(Gtk.Align.CENTER)
         rgba = Gdk.RGBA()
-        fallback = "rgba(255, 255, 255, 0.20)"
+        fallback = "#ffffff" if as_hex else "rgba(255, 255, 255, 0.20)"
         try:
             if not rgba.parse(cur_rgba_str or fallback):
                 rgba.parse(fallback)
@@ -60,7 +60,16 @@ def create_color_row(title, subtitle, cur_rgba_str, on_change=None):
             rgba.parse(fallback)
         btn.set_rgba(rgba)
         if on_change:
-            btn.connect("notify::rgba", lambda b, p: on_change(b.get_rgba().to_string()))
+            def _on_color_notify(b, p):
+                c = b.get_rgba()
+                if as_hex:
+                    r = int(round(max(0.0, min(1.0, c.red)) * 255))
+                    g = int(round(max(0.0, min(1.0, c.green)) * 255))
+                    b_val = int(round(max(0.0, min(1.0, c.blue)) * 255))
+                    on_change(f"#{r:02x}{g:02x}{b_val:02x}")
+                else:
+                    on_change(c.to_string())
+            btn.connect("notify::rgba", _on_color_notify)
         row.add_suffix(btn)
         row.set_activatable_widget(btn)
     except Exception as e:
@@ -72,6 +81,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         super().__init__(*args, **kwargs)
         self.set_title("Mak Control Center")
         self.set_default_size(980, 740)
+        self.set_icon_name("mak-app")
 
         self.bridge = MakSettingsBridge()
         self._build_ui()
@@ -87,7 +97,21 @@ class MakAppWindow(Adw.ApplicationWindow):
         title = Adw.WindowTitle(title="Mak", subtitle="macOS Desktop Suite")
         header.set_title_widget(title)
 
-        reset_btn = Gtk.Button(label="Reset to Defaults")
+        export_btn = Gtk.Button()
+        export_btn.set_icon_name("document-save-symbolic")
+        export_btn.set_tooltip_text("Export Mak Settings to JSON file")
+        export_btn.add_css_class("flat")
+        export_btn.connect("clicked", lambda *a: self._on_export_settings())
+        header.pack_end(export_btn)
+
+        import_btn = Gtk.Button()
+        import_btn.set_icon_name("document-open-symbolic")
+        import_btn.set_tooltip_text("Import Mak Settings from JSON file")
+        import_btn.add_css_class("flat")
+        import_btn.connect("clicked", lambda *a: self._on_import_settings())
+        header.pack_end(import_btn)
+
+        reset_btn = Gtk.Button(label="Reset Defaults")
         reset_btn.set_icon_name("edit-undo-symbolic")
         reset_btn.set_tooltip_text("Reset all settings across Mak to curated macOS authentic defaults")
         reset_btn.add_css_class("flat")
@@ -136,6 +160,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         self._build_spotlight_page()
         self._build_windows_page()
         self._build_blur_page()
+        self._build_tinting_page()
         self._build_theme_page()
         self._build_system_page()
 
@@ -150,11 +175,15 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         if cur_tag:
             self.stack.set_visible_child_name(cur_tag)
-            for i in range(8):
-                row = self.nav_list.get_row_at_index(i)
-                if row and getattr(row, "tag", None) == cur_tag:
+            idx = 0
+            while True:
+                row = self.nav_list.get_row_at_index(idx)
+                if not row:
+                    break
+                if getattr(row, "tag", None) == cur_tag:
                     self.nav_list.select_row(row)
                     break
+                idx += 1
 
     def _on_reset_to_defaults(self):
         self.bridge.reset_to_macos_defaults()
@@ -179,6 +208,37 @@ class MakAppWindow(Adw.ApplicationWindow):
         page = Adw.PreferencesPage()
         self.stack.add_titled_with_icon(page, "overview", "Overview", "preferences-system-symbolic")
         self._add_nav_item("overview", "Overview", "preferences-system-symbolic")
+
+        # Hero Branding Card with Mak App Logo
+        hero_group = Adw.PreferencesGroup()
+        page.add(hero_group)
+
+        hero_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=20)
+        hero_box.set_margin_top(12)
+        hero_box.set_margin_bottom(12)
+        hero_box.set_margin_start(16)
+        hero_box.set_margin_end(16)
+
+        logo_img = Gtk.Image.new_from_icon_name("mak-app")
+        logo_img.set_pixel_size(72)
+        hero_box.append(logo_img)
+
+        info_box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        info_box.set_valign(Gtk.Align.CENTER)
+
+        app_title = Gtk.Label(label="Mak")
+        app_title.set_xalign(0.0)
+        app_title.add_css_class("title-1")
+        info_box.append(app_title)
+
+        app_sub = Gtk.Label(label="Unified macOS Experience Suite for GNOME")
+        app_sub.set_xalign(0.0)
+        app_sub.add_css_class("body")
+        app_sub.add_css_class("dim-label")
+        info_box.append(app_sub)
+
+        hero_box.append(info_box)
+        hero_group.add(hero_box)
 
         status_group = Adw.PreferencesGroup(title="macOS Desktop Suite Status")
         page.add(status_group)
@@ -308,15 +368,21 @@ class MakAppWindow(Adw.ApplicationWindow):
 
         pill_group.add(create_spin_row("Dock Pill Corner Radius", "Curvature rounding radius for dock background", 0, 40, 1, self.bridge.get_dock_radius(), digits=0, on_change=self.bridge.set_dock_radius))
         pill_group.add(create_spin_row("Glass Pill Opacity", "Background translucency factor (0 = fully transparent)", 0.0, 1.0, 0.05, self.bridge.get_dock_opacity(), digits=2, on_change=self.bridge.set_dock_opacity))
-        sw_dock_blur = Adw.SwitchRow(title="Dock Background Frosted Blur", subtitle="Enable Gaussian glass blur behind dock pill")
-        sw_dock_blur.set_active(self.bridge.get_blur_dock())
-        sw_dock_blur.connect("notify::active", lambda s, p: self.bridge.set_blur_dock(s.get_active()))
-        pill_group.add(sw_dock_blur)
-        pill_group.add(create_spin_row("Dock Blur Strength (Sigma)", "Gaussian blur sigma/strength behind the dock pill", 0, 100, 5, self.bridge.get_dock_blur_sigma(), digits=0, on_change=self.bridge.set_dock_blur_sigma))
+        
+        sw_dock_glass = Adw.SwitchRow(title="Dock Liquid Glass Shader", subtitle="Enable real-time Snell-law optical refraction and Gaussian blur for the dock")
+        sw_dock_glass.set_active(self.bridge.get_dock_liquid_glass())
+        sw_dock_glass.connect("notify::active", lambda s, p: self.bridge.set_dock_liquid_glass(s.get_active()))
+        pill_group.add(sw_dock_glass)
+
+        pill_group.add(create_spin_row("Dock Blur Radius", "Adjust Gaussian blur radius directly inside the dock liquid glass engine", 0, 60, 1, self.bridge.get_dock_blur_radius(), digits=0, on_change=self.bridge.set_dock_blur_radius))
+        pill_group.add(create_spin_row("Dock Glass Tint Strength", "Translucent tint strength applied to dock liquid glass", 0.0, 1.0, 0.02, self.bridge.get_dock_tint_strength(), digits=2, on_change=self.bridge.set_dock_tint_strength))
+        pill_group.add(create_color_row("Dock Glass Tint Color", "Tint color layered within the dock liquid glass", self.bridge.get_dock_tint_color(), on_change=self.bridge.set_dock_tint_color))
+        pill_group.add(create_spin_row("Dock Glass Brightness", "Luminance multiplier for the dock liquid glass surface", 0.5, 1.5, 0.05, self.bridge.get_dock_brightness(), digits=2, on_change=self.bridge.set_dock_brightness))
+        pill_group.add(create_spin_row("Dock Glass Saturation", "Color saturation enhancement under the dock", 0.5, 2.5, 0.05, self.bridge.get_dock_saturation(), digits=2, on_change=self.bridge.set_dock_saturation))
+        pill_group.add(create_spin_row("Refraction Edge Bending", "Physical Snell-law optical bending scale along dock glass curved rim", 0.0, 1.0, 0.02, self.bridge.get_dock_edge_bending(), digits=2, on_change=self.bridge.set_dock_edge_bending))
+        pill_group.add(create_spin_row("Level of Glass (Thickness and Depth)", "Material optical density, refraction depth, and frosted translucency level", 0.0, 1.0, 0.02, self.bridge.get_dock_glass_level(), digits=2, on_change=self.bridge.set_dock_glass_level))
         pill_group.add(create_spin_row("Pill Border Outline Width", "Glass border stroke thickness in pixels", 0, 6, 1, self.bridge.get_dock_border_width(), digits=0, on_change=self.bridge.set_dock_border_width))
         pill_group.add(create_color_row("Dock Border Outline Color", "Customize color and transparency of the dock glass border outline", self.bridge.get_dock_border_color(), on_change=self.bridge.set_dock_border_color))
-        pill_group.add(create_spin_row("Refraction Edge Bending", "Physical Snell-law optical bending scale along dock glass curved rim", 0.0, 1.0, 0.02, self.bridge.get_dock_edge_bending(), digits=2, on_change=self.bridge.set_dock_edge_bending))
-        pill_group.add(create_spin_row("Level of Glass (Thickness & Depth)", "Material optical density, refraction depth, and frosted translucency level", 0.0, 1.0, 0.02, self.bridge.get_dock_glass_level(), digits=2, on_change=self.bridge.set_dock_glass_level))
 
         thick_auto = Adw.SwitchRow(title="Auto Pill Thickness", subtitle="Scale pill height automatically with resting icon size")
         thick_auto.set_active(self.bridge.get_pill_thickness_auto())
@@ -580,9 +646,37 @@ class MakAppWindow(Adw.ApplicationWindow):
         pill_style.connect("notify::active", lambda s, p: self.bridge.set_topbar_pill_style(s.get_active()))
         pan_group.add(pill_style)
 
-        # Quick Settings Buttons
-        qs_group = Adw.PreferencesGroup(title="Quick Settings Customization")
+        # Explicit Colors for Menu Bar & Control Center
+        color_group = Adw.PreferencesGroup(
+            title="Menu Bar and Control Center Explicit Colors",
+            description="Customize exact foreground colors for text and symbolic icons across the top bar, control center, and dropdown menus:"
+        )
+        page.add(color_group)
+
+        color_group.add(create_color_row("Menu Bar Items Text Color", "Explicit font and text color for top bar items, title, and clock", self.bridge.get_topbar_text_color(), on_change=self.bridge.set_topbar_text_color))
+        color_group.add(create_color_row("Menu Bar Symbolic Icon Color", "Explicit symbolic icon color for Apple logo, control center toggle, and status indicators", self.bridge.get_topbar_icon_color(), on_change=self.bridge.set_topbar_icon_color))
+        color_group.add(create_color_row("Control Center Text Color", "Explicit text color for Quick Settings toggles, titles, and slider labels", self.bridge.get_control_center_text_color(), on_change=self.bridge.set_control_center_text_color))
+        color_group.add(create_color_row("Control Center Symbolic Icon Color", "Explicit icon and glyph color for Quick Settings toggles, buttons, and sliders", self.bridge.get_control_center_icon_color(), on_change=self.bridge.set_control_center_icon_color))
+        color_group.add(create_color_row("Menu Dropdowns Text Color", "Explicit text color for Kiwi menu, context menus, and popup dropdowns", self.bridge.get_menu_text_color(), on_change=self.bridge.set_menu_text_color))
+
+        # Quick Settings & Control Center Customization
+        qs_group = Adw.PreferencesGroup(
+            title="Control Center and Quick Settings",
+            description="Configure macOS Control Center styling, toggle pods, and action shortcuts:"
+        )
         page.add(qs_group)
+
+        qs_pills = Adw.SwitchRow(
+            title="Individual Liquid Glass Pills Mode",
+            subtitle="Render each button, dropdown, and toggle as an individual liquid glass pill over a transparent background"
+        )
+        qs_pills.set_active(self.bridge.get_quick_settings_pills_mode())
+        qs_pills.connect("notify::active", lambda s, p: self.bridge.set_quick_settings_pills_mode(s.get_active()))
+        qs_group.add(qs_pills)
+
+        qs_group.add(create_spin_row("Toggle Pill Corner Radius", "Curvature radius for individual quick settings toggle pods", 10, 30, 1, self.bridge.get_quick_settings_toggle_radius(), digits=0, on_change=self.bridge.set_quick_settings_toggle_radius))
+        qs_group.add(create_spin_row("Toggle Pill Tint Strength", "Liquid glass base tint strength for toggle pods", 0.0, 1.0, 0.05, self.bridge.get_quick_settings_toggle_tint(), digits=2, on_change=self.bridge.set_quick_settings_toggle_tint))
+        qs_group.add(create_spin_row("Toggle Pill Blur Radius", "Gaussian blur radius for toggle pod liquid glass", 5, 50, 1, self.bridge.get_quick_settings_blur_radius(), digits=0, on_change=self.bridge.set_quick_settings_blur_radius))
 
         h_lock = Adw.SwitchRow(title="Hide Lock Screen Action", subtitle="Hide the lock button from quick settings popup")
         h_lock.set_active(self.bridge.get_hide_lock_button())
@@ -833,7 +927,7 @@ class MakAppWindow(Adw.ApplicationWindow):
             sw.connect("notify::active", lambda s, p, fn=setter: fn(s.get_active()))
             surf_group.add(sw)
 
-        surf_group.add(create_spin_row("Dock Blur Strength (Sigma)", "Gaussian blur sigma/strength behind the dock pill", 0, 100, 5, self.bridge.get_dock_blur_sigma(), digits=0, on_change=self.bridge.set_dock_blur_sigma))
+        surf_group.add(create_spin_row("Dock Blur Radius", "Gaussian blur radius inside dock liquid glass shader", 0, 60, 1, self.bridge.get_dock_blur_radius(), digits=0, on_change=self.bridge.set_dock_blur_radius))
 
         # ── Liquid Glass Optical Refraction Shader ──
         liq_group = Adw.PreferencesGroup(
@@ -853,7 +947,121 @@ class MakAppWindow(Adw.ApplicationWindow):
         liq_group.add(create_spin_row("Refraction Strength", "Optical bending scale along curved edges", 0.0, 1.0, 0.02, self.bridge.get_blur_refraction_strength(), digits=2, on_change=self.bridge.set_blur_refraction_strength))
         liq_group.add(create_spin_row("Chromatic Color Dispersion", "Prism RGB channel wavelength splitting on glass bevels", 0.0, 0.5, 0.01, self.bridge.get_blur_chromatic_dispersion(), digits=2, on_change=self.bridge.set_blur_chromatic_dispersion))
 
-    # ── 7. APPEARANCE & THEMES ────────────────────────────────────────────
+    # ── 7. GLASS REFRACTION & SURFACE TINTING ────────────────────────────
+    def _build_tinting_page(self):
+        page = Adw.PreferencesPage()
+        self.stack.add_titled_with_icon(page, "tinting", "Surface Tint and Glass", "color-select-symbolic")
+        self._add_nav_item("tinting", "Surface Tint and Glass", "color-select-symbolic")
+
+        # ── Group 1: Dock Glass and Surface Tint ──
+        dock_group = Adw.PreferencesGroup(
+            title="Dock Glass and Surface Tint",
+            description="Fine-tune frosted blur, physical edge refraction, glass thickness, and color tinting on the floating dock:"
+        )
+        page.add(dock_group)
+
+        d_blur = Adw.SwitchRow(
+            title="Dock Hardware Glass Blur",
+            subtitle="Enable hardware-accelerated Gaussian optical blur behind dock"
+        )
+        d_blur.set_active(self.bridge.get_dock_blur())
+        d_blur.connect("notify::active", lambda s, p: self.bridge.set_dock_blur(s.get_active()))
+        dock_group.add(d_blur)
+
+        dock_group.add(create_spin_row("Dock Blur Radius", "Gaussian blur radius in pixels behind the dock pill", 0, 100, 1, self.bridge.get_dock_blur_radius(), digits=0, on_change=self.bridge.set_dock_blur_radius))
+        dock_group.add(create_spin_row("Dock Level of Glass", "Optical depth and frosted glass refraction intensity", 0.0, 1.0, 0.05, self.bridge.get_dock_glass_level(), digits=2, on_change=self.bridge.set_dock_glass_level))
+        dock_group.add(create_spin_row("Dock Edge Refraction Bending", "Snell-law optical curvature bending scale along dock glass perimeter", 0.0, 1.0, 0.02, self.bridge.get_dock_edge_bending(), digits=2, on_change=self.bridge.set_dock_edge_bending))
+        dock_group.add(create_color_row("Dock Glass Tint Color", "Color tint layer blended over the dock optical glass", self.bridge.get_dock_tint_color(), as_hex=True, on_change=self.bridge.set_dock_tint_color))
+        dock_group.add(create_spin_row("Dock Tint Strength", "Opacity and saturation strength of the dock color tint layer", 0.0, 1.0, 0.02, self.bridge.get_dock_tint_strength(), digits=2, on_change=self.bridge.set_dock_tint_strength))
+        dock_group.add(create_spin_row("Dock Glass Corner Radius", "Curvature radius in pixels for the floating dock pill", 0, 40, 1, self.bridge.get_dock_corner_radius(), digits=0, on_change=self.bridge.set_dock_corner_radius))
+
+        # ── Group 2: Control Center and Quick Settings Glass ──
+        cc_group = Adw.PreferencesGroup(
+            title="Control Center and Quick Settings Glass",
+            description="Customize glass refraction, individual toggle capsules, tinting, and typography in the Control Center:"
+        )
+        page.add(cc_group)
+
+        cc_blur = Adw.SwitchRow(
+            title="Control Center Hardware Glass Blur",
+            subtitle="Enable hardware-accelerated liquid glass on Quick Settings card"
+        )
+        cc_blur.set_active(self.bridge.get_cc_blur())
+        cc_blur.connect("notify::active", lambda s, p: self.bridge.set_cc_blur(s.get_active()))
+        cc_group.add(cc_blur)
+
+        cc_group.add(create_spin_row("Control Center Blur Radius", "Gaussian blur radius in pixels for Quick Settings popup", 0, 100, 1, self.bridge.get_cc_blur_radius(), digits=0, on_change=self.bridge.set_cc_blur_radius))
+        cc_group.add(create_spin_row("Control Center Glass Refraction", "Optical refraction depth and bevel intensity for Quick Settings", 0.0, 1.0, 0.05, self.bridge.get_cc_glass_level(), digits=2, on_change=self.bridge.set_cc_glass_level))
+        cc_group.add(create_color_row("Quick Settings Capsule Tint Color", "Hex color tint layer applied to Quick Settings toggles and submenus", self.bridge.get_cc_tint_color(), as_hex=True, on_change=self.bridge.set_cc_tint_color))
+        cc_group.add(create_spin_row("Quick Settings Tint Strength", "Opacity factor of the Quick Settings color tint layer", 0.0, 1.0, 0.02, self.bridge.get_cc_tint_strength(), digits=2, on_change=self.bridge.set_cc_tint_strength))
+        cc_group.add(create_spin_row("Control Center Corner Radius", "Curvature radius in pixels for Quick Settings card", 10, 40, 1, self.bridge.get_cc_radius(), digits=0, on_change=self.bridge.set_cc_radius))
+        cc_group.add(create_color_row("Control Center Text Color", "Explicit typography color for Quick Settings labels and sliders", self.bridge.get_control_center_text_color(), as_hex=True, on_change=self.bridge.set_control_center_text_color))
+        cc_group.add(create_color_row("Control Center Icon Color", "Explicit symbolic icon color for Quick Settings toggles", self.bridge.get_control_center_icon_color(), as_hex=True, on_change=self.bridge.set_control_center_icon_color))
+
+        # ── Group 3: Menus and Popups Glass and Tint ──
+        menu_group = Adw.PreferencesGroup(
+            title="Menus and Popups Glass and Tint",
+            description="Configure liquid glass blur, tint overlay, and typography on Kiwi menu, dropdowns, and calendar:"
+        )
+        page.add(menu_group)
+
+        m_blur = Adw.SwitchRow(
+            title="Menu Hardware Glass Blur",
+            subtitle="Enable hardware-accelerated liquid glass on all popup menus and dropdowns"
+        )
+        m_blur.set_active(self.bridge.get_menu_blur())
+        m_blur.connect("notify::active", lambda s, p: self.bridge.set_menu_blur(s.get_active()))
+        menu_group.add(m_blur)
+
+        menu_group.add(create_spin_row("Menu Blur Radius", "Gaussian blur radius in pixels for popup menus and calendar", 0, 100, 1, self.bridge.get_menu_blur_radius(), digits=0, on_change=self.bridge.set_menu_blur_radius))
+        menu_group.add(create_spin_row("Menu Glass Refraction", "Optical refraction and bevel depth for menu surfaces", 0.0, 1.0, 0.05, self.bridge.get_menu_glass_level(), digits=2, on_change=self.bridge.set_menu_glass_level))
+        menu_group.add(create_color_row("Menu Surface Tint Color", "Color tint layer blended over translucent menu surfaces", self.bridge.get_menu_tint_color(), as_hex=True, on_change=self.bridge.set_menu_tint_color))
+        menu_group.add(create_spin_row("Menu Tint Strength", "Opacity factor for the menu surface tint layer", 0.0, 1.0, 0.02, self.bridge.get_menu_tint_strength(), digits=2, on_change=self.bridge.set_menu_tint_strength))
+        menu_group.add(create_spin_row("Menu Corner Radius", "Curvature radius in pixels for context menus, Kiwi menu, and popups", 6, 32, 1, self.bridge.get_menu_corner_radius(), digits=0, on_change=self.bridge.set_menu_corner_radius))
+        menu_group.add(create_color_row("Menu Dropdowns Text Color", "Explicit text color for Kiwi menu, context menus, and popup dropdowns", self.bridge.get_menu_text_color(), as_hex=True, on_change=self.bridge.set_menu_text_color))
+
+        # ── Group 4: Desktop Context Menu Glass ──
+        desktop_group = Adw.PreferencesGroup(
+            title="Desktop Right-Click Context Menu Glass",
+            description="Independent glass refraction and tint controls for the desktop background context menu:"
+        )
+        page.add(desktop_group)
+
+        dmenu_blur = Adw.SwitchRow(
+            title="Desktop Context Menu Glass",
+            subtitle="Enable liquid glass refraction on desktop right-click menu"
+        )
+        dmenu_blur.set_active(self.bridge.get_desktop_menu_blur())
+        dmenu_blur.connect("notify::active", lambda s, p: self.bridge.set_desktop_menu_blur(s.get_active()))
+        desktop_group.add(dmenu_blur)
+
+        desktop_group.add(create_spin_row("Desktop Menu Blur Radius", "Gaussian blur radius in pixels for desktop context menu", 0, 100, 1, self.bridge.get_desktop_menu_blur_radius(), digits=0, on_change=self.bridge.set_desktop_menu_blur_radius))
+        desktop_group.add(create_spin_row("Desktop Menu Glass Refraction", "Optical refraction depth for desktop context menu", 0.0, 1.0, 0.05, self.bridge.get_desktop_menu_glass_level(), digits=2, on_change=self.bridge.set_desktop_menu_glass_level))
+        desktop_group.add(create_color_row("Desktop Menu Tint Color", "Color tint layer blended over desktop right-click menu", self.bridge.get_desktop_menu_tint_color(), as_hex=True, on_change=self.bridge.set_desktop_menu_tint_color))
+        desktop_group.add(create_spin_row("Desktop Menu Tint Strength", "Opacity factor for desktop menu tint layer", 0.0, 1.0, 0.02, self.bridge.get_desktop_menu_tint_strength(), digits=2, on_change=self.bridge.set_desktop_menu_tint_strength))
+
+        # ── Group 5: Top Bar Glass and Item Colors ──
+        topbar_group = Adw.PreferencesGroup(
+            title="Top Bar Glass and Item Colors",
+            description="Fine-tune frosted glass blur, tint overlay, text, and symbol colors on the top panel:"
+        )
+        page.add(topbar_group)
+
+        tb_blur = Adw.SwitchRow(
+            title="Top Bar Frosted Glass Blur",
+            subtitle="Dynamic frosted blur effect behind the top panel"
+        )
+        tb_blur.set_active(self.bridge.get_topbar_blur())
+        tb_blur.connect("notify::active", lambda s, p: self.bridge.set_topbar_blur(s.get_active()))
+        topbar_group.add(tb_blur)
+
+        topbar_group.add(create_spin_row("Top Bar Blur Radius", "Gaussian blur radius for the top panel", 5, 100, 1, self.bridge.get_topbar_blur_radius(), digits=0, on_change=self.bridge.set_topbar_blur_radius))
+        topbar_group.add(create_color_row("Top Bar Glass Tint Color", "Hex color tint layer applied over the top panel glass", self.bridge.get_topbar_tint_color(), as_hex=True, on_change=self.bridge.set_topbar_tint_color))
+        topbar_group.add(create_spin_row("Top Bar Tint Strength", "Opacity factor for the top bar glass tint layer", 0.0, 1.0, 0.02, self.bridge.get_topbar_tint_strength(), digits=2, on_change=self.bridge.set_topbar_tint_strength))
+        topbar_group.add(create_color_row("Top Bar Text Color", "Explicit text and label color for top bar items, app title, and clock", self.bridge.get_topbar_text_color(), as_hex=True, on_change=self.bridge.set_topbar_text_color))
+        topbar_group.add(create_color_row("Top Bar Symbolic Icon Color", "Explicit symbolic icon color for top bar status indicators and menus", self.bridge.get_topbar_icon_color(), as_hex=True, on_change=self.bridge.set_topbar_icon_color))
+
+    # ── 8. APPEARANCE & THEMES ────────────────────────────────────────────
     def _build_theme_page(self):
         page = Adw.PreferencesPage()
         self.stack.add_titled_with_icon(page, "themes", "Appearance and Themes", "preferences-desktop-theme-symbolic")
@@ -1148,6 +1356,102 @@ class MakAppWindow(Adw.ApplicationWindow):
         reset_all_btn.connect("clicked", lambda *a: self._on_reset_to_defaults())
         reset_all_row.add_suffix(reset_all_btn)
         sys_group.add(reset_all_row)
+
+        # Configuration Management & Backups
+        config_group = Adw.PreferencesGroup(
+            title="Configuration Management and Backups",
+            description="Export and import your entire Mak configuration as a JSON file to easily save, share, or restore presets."
+        )
+        page.add(config_group)
+
+        export_row = Adw.ActionRow(
+            title="Export Settings to JSON",
+            subtitle="Save all active Dock, Top Bar, Gaps, Corners, Blur, Tint, and Theme customizations"
+        )
+        exp_btn = Gtk.Button(label="Export JSON...")
+        exp_btn.set_icon_name("document-save-symbolic")
+        exp_btn.add_css_class("pill")
+        exp_btn.connect("clicked", lambda *a: self._on_export_settings())
+        export_row.add_suffix(exp_btn)
+        config_group.add(export_row)
+
+        import_row = Adw.ActionRow(
+            title="Import Settings from JSON",
+            subtitle="Restore full Mak configuration from an exported .json file"
+        )
+        imp_btn = Gtk.Button(label="Import JSON...")
+        imp_btn.set_icon_name("document-open-symbolic")
+        imp_btn.add_css_class("pill")
+        imp_btn.connect("clicked", lambda *a: self._on_import_settings())
+        import_row.add_suffix(imp_btn)
+        config_group.add(import_row)
+
+    def _on_export_settings(self):
+        try:
+            filter_json = Gtk.FileFilter()
+            filter_json.set_name("JSON Settings Files (*.json)")
+            filter_json.add_pattern("*.json")
+            filters = Gio.ListStore.new(Gtk.FileFilter)
+            filters.append(filter_json)
+
+            dialog = Gtk.FileDialog()
+            dialog.set_title("Export Mak Configuration")
+            dialog.set_filters(filters)
+            dialog.set_default_filter(filter_json)
+            dialog.set_initial_name("mak_settings.json")
+
+            def _on_save_finish(d, res):
+                try:
+                    file = d.save_finish(res)
+                    if file and file.get_path():
+                        path = file.get_path()
+                        if not path.endswith('.json'):
+                            path += '.json'
+                        _, count = self.bridge.export_settings_json(path)
+                        toast = Adw.Toast.new(f"Exported {count} settings to {os.path.basename(path)}")
+                        self.toast_overlay.add_toast(toast)
+                except Exception:
+                    pass
+
+            dialog.save(self, None, _on_save_finish)
+        except Exception:
+            path, count = self.bridge.export_settings_json()
+            toast = Adw.Toast.new(f"Exported {count} settings to {path}")
+            self.toast_overlay.add_toast(toast)
+
+    def _on_import_settings(self):
+        try:
+            filter_json = Gtk.FileFilter()
+            filter_json.set_name("JSON Settings Files (*.json)")
+            filter_json.add_pattern("*.json")
+            filters = Gio.ListStore.new(Gtk.FileFilter)
+            filters.append(filter_json)
+
+            dialog = Gtk.FileDialog()
+            dialog.set_title("Import Mak Configuration")
+            dialog.set_filters(filters)
+            dialog.set_default_filter(filter_json)
+
+            def _on_open_finish(d, res):
+                try:
+                    file = d.open_finish(res)
+                    if file and file.get_path():
+                        path = file.get_path()
+                        success, count = self.bridge.import_settings_json(path)
+                        if success:
+                            self._reload_all_pages()
+                            toast = Adw.Toast.new(f"Successfully restored {count} settings from {os.path.basename(path)}!")
+                            self.toast_overlay.add_toast(toast)
+                        else:
+                            toast = Adw.Toast.new(f"Failed to import from {os.path.basename(path)}")
+                            self.toast_overlay.add_toast(toast)
+                except Exception:
+                    pass
+
+            dialog.open(self, None, _on_open_finish)
+        except Exception as e:
+            toast = Adw.Toast.new(f"Could not open file chooser: {e}")
+            self.toast_overlay.add_toast(toast)
 
     def _reload_extension(self):
         try:

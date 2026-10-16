@@ -170,7 +170,6 @@ export class LiquidGlassController {
             const dockDisp = Math.max(2.0, edgeBending * 28.0);
             const dockMaxZ = Math.max(10.0, glassLevel * 120.0);
             const dockIor = 1.4 + glassLevel * 1.0;
-            const dockBlurRad = Math.max(1, Math.round(glassLevel * 28.0));
 
             this._liquidSettings.set_double('glass-displacement-scale', dockDisp);
             this._liquidSettings.set_double('glass-chroma-strength', disp);
@@ -204,12 +203,55 @@ export class LiquidGlassController {
             ];
             this._liquidSettings.set_strv('application-window-blacklist', targetBlacklist);
 
+            const getStr = (key, fallback) => {
+                try {
+                    if (this._makSettings?.settings_schema?.has_key(key)) {
+                        const val = this._makSettings.get_string(key);
+                        return val || fallback;
+                    }
+                } catch (e) {}
+                return fallback;
+            };
+
+            const getDbl = (key, fallback) => {
+                try {
+                    if (this._makSettings?.settings_schema?.has_key(key)) {
+                        return this._makSettings.get_double(key);
+                    }
+                } catch (e) {}
+                return fallback;
+            };
+
+            const getInt = (key, fallback) => {
+                try {
+                    if (this._makSettings?.settings_schema?.has_key(key)) {
+                        return this._makSettings.get_int(key);
+                    }
+                } catch (e) {}
+                return fallback;
+            };
+
+            const getBool = (key, fallback) => {
+                try {
+                    if (this._makSettings?.settings_schema?.has_key(key)) {
+                        return this._makSettings.get_boolean(key);
+                    }
+                } catch (e) {}
+                return fallback;
+            };
+
             // Dock
-            this._liquidSettings.set_boolean('enable-dock-glass', true);
-            this._liquidSettings.set_double('dock-corner-radius', dockRad > 0 ? dockRad : 24.0);
-            this._liquidSettings.set_int('dock-blur-radius', dockBlurRad);
-            this._liquidSettings.set_string('dock-tint-color', '#ffffff');
-            this._liquidSettings.set_double('dock-tint-strength', Math.max(0.04, Math.min(0.20, glassLevel * 0.16)));
+            const dockBlur = getBool('dock-blur', true);
+            const dockBlurRad = getInt('dock-blur-radius', Math.max(1, Math.round(glassLevel * 28.0)));
+            const dockTintColor = getStr('dock-tint-color', '#ffffff');
+            const dockTintStrength = getDbl('dock-tint-strength', Math.max(0.04, Math.min(0.20, glassLevel * 0.16)));
+            const dockEffectiveRadius = dockRad > 0 ? dockRad : getInt('dock-corner-radius', 24);
+
+            this._liquidSettings.set_boolean('enable-dock-glass', dockBlur);
+            this._liquidSettings.set_double('dock-corner-radius', dockEffectiveRadius > 0 ? dockEffectiveRadius : 24.0);
+            this._liquidSettings.set_int('dock-blur-radius', dockBlur ? Math.max(1, dockBlurRad) : 0);
+            this._liquidSettings.set_string('dock-tint-color', dockTintColor);
+            this._liquidSettings.set_double('dock-tint-strength', Math.max(0.0, Math.min(1.0, dockTintStrength)));
 
             // Top Bar
             const topbarBlur = this._makSettings.get_boolean('topbar-blur');
@@ -219,15 +261,18 @@ export class LiquidGlassController {
             const topbarBlurRad = this._makSettings.get_int('topbar-blur-radius');
             const topbarTrans = this._makSettings.get_double('topbar-transparency');
             const blurBright = this._makSettings.get_double('blur-brightness');
+            const topbarTintColor = getStr('topbar-tint-color', '#ffffff');
+            const topbarTintStrength = getDbl('topbar-tint-strength', 0.08);
 
             if (!topbarBlur || !blurPanel || topbarOpaque) {
                 this._liquidSettings.set_string('top-bar-style', 'off');
             } else {
                 this._liquidSettings.set_string('top-bar-style', 'pill');
-                this._liquidSettings.set_string('top-bar-tint-color', '#ffffff');
-                // Calculate tint strength from panel transparency:
-                const tintStr = Math.max(0.02, Math.min(0.40, (1.0 - topbarTrans) * 0.22));
-                this._liquidSettings.set_double('top-bar-tint-strength', tintStr);
+                this._liquidSettings.set_string('top-bar-tint-color', topbarTintColor);
+                // Calculate tint strength from panel transparency or explicit setting:
+                const calcTintStr = Math.max(0.02, Math.min(0.40, (1.0 - topbarTrans) * 0.22));
+                const finalTopbarTint = topbarTintStrength > 0.08 ? topbarTintStrength : calcTintStr;
+                this._liquidSettings.set_double('top-bar-tint-strength', finalTopbarTint);
                 this._liquidSettings.set_int('top-bar-blur-radius', topbarBlurRad > 0 ? topbarBlurRad : 24);
                 this._liquidSettings.set_double('top-bar-brightness', blurBright > 0 ? blurBright : 1.0);
 
@@ -255,42 +300,63 @@ export class LiquidGlassController {
             // Re-apply topbar module transparency styling
             try { this._extension?._topbar?._applyPanelTransparency?.(); } catch (e) {}
 
+            // Menus (Kiwi menu, app menus, calendar)
+            const menuBlur = getBool('menu-blur', true);
+            const menuBlurRad = getInt('menu-blur-radius', 16);
+            const menuGlassLevel = getDbl('menu-glass-level', 0.60);
+            const menuTintColor = getStr('menu-tint-color', '#ffffff');
+            const menuTintStrength = getDbl('menu-tint-strength', 0.08);
+            const menuCornerRad = getInt('menu-corner-radius', 14);
+
             // Calendar & Date Menu
-            this._liquidSettings.set_boolean('enable-menu-glass', true);
+            this._liquidSettings.set_boolean('enable-menu-glass', menuBlur);
             this._liquidSettings.set_boolean('enable-menu-animation', false);
-            this._liquidSettings.set_double('menu-corner-radius', 14.0);
+            this._liquidSettings.set_double('menu-corner-radius', menuCornerRad > 0 ? menuCornerRad : 14.0);
             this._liquidSettings.set_int('menu-glass-expand', 0);
-            this._liquidSettings.set_int('menu-blur-radius', 16);
-            this._liquidSettings.set_string('menu-tint-color', '#ffffff');
-            this._liquidSettings.set_double('menu-tint-strength', 0.08);
+            this._liquidSettings.set_int('menu-blur-radius', menuBlur ? Math.max(1, menuBlurRad) : 0);
+            this._liquidSettings.set_string('menu-tint-color', menuTintColor);
+            this._liquidSettings.set_double('menu-tint-strength', Math.max(0.0, Math.min(1.0, menuTintStrength)));
             this._liquidSettings.set_boolean('menu-enable-adaptive-text-color', false);
 
             // Extra Panel Menus (Kiwi Apple menu, system indicators)
-            this._liquidSettings.set_boolean('enable-extra-menu-glass', true);
+            this._liquidSettings.set_boolean('enable-extra-menu-glass', menuBlur);
             this._liquidSettings.set_boolean('enable-panel-menu-animation', false);
-            this._liquidSettings.set_double('panel-menu-corner-radius', 14.0);
+            this._liquidSettings.set_double('panel-menu-corner-radius', menuCornerRad > 0 ? menuCornerRad : 14.0);
             this._liquidSettings.set_int('panel-menu-glass-expand', 0);
-            this._liquidSettings.set_int('panel-menu-blur-radius', 16);
-            this._liquidSettings.set_string('panel-menu-tint-color', '#ffffff');
-            this._liquidSettings.set_double('panel-menu-tint-strength', 0.08);
+            this._liquidSettings.set_int('panel-menu-blur-radius', menuBlur ? Math.max(1, menuBlurRad) : 0);
+            this._liquidSettings.set_string('panel-menu-tint-color', menuTintColor);
+            this._liquidSettings.set_double('panel-menu-tint-strength', Math.max(0.0, Math.min(1.0, menuTintStrength)));
             this._liquidSettings.set_boolean('panel-menu-enable-adaptive-text-color', false);
 
-            // Desktop & Application Context Menus
-            this._liquidSettings.set_boolean('enable-desktop-menu-glass', false);
-            this._liquidSettings.set_double('desktop-menu-corner-radius', 14.0);
-            this._liquidSettings.set_int('desktop-menu-blur-radius', 16);
-            this._liquidSettings.set_string('desktop-menu-tint-color', '#ffffff');
-            this._liquidSettings.set_double('desktop-menu-tint-strength', 0.08);
+            // Desktop Context Menus
+            const desktopMenuBlur = getBool('desktop-menu-blur', true);
+            const desktopMenuBlurRad = getInt('desktop-menu-blur-radius', 16);
+            const desktopMenuTintColor = getStr('desktop-menu-tint-color', '#ffffff');
+            const desktopMenuTintStrength = getDbl('desktop-menu-tint-strength', 0.08);
+
+            this._liquidSettings.set_boolean('enable-desktop-menu-glass', desktopMenuBlur);
+            this._liquidSettings.set_double('desktop-menu-corner-radius', menuCornerRad > 0 ? menuCornerRad : 14.0);
+            this._liquidSettings.set_int('desktop-menu-blur-radius', desktopMenuBlur ? Math.max(1, desktopMenuBlurRad) : 0);
+            this._liquidSettings.set_string('desktop-menu-tint-color', desktopMenuTintColor);
+            this._liquidSettings.set_double('desktop-menu-tint-strength', Math.max(0.0, Math.min(1.0, desktopMenuTintStrength)));
             this._liquidSettings.set_double('desktop-menu-content-opacity', 0.88);
 
             // Quick Settings: Unified background card mode (0), native toggle styling
-            this._liquidSettings.set_boolean('enable-quick-settings-glass', true);
+            const ccBlur = getBool('control-center-blur', true);
+            const ccBlurRad = getInt('control-center-blur-radius', 18);
+            const ccGlassLevel = getDbl('control-center-glass-level', 0.60);
+            const ccTintColor = getStr('control-center-tint-color', '#ffffff');
+            const ccTintStrength = getDbl('control-center-tint-strength', 0.08);
+            const ccCornerRad = getInt('quick-settings-radius', 20);
+
+            this._liquidSettings.set_boolean('enable-quick-settings-glass', ccBlur);
             this._liquidSettings.set_boolean('enable-quick-settings-animation', false);
             this._liquidSettings.set_int('quick-settings-apply-to', 0);
-            this._liquidSettings.set_double('quick-settings-corner-radius', 20.0);
-            this._liquidSettings.set_int('quick-settings-blur-radius', 18);
-            this._liquidSettings.set_string('quick-settings-tint-color', '#ffffff');
-            this._liquidSettings.set_double('quick-settings-tint-strength', 0.08);
+            this._liquidSettings.set_double('quick-settings-corner-radius', ccCornerRad > 0 ? ccCornerRad : 20.0);
+            this._liquidSettings.set_int('quick-settings-blur-radius', ccBlur ? Math.max(1, ccBlurRad) : 0);
+            this._liquidSettings.set_string('quick-settings-tint-color', ccTintColor);
+            this._liquidSettings.set_double('quick-settings-tint-strength', Math.max(0.0, Math.min(1.0, ccTintStrength)));
+            this._liquidSettings.set_double('quick-settings-toggle-tint-strength', Math.max(0.0, Math.min(1.0, ccTintStrength)));
             this._liquidSettings.set_boolean('quick-settings-enable-adaptive-text-color', false);
 
             // Notifications
@@ -320,6 +386,11 @@ export class LiquidGlassController {
             'blur-chromatic-dispersion',
             'dock-edge-bending',
             'dock-glass-level',
+            'dock-blur',
+            'dock-blur-radius',
+            'dock-corner-radius',
+            'dock-tint-color',
+            'dock-tint-strength',
             'global-opacity',
             'corner-radius',
             'dock-radius',
@@ -328,9 +399,28 @@ export class LiquidGlassController {
             'topbar-transparency',
             'topbar-opaque',
             'topbar-pill-style',
+            'topbar-tint-color',
+            'topbar-tint-strength',
             'blur-panel',
             'blur-brightness',
-            'blur-sigma'
+            'blur-sigma',
+            'control-center-blur',
+            'control-center-blur-radius',
+            'control-center-glass-level',
+            'control-center-tint-color',
+            'control-center-tint-strength',
+            'quick-settings-radius',
+            'menu-blur',
+            'menu-blur-radius',
+            'menu-glass-level',
+            'menu-tint-color',
+            'menu-tint-strength',
+            'menu-corner-radius',
+            'desktop-menu-blur',
+            'desktop-menu-blur-radius',
+            'desktop-menu-glass-level',
+            'desktop-menu-tint-color',
+            'desktop-menu-tint-strength'
         ]) {
             const id = this._makSettings.connect(`changed::${key}`, sync);
             this._makSettingsIds.push(id);

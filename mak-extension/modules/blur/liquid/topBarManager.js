@@ -92,8 +92,17 @@ export class TopBarManager {
         this._applyMaterial();
         this._lastKey = '';
         this._savedStyles = [panel, panel._leftBox, panel._centerBox, panel._rightBox].map(actor => [actor, actor.get_style()]);
-        // The theme can change the bar's height under us.
-        this._panelStyleId = panel.connect('style-changed', () => this._applyLayout());
+        let applyingLayout = false;
+        this._panelStyleId = panel.connect('style-changed', () => {
+            if (applyingLayout)
+                return;
+            applyingLayout = true;
+            try {
+                this._applyLayout();
+            } finally {
+                applyingLayout = false;
+            }
+        });
         this._applyLayout();
         startSyncLoop(this._frameSignalSlot, this._frameSlot, {
             // At shell shutdown the stage destroys the glass before we are told.
@@ -154,7 +163,9 @@ export class TopBarManager {
                 style = `padding: ${top}px ${right}px ${bottom}px ${left}px;`;
             }
             const own = original?.trim().replace(/;$/, '');
-            actor.set_style(own ? `${own}; ${style}` : style);
+            const newStyle = own ? `${own}; ${style}` : style;
+            if (actor.get_style() !== newStyle)
+                actor.set_style(newStyle);
         }
     }
 

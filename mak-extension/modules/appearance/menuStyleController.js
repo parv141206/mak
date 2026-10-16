@@ -26,7 +26,9 @@ export class MenuStyleController {
         this._settingsChangedId = this._settings.connect('changed', (s, key) => {
             if (key.startsWith('menu-') || key.startsWith('quick-settings-') ||
                 key.startsWith('notification-') || key === 'global-opacity' ||
-                key === 'blur-liquid-glass') {
+                key === 'blur-liquid-glass' || key.startsWith('topbar-') ||
+                key.startsWith('control-center-') || key.startsWith('desktop-menu-') ||
+                key.startsWith('dock-')) {
                 this.updateStyles();
             }
         });
@@ -74,6 +76,59 @@ export class MenuStyleController {
         const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
         const isLight = (colorScheme === 'prefer-light') || gtkTheme.toLowerCase().includes('light');
         const isAmoled = gtkTheme.toLowerCase().includes('amoled');
+
+        const getStr = (key, fallback) => {
+            try {
+                if (this._settings?.settings_schema?.has_key(key)) {
+                    const val = this._settings.get_string(key);
+                    return val || fallback;
+                }
+            } catch (e) {}
+            return fallback;
+        };
+
+        const getDbl = (key, fallback) => {
+            try {
+                if (this._settings?.settings_schema?.has_key(key)) {
+                    return this._settings.get_double(key);
+                }
+            } catch (e) {}
+            return fallback;
+        };
+
+        const hexToRgb = (hex, fallback = [255, 255, 255]) => {
+            if (!hex || typeof hex !== 'string') return fallback;
+            const h = hex.trim().replace(/^#/, '');
+            if (h.length === 3) {
+                return [
+                    parseInt(h[0] + h[0], 16),
+                    parseInt(h[1] + h[1], 16),
+                    parseInt(h[2] + h[2], 16)
+                ];
+            }
+            if (h.length === 6) {
+                return [
+                    parseInt(h.substring(0, 2), 16),
+                    parseInt(h.substring(2, 4), 16),
+                    parseInt(h.substring(4, 6), 16)
+                ];
+            }
+            return fallback;
+        };
+
+        const topbarTextColor = getStr('topbar-text-color', '#ffffff');
+        const topbarIconColor = getStr('topbar-icon-color', '#ffffff');
+        const controlCenterTextColor = getStr('control-center-text-color', '#ffffff');
+        const controlCenterIconColor = getStr('control-center-icon-color', '#ffffff');
+        const customMenuTextColor = getStr('menu-text-color', '#ffffff');
+
+        const controlCenterTintColor = getStr('control-center-tint-color', '#ffffff');
+        const controlCenterTintStrength = getDbl('control-center-tint-strength', 0.08);
+        const [ccTintR, ccTintG, ccTintB] = hexToRgb(controlCenterTintColor);
+
+        const menuTintColor = getStr('menu-tint-color', '#ffffff');
+        const menuTintStrength = getDbl('menu-tint-strength', 0.08);
+        const [mTintR, mTintG, mTintB] = hexToRgb(menuTintColor);
 
         let bgR = 32, bgG = 32, bgB = 36;
         let menuOpacity = 0.65;
@@ -139,6 +194,21 @@ export class MenuStyleController {
             btBarBg = 'rgba(255, 255, 255, 0.22)';
             btText = 'rgba(255, 255, 255, 0.8)';
         }
+        const finalTopbarText = (topbarTextColor && topbarTextColor !== 'default') ? topbarTextColor : (isLight ? '#1d1d1f' : '#f5f5f7');
+        const finalTopbarIcon = (topbarIconColor && topbarIconColor !== 'default') ? topbarIconColor : (isLight ? '#1d1d1f' : '#f2f2f7');
+
+        const isCCWhite = controlCenterTextColor === '#ffffff' || controlCenterTextColor === 'rgb(255,255,255)';
+        const finalCCText = (controlCenterTextColor && controlCenterTextColor !== 'default' && !(isLight && isCCWhite))
+            ? controlCenterTextColor 
+            : (isLight ? '#1d1d1f' : '#f5f5f7');
+        const isCCIconWhite = controlCenterIconColor === '#ffffff' || controlCenterIconColor === 'rgb(255,255,255)';
+        const finalCCIcon = (controlCenterIconColor && controlCenterIconColor !== 'default' && !(isLight && isCCIconWhite))
+            ? controlCenterIconColor 
+            : (isLight ? '#1d1d1f' : '#f2f2f7');
+        const isMenuWhite = customMenuTextColor === '#ffffff' || customMenuTextColor === 'rgb(255,255,255)';
+        const finalMenuText = (customMenuTextColor && customMenuTextColor !== 'default' && !(isLight && isMenuWhite))
+            ? customMenuTextColor 
+            : textColor;
 
         const isLiquidGlass = this._settings.get_boolean('blur-liquid-glass');
         if (isLiquidGlass) {
@@ -152,13 +222,70 @@ export class MenuStyleController {
                 : '0 14px 36px rgba(0, 0, 0, 0.40), 0 2px 10px rgba(0, 0, 0, 0.18)';
         }
 
-        const frostedGlassBg = isLight
-            ? 'rgba(255, 255, 255, 0.28)'
-            : (isAmoled ? 'rgba(18, 18, 22, 0.36)' : 'rgba(30, 30, 34, 0.32)');
+        // Quick Settings capsule/pill tinting
+        const ccPillAlpha = isLight
+            ? (0.20 + controlCenterTintStrength * 0.12).toFixed(2)
+            : (0.08 + controlCenterTintStrength * 0.14).toFixed(2);
+        const ccPillHoverAlpha = isLight
+            ? (0.32 + controlCenterTintStrength * 0.14).toFixed(2)
+            : (0.16 + controlCenterTintStrength * 0.16).toFixed(2);
+        const qsPillBg = isLiquidGlass
+            ? `rgba(${ccTintR}, ${ccTintG}, ${ccTintB}, ${ccPillAlpha})`
+            : qsTileBg;
+        const qsPillHoverBg = isLiquidGlass
+            ? `rgba(${ccTintR}, ${ccTintG}, ${ccTintB}, ${ccPillHoverAlpha})`
+            : qsTileHoverBg;
+
+        // Submenu background inside Quick Settings
+        const qsSubmenuBgR = (controlCenterTintColor !== '#ffffff' && controlCenterTintStrength > 0)
+            ? Math.round(bgR * (1 - controlCenterTintStrength) + ccTintR * controlCenterTintStrength)
+            : bgR;
+        const qsSubmenuBgG = (controlCenterTintColor !== '#ffffff' && controlCenterTintStrength > 0)
+            ? Math.round(bgG * (1 - controlCenterTintStrength) + ccTintG * controlCenterTintStrength)
+            : bgG;
+        const qsSubmenuBgB = (controlCenterTintColor !== '#ffffff' && controlCenterTintStrength > 0)
+            ? Math.round(bgB * (1 - controlCenterTintStrength) + ccTintB * controlCenterTintStrength)
+            : bgB;
+
+        // Menu background tinted with menu-tint-color
+        if (menuTintColor !== '#ffffff' && menuTintStrength > 0) {
+            bgR = Math.round(bgR * (1 - menuTintStrength) + mTintR * menuTintStrength);
+            bgG = Math.round(bgG * (1 - menuTintStrength) + mTintG * menuTintStrength);
+            bgB = Math.round(bgB * (1 - menuTintStrength) + mTintB * menuTintStrength);
+        }
+
+        const frostedGlassBg = (menuTintColor !== '#ffffff' && menuTintStrength > 0)
+            ? `rgba(${mTintR}, ${mTintG}, ${mTintB}, ${isLight ? 0.32 : 0.28})`
+            : (isLight
+                ? 'rgba(255, 255, 255, 0.28)'
+                : (isAmoled ? 'rgba(18, 18, 22, 0.36)' : 'rgba(30, 30, 34, 0.32)'));
 
         const borderCss = `${borderWidth > 0 ? borderWidth : 1}px solid ${borderStrokeColor}`;
 
         const css = `/* Generated by Mak Appearance Controller */
+/* ── Explicit Top Bar Item Colors ────────────────────────────────────────── */
+#panel.mak-panel .panel-button,
+#panel.mak-panel .panel-button StLabel,
+#panel.mak-panel .mak-app-title-label,
+#panel.mak-panel .clock-display,
+#panel.mak-panel .clock,
+#panel.mak-panel .clock-display-box .clock,
+#panel.mak-panel .mak-user-switcher-label,
+#panel.mak-panel .mak-bt-panel-label {
+    color: ${finalTopbarText} !important;
+}
+
+#panel.mak-panel .menu-button,
+#panel.mak-panel .system-status-icon,
+#panel.mak-panel .panel-button StIcon,
+#panel.mak-panel .panel-button .system-status-icon,
+#panel.mak-panel .mak-spotlight-button StIcon,
+#panel.mak-panel .mak-control-center-button StIcon,
+#panel.mak-panel .mak-quick-settings-button StIcon,
+#panel.mak-panel .mak-bt-panel-box StIcon {
+    color: ${finalTopbarIcon} !important;
+}
+
 /* ── Unified macOS Popup Menus, Context Menus & Kiwi Menu ─────────────────── */
 .popup-menu-boxpointer,
 .candidate-popup-boxpointer {
@@ -189,11 +316,11 @@ export class MenuStyleController {
     margin: 2px 4px !important;
     padding: 6px 12px !important;
     transition-duration: 100ms !important;
-    color: ${textColor} !important;
+    color: ${finalMenuText} !important;
 }
 
 .popup-menu-item StLabel {
-    color: ${textColor} !important;
+    color: ${finalMenuText} !important;
 }
 
 .popup-menu-item:hover,
@@ -449,44 +576,49 @@ export class MenuStyleController {
     color: ${itemHoverColor} !important;
 }
 
-/* ── Quick Settings Control Center ────────────────────────────────────────── */
-/* Eliminate duplicate background: the outer popup-menu-content provides the card */
-.quick-settings,
-.quick-toggle-menu {
-    border: none !important;
-    background-color: transparent !important;
-    background-image: none !important;
-    box-shadow: none !important;
-    color: ${textColor} !important;
-}
-
-/* Ensure the popup container around quick settings has the proper radius & shadow */
+/* ── Quick Settings Control Center Floating Individual Liquid Glass Pills ─── */
+/* Outer background is completely transparent so each pod floats as an independent pill */
+.quick-settings-menu,
 .quick-settings-menu .popup-menu-content,
-.popup-menu-content:has(.quick-settings) {
-    border-radius: ${qsRadius}px !important;
-    box-shadow: ${qsBoxShadow} !important;
-}
-
-.liquid-glass-transparent .quick-settings,
+.quick-settings-menu .popup-menu-boxpointer,
+.popup-menu-boxpointer:has(.quick-settings),
+.popup-menu-content:has(.quick-settings),
+.popup-menu:has(.quick-settings),
+.liquid-glass-qs-root,
+.liquid-glass-qs-root .popup-menu-content,
+.liquid-glass-qs-root .popup-menu-boxpointer,
+.liquid-glass-transparent:has(.quick-settings),
+.liquid-glass-transparent.popup-menu:has(.quick-settings),
 .liquid-glass-transparent.quick-settings,
-.liquid-glass-qs-root .quick-settings,
-.liquid-glass-qs-root.quick-settings,
-.liquid-glass-transparent .quick-toggle-menu,
-.liquid-glass-transparent.quick-toggle-menu,
-.liquid-glass-qs-root .quick-toggle-menu,
-.liquid-glass-qs-root.quick-toggle-menu {
+.liquid-glass-qs-root.quick-settings {
     border: none !important;
+    background: transparent !important;
     background-color: transparent !important;
     background-image: none !important;
     box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.liquid-glass-transparent .popup-menu-content,
-.liquid-glass-qs-root .popup-menu-content,
-.liquid-glass-transparent.popup-menu .popup-menu-content,
-.popup-menu.liquid-glass-transparent .popup-menu-content,
-.liquid-glass-transparent.popup-menu,
-.popup-menu.liquid-glass-transparent {
+.quick-settings {
+    border: none !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 8px !important;
+}
+
+/* Unified structured grid gaps between pills */
+.quick-settings-grid {
+    spacing-rows: 8px !important;
+    spacing-columns: 8px !important;
+}
+
+/* Other popup menus (Kiwi menu, date/calendar) preserve their frosted glass card */
+.popup-menu:not(.liquid-glass-qs-root) .popup-menu-content,
+.popup-menu.liquid-glass-transparent:not(.liquid-glass-qs-root) .popup-menu-content {
     border: ${borderCss} !important;
     background-color: ${frostedGlassBg} !important;
     box-shadow: ${boxShadow} !important;
@@ -494,45 +626,81 @@ export class MenuStyleController {
 
 .liquid-glass-transparent.notification-banner,
 .liquid-glass-transparent .notification-banner,
-.liquid-glass-transparent.message,
-.liquid-glass-transparent .message,
-.liquid-glass-transparent .message-box,
 .notification-banner.liquid-glass-transparent,
 .notification-banner.liquid-glass-transparent-keep-border {
     border: ${borderCss} !important;
     background-color: ${frostedGlassBg} !important;
     box-shadow: ${qsBoxShadow} !important;
+    border-radius: ${notifRadius}px !important;
 }
 
-.quick-settings StLabel,
-.quick-toggle-menu StLabel {
-    color: ${textColor} !important;
+/* ── Top System Row: Battery pill + circular action icons ──────────────────── */
+.quick-settings-system-item {
+    margin-bottom: 4px !important;
 }
 
-.quick-settings StIcon,
-.quick-toggle-menu StIcon {
-    color: ${textColor} !important;
+.quick-settings-system-item > StBoxLayout {
+    spacing: 6px !important;
 }
 
-/* Header Action Buttons (Screenshot, Settings, Lock, Power) */
+/* Battery percentage pill: compact, elegant capsule pill */
+.quick-settings-system-item .power-item,
+.quick-settings-system-item .quick-toggle.power-item {
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 34px !important;
+    height: 34px !important;
+    padding: 0 12px !important;
+    margin: 0 !important;
+    border-radius: 9999px !important;
+    background-color: ${qsPillBg} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+    box-shadow: none !important;
+    color: ${finalCCText} !important;
+}
+
+.quick-settings-system-item .power-item StIcon,
+.quick-settings-system-item .quick-toggle.power-item StIcon {
+    icon-size: 16px !important;
+    color: ${finalCCIcon} !important;
+    margin-right: 4px !important;
+}
+
+.quick-settings-system-item .power-item StLabel,
+.quick-settings-system-item .quick-toggle.power-item StLabel {
+    color: ${finalCCText} !important;
+    font-size: 0.9em !important;
+    font-weight: 600 !important;
+}
+
+/* Header Action Buttons (Screenshot, Settings, Lock, Power) - Sleek round pills */
 .quick-settings-system-item .icon-button,
 .quick-settings .icon-button,
 .quick-settings .button {
-    color: ${textColor} !important;
-    background-color: ${qsTileBg} !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: ${finalCCIcon} !important;
+    background-color: ${qsPillBg} !important;
+    border: 1px solid ${borderStrokeColor} !important;
     border-radius: 9999px !important;
+    box-shadow: none !important;
 }
 
 .quick-settings-system-item .icon-button StIcon,
 .quick-settings .icon-button StIcon,
 .quick-settings .button StIcon {
-    color: ${textColor} !important;
+    icon-size: 15px !important;
+    color: ${finalCCIcon} !important;
 }
 
 .quick-settings-system-item .icon-button:hover,
 .quick-settings .icon-button:hover,
 .quick-settings .button:hover {
-    background-color: ${qsTileHoverBg} !important;
+    background-color: ${qsPillHoverBg} !important;
     color: ${itemHoverColor} !important;
 }
 
@@ -542,45 +710,220 @@ export class MenuStyleController {
     color: ${itemHoverColor} !important;
 }
 
-/* Quick Slider (Volume, Brightness) */
+/* ── Sliders (Volume, Brightness) - Clean capsules ─────────────────────────── */
 .quick-slider {
-    background-color: ${qsTileBg} !important;
-    border-radius: 24px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 0 12px !important;
+    margin: 2px 0 !important;
+    background-color: ${qsPillBg} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+    border-radius: 9999px !important;
+    box-shadow: none !important;
+}
+
+.quick-slider > StBoxLayout {
+    spacing: 10px !important;
+}
+
+.quick-slider .icon-button {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .quick-slider StIcon,
 .quick-slider .icon-button StIcon {
+    icon-size: 16px !important;
+    color: ${finalCCIcon} !important;
+}
+
+.quick-slider .slider-bin {
+    min-height: 16px !important;
+    padding: 0 !important;
+}
+
+/* ── Quick Toggles (Wi-Fi, Bluetooth, Dark Style, Night Light, etc.) ───────── */
+/* Outer pills: consistent capsule geometry and refined proportions */
+.quick-settings-grid > .quick-toggle,
+.quick-settings-grid .quick-toggle:not(.quick-toggle-has-menu .quick-toggle):not(.power-item),
+.quick-toggle-has-menu {
+    min-height: 44px !important;
+    height: 44px !important;
+    border-radius: 9999px !important;
+    background-color: ${qsPillBg} !important;
+    border: 1px solid ${borderStrokeColor} !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.quick-settings-grid > .quick-toggle,
+.quick-settings-grid .quick-toggle:not(.quick-toggle-has-menu .quick-toggle):not(.power-item) {
+    padding: 0 12px !important;
+}
+
+.quick-settings-grid > .quick-toggle:hover,
+.quick-settings-grid .quick-toggle:hover:not(.quick-toggle-has-menu .quick-toggle):not(.power-item),
+.quick-toggle-has-menu:hover {
+    background-color: ${qsPillHoverBg} !important;
+}
+
+/* Reset inner buttons inside .quick-toggle-has-menu: prevent double boxes & weird borders */
+.quick-toggle-has-menu .quick-toggle {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 0 0 12px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    border-radius: 9999px 0 0 9999px !important;
+}
+
+.quick-toggle-has-menu .quick-toggle-menu-button {
+    background: transparent !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 10px 0 4px !important;
+    min-height: 44px !important;
+    height: 44px !important;
+    border-radius: 0 9999px 9999px 0 !important;
+    color: ${finalCCIcon} !important;
+}
+
+.quick-toggle-has-menu .quick-toggle-menu-button:hover {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+.quick-toggle-has-menu .quick-toggle-separator {
+    width: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Dropdown Submenus inside Quick Settings */
+.quick-toggle-menu,
+.quick-settings .quick-toggle-menu,
+.liquid-glass-qs-root .quick-toggle-menu,
+.quick-settings .popup-sub-menu {
+    border-radius: 18px !important;
+    border: 1px solid ${borderStrokeColor} !important;
+    background-color: rgba(${qsSubmenuBgR}, ${qsSubmenuBgG}, ${qsSubmenuBgB}, ${isLight ? '0.92' : '0.88'}) !important;
+    box-shadow: ${qsBoxShadow} !important;
+    padding: 10px 14px !important;
+    margin: 8px 0 !important;
+}
+
+.quick-toggle-menu .header,
+.quick-settings .quick-toggle-menu .header {
+    margin-bottom: 8px !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px solid ${separatorColor} !important;
+}
+
+.quick-toggle-menu .header .title,
+.quick-settings .quick-toggle-menu .header .title {
+    color: ${textColor} !important;
+    font-weight: bold !important;
+    font-size: 1.1em !important;
+}
+
+.quick-toggle-menu .header .subtitle,
+.quick-settings .quick-toggle-menu .header .subtitle {
+    color: ${secondaryTextColor} !important;
+    font-size: 0.88em !important;
+}
+
+.quick-toggle-menu .header .icon,
+.quick-settings .quick-toggle-menu .header .icon {
     color: ${textColor} !important;
 }
 
-/* Quick Toggles (Wi-Fi, Bluetooth, Dark Style, Night Light, etc.) */
-.quick-toggle,
-.quick-toggle-has-menu {
-    background-color: ${qsTileBg} !important;
-    border-radius: 9999px !important;
+.quick-toggle-menu .popup-menu-item,
+.quick-settings .quick-toggle-menu .popup-menu-item {
+    border-radius: 10px !important;
+    padding: 8px 12px !important;
+    margin: 2px 0 !important;
+    color: ${textColor} !important;
 }
 
-.quick-toggle:hover,
-.quick-toggle-has-menu:hover {
-    background-color: ${qsTileHoverBg} !important;
+.quick-toggle-menu .popup-menu-item StLabel,
+.quick-settings .quick-toggle-menu .popup-menu-item StLabel {
+    color: ${textColor} !important;
 }
 
-.quick-toggle-has-menu .quick-toggle:not(:checked) {
-    background-color: transparent !important;
+.quick-toggle-menu .popup-menu-item StIcon,
+.quick-settings .quick-toggle-menu .popup-menu-item StIcon {
+    color: ${textColor} !important;
 }
 
-/* Unchecked Toggles: crisp contrast text and icons */
+.quick-toggle-menu .popup-menu-item:hover,
+.quick-toggle-menu .popup-menu-item:focus,
+.quick-settings .quick-toggle-menu .popup-menu-item:hover,
+.quick-settings .quick-toggle-menu .popup-menu-item:focus {
+    background-color: ${itemHoverBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.quick-toggle-menu .popup-menu-item:hover StLabel,
+.quick-toggle-menu .popup-menu-item:focus StLabel,
+.quick-toggle-menu .popup-menu-item:hover StIcon,
+.quick-toggle-menu .popup-menu-item:focus StIcon,
+.quick-settings .quick-toggle-menu .popup-menu-item:hover StLabel,
+.quick-settings .quick-toggle-menu .popup-menu-item:focus StLabel,
+.quick-settings .quick-toggle-menu .popup-menu-item:hover StIcon,
+.quick-settings .quick-toggle-menu .popup-menu-item:focus StIcon {
+    color: ${itemHoverColor} !important;
+}
+
+.quick-toggle-menu .popup-menu-item:active,
+.quick-settings .quick-toggle-menu .popup-menu-item:active {
+    background-color: ${itemActiveBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.quick-toggle-menu .popup-menu-item.selected,
+.quick-settings .quick-toggle-menu .popup-menu-item.selected {
+    background-color: ${itemSelectedBg} !important;
+    color: ${itemHoverColor} !important;
+}
+
+.quick-toggle-menu .popup-separator-menu-item,
+.quick-settings .quick-toggle-menu .popup-separator-menu-item {
+    margin: 4px 6px !important;
+    padding: 0 !important;
+}
+
+.quick-toggle-menu .popup-separator-menu-item .popup-separator-menu-item-separator,
+.quick-settings .quick-toggle-menu .popup-separator-menu-item .popup-separator-menu-item-separator {
+    background-color: ${separatorColor} !important;
+    height: 1px !important;
+}
+
+/* Unchecked Toggles & Dropdown items: explicit user-configured text and icons */
 .quick-toggle:not(:checked) StIcon,
 .quick-toggle:not(:checked) .quick-toggle-icon,
 .quick-toggle-has-menu:not(:checked) StIcon,
 .quick-toggle-has-menu:not(:checked) .quick-toggle-icon,
-.quick-toggle-has-menu:not(:checked) .quick-toggle-menu-button StIcon {
-    color: ${textColor} !important;
+.quick-toggle-has-menu:not(:checked) .quick-toggle-menu-button StIcon,
+.quick-toggle-menu StIcon {
+    color: ${finalCCIcon} !important;
 }
 
 .quick-toggle:not(:checked) StLabel,
-.quick-toggle-has-menu:not(:checked) StLabel {
-    color: ${textColor} !important;
+.quick-toggle-has-menu:not(:checked) StLabel,
+.quick-toggle-has-menu:not(:checked) .quick-toggle-title,
+.quick-settings StLabel,
+.quick-toggle-menu StLabel {
+    color: ${finalCCText} !important;
+}
+
+.quick-toggle-has-menu:not(:checked) .quick-toggle-subtitle {
+    color: ${secondaryTextColor} !important;
 }
 
 .quick-toggle-has-menu:not(:checked) .quick-toggle-menu-button {
@@ -588,9 +931,9 @@ export class MenuStyleController {
 }
 
 /* Checked / Active Toggles: dynamic shell accent with crisp WHITE text and icons */
-.quick-toggle:checked,
-.quick-toggle-has-menu:checked,
-.quick-toggle-has-menu .quick-toggle:checked {
+.quick-settings-grid > .quick-toggle:checked,
+.quick-settings-grid .quick-toggle:checked:not(.quick-toggle-has-menu .quick-toggle):not(.power-item),
+.quick-toggle-has-menu:checked {
     background-color: -st-accent-color !important;
     color: #ffffff !important;
 }
@@ -600,6 +943,13 @@ export class MenuStyleController {
 .quick-toggle-has-menu:checked StIcon,
 .quick-toggle-has-menu:checked .quick-toggle-icon,
 .quick-toggle-has-menu:checked .quick-toggle-menu-button StIcon {
+    color: #ffffff !important;
+}
+
+.quick-toggle-has-menu:checked .quick-toggle,
+.quick-toggle-has-menu:checked .quick-toggle StLabel,
+.quick-toggle-has-menu:checked .quick-toggle-title,
+.quick-toggle-has-menu:checked .quick-toggle-subtitle {
     color: #ffffff !important;
 }
 
@@ -618,7 +968,7 @@ export class MenuStyleController {
 .quick-settings .battery-bar,
 .quick-settings .battery-label,
 .quick-settings-system-item StLabel {
-    color: ${textColor} !important;
+    color: ${finalCCText} !important;
 }
 
 /* ── Notification Banners ─────────────────────────────────────────────────── */
@@ -656,7 +1006,8 @@ export class MenuStyleController {
 .notification-banner .message-body,
 .notification-banner .message-header-content,
 .notification-banner StBoxLayout,
-.notification-banner StBin {
+.notification-banner StBin,
+.notification-banner .message-notification-group {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;

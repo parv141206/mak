@@ -1691,47 +1691,14 @@
 /* Shell boxpointer and quick settings while glass is active (outer wrappers transparent, card contents styled by appearance controller) */
 .liquid-glass-transparent .popup-menu-boxpointer,
 .liquid-glass-transparent .quick-settings,
-.liquid-glass-transparent .quick-toggle-menu,
 .liquid-glass-transparent.quick-settings,
-.liquid-glass-transparent.quick-toggle-menu,
 .liquid-glass-qs-root .popup-menu-boxpointer,
 .liquid-glass-qs-root .quick-settings,
-.liquid-glass-qs-root .quick-toggle-menu,
-.liquid-glass-qs-root.quick-settings,
-.liquid-glass-qs-root.quick-toggle-menu {
+.liquid-glass-qs-root.quick-settings {
     background-color: transparent !important;
     background-image: none !important;
     border: none !important;
     box-shadow: none !important;
-}
-
-/* Quick Settings macOS Toggle Button Contrast & Legibility across Dark and Light themes */
-.quick-settings .quick-toggle:not(:checked),
-.quick-settings .quick-toggle-has-menu:not(:checked),
-.quick-toggle-menu .quick-toggle:not(:checked),
-.quick-toggle-menu .quick-toggle-has-menu:not(:checked) {
-    background-color: rgba(255, 255, 255, 0.14) !important;
-    color: #f5f5f7 !important;
-}
-
-.quick-settings .quick-toggle:not(:checked) StLabel,
-.quick-settings .quick-toggle:not(:checked) StIcon,
-.quick-settings .quick-toggle:not(:checked) .quick-toggle-icon,
-.quick-settings .quick-toggle-has-menu:not(:checked) StLabel,
-.quick-settings .quick-toggle-has-menu:not(:checked) StIcon,
-.quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-icon,
-.quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-title,
-.quick-settings .quick-toggle-has-menu:not(:checked) .quick-toggle-subtitle {
-    color: #f5f5f7 !important;
-}
-
-.quick-settings .quick-toggle:not(:checked):hover,
-.quick-settings .quick-toggle-has-menu:not(:checked):hover {
-    background-color: rgba(255, 255, 255, 0.22) !important;
-}
-
-.quick-settings .quick-toggle-has-menu .quick-toggle:not(:checked) {
-    background-color: transparent !important;
 }
 
 .quick-settings .quick-toggle:checked,

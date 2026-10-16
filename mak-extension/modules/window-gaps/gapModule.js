@@ -30,9 +30,19 @@ export class GapManager {
                 ? Main.panel.height
                 : 0;
 
-            // Dock offsets per side if present on this monitor
+            // Dock offsets per side if present on this monitor.
+            // When auto-hide or dodge mode is active, maximized windows must expand
+            // to the full screen edge (minus window margins), leaving no dock reserve.
             let dockReserve = { top: 0, bottom: 0, left: 0, right: 0 };
-            if (this._extension?._dock?._manager?._docks) {
+            const autoHideMode = this._settings?.settings_schema?.has_key('auto-hide-mode')
+                ? this._settings.get_string('auto-hide-mode')
+                : 'never';
+            const dockAutoHideActive = autoHideMode !== 'never';
+            const dockEnabled = this._settings?.settings_schema?.has_key('dock-enabled')
+                ? this._settings.get_boolean('dock-enabled')
+                : true;
+
+            if (dockEnabled && !dockAutoHideActive && this._extension?._dock?._manager?._docks) {
                 for (const dock of this._extension._dock._manager._docks) {
                     if (dock.monitorIndex === monitor.index || dock._monitor === monitor) {
                         const strut = dock._geom?.strut;
@@ -162,7 +172,8 @@ export class WindowGapModule {
         this._gapManager = new GapManager(this._settings, this._extension);
 
         this._settingsId = this._settings.connect('changed', (s, key) => {
-            if (key.startsWith('gap') || key === 'gaps-enabled' || key === 'gaps-maximized')
+            if (key.startsWith('gap') || key === 'gaps-enabled' || key === 'gaps-maximized' ||
+                key === 'auto-hide-mode' || key === 'dock-enabled' || key === 'dock-position')
                 this._gapManager.rebuild();
         });
 

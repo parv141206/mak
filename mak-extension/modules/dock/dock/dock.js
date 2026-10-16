@@ -2,6 +2,7 @@
 
 import Clutter from 'gi://Clutter';
 import Gio from 'gi://Gio';
+import GLib from 'gi://GLib';
 import St from 'gi://St';
 
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
@@ -19,6 +20,7 @@ export class DockChrome {
         this._autohideHandle = null;
         this._edgeZone = null;
         this._strut = null;
+        this._strutInChrome = false;
         this._handleVisible = false;
         this._bgStyleCache = null;
         this._handleClipCache = null;
@@ -92,11 +94,9 @@ export class DockChrome {
             });
 
             // Strut reserves screen space so maximized windows clear the dock.
+            // Only added dynamically to Main.layoutManager when a non-null strut is applied.
             this._strut = new St.Widget({ reactive: false, opacity: 0 });
-            Main.layoutManager.addChrome(this._strut, {
-                affectsStruts: true,
-                trackFullscreen: true,
-            });
+            this._strutInChrome = false;
 
             Main.layoutManager.addChrome(this._container, {
                 affectsStruts: false,
@@ -229,11 +229,58 @@ export class DockChrome {
 
     applyStrut(strut) {
         if (!strut) {
-            if (this._strut.width !== 0 || this._strut.height !== 0)
+            if (this._strutInChrome) {
+                try {
+                    Main.layoutManager.removeChrome(this._strut);
+                } catch { }
+                this._strutInChrome = false;
+                try {
+                    Main.layoutManager._queueUpdateRegions();
+                    GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+                        try {
+                            for (const actor of global.get_window_actors()) {
+                                const win = actor.metaWindow;
+                                if (win && (win.maximized_horizontally || win.maximized_vertically)) {
+                                    win.unmaximize();
+                                    win.maximize();
+                                }
+                            }
+                        } catch { }
+                        return GLib.SOURCE_REMOVE;
+                    });
+                } catch { }
+            }
+            if (this._strut && (this._strut.width !== 0 || this._strut.height !== 0))
                 this._strut.set_size(0, 0);
             return;
         }
+
+        const wasInChrome = this._strutInChrome;
+        if (!this._strutInChrome) {
+            Main.layoutManager.addChrome(this._strut, {
+                affectsStruts: true,
+                trackFullscreen: true,
+            });
+            this._strutInChrome = true;
+        }
         this._applyRect(this._strut, strut.x, strut.y, strut.w, strut.h);
+        try {
+            Main.layoutManager._queueUpdateRegions();
+            if (!wasInChrome) {
+                GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+                    try {
+                        for (const actor of global.get_window_actors()) {
+                            const win = actor.metaWindow;
+                            if (win && (win.maximized_horizontally || win.maximized_vertically)) {
+                                win.unmaximize();
+                                win.maximize();
+                            }
+                        }
+                    } catch { }
+                    return GLib.SOURCE_REMOVE;
+                });
+            }
+        } catch { }
     }
 
     applyStrip(strip) {
@@ -404,12 +451,20 @@ export class DockChrome {
         }
         this._containerClipIds = [];
         this._containerClipMonitor = null;
-        for (const key of ['_magZone', '_strip', '_autohideHandle', '_edgeZone', '_strut', '_container']) {
+        for (const key of ['_magZone', '_strip', '_autohideHandle', '_edgeZone', '_container']) {
             const actor = this[key];
             if (!actor) continue;
             try { Main.layoutManager.removeChrome(actor); } catch { }
             try { actor.destroy(); } catch { }
             this[key] = null;
+        }
+        if (this._strut) {
+            if (this._strutInChrome) {
+                try { Main.layoutManager.removeChrome(this._strut); } catch { }
+                this._strutInChrome = false;
+            }
+            try { this._strut.destroy(); } catch { }
+            this._strut = null;
         }
         if (this._glassPipeline) {
             this._glassPipeline.destroy();
