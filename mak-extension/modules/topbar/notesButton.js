@@ -224,12 +224,9 @@ export const NotesButton = GObject.registerClass(
                 line_wrap_mode: Pango.WrapMode.WORD_CHAR,
                 activatable: false,
                 single_line_mode: false,
-                color: new Clutter.Color({ red: 245, green: 245, blue: 245, alpha: 255 }),
-                selected_text_color: new Clutter.Color({ red: 255, green: 255, blue: 255, alpha: 255 }),
-                selection_color: new Clutter.Color({ red: 99, green: 102, blue: 241, alpha: 180 }),
-                cursor_color: new Clutter.Color({ red: 245, green: 158, blue: 11, alpha: 255 }),
                 cursor_visible: true,
             });
+            this._textView.set_style('color: #f5f5f5;');
 
             this._textView.connect('text-changed', () => {
                 this._currentText = this._textView.get_text();
