@@ -701,6 +701,36 @@
       <description>Save clipboard items across sessions.</description>
     </key>
 
+    <key type="b" name="topbar-caffeine">
+      <default>true</default>
+      <summary>Enable Caffeine Keep-Awake</summary>
+      <description>Shows native standalone Caffeine keep-awake indicator in top bar.</description>
+    </key>
+
+    <key type="b" name="caffeine-active">
+      <default>false</default>
+      <summary>Caffeine Active State</summary>
+      <description>Whether screen and system sleep inhibition is currently active.</description>
+    </key>
+
+    <key type="i" name="caffeine-duration">
+      <default>0</default>
+      <summary>Caffeine Duration</summary>
+      <description>Keep-awake duration in minutes (0 = indefinitely).</description>
+    </key>
+
+    <key type="b" name="topbar-scratchpad">
+      <default>true</default>
+      <summary>Enable Quick Scratchpad</summary>
+      <description>Shows Quick Notes popover scratchpad button in top bar.</description>
+    </key>
+
+    <key type="b" name="dynamic-island-enabled">
+      <default>true</default>
+      <summary>Enable Dynamic Island</summary>
+      <description>Show macOS-inspired intelligent live capsule on flat screen with attached top bar.</description>
+    </key>
+
     <key type="b" name="topbar-siri-button">
       <default>false</default>
       <summary>Siri Orb Button</summary>

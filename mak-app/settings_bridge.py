@@ -439,6 +439,15 @@ class MakSettingsBridge:
     def get_clipboard_history_size(self): return self._get_i("clipboard-history-size", None, None, 30)
     def set_clipboard_history_size(self, v): self._set_i("clipboard-history-size", None, None, int(v))
 
+    def get_topbar_caffeine(self): return self._get_b("topbar-caffeine", None, None, True)
+    def set_topbar_caffeine(self, v): self._set_b("topbar-caffeine", None, None, v)
+
+    def get_topbar_scratchpad(self): return self._get_b("topbar-scratchpad", None, None, True)
+    def set_topbar_scratchpad(self, v): self._set_b("topbar-scratchpad", None, None, v)
+
+    def get_dynamic_island_enabled(self): return self._get_b("dynamic-island-enabled", None, None, True)
+    def set_dynamic_island_enabled(self, v): self._set_b("dynamic-island-enabled", None, None, v)
+
     # Top Bar, Control Center & Menu Item Colors
     def get_topbar_text_color(self): return self._get_s("topbar-text-color", None, None, "#ffffff")
     def set_topbar_text_color(self, v): self._set_s("topbar-text-color", None, None, str(v))

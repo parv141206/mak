@@ -21,6 +21,9 @@ const { MenuStyleController } = await import(`../appearance/menuStyleController.
 const { WindowCornersModule } = await import(`../window-corners/cornersModule.js?v=${_uid}`);
 const { BlurModule } = await import(`../blur/blurModule.js?v=${_uid}`);
 const { ClipboardButton } = await import(`./clipboardButton.js?v=${_uid}`);
+const { CaffeineButton } = await import(`./caffeineButton.js?v=${_uid}`);
+const { NotesButton } = await import(`./notesButton.js?v=${_uid}`);
+const { DynamicIsland } = await import(`./dynamicIsland.js?v=${_uid}`);
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: `MakAppTitleButton_${_uid}` },
@@ -132,6 +135,9 @@ export class TopBarModule {
         this._controlCenterBtn = null;
         this._makQuickSettingsBtn = null;
         this._clipboardBtn = null;
+        this._caffeineBtn = null;
+        this._notesBtn = null;
+        this._dynamicIsland = null;
         this._panelBlurEffect = null;
         this._clockMoved = false;
         this._origBannerAlignment = null;
@@ -196,6 +202,16 @@ export class TopBarModule {
             this._enableBluetoothBattery();
         }
 
+        // 6b. Caffeine Button (☕)
+        if (this._settings.get_boolean('topbar-caffeine')) {
+            this._enableCaffeineButton();
+        }
+
+        // 6c. Notes Scratchpad Button (📝)
+        if (this._settings.get_boolean('topbar-scratchpad')) {
+            this._enableNotesButton();
+        }
+
         // 7. Spotlight Button (Magnifying Glass)
         if (this._settings.get_boolean('topbar-spotlight-button')) {
             this._enableSpotlightButton();
@@ -204,6 +220,11 @@ export class TopBarModule {
         // 7b. Clipboard Button (📋)
         if (this._settings.get_boolean('topbar-clipboard')) {
             this._enableClipboardButton();
+        }
+
+        // 7c. Dynamic Island
+        if (this._settings.get_boolean('dynamic-island-enabled')) {
+            this._enableDynamicIsland();
         }
 
         // 8. Control Center Button (Dual Sliders ⚎)
@@ -258,6 +279,14 @@ export class TopBarModule {
                 if (this._settings.get_boolean('topbar-bluetooth-battery')) this._enableBluetoothBattery();
                 else this._disableBluetoothBattery();
                 this._applyRightBoxOrder();
+            } else if (key === 'topbar-caffeine') {
+                if (this._settings.get_boolean('topbar-caffeine')) this._enableCaffeineButton();
+                else this._disableCaffeineButton();
+                this._applyRightBoxOrder();
+            } else if (key === 'topbar-scratchpad') {
+                if (this._settings.get_boolean('topbar-scratchpad')) this._enableNotesButton();
+                else this._disableNotesButton();
+                this._applyRightBoxOrder();
             } else if (key === 'topbar-spotlight-button') {
                 if (this._settings.get_boolean('topbar-spotlight-button')) this._enableSpotlightButton();
                 else this._disableSpotlightButton();
@@ -266,6 +295,9 @@ export class TopBarModule {
                 if (this._settings.get_boolean('topbar-clipboard')) this._enableClipboardButton();
                 else this._disableClipboardButton();
                 this._applyRightBoxOrder();
+            } else if (key === 'dynamic-island-enabled') {
+                if (this._settings.get_boolean('dynamic-island-enabled')) this._enableDynamicIsland();
+                else this._disableDynamicIsland();
             } else if (key === 'topbar-control-center') {
                 if (this._settings.get_boolean('topbar-control-center')) this._enableControlCenterButton();
                 else this._disableControlCenterButton();
@@ -393,6 +425,73 @@ export class TopBarModule {
         if (this._spotlightBtn) {
             try { this._spotlightBtn.destroy(); } catch (e) {}
             this._spotlightBtn = null;
+        }
+    }
+
+    async _enableCaffeineButton() {
+        if (this._caffeineBtn) return;
+        try {
+            let Cls = CaffeineButton;
+            try {
+                const mod = await import(`./caffeineButton.js?v=${Date.now()}`);
+                if (mod && mod.CaffeineButton) Cls = mod.CaffeineButton;
+            } catch (e) {}
+            this._caffeineBtn = new Cls(this._extension);
+            Main.panel.addToStatusArea('MakCaffeine', this._caffeineBtn, 3, 'right');
+            this._applyRightBoxOrder();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Caffeine button:', err);
+        }
+    }
+
+    _disableCaffeineButton() {
+        if (this._caffeineBtn) {
+            try { this._caffeineBtn.destroy(); } catch (e) {}
+            this._caffeineBtn = null;
+        }
+    }
+
+    async _enableNotesButton() {
+        if (this._notesBtn) return;
+        try {
+            let Cls = NotesButton;
+            try {
+                const mod = await import(`./notesButton.js?v=${Date.now()}`);
+                if (mod && mod.NotesButton) Cls = mod.NotesButton;
+            } catch (e) {}
+            this._notesBtn = new Cls(this._extension);
+            Main.panel.addToStatusArea('MakNotes', this._notesBtn, 4, 'right');
+            this._applyRightBoxOrder();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Notes button:', err);
+        }
+    }
+
+    _disableNotesButton() {
+        if (this._notesBtn) {
+            try { this._notesBtn.destroy(); } catch (e) {}
+            this._notesBtn = null;
+        }
+    }
+
+    async _enableDynamicIsland() {
+        if (this._dynamicIsland) return;
+        try {
+            let Cls = DynamicIsland;
+            try {
+                const mod = await import(`./dynamicIsland.js?v=${Date.now()}`);
+                if (mod && mod.DynamicIsland) Cls = mod.DynamicIsland;
+            } catch (e) {}
+            this._dynamicIsland = new Cls(this._extension);
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not add Dynamic Island:', err);
+        }
+    }
+
+    _disableDynamicIsland() {
+        if (this._dynamicIsland) {
+            try { this._dynamicIsland.destroy(); } catch (e) {}
+            this._dynamicIsland = null;
         }
     }
 
@@ -524,6 +623,8 @@ export class TopBarModule {
             'keyboard',
             'MakBluetoothBattery',
             'quickSettings',
+            'MakCaffeine',
+            'MakNotes',
             'MakClipboard',
             'MakSpotlight',
             'MakControlCenter',
@@ -642,6 +743,9 @@ export class TopBarModule {
         this._restoreClock();
         this._hideActivities(false);
 
+        this._disableDynamicIsland();
+        this._disableNotesButton();
+        this._disableCaffeineButton();
         this._disableControlCenterButton();
         this._disableMakQuickSettingsButton();
         this._disableClipboardButton();
