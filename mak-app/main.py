@@ -636,6 +636,30 @@ class MakAppWindow(Adw.ApplicationWindow):
             on_change=self.bridge.set_clipboard_history_size
         ))
 
+        caff_row = Adw.SwitchRow(
+            title="Caffeine (Keep-Awake) Indicator",
+            subtitle="Standalone native sleep inhibitor with duration presets (15m, 30m, 1h, 2h, 4h, indefinite)"
+        )
+        caff_row.set_active(self.bridge.get_topbar_caffeine())
+        caff_row.connect("notify::active", lambda s, p: self.bridge.set_topbar_caffeine(s.get_active()))
+        ind_group.add(caff_row)
+
+        notes_row = Adw.SwitchRow(
+            title="Quick Notes / Scratchpad Popover",
+            subtitle="macOS-styled floating notepad popover with live autosave, stats, and 1-click copy"
+        )
+        notes_row.set_active(self.bridge.get_topbar_scratchpad())
+        notes_row.connect("notify::active", lambda s, p: self.bridge.set_topbar_scratchpad(s.get_active()))
+        ind_group.add(notes_row)
+
+        island_row = Adw.SwitchRow(
+            title="Dynamic Island (Live Capsule)",
+            subtitle="Intelligent attached capsule for flat screens: media player with animated wave bars, volume/brightness HUD, and expandable card"
+        )
+        island_row.set_active(self.bridge.get_dynamic_island_enabled())
+        island_row.connect("notify::active", lambda s, p: self.bridge.set_dynamic_island_enabled(s.get_active()))
+        ind_group.add(island_row)
+
         # Panel Appearance
         pan_group = Adw.PreferencesGroup(title="Panel Styling and Frosted Blur")
         page.add(pan_group)

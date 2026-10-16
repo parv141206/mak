@@ -2227,3 +2227,367 @@
     color: rgba(255, 255, 255, 0.35);
     text-align: center;
 }
+
+/* ── Mak Caffeine (Keep-Awake) ────────────────────────────────────────── */
+.mak-caffeine-button {
+    padding: 0 4px;
+}
+
+.mak-caffeine-panel-box {
+    spacing: 4px;
+}
+
+.mak-caffeine-panel-icon {
+    icon-size: 16px;
+    color: rgba(255, 255, 255, 0.7);
+    transition-duration: 150ms;
+}
+
+.mak-caffeine-panel-icon.active {
+    color: #f59e0b; /* Amber warm glow */
+}
+
+.mak-caffeine-panel-badge {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f59e0b;
+    background-color: rgba(245, 158, 11, 0.15);
+    border-radius: 9999px;
+    padding: 0 5px;
+}
+
+.mak-caffeine-menu {
+    min-width: 250px;
+    padding: 0;
+}
+
+.mak-caffeine-container {
+    padding: 10px 12px;
+    spacing: 8px;
+}
+
+.mak-caffeine-header {
+    padding: 2px 4px;
+}
+
+.mak-caffeine-title-box {
+    spacing: 2px;
+}
+
+.mak-caffeine-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.mak-caffeine-header-sub {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.mak-caffeine-status-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mak-caffeine-status-badge.active {
+    background-color: rgba(245, 158, 11, 0.25);
+    color: #f59e0b;
+}
+
+.mak-caffeine-separator {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.08);
+    margin: 4px 0;
+}
+
+.mak-caffeine-presets-box {
+    spacing: 2px;
+}
+
+.mak-caffeine-preset-row {
+    border-radius: 6px;
+    padding: 5px 8px;
+    background-color: transparent;
+    transition-duration: 100ms;
+}
+
+.mak-caffeine-preset-row:hover,
+.mak-caffeine-preset-row:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.mak-caffeine-preset-content {
+    spacing: 8px;
+}
+
+.mak-caffeine-preset-icon {
+    icon-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mak-caffeine-preset-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.mak-caffeine-preset-check {
+    icon-size: 12px;
+    color: #f59e0b;
+}
+
+.mak-caffeine-toggle-btn {
+    border-radius: 8px;
+    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    transition-duration: 150ms;
+    margin-top: 4px;
+}
+
+.mak-caffeine-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.16);
+}
+
+.mak-caffeine-toggle-btn.active {
+    background-color: rgba(255, 59, 48, 0.2);
+    border-color: rgba(255, 59, 48, 0.35);
+}
+
+.mak-caffeine-toggle-btn.active:hover {
+    background-color: rgba(255, 59, 48, 0.35);
+}
+
+.mak-caffeine-toggle-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* ── Mak Quick Notes / Scratchpad ─────────────────────────────────────── */
+.mak-notes-button {
+    padding: 0 4px;
+}
+
+.mak-notes-panel-icon {
+    icon-size: 16px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mak-notes-menu {
+    min-width: 360px;
+    max-width: 420px;
+    padding: 0;
+}
+
+.mak-notes-container {
+    padding: 10px 12px;
+    spacing: 8px;
+}
+
+.mak-notes-header {
+    padding: 2px 2px 6px 2px;
+}
+
+.mak-notes-title-box {
+    spacing: 6px;
+}
+
+.mak-notes-header-icon {
+    icon-size: 15px;
+    color: #f59e0b;
+}
+
+.mak-notes-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.mak-notes-stats-badge {
+    font-size: 10px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 9999px;
+    padding: 1px 7px;
+}
+
+.mak-notes-actions-box {
+    spacing: 4px;
+}
+
+.mak-notes-action-btn {
+    border-radius: 6px;
+    padding: 4px 6px;
+    background-color: rgba(255, 255, 255, 0.06);
+    transition-duration: 120ms;
+}
+
+.mak-notes-action-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.mak-notes-action-icon {
+    icon-size: 13px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mak-notes-scroll-view {
+    min-height: 140px;
+    max-height: 280px;
+    background-color: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.mak-notes-text-wrap {
+    spacing: 0;
+}
+
+/* ── Mak Dynamic Island ──────────────────────────────────────────────── */
+.mak-island-container {
+    padding: 0;
+}
+
+.mak-island-pill {
+    background-color: #000000;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    padding: 0 10px;
+    transition-duration: 220ms;
+}
+
+.mak-island-compact-box {
+    spacing: 8px;
+    height: 32px;
+}
+
+.mak-island-mini-icon {
+    icon-size: 14px;
+    color: #f59e0b;
+}
+
+.mak-island-compact-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.mak-island-wave-box {
+    spacing: 2px;
+}
+
+.mak-island-wave-bar {
+    width: 2.5px;
+    height: 6px;
+    background-color: #22c55e;
+    border-radius: 9999px;
+    transition-duration: 100ms;
+}
+
+.mak-island-wave-bar.bar-0 { background-color: #22c55e; }
+.mak-island-wave-bar.bar-1 { background-color: #3b82f6; }
+.mak-island-wave-bar.bar-2 { background-color: #f59e0b; }
+.mak-island-wave-bar.bar-3 { background-color: #ec4899; }
+
+.mak-island-hud-box {
+    spacing: 8px;
+    height: 34px;
+}
+
+.mak-island-hud-icon {
+    icon-size: 14px;
+    color: #ffffff;
+}
+
+.mak-island-hud-track {
+    height: 6px;
+    background-color: rgba(255, 255, 255, 0.18);
+    border-radius: 9999px;
+}
+
+.mak-island-hud-fill {
+    height: 6px;
+    background-color: #ffffff;
+    border-radius: 9999px;
+    transition-duration: 100ms;
+}
+
+.mak-island-hud-percent {
+    font-size: 11px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    min-width: 32px;
+    text-align: right;
+}
+
+.mak-island-expanded-box {
+    padding: 12px 6px;
+    spacing: 8px;
+}
+
+.mak-island-expanded-top {
+    spacing: 12px;
+}
+
+.mak-island-cover-art {
+    icon-size: 44px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+.mak-island-expanded-meta {
+    spacing: 2px;
+}
+
+.mak-island-expanded-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.mak-island-expanded-artist {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.mak-island-controls-box {
+    spacing: 4px;
+}
+
+.mak-island-ctrl-btn {
+    border-radius: 9999px;
+    padding: 6px;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition-duration: 120ms;
+}
+
+.mak-island-ctrl-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.mak-island-ctrl-btn.play-pause {
+    background-color: #ffffff;
+}
+
+.mak-island-ctrl-btn.play-pause:hover {
+    background-color: rgba(255, 255, 255, 0.85);
+}
+
+.mak-island-ctrl-icon {
+    icon-size: 14px;
+    color: #ffffff;
+}
+
+.mak-island-ctrl-icon.play {
+    color: #000000;
+}
+
