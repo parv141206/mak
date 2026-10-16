@@ -158,51 +158,6 @@ export class LiquidGlassController {
         if (!this._liquidSettings || !this._makSettings) return;
 
         try {
-            const refr = this._makSettings.get_double('blur-refraction-strength');
-            const disp = this._makSettings.get_double('blur-chromatic-dispersion');
-            const globalOp = this._makSettings.get_double('global-opacity');
-            const cornerRad = this._makSettings.get_int('corner-radius');
-            const dockRad = this._makSettings.get_int('dock-radius');
-            const edgeBending = this._makSettings.get_double('dock-edge-bending') || refr;
-            const glassLevel = this._makSettings.get_double('dock-glass-level') || 0.60;
-
-            // Optics & Dock Refraction Bending
-            const dockDisp = Math.max(2.0, edgeBending * 28.0);
-            const dockMaxZ = Math.max(10.0, glassLevel * 120.0);
-            const dockIor = 1.4 + glassLevel * 1.0;
-
-            this._liquidSettings.set_double('glass-displacement-scale', dockDisp);
-            this._liquidSettings.set_double('glass-chroma-strength', disp);
-            this._liquidSettings.set_double('glass-max-z', dockMaxZ);
-            this._liquidSettings.set_double('glass-ior', dockIor);
-            this._liquidSettings.set_double('glass-corner-smoothing', 0.6);
-
-            const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
-            const isGlassyTheme = gtkTheme.toLowerCase().includes('glassy') || gtkTheme.toLowerCase().includes('glass');
-
-            // Windows: Enable liquid glass refraction only when a glassy theme is selected. Keep opaque otherwise.
-            this._liquidSettings.set_boolean('enable-application-glass', isGlassyTheme);
-            this._liquidSettings.set_boolean('application-glass-all-windows', isGlassyTheme);
-            this._liquidSettings.set_double('application-content-opacity', isGlassyTheme ? Math.max(0.78, Math.min(0.96, globalOp)) : 1.0);
-            this._liquidSettings.set_double('application-corner-radius', cornerRad > 0 ? cornerRad : 16.0);
-            this._liquidSettings.set_int('application-blur-radius', 14);
-            this._liquidSettings.set_string('application-tint-color', '#ffffff');
-            this._liquidSettings.set_double('application-tint-strength', 0.05);
-
-            // Blacklist Chrome, Brave, VS Code, Electron to preserve solid web rendering & authentic traffic lights
-            const targetBlacklist = [
-                'google-chrome*',
-                'chromium*',
-                'brave*',
-                'code*',
-                'Code*',
-                'electron*',
-                'Plank',
-                'com.desktop.ding',
-                'Conky',
-            ];
-            this._liquidSettings.set_strv('application-window-blacklist', targetBlacklist);
-
             const getStr = (key, fallback) => {
                 try {
                     if (this._makSettings?.settings_schema?.has_key(key)) {
@@ -239,6 +194,58 @@ export class LiquidGlassController {
                 } catch (e) {}
                 return fallback;
             };
+
+            const refr = getDbl('blur-refraction-strength', 0.42);
+            const disp = getDbl('blur-chromatic-dispersion', 0.08);
+            const globalOp = getDbl('global-opacity', 0.85);
+            const cornerRad = getInt('corner-radius', 16);
+            const dockRad = getInt('dock-radius', 24);
+            const edgeBending = getDbl('dock-edge-bending', refr);
+            const glassLevel = getDbl('dock-glass-level', 0.60);
+
+            // Optics & Dock Refraction Bending
+            const dockDisp = Math.max(2.0, edgeBending * 28.0);
+            const dockMaxZ = Math.max(10.0, glassLevel * 120.0);
+            const dockIor = 1.4 + glassLevel * 1.0;
+
+            this._liquidSettings.set_double('glass-displacement-scale', dockDisp);
+            this._liquidSettings.set_double('glass-chroma-strength', disp);
+            this._liquidSettings.set_double('glass-max-z', dockMaxZ);
+            this._liquidSettings.set_double('glass-ior', dockIor);
+            this._liquidSettings.set_double('glass-corner-smoothing', 0.6);
+
+            const gtkTheme = this._interfaceSettings ? this._interfaceSettings.get_string('gtk-theme') : '';
+            const isGlassyTheme = gtkTheme.toLowerCase().includes('glassy') || gtkTheme.toLowerCase().includes('glass');
+
+            // Windows: Enable liquid glass refraction only when a glassy theme is selected and blur-applications is true.
+            const appBlur = getBool('blur-applications', true);
+            const appBlurRad = getInt('app-blur-radius', 14);
+            const appOpacity = getDbl('app-opacity', isGlassyTheme ? Math.max(0.70, Math.min(0.96, globalOp)) : 1.0);
+            const appTintColor = getStr('app-tint-color', '#ffffff');
+            const appTintStrength = getDbl('app-tint-strength', 0.05);
+            const appCornerRad = cornerRad > 0 ? cornerRad : getInt('corner-radius', 16);
+
+            this._liquidSettings.set_boolean('enable-application-glass', isGlassyTheme && appBlur);
+            this._liquidSettings.set_boolean('application-glass-all-windows', isGlassyTheme && appBlur);
+            this._liquidSettings.set_double('application-content-opacity', (isGlassyTheme && appBlur) ? appOpacity : 1.0);
+            this._liquidSettings.set_double('application-corner-radius', appCornerRad > 0 ? appCornerRad : 16.0);
+            this._liquidSettings.set_int('application-blur-radius', (isGlassyTheme && appBlur) ? Math.max(1, appBlurRad) : 0);
+            this._liquidSettings.set_string('application-tint-color', appTintColor);
+            this._liquidSettings.set_double('application-tint-strength', Math.max(0.0, Math.min(1.0, appTintStrength)));
+
+            // Blacklist Chrome, Brave, VS Code, Electron to preserve solid web rendering & authentic traffic lights
+            const targetBlacklist = [
+                'google-chrome*',
+                'chromium*',
+                'brave*',
+                'code*',
+                'Code*',
+                'electron*',
+                'Plank',
+                'com.desktop.ding',
+                'Conky',
+            ];
+            this._liquidSettings.set_strv('application-window-blacklist', targetBlacklist);
 
             // Dock
             const dockBlur = getBool('dock-blur', true);
@@ -420,7 +427,13 @@ export class LiquidGlassController {
             'desktop-menu-blur-radius',
             'desktop-menu-glass-level',
             'desktop-menu-tint-color',
-            'desktop-menu-tint-strength'
+            'desktop-menu-tint-strength',
+            'blur-applications',
+            'app-blur-radius',
+            'app-opacity',
+            'app-tint-color',
+            'app-tint-strength',
+            'app-glass-level'
         ]) {
             const id = this._makSettings.connect(`changed::${key}`, sync);
             this._makSettingsIds.push(id);
