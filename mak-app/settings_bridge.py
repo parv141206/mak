@@ -4,6 +4,8 @@
 
 import os
 import re
+import json
+import subprocess
 import gi
 
 gi.require_version('Gio', '2.0')
@@ -53,6 +55,7 @@ class MakSettingsBridge:
         self.bms_popup = load_settings("org.gnome.shell.extensions.blur-my-shell.popup")
         self.bms_apps = load_settings("org.gnome.shell.extensions.blur-my-shell.applications")
         self.bms_dock = load_settings("org.gnome.shell.extensions.blur-my-shell.dash-to-dock")
+        self.liquid_glass = load_settings("org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com")
 
     # ── Safe Getter / Setter Utilities ─────────────────────────────────────
     @staticmethod
@@ -430,6 +433,22 @@ class MakSettingsBridge:
     def get_topbar_mak_menu(self): return self._get_b("topbar-mak-menu", None, None, True)
     def set_topbar_mak_menu(self, v): self._set_b("topbar-mak-menu", None, None, v)
 
+    # Top Bar, Control Center & Menu Item Colors
+    def get_topbar_text_color(self): return self._get_s("topbar-text-color", None, None, "#ffffff")
+    def set_topbar_text_color(self, v): self._set_s("topbar-text-color", None, None, str(v))
+
+    def get_topbar_icon_color(self): return self._get_s("topbar-icon-color", None, None, "#ffffff")
+    def set_topbar_icon_color(self, v): self._set_s("topbar-icon-color", None, None, str(v))
+
+    def get_control_center_text_color(self): return self._get_s("control-center-text-color", None, None, "#ffffff")
+    def set_control_center_text_color(self, v): self._set_s("control-center-text-color", None, None, str(v))
+
+    def get_control_center_icon_color(self): return self._get_s("control-center-icon-color", None, None, "#ffffff")
+    def set_control_center_icon_color(self, v): self._set_s("control-center-icon-color", None, None, str(v))
+
+    def get_menu_text_color(self): return self._get_s("menu-text-color", None, None, "#ffffff")
+    def set_menu_text_color(self, v): self._set_s("menu-text-color", None, None, str(v))
+
 
     # ── 3. SPOTLIGHT SEARCH SETTINGS ───────────────────────────────────────
     def get_spotlight_enabled(self): return self._get_b("spotlight-enabled", None, None, True)
@@ -787,31 +806,99 @@ class MakSettingsBridge:
     def get_blur_panel(self): return self._get_b("blur-panel", None, None, True)
     def set_blur_panel(self, v): self._set_b("blur-panel", None, None, v)
 
-    def get_blur_dock(self):
-        if self.bms_dock and self._has_key(self.bms_dock, "blur"):
-            return self.bms_dock.get_boolean("blur")
-        return self._get_b("blur-dock", self.dock, "dock-blur", True)
+    # ── DOCK LIQUID GLASS & BLUR CONTROLS ──
+    def get_dock_liquid_glass(self):
+        return self._get_b("dock-blur", self.liquid_glass, "enable-dock-glass", True)
 
-    def set_blur_dock(self, v):
-        self._set_b("blur-dock", self.dock, "dock-blur", v)
-        if self.mak:
-            try: self.mak.set_boolean("dock-blur", bool(v))
+    def set_dock_liquid_glass(self, v):
+        self._set_b("dock-blur", self.liquid_glass, "enable-dock-glass", v)
+        if self.dock and self._has_key(self.dock, "dock-blur"):
+            try: self.dock.set_boolean("dock-blur", bool(v))
             except Exception: pass
         if self.bms_dock and self._has_key(self.bms_dock, "blur"):
             try: self.bms_dock.set_boolean("blur", bool(v))
             except Exception: pass
 
-    def get_dock_blur_sigma(self):
-        if self.bms_dock and self._has_key(self.bms_dock, "sigma"):
-            return self.bms_dock.get_int("sigma")
-        return 30
+    def get_dock_blur(self):
+        return self.get_dock_liquid_glass()
 
-    def set_dock_blur_sigma(self, v):
+    def set_dock_blur(self, v):
+        self.set_dock_liquid_glass(v)
+
+    def get_dock_blur_radius(self):
+        return self._get_i("dock-blur-radius", self.liquid_glass, "dock-blur-radius", 24)
+
+    def set_dock_blur_radius(self, v):
+        self._set_i("dock-blur-radius", self.liquid_glass, "dock-blur-radius", v)
         if self.bms_dock and self._has_key(self.bms_dock, "sigma"):
             try:
                 self.bms_dock.set_boolean("customize", True)
                 self.bms_dock.set_int("sigma", int(v))
             except Exception: pass
+
+    def get_dock_tint_strength(self):
+        return self._get_d("dock-tint-strength", self.liquid_glass, "dock-tint-strength", 0.12)
+
+    def set_dock_tint_strength(self, v):
+        self._set_d("dock-tint-strength", self.liquid_glass, "dock-tint-strength", v)
+
+    def get_dock_tint_color(self):
+        return self._get_s("dock-tint-color", self.liquid_glass, "dock-tint-color", "#ffffff")
+
+    def set_dock_tint_color(self, v):
+        self._set_s("dock-tint-color", self.liquid_glass, "dock-tint-color", v)
+
+    def get_dock_corner_radius(self):
+        return self._get_i("dock-corner-radius", self.dock, "dock-radius", 24)
+
+    def set_dock_corner_radius(self, v):
+        self._set_i("dock-corner-radius", self.dock, "dock-radius", v)
+        self._set_i("dock-radius", None, None, v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-corner-radius"):
+            try: self.liquid_glass.set_double("dock-corner-radius", float(v))
+            except Exception: pass
+
+    def get_dock_brightness(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-brightness"):
+            return self.liquid_glass.get_double("dock-brightness")
+        return 1.0
+
+    def set_dock_brightness(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-brightness"):
+            try: self.liquid_glass.set_double("dock-brightness", float(v))
+            except Exception as e: print(f"[Bridge] Error setting dock-brightness: {e}")
+
+    def get_dock_saturation(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-saturation"):
+            return self.liquid_glass.get_double("dock-saturation")
+        return 1.08
+
+    def set_dock_saturation(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-saturation"):
+            try: self.liquid_glass.set_double("dock-saturation", float(v))
+            except Exception as e: print(f"[Bridge] Error setting dock-saturation: {e}")
+
+    def get_dock_contrast(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-contrast"):
+            return self.liquid_glass.get_double("dock-contrast")
+        return 1.06
+
+    def set_dock_contrast(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "dock-contrast"):
+            try: self.liquid_glass.set_double("dock-contrast", float(v))
+            except Exception as e: print(f"[Bridge] Error setting dock-contrast: {e}")
+
+    def get_blur_dock(self):
+        return self.get_dock_liquid_glass()
+
+    def set_blur_dock(self, v):
+        self.set_dock_liquid_glass(v)
+
+    def get_dock_blur_sigma(self):
+        return self.get_dock_blur_radius()
+
+    def set_dock_blur_sigma(self, v):
+        self.set_dock_blur_radius(v)
 
     def get_blur_overview(self): return self._get_b("blur-overview", None, None, True)
     def set_blur_overview(self, v): self._set_b("blur-overview", None, None, v)
@@ -873,6 +960,174 @@ class MakSettingsBridge:
 
     def get_notification_radius(self): return self._get_i("notification-radius", None, None, 18)
     def set_notification_radius(self, v): self._set_i("notification-radius", None, None, v)
+
+    # ── Quick Settings Individual Liquid Glass Pills Mode ──
+    def get_quick_settings_pills_mode(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-apply-to"):
+            return self.liquid_glass.get_int("quick-settings-apply-to") == 1
+        return True
+
+    def set_quick_settings_pills_mode(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-apply-to"):
+            try: self.liquid_glass.set_int("quick-settings-apply-to", 1 if v else 0)
+            except Exception as e: print(f"[Bridge] Error setting quick-settings-apply-to: {e}")
+
+    def get_quick_settings_toggle_radius(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-toggle-corner-radius"):
+            return self.liquid_glass.get_double("quick-settings-toggle-corner-radius")
+        return 18.0
+
+    def set_quick_settings_toggle_radius(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-toggle-corner-radius"):
+            try: self.liquid_glass.set_double("quick-settings-toggle-corner-radius", float(v))
+            except Exception as e: print(f"[Bridge] Error setting quick-settings-toggle-corner-radius: {e}")
+
+    def get_quick_settings_toggle_tint(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-toggle-tint-strength"):
+            return self.liquid_glass.get_double("quick-settings-toggle-tint-strength")
+        return 0.50
+
+    def set_quick_settings_toggle_tint(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-toggle-tint-strength"):
+            try: self.liquid_glass.set_double("quick-settings-toggle-tint-strength", float(v))
+            except Exception as e: print(f"[Bridge] Error setting quick-settings-toggle-tint-strength: {e}")
+
+    def get_quick_settings_blur_radius(self):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-blur-radius"):
+            return self.liquid_glass.get_int("quick-settings-blur-radius")
+        return 18
+
+    def set_quick_settings_blur_radius(self, v):
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-blur-radius"):
+            try: self.liquid_glass.set_int("quick-settings-blur-radius", int(v))
+            except Exception as e: print(f"[Bridge] Error setting quick-settings-blur-radius: {e}")
+
+    # ── Control Center / Quick Settings Glass & Tint ──
+    def get_cc_blur(self):
+        return self._get_b("control-center-blur", self.liquid_glass, "enable-quick-settings-glass", True)
+
+    def set_cc_blur(self, v):
+        self._set_b("control-center-blur", self.liquid_glass, "enable-quick-settings-glass", v)
+
+    def get_cc_blur_radius(self):
+        return self._get_i("control-center-blur-radius", self.liquid_glass, "quick-settings-blur-radius", 18)
+
+    def set_cc_blur_radius(self, v):
+        self._set_i("control-center-blur-radius", self.liquid_glass, "quick-settings-blur-radius", v)
+
+    def get_cc_glass_level(self):
+        return self._get_d("control-center-glass-level", None, None, 0.60)
+
+    def set_cc_glass_level(self, v):
+        self._set_d("control-center-glass-level", None, None, v)
+
+    def get_cc_tint_color(self):
+        return self._get_s("control-center-tint-color", self.liquid_glass, "quick-settings-tint-color", "#ffffff")
+
+    def set_cc_tint_color(self, v):
+        self._set_s("control-center-tint-color", self.liquid_glass, "quick-settings-tint-color", v)
+
+    def get_cc_tint_strength(self):
+        return self._get_d("control-center-tint-strength", self.liquid_glass, "quick-settings-tint-strength", 0.08)
+
+    def set_cc_tint_strength(self, v):
+        self._set_d("control-center-tint-strength", self.liquid_glass, "quick-settings-tint-strength", v)
+
+    def get_cc_radius(self):
+        return self.get_quick_settings_radius()
+
+    def set_cc_radius(self, v):
+        self.set_quick_settings_radius(v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "quick-settings-corner-radius"):
+            try: self.liquid_glass.set_double("quick-settings-corner-radius", float(v))
+            except Exception: pass
+
+    # ── Menus & Popups Glass & Tint ──
+    def get_menu_blur(self):
+        return self._get_b("menu-blur", self.liquid_glass, "enable-menu-glass", True)
+
+    def set_menu_blur(self, v):
+        self._set_b("menu-blur", self.liquid_glass, "enable-menu-glass", v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "enable-extra-menu-glass"):
+            try: self.liquid_glass.set_boolean("enable-extra-menu-glass", bool(v))
+            except Exception: pass
+
+    def get_menu_blur_radius(self):
+        return self._get_i("menu-blur-radius", self.liquid_glass, "menu-blur-radius", 16)
+
+    def set_menu_blur_radius(self, v):
+        self._set_i("menu-blur-radius", self.liquid_glass, "menu-blur-radius", v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "panel-menu-blur-radius"):
+            try: self.liquid_glass.set_int("panel-menu-blur-radius", int(v))
+            except Exception: pass
+
+    def get_menu_glass_level(self):
+        return self._get_d("menu-glass-level", None, None, 0.60)
+
+    def set_menu_glass_level(self, v):
+        self._set_d("menu-glass-level", None, None, v)
+
+    def get_menu_tint_color(self):
+        return self._get_s("menu-tint-color", self.liquid_glass, "menu-tint-color", "#ffffff")
+
+    def set_menu_tint_color(self, v):
+        self._set_s("menu-tint-color", self.liquid_glass, "menu-tint-color", v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "panel-menu-tint-color"):
+            try: self.liquid_glass.set_string("panel-menu-tint-color", str(v))
+            except Exception: pass
+
+    def get_menu_tint_strength(self):
+        return self._get_d("menu-tint-strength", self.liquid_glass, "menu-tint-strength", 0.08)
+
+    def set_menu_tint_strength(self, v):
+        self._set_d("menu-tint-strength", self.liquid_glass, "menu-tint-strength", v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "panel-menu-tint-strength"):
+            try: self.liquid_glass.set_double("panel-menu-tint-strength", float(v))
+            except Exception: pass
+
+    # ── Desktop Context Menu Glass & Tint ──
+    def get_desktop_menu_blur(self):
+        return self._get_b("desktop-menu-blur", self.liquid_glass, "enable-desktop-menu-glass", True)
+
+    def set_desktop_menu_blur(self, v):
+        self._set_b("desktop-menu-blur", self.liquid_glass, "enable-desktop-menu-glass", v)
+
+    def get_desktop_menu_blur_radius(self):
+        return self._get_i("desktop-menu-blur-radius", self.liquid_glass, "desktop-menu-blur-radius", 16)
+
+    def set_desktop_menu_blur_radius(self, v):
+        self._set_i("desktop-menu-blur-radius", self.liquid_glass, "desktop-menu-blur-radius", v)
+
+    def get_desktop_menu_glass_level(self):
+        return self._get_d("desktop-menu-glass-level", None, None, 0.60)
+
+    def set_desktop_menu_glass_level(self, v):
+        self._set_d("desktop-menu-glass-level", None, None, v)
+
+    def get_desktop_menu_tint_color(self):
+        return self._get_s("desktop-menu-tint-color", self.liquid_glass, "desktop-menu-tint-color", "#ffffff")
+
+    def set_desktop_menu_tint_color(self, v):
+        self._set_s("desktop-menu-tint-color", self.liquid_glass, "desktop-menu-tint-color", v)
+
+    def get_desktop_menu_tint_strength(self):
+        return self._get_d("desktop-menu-tint-strength", self.liquid_glass, "desktop-menu-tint-strength", 0.08)
+
+    def set_desktop_menu_tint_strength(self, v):
+        self._set_d("desktop-menu-tint-strength", self.liquid_glass, "desktop-menu-tint-strength", v)
+
+    # ── Top Bar Glass & Tint ──
+    def get_topbar_tint_color(self):
+        return self._get_s("topbar-tint-color", self.liquid_glass, "top-bar-tint-color", "#ffffff")
+
+    def set_topbar_tint_color(self, v):
+        self._set_s("topbar-tint-color", self.liquid_glass, "top-bar-tint-color", v)
+
+    def get_topbar_tint_strength(self):
+        return self._get_d("topbar-tint-strength", self.liquid_glass, "top-bar-tint-strength", 0.08)
+
+    def set_topbar_tint_strength(self, v):
+        self._set_d("topbar-tint-strength", self.liquid_glass, "top-bar-tint-strength", v)
 
     # ── 8. RESET TO MACOS PREFERRED DEFAULTS ───────────────────────────────
     def reset_to_macos_defaults(self):
@@ -976,6 +1231,54 @@ class MakSettingsBridge:
         self.set_quick_settings_radius(24)
         self.set_notification_radius(18)
 
+        # Top Bar & Control Center Colors
+        self.set_topbar_text_color("#ffffff")
+        self.set_topbar_icon_color("#ffffff")
+        self.set_control_center_text_color("#ffffff")
+        self.set_control_center_icon_color("#ffffff")
+        self.set_menu_text_color("#ffffff")
+
+        # Surface Tint & Glass
+        self.set_dock_tint_color("#ffffff")
+        self.set_dock_tint_strength(0.12)
+        self.set_dock_edge_bending(0.42)
+        self.set_dock_glass_level(0.60)
+        self.set_dock_blur_radius(24)
+        self.set_dock_corner_radius(24)
+        self.set_topbar_tint_color("#ffffff")
+        self.set_topbar_tint_strength(0.08)
+        self.set_topbar_text_color("#ffffff")
+        self.set_topbar_icon_color("#ffffff")
+        self.set_cc_blur(True)
+        self.set_cc_blur_radius(18)
+        self.set_cc_glass_level(0.60)
+        self.set_cc_tint_color("#ffffff")
+        self.set_cc_tint_strength(0.08)
+        self.set_cc_radius(20)
+        self.set_control_center_text_color("#ffffff")
+        self.set_control_center_icon_color("#ffffff")
+        self.set_menu_blur(True)
+        self.set_menu_blur_radius(16)
+        self.set_menu_glass_level(0.60)
+        self.set_menu_tint_color("#ffffff")
+        self.set_menu_tint_strength(0.08)
+        self.set_menu_corner_radius(14)
+        self.set_menu_text_color("#ffffff")
+        self.set_desktop_menu_blur(True)
+        self.set_desktop_menu_blur_radius(16)
+        self.set_desktop_menu_glass_level(0.60)
+        self.set_desktop_menu_tint_color("#ffffff")
+        self.set_desktop_menu_tint_strength(0.08)
+
+        # Dock Liquid Glass & Quick Settings Pills
+        self.set_dock_liquid_glass(True)
+        self.set_dock_brightness(1.0)
+        self.set_dock_saturation(1.08)
+        self.set_dock_contrast(1.06)
+        self.set_quick_settings_pills_mode(True)
+        self.set_quick_settings_toggle_radius(18.0)
+        self.set_quick_settings_toggle_tint(0.50)
+
         # Reset Liquid Glass Dock Shadow to Soft Apple Diffusion
         try:
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "shadow-intensity", "0.12"], check=False)
@@ -986,7 +1289,92 @@ class MakSettingsBridge:
 
         # Apply Current macOS Theme with updated widget overrides
         try:
+            import theme_manager
             curr_th = theme_manager.get_current_theme() or "dark"
             theme_manager.apply_global_theme(curr_th)
         except Exception as e:
             print(f"[Bridge] Error resetting theme: {e}")
+
+    def export_settings_json(self, filepath=None):
+        """Exports the complete Mak desktop configuration across all schemas to a JSON file."""
+        if not filepath:
+            os.makedirs(os.path.join(HOME, ".config", "mak"), exist_ok=True)
+            filepath = os.path.join(HOME, ".config", "mak", "mak_settings_export.json")
+
+        schemas = [
+            "org.gnome.shell.extensions.mak",
+            "org.gnome.shell.extensions.aqua-dock-pro",
+            "org.gnome.shell.extensions.rounded-window-corners-reborn",
+            "org.gnome.shell.extensions.window-gap",
+            "org.gnome.shell.extensions.superbar",
+            "org.gnome.shell.extensions.kiwimenu",
+            "org.gnome.shell.extensions.blur-my-shell",
+            "org.gnome.shell.extensions.blur-my-shell.panel",
+            "org.gnome.shell.extensions.blur-my-shell.popup",
+            "org.gnome.shell.extensions.blur-my-shell.applications",
+            "org.gnome.shell.extensions.blur-my-shell.dash-to-dock",
+            "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com",
+            "org.gnome.desktop.interface",
+        ]
+        data = {}
+        for schema in schemas:
+            res = subprocess.run(["gsettings", "list-keys", schema], capture_output=True, text=True)
+            if res.returncode != 0:
+                continue
+            keys = [k.strip() for k in res.stdout.strip().splitlines() if k.strip()]
+            if not keys:
+                continue
+            data[schema] = {}
+            for key in keys:
+                if schema == "org.gnome.desktop.interface" and key not in (
+                    "gtk-theme", "icon-theme", "cursor-theme", "color-scheme",
+                    "font-name", "document-font-name", "monospace-font-name"
+                ):
+                    continue
+                r = subprocess.run(["gsettings", "get", schema, key], capture_output=True, text=True)
+                if r.returncode == 0:
+                    data[schema][key] = r.stdout.strip()
+
+        os.makedirs(os.path.dirname(os.path.abspath(filepath)), exist_ok=True)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+        return filepath, len(data.get("org.gnome.shell.extensions.mak", {}))
+
+    def import_settings_json(self, filepath):
+        """Imports Mak desktop configuration from a JSON file and applies it to active schemas."""
+        if not os.path.exists(filepath):
+            return False, 0
+        try:
+            with open(filepath, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+        except Exception as e:
+            print(f"[Bridge] Error reading JSON: {e}")
+            return False, 0
+
+        applied_count = 0
+        for schema, keys in data.items():
+            if not isinstance(keys, dict):
+                continue
+            res = subprocess.run(["gsettings", "list-keys", schema], capture_output=True, text=True)
+            if res.returncode != 0:
+                continue
+            valid_keys = set(res.stdout.strip().splitlines())
+            for key, val in keys.items():
+                if key in valid_keys:
+                    val_str = str(val)
+                    subprocess.run(["gsettings", "set", schema, key, val_str], check=False)
+                    applied_count += 1
+
+        # Re-initialize active Gio.Settings handles
+        self.__init__()
+
+        # Re-apply current theme
+        try:
+            import theme_manager
+            curr_th = theme_manager.get_current_theme() or "dark"
+            theme_manager.apply_global_theme(curr_th)
+        except Exception as e:
+            print(f"[Bridge] Theme reapply error: {e}")
+
+        return True, applied_count
+

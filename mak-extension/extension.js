@@ -52,7 +52,7 @@ export default class MakExtension extends Extension {
         }
 
         try {
-            const { MenuStyleController: DynamicMenuStyle } = await import(`./modules/appearance/menuStyleController.js?v=${Date.now()}`);
+            const { MenuStyleController: DynamicMenuStyle } = await import(`./modules/appearance/menuStyleController_v3.js?v=${Date.now()}`);
             this._menuStyle = new DynamicMenuStyle(this);
         } catch (err) {
             this._menuStyle = new MenuStyleController(this);
@@ -129,7 +129,8 @@ export default class MakExtension extends Extension {
                    key === 'shadow-enabled' ||
                    key === 'border-color') {
             this._windowCorners?.sync();
-        } else if (key.startsWith('gap') || key === 'gaps-maximized') {
+        } else if (key.startsWith('gap') || key === 'gaps-maximized' ||
+                   key === 'auto-hide-mode' || key === 'dock-enabled' || key === 'dock-position') {
             this._windowGaps?.rebuild();
         }
     }

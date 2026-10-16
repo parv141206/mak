@@ -230,6 +230,33 @@
       <description>Controls the frosted glass thickness, optical depth, and refraction intensity for the dock.</description>
     </key>
 
+    <key type="i" name="dock-blur-radius">
+      <default>24</default>
+      <range min="0" max="100"/>
+      <summary>Dock Blur Radius</summary>
+      <description>Blur radius in pixels for the dock background.</description>
+    </key>
+
+    <key type="i" name="dock-corner-radius">
+      <default>24</default>
+      <range min="0" max="40"/>
+      <summary>Dock Corner Radius</summary>
+      <description>Curvature radius for the dock glass pill.</description>
+    </key>
+
+    <key type="s" name="dock-tint-color">
+      <default>'#ffffff'</default>
+      <summary>Dock Glass Tint Color</summary>
+      <description>Hex color layer applied over dock glass refraction.</description>
+    </key>
+
+    <key type="d" name="dock-tint-strength">
+      <default>0.12</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Dock Tint Strength</summary>
+      <description>Opacity factor for the dock glass tint layer.</description>
+    </key>
+
     <!-- Autohide Behavior -->
     <key type="s" name="auto-hide-mode">
       <default>'dodge'</default>
@@ -672,6 +699,49 @@
       <default>false</default>
       <summary>Global App Menus</summary>
       <description>Display macOS File, Edit, View, Window, Help menus next to App Name.</description>
+    </key>
+
+    <key type="s" name="topbar-text-color">
+      <default>'#ffffff'</default>
+      <summary>Top Bar Text Color</summary>
+      <description>Explicit text and label color for top bar items, title, and clock.</description>
+    </key>
+
+    <key type="s" name="topbar-icon-color">
+      <default>'#ffffff'</default>
+      <summary>Top Bar Icon Color</summary>
+      <description>Explicit symbolic icon color for top bar indicators, menus, and controls.</description>
+    </key>
+
+    <key type="s" name="control-center-text-color">
+      <default>'#ffffff'</default>
+      <summary>Control Center Text Color</summary>
+      <description>Explicit text color for quick settings items, toggles, and sliders.</description>
+    </key>
+
+    <key type="s" name="control-center-icon-color">
+      <default>'#ffffff'</default>
+      <summary>Control Center Icon Color</summary>
+      <description>Explicit icon color for quick settings items, toggles, and sliders.</description>
+    </key>
+
+    <key type="s" name="menu-text-color">
+      <default>'#ffffff'</default>
+      <summary>Menu Dropdowns Text Color</summary>
+      <description>Explicit text color for Kiwi menu, context menus, and popup dropdowns.</description>
+    </key>
+
+    <key type="s" name="topbar-tint-color">
+      <default>'#ffffff'</default>
+      <summary>Top Bar Tint Color</summary>
+      <description>Hex color tint layer applied over the top panel glass.</description>
+    </key>
+
+    <key type="d" name="topbar-tint-strength">
+      <default>0.08</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Top Bar Tint Strength</summary>
+      <description>Intensity factor for the top bar glass tint.</description>
     </key>
 
 
@@ -1193,5 +1263,107 @@
       <description>Corner radius in pixels for desktop notification banners.</description>
     </key>
 
+    <!-- Control Center / Quick Settings Glass & Blur -->
+    <key type="b" name="control-center-blur">
+      <default>true</default>
+      <summary>Control Center Blur</summary>
+      <description>Enable hardware-accelerated blur on Quick Settings control center.</description>
+    </key>
+
+    <key type="i" name="control-center-blur-radius">
+      <default>18</default>
+      <range min="0" max="100"/>
+      <summary>Control Center Blur Radius</summary>
+      <description>Blur radius in pixels for Quick Settings pills and panel.</description>
+    </key>
+
+    <key type="d" name="control-center-glass-level">
+      <default>0.60</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Control Center Glass Level</summary>
+      <description>Optical refraction and depth factor for Quick Settings pills.</description>
+    </key>
+
+    <key type="s" name="control-center-tint-color">
+      <default>'#ffffff'</default>
+      <summary>Control Center Tint Color</summary>
+      <description>Hex tint color layer for Quick Settings pills and panel.</description>
+    </key>
+
+    <key type="d" name="control-center-tint-strength">
+      <default>0.08</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Control Center Tint Strength</summary>
+      <description>Intensity factor for Quick Settings tint layer.</description>
+    </key>
+
+    <!-- Menus & Context Menus Glass & Blur -->
+    <key type="b" name="menu-blur">
+      <default>true</default>
+      <summary>Menu Blur</summary>
+      <description>Enable hardware-accelerated blur on popup menus, Kiwi menu, and calendar.</description>
+    </key>
+
+    <key type="i" name="menu-blur-radius">
+      <default>16</default>
+      <range min="0" max="100"/>
+      <summary>Menu Blur Radius</summary>
+      <description>Blur radius in pixels for popup menus and dropdowns.</description>
+    </key>
+
+    <key type="d" name="menu-glass-level">
+      <default>0.60</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Menu Glass Level</summary>
+      <description>Optical refraction depth for menus and dropdowns.</description>
+    </key>
+
+    <key type="s" name="menu-tint-color">
+      <default>'#ffffff'</default>
+      <summary>Menu Tint Color</summary>
+      <description>Hex tint color layer for popup menus and dropdowns.</description>
+    </key>
+
+    <key type="d" name="menu-tint-strength">
+      <default>0.08</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Menu Tint Strength</summary>
+      <description>Intensity factor for menu tint layer.</description>
+    </key>
+
+    <key type="b" name="desktop-menu-blur">
+      <default>true</default>
+      <summary>Desktop Context Menu Blur</summary>
+      <description>Enable liquid glass refraction blur on desktop right-click context menu.</description>
+    </key>
+
+    <key type="i" name="desktop-menu-blur-radius">
+      <default>16</default>
+      <range min="0" max="100"/>
+      <summary>Desktop Context Menu Blur Radius</summary>
+      <description>Blur radius in pixels for desktop context menu.</description>
+    </key>
+
+    <key type="d" name="desktop-menu-glass-level">
+      <default>0.60</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Desktop Context Menu Glass Level</summary>
+      <description>Refraction depth for desktop context menu.</description>
+    </key>
+
+    <key type="s" name="desktop-menu-tint-color">
+      <default>'#ffffff'</default>
+      <summary>Desktop Context Menu Tint Color</summary>
+      <description>Hex tint color layer for desktop right-click context menu.</description>
+    </key>
+
+    <key type="d" name="desktop-menu-tint-strength">
+      <default>0.08</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Desktop Context Menu Tint Strength</summary>
+      <description>Intensity factor for desktop context menu tint layer.</description>
+    </key>
+
   </schema>
 </schemalist>
+

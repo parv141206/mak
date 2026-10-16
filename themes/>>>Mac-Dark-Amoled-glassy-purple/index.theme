@@ -1,12 +1,13 @@
 [Desktop Entry]
 Type=X-GNOME-Metatheme
-Name=>>>Mac-Dark-Amoled-glassy-purple
-Comment=Translucent macOS AMOLED Deep Midnight Glass theme with purple accents
+Name=>>>Mac-Dark-Amoled-Dark-purple
+Comment=A MacOS Tahoe like Gtk+ theme based on Elegant Design
 Encoding=UTF-8
 
 [X-GNOME-Metatheme]
-GtkTheme=>>>Mac-Dark-Amoled-glassy-purple
-MetacityTheme=>>>Mac-Dark-Amoled-glassy-purple
-IconTheme=MacTahoe-purple-dark
-CursorTheme=MacTahoe-dark
+GtkTheme=>>>Mac-Dark-Amoled-Dark-purple
+MetacityTheme=>>>Mac-Dark-Amoled-Dark-purple
+IconTheme=>>>Mac-Dark-Amoled-Dark
+CursorTheme=MACTAHOE-cursors
 ButtonLayout=close,minimize,maximize:menu
+

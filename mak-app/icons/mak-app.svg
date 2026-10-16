@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Soft Elevation Shadow -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="16" flood-color="#000000" flood-opacity="0.6"/>
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+
+    <!-- Subtle Specular Inner Rim -->
+    <linearGradient id="rim-stroke" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="30%" stop-color="#ffffff" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <!-- Bolt Drop Shadow for depth -->
+    <filter id="bolt-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- ── Squircle Base ── -->
+  <g filter="url(#shadow)">
+    <rect x="36" y="36" width="440" height="440" rx="102" ry="102" fill="#141417"/>
+    <rect x="36.5" y="36.5" width="439" height="439" rx="101.5" ry="101.5" fill="none" stroke="url(#rim-stroke)" stroke-width="1.5"/>
+  </g>
+
+  <!-- ── Optically Centered Monochrome Lightning Bolt ── -->
+  <g filter="url(#bolt-shadow)">
+    <path d="M 284,92
+             L 168,262
+             C 165,267 169,274 176,274
+             L 248,274
+             L 218,414
+             C 216,421 225,426 230,420
+             L 352,246
+             C 356,241 352,234 345,234
+             L 278,234
+             L 298,98
+             C 300,92 290,87 284,92 Z"
+          fill="#ffffff"/>
+  </g>
+</svg>

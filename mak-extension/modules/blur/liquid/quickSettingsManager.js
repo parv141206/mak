@@ -554,6 +554,7 @@ export class QuickSettingsManager {
         this._animSignalId = this.menu.connect('open-state-changed', (menu, isOpen) => {
             if (isOpen) {
                 this._forgetSubmenus();
+                this._applyClassStyles();
                 startFrameSync();
                 this._startAdaptiveColorSampling(true);
                 this._toggleStyles.start();
