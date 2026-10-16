@@ -61,10 +61,13 @@ export const DynamicIsland = GObject.registerClass(
             });
             this._monitorsChangedId = Main.layoutManager.connect('monitors-changed', () => this._reposition());
 
+            // Initially hidden until an active media or HUD event occurs
+            this.visible = false;
+
             // Hover interactions
             this.connect('notify::hover', () => {
                 if (this.hover) {
-                    if (this._activePlayer && this._state !== 'expanded') {
+                    if (this._state !== 'expanded') {
                         this._expand();
                     }
                 } else {
@@ -80,7 +83,7 @@ export const DynamicIsland = GObject.registerClass(
                 if (btn === 1) { // Left click
                     if (this._state === 'expanded') {
                         this._collapse();
-                    } else if (this._activePlayer) {
+                    } else {
                         this._expand();
                     }
                     return Clutter.EVENT_STOP;
@@ -372,13 +375,15 @@ export const DynamicIsland = GObject.registerClass(
                 this._stopWaveAnimation();
             }
 
-            this.visible = true;
+            const hasMedia = isPlaying || (this._activePlayer && this._activePlayer.trackTitle && this._activePlayer.trackTitle !== 'Unknown title');
+            this.visible = !!hasMedia;
         }
 
         _updateIdleState() {
             this._stopWaveAnimation();
             this._compactTitle.set_text('Mak Desktop');
             this._coverImage.set_icon_name('audio-x-generic-symbolic');
+            this.visible = false;
             if (this._state === 'expanded') {
                 this._collapse();
             }
@@ -455,6 +460,7 @@ export const DynamicIsland = GObject.registerClass(
             this._hudFill.style = `width: ${fillWidth}px;`;
 
             // Switch to HUD state
+            this.visible = true;
             this._compactBox.visible = false;
             this._expandedBox.visible = false;
             this._hudBox.visible = true;
@@ -468,6 +474,8 @@ export const DynamicIsland = GObject.registerClass(
                 this._hudBox.visible = false;
                 this._compactBox.visible = true;
                 this._state = 'compact';
+                const hasMedia = this._activePlayer && (this._activePlayer.status === 'Playing' || (this._activePlayer.trackTitle && this._activePlayer.trackTitle !== 'Unknown title'));
+                this.visible = !!hasMedia;
                 this._animateTo(COMPACT_WIDTH, COMPACT_HEIGHT);
                 return GLib.SOURCE_REMOVE;
             });

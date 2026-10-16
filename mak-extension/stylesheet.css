@@ -2591,3 +2591,21 @@
     color: #000000;
 }
 
+/* ── Mak macOS Battery Widget ────────────────────────────────────────── */
+.mak-mac-battery-box {
+    spacing: 5px;
+    padding: 0 3px;
+}
+
+.mak-mac-battery-canvas {
+    y-align: center;
+}
+
+.mak-mac-battery-side-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #ffffff;
+    y-align: center;
+}
+
+

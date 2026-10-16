@@ -24,6 +24,7 @@ const { ClipboardButton } = await import(`./clipboardButton.js?v=${_uid}`);
 const { CaffeineButton } = await import(`./caffeineButton.js?v=${_uid}`);
 const { NotesButton } = await import(`./notesButton.js?v=${_uid}`);
 const { DynamicIsland } = await import(`./dynamicIsland.js?v=${_uid}`);
+const { MacBatteryController } = await import(`./macBattery.js?v=${_uid}`);
 
 const AppTitleButton = GObject.registerClass(
     { GTypeName: `MakAppTitleButton_${_uid}` },
@@ -138,6 +139,7 @@ export class TopBarModule {
         this._caffeineBtn = null;
         this._notesBtn = null;
         this._dynamicIsland = null;
+        this._macBattery = null;
         this._panelBlurEffect = null;
         this._clockMoved = false;
         this._origBannerAlignment = null;
@@ -201,6 +203,9 @@ export class TopBarModule {
         if (this._settings.get_boolean('topbar-bluetooth-battery')) {
             this._enableBluetoothBattery();
         }
+
+        // 6a. macOS System Battery (Colored + Inside/Side Percentage)
+        this._enableMacBattery();
 
         // 6b. Caffeine Button (☕)
         if (this._settings.get_boolean('topbar-caffeine')) {
@@ -520,6 +525,28 @@ export class TopBarModule {
         }
     }
 
+    async _enableMacBattery() {
+        if (this._macBattery) return;
+        try {
+            let Cls = MacBatteryController;
+            try {
+                const mod = await import(`./macBattery.js?v=${Date.now()}`);
+                if (mod && mod.MacBatteryController) Cls = mod.MacBatteryController;
+            } catch (e) {}
+            this._macBattery = new Cls(this._extension);
+            this._macBattery.enable();
+        } catch (err) {
+            console.warn('[Mak TopBar] Could not enable MacBattery:', err);
+        }
+    }
+
+    _disableMacBattery() {
+        if (this._macBattery) {
+            try { this._macBattery.disable(); } catch (e) {}
+            this._macBattery = null;
+        }
+    }
+
     _enableControlCenterButton() {
         if (this._controlCenterBtn) return;
         try {
@@ -746,6 +773,7 @@ export class TopBarModule {
         this._disableDynamicIsland();
         this._disableNotesButton();
         this._disableCaffeineButton();
+        this._disableMacBattery();
         this._disableControlCenterButton();
         this._disableMakQuickSettingsButton();
         this._disableClipboardButton();

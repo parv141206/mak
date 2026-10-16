@@ -726,9 +726,21 @@
     </key>
 
     <key type="b" name="dynamic-island-enabled">
-      <default>true</default>
+      <default>false</default>
       <summary>Enable Dynamic Island</summary>
       <description>Show macOS-inspired intelligent live capsule on flat screen with attached top bar.</description>
+    </key>
+
+    <key type="s" name="battery-percentage-mode">
+      <default>'inside'</default>
+      <summary>Battery Percentage Display Mode</summary>
+      <description>Where to display battery percentage: 'inside' (inside battery capsule), 'side' (beside icon), or 'hidden'.</description>
+    </key>
+
+    <key type="b" name="battery-colored">
+      <default>true</default>
+      <summary>Color-Coded Battery Status</summary>
+      <description>Show green when charging, yellow/orange for power warning, and red for low battery.</description>
     </key>
 
     <key type="b" name="topbar-siri-button">
