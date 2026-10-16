@@ -937,28 +937,75 @@ class MakSettingsBridge:
     def set_blur_chromatic_dispersion(self, v): self._set_d("blur-chromatic-dispersion", None, None, v)
 
     def get_blur_applications(self):
-        return self._get_b("blur-applications", self.bms_apps, "blur", True)
+        return self._get_b("blur-applications", self.liquid_glass, "enable-application-glass", True)
+
     def set_blur_applications(self, v):
-        self._set_b("blur-applications", self.bms_apps, "blur", v)
+        self._set_b("blur-applications", self.liquid_glass, "enable-application-glass", v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "application-glass-all-windows"):
+            try:
+                self.liquid_glass.set_boolean("application-glass-all-windows", v)
+            except Exception: pass
+        if self.bms_apps and self._has_key(self.bms_apps, "blur"):
+            try:
+                self.bms_apps.set_boolean("blur", v)
+            except Exception: pass
         if self.bms and self._has_key(self.bms, "hacks-level"):
             try:
                 self.bms.set_int("hacks-level", 2)
             except Exception: pass
 
-    def get_app_opacity(self):
-        if self.bms_apps:
+    def get_app_blur_radius(self):
+        return self._get_i("app-blur-radius", self.liquid_glass, "application-blur-radius", 14)
+
+    def set_app_blur_radius(self, v):
+        self._set_i("app-blur-radius", self.liquid_glass, "application-blur-radius", int(v))
+        if self.bms_apps and self._has_key(self.bms_apps, "sigma"):
             try:
-                raw = self.bms_apps.get_int("opacity")
-                return round(raw / 255.0, 2)
+                self.bms_apps.set_boolean("customize", True)
+                self.bms_apps.set_int("sigma", int(v))
             except Exception: pass
-        return 0.84
+
+    def get_app_opacity(self):
+        return self._get_d("app-opacity", self.liquid_glass, "application-content-opacity", 0.85)
 
     def set_app_opacity(self, v):
-        raw = int(round(float(v) * 255.0))
+        val = max(0.50, min(1.0, float(v)))
+        raw = int(round(val * 255.0))
         raw = max(50, min(255, raw))
-        if self.bms_apps:
+        self._set_d("app-opacity", self.liquid_glass, "application-content-opacity", val)
+        if self.bms_apps and self._has_key(self.bms_apps, "opacity"):
             try: self.bms_apps.set_int("opacity", raw)
             except Exception as e: print(f"[Bridge] Error setting app opacity: {e}")
+
+    def get_app_glass_level(self):
+        return self._get_d("app-glass-level", None, None, 0.50)
+
+    def set_app_glass_level(self, v):
+        self._set_d("app-glass-level", None, None, float(v))
+
+    def get_app_tint_color(self):
+        return self._get_s("app-tint-color", self.liquid_glass, "application-tint-color", "#ffffff")
+
+    def set_app_tint_color(self, v):
+        self._set_s("app-tint-color", self.liquid_glass, "application-tint-color", v)
+
+    def get_app_tint_strength(self):
+        return self._get_d("app-tint-strength", self.liquid_glass, "application-tint-strength", 0.05)
+
+    def set_app_tint_strength(self, v):
+        self._set_d("app-tint-strength", self.liquid_glass, "application-tint-strength", float(v))
+
+    def get_app_corner_radius(self):
+        return self.get_corner_radius()
+
+    def set_app_corner_radius(self, v):
+        self.set_corner_radius(v)
+        if self.liquid_glass and self._has_key(self.liquid_glass, "application-corner-radius"):
+            try: self.liquid_glass.set_double("application-corner-radius", float(v))
+            except Exception: pass
+        if self.bms_apps and self._has_key(self.bms_apps, "corner-radius"):
+            try: self.bms_apps.set_int("corner-radius", int(v))
+            except Exception: pass
 
     # ── 7. UI & MENU STYLING (macOS Unified Design) ────────────────────────
     def get_menu_corner_radius(self): return self._get_i("menu-corner-radius", None, None, 16)

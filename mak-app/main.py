@@ -996,6 +996,7 @@ class MakAppWindow(Adw.ApplicationWindow):
             surf_group.add(sw)
 
         surf_group.add(create_spin_row("Dock Blur Radius", "Gaussian blur radius inside dock liquid glass shader", 0, 60, 1, self.bridge.get_dock_blur_radius(), digits=0, on_change=self.bridge.set_dock_blur_radius))
+        surf_group.add(create_spin_row("Application Window Blur Radius", "Gaussian blur radius inside application window liquid glass shader", 0, 100, 1, self.bridge.get_app_blur_radius(), digits=0, on_change=self.bridge.set_app_blur_radius))
 
         # ── Liquid Glass Optical Refraction Shader ──
         liq_group = Adw.PreferencesGroup(
@@ -1128,6 +1129,28 @@ class MakAppWindow(Adw.ApplicationWindow):
         topbar_group.add(create_spin_row("Top Bar Tint Strength", "Opacity factor for the top bar glass tint layer", 0.0, 1.0, 0.02, self.bridge.get_topbar_tint_strength(), digits=2, on_change=self.bridge.set_topbar_tint_strength))
         topbar_group.add(create_color_row("Top Bar Text Color", "Explicit text and label color for top bar items, app title, and clock", self.bridge.get_topbar_text_color(), as_hex=True, on_change=self.bridge.set_topbar_text_color))
         topbar_group.add(create_color_row("Top Bar Symbolic Icon Color", "Explicit symbolic icon color for top bar status indicators and menus", self.bridge.get_topbar_icon_color(), as_hex=True, on_change=self.bridge.set_topbar_icon_color))
+
+        # ── Group 6: Application Windows Glass and Tint ──
+        app_group = Adw.PreferencesGroup(
+            title="Application Windows Glass and Tint",
+            description="Fine-tune frosted glass blur, window translucency, optical refraction, and color tinting on application windows in glassy themes:"
+        )
+        page.add(app_group)
+
+        app_blur = Adw.SwitchRow(
+            title="Application Window Hardware Glass Blur",
+            subtitle="Enable hardware-accelerated liquid glass and frosted blur on application windows"
+        )
+        app_blur.set_active(self.bridge.get_blur_applications())
+        app_blur.connect("notify::active", lambda s, p: self.bridge.set_blur_applications(s.get_active()))
+        app_group.add(app_blur)
+
+        app_group.add(create_spin_row("Application Blur Radius", "Gaussian blur radius in pixels behind application windows", 0, 100, 1, self.bridge.get_app_blur_radius(), digits=0, on_change=self.bridge.set_app_blur_radius))
+        app_group.add(create_spin_row("Application Window Opacity", "Translucency factor for window surfaces in glassy mode", 0.50, 1.0, 0.02, self.bridge.get_app_opacity(), digits=2, on_change=self.bridge.set_app_opacity))
+        app_group.add(create_spin_row("Application Glass Refraction", "Optical refraction depth and bevel intensity for application glass", 0.0, 1.0, 0.05, self.bridge.get_app_glass_level(), digits=2, on_change=self.bridge.set_app_glass_level))
+        app_group.add(create_color_row("Application Glass Tint Color", "Color tint layer blended over translucent window glass", self.bridge.get_app_tint_color(), as_hex=True, on_change=self.bridge.set_app_tint_color))
+        app_group.add(create_spin_row("Application Tint Strength", "Opacity and saturation factor for the application tint layer", 0.0, 1.0, 0.02, self.bridge.get_app_tint_strength(), digits=2, on_change=self.bridge.set_app_tint_strength))
+        app_group.add(create_spin_row("Application Window Corner Radius", "Curvature radius in pixels for application window corners", 0, 40, 1, self.bridge.get_app_corner_radius(), digits=0, on_change=self.bridge.set_app_corner_radius))
 
     # ── 8. APPEARANCE & THEMES ────────────────────────────────────────────
     def _build_theme_page(self):

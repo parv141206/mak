@@ -1202,6 +1202,46 @@
       <description>Blur background in app drawer folders.</description>
     </key>
 
+    <key type="b" name="blur-applications">
+      <default>true</default>
+      <summary>Blur Applications</summary>
+      <description>Enable hardware-accelerated frosted glass blur behind application windows.</description>
+    </key>
+
+    <key type="i" name="app-blur-radius">
+      <default>14</default>
+      <range min="0" max="100"/>
+      <summary>Application Blur Radius</summary>
+      <description>Gaussian blur radius in pixels behind application windows in glassy mode.</description>
+    </key>
+
+    <key type="d" name="app-opacity">
+      <default>0.85</default>
+      <range min="0.50" max="1.0"/>
+      <summary>Application Window Opacity</summary>
+      <description>Translucency factor for window surfaces in glassy mode.</description>
+    </key>
+
+    <key type="d" name="app-glass-level">
+      <default>0.50</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Application Glass Refraction</summary>
+      <description>Optical refraction depth and bevel intensity for application windows.</description>
+    </key>
+
+    <key type="s" name="app-tint-color">
+      <default>'#ffffff'</default>
+      <summary>Application Glass Tint Color</summary>
+      <description>Color tint layer blended over translucent window glass.</description>
+    </key>
+
+    <key type="d" name="app-tint-strength">
+      <default>0.05</default>
+      <range min="0.0" max="1.0"/>
+      <summary>Application Tint Strength</summary>
+      <description>Opacity factor for the application window tint layer.</description>
+    </key>
+
     <key type="b" name="blur-liquid-glass">
       <default>true</default>
       <summary>Liquid Glass Refraction Shader</summary>

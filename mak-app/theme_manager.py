@@ -5390,11 +5390,41 @@ def apply_global_theme(theme_key):
     # 9. Sync Application Translucency / Blur (Blur-my-shell & Liquid Glass)
     try:
         if is_glassy:
+            app_radius = 14
+            app_opacity = 0.85
+            app_tint_color = '#ffffff'
+            app_tint_strength = 0.05
+            try:
+                res_r = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-blur-radius"], capture_output=True, text=True)
+                if res_r.returncode == 0 and res_r.stdout.strip().isdigit():
+                    app_radius = int(res_r.stdout.strip())
+            except Exception: pass
+            try:
+                res_o = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-opacity"], capture_output=True, text=True)
+                if res_o.returncode == 0:
+                    app_opacity = float(res_o.stdout.strip())
+            except Exception: pass
+            try:
+                res_c = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-tint-color"], capture_output=True, text=True)
+                if res_c.returncode == 0 and res_c.stdout.strip():
+                    app_tint_color = res_c.stdout.strip().strip("'\"")
+            except Exception: pass
+            try:
+                res_s = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "app-tint-strength"], capture_output=True, text=True)
+                if res_s.returncode == 0:
+                    app_tint_strength = float(res_s.stdout.strip())
+            except Exception: pass
+
+            raw_op = int(round(app_opacity * 255.0))
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "true"], check=False)
-            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "215"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", str(raw_op)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "sigma", str(app_radius)], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "enable-application-glass", "true"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-glass-all-windows", "true"], check=False)
-            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-content-opacity", "0.85"], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-content-opacity", str(app_opacity)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-blur-radius", str(app_radius)], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-tint-color", app_tint_color], check=False)
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.liquid-glass@thinkingcoding1231.gmail.com", "application-tint-strength", str(app_tint_strength)], check=False)
         else:
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "blur", "false"], check=False)
             subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.blur-my-shell.applications", "opacity", "255"], check=False)
