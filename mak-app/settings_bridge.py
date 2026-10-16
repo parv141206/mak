@@ -445,8 +445,14 @@ class MakSettingsBridge:
     def get_topbar_scratchpad(self): return self._get_b("topbar-scratchpad", None, None, True)
     def set_topbar_scratchpad(self, v): self._set_b("topbar-scratchpad", None, None, v)
 
-    def get_dynamic_island_enabled(self): return self._get_b("dynamic-island-enabled", None, None, True)
+    def get_dynamic_island_enabled(self): return self._get_b("dynamic-island-enabled", None, None, False)
     def set_dynamic_island_enabled(self, v): self._set_b("dynamic-island-enabled", None, None, v)
+
+    def get_battery_percentage_mode(self): return self._get_s("battery-percentage-mode", None, None, "inside")
+    def set_battery_percentage_mode(self, v): self._set_s("battery-percentage-mode", None, None, str(v))
+
+    def get_battery_colored(self): return self._get_b("battery-colored", None, None, True)
+    def set_battery_colored(self, v): self._set_b("battery-colored", None, None, v)
 
     # Top Bar, Control Center & Menu Item Colors
     def get_topbar_text_color(self): return self._get_s("topbar-text-color", None, None, "#ffffff")

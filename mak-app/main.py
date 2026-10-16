@@ -660,6 +660,35 @@ class MakAppWindow(Adw.ApplicationWindow):
         island_row.connect("notify::active", lambda s, p: self.bridge.set_dynamic_island_enabled(s.get_active()))
         ind_group.add(island_row)
 
+        # macOS Battery Style & Percentage Toggle
+        bat_group = Adw.PreferencesGroup(title="macOS Battery Indicator")
+        page.add(bat_group)
+
+        bat_mode_row = Adw.ComboRow(
+            title="Battery Percentage Style",
+            subtitle="Display percentage inside the battery capsule (Mac style), beside the icon, or hidden"
+        )
+        bat_model = Gtk.StringList.new([
+            "Percentage Inside Battery Icon (macOS Style)",
+            "Percentage Beside Battery Icon",
+            "Hidden (Battery Capsule Only)"
+        ])
+        bat_mode_row.set_model(bat_model)
+        mode_keys = ["inside", "side", "hidden"]
+        current_mode = self.bridge.get_battery_percentage_mode()
+        current_idx = mode_keys.index(current_mode) if current_mode in mode_keys else 0
+        bat_mode_row.set_selected(current_idx)
+        bat_mode_row.connect("notify::selected", lambda s, p: self.bridge.set_battery_percentage_mode(mode_keys[s.get_selected()]))
+        bat_group.add(bat_mode_row)
+
+        bat_color_row = Adw.SwitchRow(
+            title="Color-Coded Battery Status",
+            subtitle="Authentic macOS colors: Green when charging/full, Orange/Yellow for warning (≤30%), and Red for low battery (≤20%)"
+        )
+        bat_color_row.set_active(self.bridge.get_battery_colored())
+        bat_color_row.connect("notify::active", lambda s, p: self.bridge.set_battery_colored(s.get_active()))
+        bat_group.add(bat_color_row)
+
         # Panel Appearance
         pan_group = Adw.PreferencesGroup(title="Panel Styling and Frosted Blur")
         page.add(pan_group)
