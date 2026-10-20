@@ -208,10 +208,22 @@ class TestSettingsEffect(unittest.TestCase):
         self.assertEqual(rp_dark["window_bg"], "#191724")
         self.assertEqual(rp_dark["headerbar_bg"], "#191724")
 
+        # Test Tokyo Night specifically
+        tn_dark = THEME_FLAVORS["tokyo-night"]["dark"]
+        self.assertEqual(tn_dark["sidebar_bg"], "#1a1b26")
+        self.assertEqual(tn_dark["view_bg"], "#1a1b26")
+        self.assertEqual(tn_dark["window_bg"], "#1a1b26")
+        self.assertEqual(tn_dark["headerbar_bg"], "#1a1b26")
+
         rp_palette = get_flavor_palette("rose-pine", is_dark=True)
         self.assertIn("@define-color sidebar_bg_color #191724;", rp_palette)
         self.assertIn("@define-color window_bg_color #191724;", rp_palette)
         self.assertIn("@define-color view_bg_color #191724;", rp_palette)
+
+        tn_palette = get_flavor_palette("tokyo-night", is_dark=True)
+        self.assertIn("@define-color sidebar_bg_color #1a1b26;", tn_palette)
+        self.assertIn("@define-color window_bg_color #1a1b26;", tn_palette)
+        self.assertIn("@define-color view_bg_color #1a1b26;", tn_palette)
 
         # Verify all flavors have both dark and light modes with valid hex colors
         for key, flv in THEME_FLAVORS.items():
