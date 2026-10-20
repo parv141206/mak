@@ -140,23 +140,25 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn(".nautilus-window .content-pane", c_gtk4)
             self.assertIn("background-color: @view_bg_color;", c_gtk4)
 
-            # Verify full-height seamless macOS sidebar architecture
+            # Verify authentic Mac Tahoe full floating sidebar architecture
             self.assertIn(".sidebar-pane,", c_gtk4)
-            self.assertIn("margin: 0;", c_gtk4)
-            self.assertIn("border-radius: 0;", c_gtk4)
+            self.assertIn("margin: 6px 0 6px 6px;", c_gtk4)
+            self.assertIn("border-radius: 14px;", c_gtk4)
             self.assertIn("background-color: @sidebar_bg_color;", c_gtk4)
 
-            # Verify continuous full-height vertical border separating sidebar from content pane
+            # Verify thin border and elevation drop shadow on floating sidebar
             self.assertIn(".sidebar-pane:dir(ltr),", c_gtk4)
-            self.assertIn("border-right: 1px solid @headerbar_border_color;", c_gtk4)
+            self.assertIn("box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px alpha(currentColor, 0.14);", c_gtk4)
 
-            # Verify sidebar internal widgets and headerbars are transparent so sidebar color seamlessly fills the column
+            # Verify sidebar internal widgets and headerbars are transparent so full card floats seamlessly
             self.assertIn(".sidebar-pane list:not(.boxed-list),", c_gtk4)
             self.assertIn(".sidebar-pane headerbar,", c_gtk4)
             self.assertIn("background-color: transparent;", c_gtk4)
 
+            # Verify traffic lights window controls padding inside sidebar headerbar
+            self.assertIn("padding-left: 8px;", c_gtk4)
+
             # Verify horizontal divider seam elimination
-            self.assertIn(".sidebar-pane toolbarview > .top-bar,", c_gtk4)
             self.assertIn(".sidebar-pane > separator.horizontal,", c_gtk4)
 
             # Verify universal window background rules

@@ -5641,8 +5641,12 @@ window.background.csd > contents > leaflet.unfolded > box > stack > widget > ove
 window.background.csd > widget > leaflet.unfolded > box > headerbar,
 window.background.csd > widget > leaflet.unfolded > box > stack > widget > box > widget > headerbar,
 window.background.csd > widget > leaflet.unfolded > box > stack > widget > overlay > leaflet.folded > box > headerbar,
+.nautilus-window headerbar,
+.nautilus-window headerbar:backdrop,
 .nautilus-window .content-pane headerbar,
 .nautilus-window .content-pane headerbar:backdrop,
+.nautilus-window toolbarview > headerbar,
+.nautilus-window toolbarview > headerbar:backdrop,
 .nautilus-window .content-pane toolbarview > headerbar,
 .nautilus-window .content-pane toolbarview > headerbar:backdrop {
   background-color: @headerbar_bg_color;
@@ -5698,103 +5702,130 @@ leaflet.unfolded:backdrop,
   color: @window_fg_color;
 }
 
-/* ── Full-Height Seamless macOS Sidebar Architecture ── */
+/* ── Authentic Mac Tahoe Full Floating Sidebar Architecture ── */
 
-/* Seamless Sidebar Pane: covers till top behind traffic lights and window title across all apps */
+/* Full Floating Sidebar Card Surface (encompasses traffic lights & places list) */
 .sidebar-pane,
-.sidebar-pane:backdrop,
 .content-pane .sidebar-pane,
-.content-pane .sidebar-pane:backdrop,
 .sidebar-pane .content-pane,
-.sidebar-pane .content-pane:backdrop,
 overlay-split-view > .sidebar-pane,
-overlay-split-view > .sidebar-pane:backdrop,
 navigation-split-view > .sidebar-pane,
-navigation-split-view > .sidebar-pane:backdrop,
 split-view > .sidebar-pane,
-split-view > .sidebar-pane:backdrop,
 .nautilus-window .sidebar-pane,
-.nautilus-window .sidebar-pane:backdrop,
 #NautilusFileChooser .sidebar-pane,
-#NautilusFileChooser .sidebar-pane:backdrop,
-.nautilus-file-chooser .sidebar-pane,
-.nautilus-file-chooser .sidebar-pane:backdrop {
-  margin: 0;
-  border-radius: 0;
-  background-color: @sidebar_bg_color;
-  background-image: none;
+.nautilus-file-chooser .sidebar-pane {
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), transparent 80%, rgba(255, 255, 255, 0.03));
   color: @sidebar_fg_color;
-  box-shadow: none;
+  border-radius: 14px;
+  background-color: @sidebar_bg_color;
 }
 
-/* Full-Height Vertical Border ("the border thingy") separating sidebar from content pane */
+/* Floating Card Margins for ALL apps */
 .sidebar-pane:dir(ltr),
-.sidebar-pane:backdrop:dir(ltr),
-.sidebar-pane:dir(ltr) banner > revealer > widget,
 .content-pane .sidebar-pane:dir(ltr),
-.content-pane .sidebar-pane:backdrop:dir(ltr),
-.content-pane .sidebar-pane:dir(ltr) banner > revealer > widget,
 .sidebar-pane .content-pane:dir(ltr),
-.sidebar-pane .content-pane:backdrop:dir(ltr),
-.sidebar-pane .content-pane:dir(ltr) banner > revealer > widget,
 overlay-split-view > .sidebar-pane:dir(ltr),
-overlay-split-view > .sidebar-pane:backdrop:dir(ltr),
 navigation-split-view > .sidebar-pane:dir(ltr),
-navigation-split-view > .sidebar-pane:backdrop:dir(ltr),
 split-view > .sidebar-pane:dir(ltr),
-split-view > .sidebar-pane:backdrop:dir(ltr),
 .nautilus-window .sidebar-pane:dir(ltr),
-.nautilus-window .sidebar-pane:backdrop:dir(ltr),
-.nautilus-window .sidebar-pane:dir(ltr) banner > revealer > widget,
 #NautilusFileChooser .sidebar-pane:dir(ltr),
-#NautilusFileChooser .sidebar-pane:backdrop:dir(ltr),
-#NautilusFileChooser .sidebar-pane:dir(ltr) banner > revealer > widget,
-.nautilus-file-chooser .sidebar-pane:dir(ltr),
-.nautilus-file-chooser .sidebar-pane:backdrop:dir(ltr),
-.nautilus-file-chooser .sidebar-pane:dir(ltr) banner > revealer > widget {
-  border-right: 1px solid @headerbar_border_color;
-  border-left: none;
-  border-top: none;
-  border-bottom: none;
-  box-shadow: none;
-  margin: 0;
-  border-radius: 0;
+.nautilus-file-chooser .sidebar-pane:dir(ltr) {
+  margin: 6px 0 6px 6px;
 }
 
 .sidebar-pane:dir(rtl),
-.sidebar-pane:backdrop:dir(rtl),
-.sidebar-pane:dir(rtl) banner > revealer > widget,
 .content-pane .sidebar-pane:dir(rtl),
-.content-pane .sidebar-pane:backdrop:dir(rtl),
-.content-pane .sidebar-pane:dir(rtl) banner > revealer > widget,
 .sidebar-pane .content-pane:dir(rtl),
-.sidebar-pane .content-pane:backdrop:dir(rtl),
-.sidebar-pane .content-pane:dir(rtl) banner > revealer > widget,
 overlay-split-view > .sidebar-pane:dir(rtl),
-overlay-split-view > .sidebar-pane:backdrop:dir(rtl),
 navigation-split-view > .sidebar-pane:dir(rtl),
-navigation-split-view > .sidebar-pane:backdrop:dir(rtl),
 split-view > .sidebar-pane:dir(rtl),
-split-view > .sidebar-pane:backdrop:dir(rtl),
 .nautilus-window .sidebar-pane:dir(rtl),
-.nautilus-window .sidebar-pane:backdrop:dir(rtl),
-.nautilus-window .sidebar-pane:dir(rtl) banner > revealer > widget,
 #NautilusFileChooser .sidebar-pane:dir(rtl),
-#NautilusFileChooser .sidebar-pane:backdrop:dir(rtl),
-#NautilusFileChooser .sidebar-pane:dir(rtl) banner > revealer > widget,
-.nautilus-file-chooser .sidebar-pane:dir(rtl),
-.nautilus-file-chooser .sidebar-pane:backdrop:dir(rtl),
-.nautilus-file-chooser .sidebar-pane:dir(rtl) banner > revealer > widget {
-  border-left: 1px solid @headerbar_border_color;
-  border-right: none;
-  border-top: none;
-  border-bottom: none;
-  box-shadow: none;
-  margin: 0;
-  border-radius: 0;
+.nautilus-file-chooser .sidebar-pane:dir(rtl) {
+  margin: 6px 6px 6px 0;
 }
 
-/* Sidebar Internal Widgets: Strictly transparent so sidebar color seamlessly fills the pane */
+/* Thin Border and Elevation Drop Shadow for ALL apps */
+.sidebar-pane:dir(ltr),
+.sidebar-pane:dir(ltr) banner > revealer > widget,
+.content-pane .sidebar-pane:dir(ltr),
+.content-pane .sidebar-pane:dir(ltr) banner > revealer > widget,
+.sidebar-pane .content-pane:dir(ltr),
+.sidebar-pane .content-pane:dir(ltr) banner > revealer > widget,
+overlay-split-view > .sidebar-pane:dir(ltr),
+navigation-split-view > .sidebar-pane:dir(ltr),
+split-view > .sidebar-pane:dir(ltr),
+.nautilus-window .sidebar-pane:dir(ltr),
+.nautilus-window .sidebar-pane:dir(ltr) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane:dir(ltr),
+#NautilusFileChooser .sidebar-pane:dir(ltr) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane:dir(ltr),
+.nautilus-file-chooser .sidebar-pane:dir(ltr) banner > revealer > widget {
+  box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px alpha(currentColor, 0.14);
+  border-right: none;
+}
+
+.sidebar-pane:dir(rtl),
+.sidebar-pane:dir(rtl) banner > revealer > widget,
+.content-pane .sidebar-pane:dir(rtl),
+.content-pane .sidebar-pane:dir(rtl) banner > revealer > widget,
+.sidebar-pane .content-pane:dir(rtl),
+.sidebar-pane .content-pane:dir(rtl) banner > revealer > widget,
+overlay-split-view > .sidebar-pane:dir(rtl),
+navigation-split-view > .sidebar-pane:dir(rtl),
+split-view > .sidebar-pane:dir(rtl),
+.nautilus-window .sidebar-pane:dir(rtl),
+.nautilus-window .sidebar-pane:dir(rtl) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane:dir(rtl),
+#NautilusFileChooser .sidebar-pane:dir(rtl) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane:dir(rtl),
+.nautilus-file-chooser .sidebar-pane:dir(rtl) banner > revealer > widget {
+  box-shadow: -2px 3px 12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px alpha(currentColor, 0.14);
+  border-left: none;
+}
+
+/* Sidebar Backdrop (Unfocused Window) */
+.sidebar-pane:backdrop,
+.content-pane .sidebar-pane:backdrop,
+.sidebar-pane .content-pane:backdrop,
+.nautilus-window .sidebar-pane:backdrop,
+#NautilusFileChooser .sidebar-pane:backdrop,
+.nautilus-file-chooser .sidebar-pane:backdrop {
+  transition: background-color 150ms cubic-bezier(0, 0, 0.2, 1);
+  background-color: alpha(@window_fg_color, 0.015);
+  background-image: none;
+  box-shadow: none;
+  border: none;
+}
+
+.sidebar-pane:backdrop:dir(ltr),
+.sidebar-pane:backdrop:dir(ltr) banner > revealer > widget,
+.sidebar-pane:backdrop.end:dir(rtl),
+.sidebar-pane:backdrop.end:dir(rtl) banner > revealer > widget,
+.sidebar-pane:backdrop:dir(rtl),
+.sidebar-pane:backdrop:dir(rtl) banner > revealer > widget,
+.sidebar-pane:backdrop.end:dir(ltr),
+.sidebar-pane:backdrop.end:dir(ltr) banner > revealer > widget,
+.nautilus-window .sidebar-pane:backdrop:dir(ltr),
+.nautilus-window .sidebar-pane:backdrop:dir(ltr) banner > revealer > widget,
+.nautilus-window .sidebar-pane:backdrop.end:dir(rtl),
+.nautilus-window .sidebar-pane:backdrop.end:dir(rtl) banner > revealer > widget,
+.nautilus-window .sidebar-pane:backdrop:dir(rtl),
+.nautilus-window .sidebar-pane:backdrop:dir(rtl) banner > revealer > widget,
+.nautilus-window .sidebar-pane:backdrop.end:dir(ltr),
+.nautilus-window .sidebar-pane:backdrop.end:dir(ltr) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane:backdrop:dir(ltr),
+#NautilusFileChooser .sidebar-pane:backdrop:dir(ltr) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane:backdrop.end:dir(rtl),
+#NautilusFileChooser .sidebar-pane:backdrop.end:dir(rtl) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane:backdrop:dir(ltr),
+.nautilus-file-chooser .sidebar-pane:backdrop:dir(ltr) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane:backdrop.end:dir(rtl),
+.nautilus-file-chooser .sidebar-pane:backdrop.end:dir(rtl) banner > revealer > widget {
+  box-shadow: none;
+}
+
+/* Sidebar Internal Widgets: Strictly transparent so card radius & thin border shine through */
 .sidebar-pane list:not(.boxed-list),
 .sidebar-pane .frame,
 .sidebar-pane .sidebar,
@@ -5815,7 +5846,7 @@ split-view > .sidebar-pane:backdrop:dir(rtl),
   border: none;
 }
 
-/* Seamless Headerbars atop Sidebar (covers till top behind traffic lights and window title) */
+/* Sidebar headerbars - transparent to blend seamlessly into top of floating card */
 .sidebar-pane headerbar,
 .sidebar-pane headerbar:backdrop,
 .sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar,
@@ -5824,9 +5855,6 @@ split-view > .sidebar-pane:backdrop:dir(rtl),
 .sidebar-pane toolbarview > .top-bar.raised,
 .sidebar-pane toolbarview > .top-bar.border,
 .sidebar-pane toolbarview > .top-bar.raised.border,
-.sidebar-pane toolbarview > .top-bar > revealer,
-.sidebar-pane toolbarview > .top-bar > revealer > windowhandle,
-.sidebar-pane toolbarview > .top-bar > revealer > windowhandle > box,
 overlay-split-view > .sidebar-pane headerbar,
 overlay-split-view > .sidebar-pane headerbar:backdrop,
 navigation-split-view > .sidebar-pane headerbar,
@@ -5846,17 +5874,35 @@ split-view > .sidebar-pane headerbar:backdrop,
   border: none;
 }
 
-/* Eliminate horizontal divider seam at y=60 inside sidebar */
-.sidebar-pane toolbarview > .top-bar,
-.sidebar-pane toolbarview > .top-bar > revealer,
+/* Traffic lights / window controls positioning in floating sidebar headerbar */
+.sidebar-pane headerbar windowcontrols:not(.empty).start:dir(ltr),
+.sidebar-pane headerbar windowcontrols:not(.empty).end:dir(rtl) {
+  margin-right: 0;
+  padding-left: 8px;
+  padding-right: 0;
+}
+
+.sidebar-pane headerbar windowcontrols:not(.empty).start:dir(rtl),
+.sidebar-pane headerbar windowcontrols:not(.empty).end:dir(ltr) {
+  margin-left: 0;
+  padding-left: 0;
+  padding-right: 8px;
+}
+
+.sidebar-pane headerbar windowcontrols button.close,
+.sidebar-pane headerbar windowcontrols button.maximize,
+.sidebar-pane headerbar windowcontrols button.minimize {
+  margin: 0 1px;
+}
+
+/* Hide horizontal separator seam between headerbar and placessidebar */
 .sidebar-pane > separator.horizontal,
 .sidebar-pane separator,
 .nautilus-window .sidebar-pane > separator.horizontal,
 .nautilus-window .sidebar-pane separator {
-  border-bottom: none;
-  border-top: none;
   background-color: transparent;
   background-image: none;
+  border: none;
   box-shadow: none;
   min-height: 0;
   opacity: 0;
