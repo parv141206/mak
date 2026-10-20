@@ -6183,10 +6183,30 @@ row.combo listview.inline {
 
 /* ── Mak Flavor Popover & Dropdown Menu Styling ── */
 popover,
-popover:backdrop {
+popover:backdrop,
+popover.menu,
+popover.menu:backdrop,
+popover.background,
+popover.background:backdrop,
+popover.menu.background,
+popover.menu.background:backdrop,
+window popover,
+window.csd popover,
+window.background.csd popover,
+.menu.background,
+menubutton > popover,
+menubutton > popover.menu,
+popover:focus,
+popover:focus-visible,
+popover:focus-within,
+popover.menu:focus,
+popover.menu:focus-visible,
+popover.menu:focus-within {
   background-color: transparent;
   color: @popover_fg_color;
   border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 popover > arrow,
@@ -6198,6 +6218,7 @@ popover.menu.background > contents {
   background-image: none;
   color: @popover_fg_color;
   border: none;
+  outline: none;
   border-radius: 12px;
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
 }
@@ -6441,37 +6462,43 @@ dialog-host > dialog.background sheet {
   border-color: @headerbar_border_color;
 }
 
-/* GTK3 Menus & Menubars */
+/* GTK3 Menus & Menubars - Borderless & Clean */
 menu,
-.menu,
 menu:backdrop,
-.menu:backdrop,
-menubar menu,
-menubar .menu {
+menubar > menu,
+menubar > menu:backdrop,
+.menu,
+.menu:backdrop {
   background-color: @popover_bg_color;
   color: @popover_fg_color;
-  border: 1px solid @headerbar_border_color;
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 menu menuitem,
+menubar menuitem,
 .menu menuitem {
   color: @popover_fg_color;
   background-color: transparent;
 }
 
 menu menuitem:hover,
+menubar menuitem:hover,
 .menu menuitem:hover {
   background-color: alpha(currentColor, 0.08);
   color: @popover_fg_color;
 }
 
 menu menuitem:selected,
+menubar menuitem:selected,
 .menu menuitem:selected {
   background-color: @accent_bg_color;
   color: #ffffff;
 }
 
 menu separator,
+menubar separator,
 .menu separator {
   background-color: @headerbar_border_color;
 }
@@ -6480,6 +6507,30 @@ window.background > contents > toastoverlay > leaflet > box + separator + box,
 window.background > widget > toastoverlay > leaflet > box + separator + box {
   background-color: @window_bg_color;
   color: @window_fg_color;
+}
+
+/* Explicit absolute suppression of popover and popup container wireframe borders */
+popover,
+popover:backdrop,
+popover.menu,
+popover.menu:backdrop,
+popover.background,
+popover.background:backdrop,
+popover.menu.background,
+popover.menu.background:backdrop,
+popover:focus,
+popover:focus-visible,
+popover:focus-within,
+popover.menu:focus,
+popover.menu:focus-visible,
+popover.menu:focus-within,
+window popover,
+window.csd popover,
+window.background.csd popover,
+.menu {
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 """
     parts.append(safe_surface_rules.strip())
