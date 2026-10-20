@@ -140,15 +140,14 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn(".nautilus-window .content-pane", c_gtk4)
             self.assertIn("background-color: @view_bg_color;", c_gtk4)
 
-            # Verify sidebar pane and split-view rules
+            # Verify authentic MacTahoe floating sidebar card and border rules
             self.assertIn(".sidebar-pane,", c_gtk4)
-            self.assertIn("overlay-split-view > .sidebar-pane,", c_gtk4)
-            self.assertIn("navigation-split-view > .sidebar-pane,", c_gtk4)
-            self.assertIn("background-color: @sidebar_bg_color;", c_gtk4)
-            self.assertIn("background-image: none;", c_gtk4)
+            self.assertIn("border-radius: 18px;", c_gtk4)
+            self.assertIn(".sidebar-pane:dir(ltr),", c_gtk4)
+            self.assertIn("inset 0 0 0 1px alpha(currentColor, 0.12);", c_gtk4)
 
-            # Verify sidebar borders are NOT destroyed across apps
-            self.assertNotIn("box-shadow: none;\n}\n\n/* Sidebar headerbars", c_gtk4)
+            # Verify sidebar internal widgets are transparent so card radius & borders remain pristine
+            self.assertIn(".sidebar-pane list:not(.boxed-list),", c_gtk4)
             self.assertIn(".sidebar-pane headerbar,", c_gtk4)
             self.assertIn("background-color: transparent;", c_gtk4)
 
