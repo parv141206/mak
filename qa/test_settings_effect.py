@@ -140,20 +140,24 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn(".nautilus-window .content-pane", c_gtk4)
             self.assertIn("background-color: @view_bg_color;", c_gtk4)
 
-            # Verify authentic MacTahoe floating sidebar card and border rules
+            # Verify full-height seamless macOS sidebar architecture
             self.assertIn(".sidebar-pane,", c_gtk4)
-            self.assertIn("border-radius: 18px;", c_gtk4)
-            self.assertIn(".sidebar-pane:dir(ltr),", c_gtk4)
-            self.assertIn("inset 0 0 0 1px alpha(currentColor, 0.12);", c_gtk4)
+            self.assertIn("margin: 0;", c_gtk4)
+            self.assertIn("border-radius: 0;", c_gtk4)
+            self.assertIn("background-color: @sidebar_bg_color;", c_gtk4)
 
-            # Verify sidebar internal widgets are transparent so card radius & borders remain pristine
+            # Verify continuous full-height vertical border separating sidebar from content pane
+            self.assertIn(".sidebar-pane:dir(ltr),", c_gtk4)
+            self.assertIn("border-right: 1px solid @headerbar_border_color;", c_gtk4)
+
+            # Verify sidebar internal widgets and headerbars are transparent so sidebar color seamlessly fills the column
             self.assertIn(".sidebar-pane list:not(.boxed-list),", c_gtk4)
             self.assertIn(".sidebar-pane headerbar,", c_gtk4)
             self.assertIn("background-color: transparent;", c_gtk4)
 
-            # Verify Nautilus sidebar spread box-shadow uses @window_bg_color without gray halos
-            self.assertIn(".nautilus-window .sidebar-pane:dir(ltr)", c_gtk4)
-            self.assertIn("box-shadow: 0 0 0 6px @window_bg_color", c_gtk4)
+            # Verify horizontal divider seam elimination
+            self.assertIn(".sidebar-pane toolbarview > .top-bar,", c_gtk4)
+            self.assertIn(".sidebar-pane > separator.horizontal,", c_gtk4)
 
             # Verify universal window background rules
             self.assertIn(".background,", c_gtk4)
