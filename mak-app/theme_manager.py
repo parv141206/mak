@@ -351,7 +351,7 @@ THEME_FLAVORS = {
             "headerbar_bg": "#191724",
             "headerbar_solid_bg": "#191724",
             "headerbar_fg": "#e0def4",
-            "sidebar_bg": "#14121e",
+            "sidebar_bg": "#191724",
             "sidebar_fg": "#e0def4",
             "card_bg": "#26233a",
             "card_fg": "#e0def4",
@@ -5550,6 +5550,11 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         rest_lines.append(line)
 
     clean_body = "\n".join(rest_lines).strip()
+    clean_body = re.sub(
+        r"box-shadow:\s*0 0 0 6px (?:#242424|#ffffff), 0 32px 0 6px (?:#242424|#ffffff), 0 -32px 0 6px (?:#242424|#ffffff)",
+        "box-shadow: 0 0 0 6px @window_bg_color, 0 32px 0 6px @window_bg_color, 0 -32px 0 6px @window_bg_color",
+        clean_body
+    )
     import_block = "\n".join(imports).strip()
 
     is_gtk4 = "gtk-4.0" in dst_css_path or "gtk-3.0" not in dst_css_path
@@ -5738,10 +5743,9 @@ window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewp
   background-color: @sidebar_bg_color;
   background-image: none;
   color: @sidebar_fg_color;
-  box-shadow: none;
 }
 
-/* Sidebar headerbars */
+/* Sidebar headerbars - transparent to blend seamlessly into sidebar card */
 .sidebar-pane headerbar,
 .sidebar-pane headerbar:backdrop,
 .sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar,
@@ -5750,10 +5754,42 @@ overlay-split-view > .sidebar-pane headerbar,
 overlay-split-view > .sidebar-pane headerbar:backdrop,
 navigation-split-view > .sidebar-pane headerbar,
 navigation-split-view > .sidebar-pane headerbar:backdrop {
-  background-color: @headerbar_bg_color;
+  background-color: transparent;
   background-image: none;
   color: @headerbar_fg_color;
-  border-color: @headerbar_border_color;
+  box-shadow: none;
+  border: none;
+}
+
+/* Nautilus & File Choosers Sidebar Box-Shadow Override (Zero off-color gray halos) */
+.nautilus-window .sidebar-pane:dir(ltr),
+.nautilus-window .sidebar-pane:dir(ltr) banner > revealer > widget,
+.nautilus-window .sidebar-pane.end:dir(rtl),
+.nautilus-window .sidebar-pane.end:dir(rtl) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane:dir(ltr),
+#NautilusFileChooser .sidebar-pane:dir(ltr) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane.end:dir(rtl),
+#NautilusFileChooser .sidebar-pane.end:dir(rtl) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane:dir(ltr),
+.nautilus-file-chooser .sidebar-pane:dir(ltr) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane.end:dir(rtl),
+.nautilus-file-chooser .sidebar-pane.end:dir(rtl) banner > revealer > widget {
+  box-shadow: 0 0 0 6px @window_bg_color, 0 32px 0 6px @window_bg_color, 0 -32px 0 6px @window_bg_color, 2px 3px 12px rgba(0, 0, 0, 0.1), inset 0 0 0 1px alpha(currentColor, 0.08);
+}
+
+.nautilus-window .sidebar-pane:dir(rtl),
+.nautilus-window .sidebar-pane:dir(rtl) banner > revealer > widget,
+.nautilus-window .sidebar-pane.end:dir(ltr),
+.nautilus-window .sidebar-pane.end:dir(ltr) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane:dir(rtl),
+#NautilusFileChooser .sidebar-pane:dir(rtl) banner > revealer > widget,
+#NautilusFileChooser .sidebar-pane.end:dir(ltr),
+#NautilusFileChooser .sidebar-pane.end:dir(ltr) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane:dir(rtl),
+.nautilus-file-chooser .sidebar-pane:dir(rtl) banner > revealer > widget,
+.nautilus-file-chooser .sidebar-pane.end:dir(ltr),
+.nautilus-file-chooser .sidebar-pane.end:dir(ltr) banner > revealer > widget {
+  box-shadow: 0 0 0 6px @window_bg_color, 0 32px 0 6px @window_bg_color, 0 -32px 0 6px @window_bg_color, -2px 3px 12px rgba(0, 0, 0, 0.1), inset 0 0 0 1px alpha(currentColor, 0.08);
 }
 
 /* Content Pane Surfaces (Nautilus, Libadwaita & GTK Views) */

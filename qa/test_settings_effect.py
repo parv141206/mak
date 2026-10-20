@@ -147,6 +147,15 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn("background-color: @sidebar_bg_color;", c_gtk4)
             self.assertIn("background-image: none;", c_gtk4)
 
+            # Verify sidebar borders are NOT destroyed across apps
+            self.assertNotIn("box-shadow: none;\n}\n\n/* Sidebar headerbars", c_gtk4)
+            self.assertIn(".sidebar-pane headerbar,", c_gtk4)
+            self.assertIn("background-color: transparent;", c_gtk4)
+
+            # Verify Nautilus sidebar spread box-shadow uses @window_bg_color without gray halos
+            self.assertIn(".nautilus-window .sidebar-pane:dir(ltr)", c_gtk4)
+            self.assertIn("box-shadow: 0 0 0 6px @window_bg_color", c_gtk4)
+
             # Verify universal window background rules
             self.assertIn(".background,", c_gtk4)
             self.assertIn("background-color: @window_bg_color;", c_gtk4)
@@ -161,13 +170,13 @@ class TestSettingsEffect(unittest.TestCase):
         
         # Test Rosé Pine specifically
         rp_dark = THEME_FLAVORS["rose-pine"]["dark"]
-        self.assertEqual(rp_dark["sidebar_bg"], "#14121e")
+        self.assertEqual(rp_dark["sidebar_bg"], "#191724")
         self.assertEqual(rp_dark["view_bg"], "#191724")
         self.assertEqual(rp_dark["window_bg"], "#191724")
         self.assertEqual(rp_dark["headerbar_bg"], "#191724")
 
         rp_palette = get_flavor_palette("rose-pine", is_dark=True)
-        self.assertIn("@define-color sidebar_bg_color #14121e;", rp_palette)
+        self.assertIn("@define-color sidebar_bg_color #191724;", rp_palette)
         self.assertIn("@define-color window_bg_color #191724;", rp_palette)
         self.assertIn("@define-color view_bg_color #191724;", rp_palette)
 
