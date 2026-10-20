@@ -158,18 +158,20 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn("window.background.csd .sidebar-pane headerbar,", c_gtk4)
             self.assertIn("border-top-left-radius: 13px;", c_gtk4)
 
-            # Verify popovers, menus, and dropdowns adapt to flavor palette seamlessly
+            # Verify popovers, menus, and dropdowns adapt to flavor palette seamlessly without borders
             self.assertIn("popover > contents,", c_gtk4)
             self.assertIn("background-color: @popover_bg_color;", c_gtk4)
+            self.assertIn("border: none;", c_gtk4)
             self.assertIn("popover.menu > contents stack scrolledwindow", c_gtk4)
             self.assertIn("popover.menu modelbutton", c_gtk4)
             self.assertIn("dropdown button.combo", c_gtk4)
 
-            # Verify text inputs, search entries, pathbars, and dialogs adapt to flavor palette
+            # Verify text inputs, search entries, pathbars, and dialogs adapt to flavor palette without dual color
             self.assertIn("caret-color: @accent_color;", c_gtk4)
             self.assertIn("searchbar entry", c_gtk4)
             self.assertIn("headerbar entry,", c_gtk4)
-            self.assertIn("background-color: alpha(currentColor, 0.06);", c_gtk4)
+            self.assertIn(".nautilus-window .nautilus-pathbar scrolledwindow,", c_gtk4)
+            self.assertIn("background-color: alpha(currentColor, 0.08);", c_gtk4)
             self.assertIn("dialog.background sheet", c_gtk4)
             self.assertIn("background-color: @dialog_bg_color;", c_gtk4)
 

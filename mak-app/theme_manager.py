@@ -5581,18 +5581,23 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         clean_body
     )
     clean_body = re.sub(
+        r"(popover(?:\.menu)?(?:\.background)?\s*>\s*(?:contents|arrow)\s*\{[^}]*border:\s*)[^;]+;",
+        r"\1none;",
+        clean_body
+    )
+    clean_body = re.sub(
         r"popover\s*>\s*contents\s+stack\s+scrolledwindow(?::not\(\.view\))?\s*>\s*viewport\s*\{[^}]*\}",
         "popover > contents stack scrolledwindow:not(.view) > viewport { background-color: transparent; border: none; }",
         clean_body
     )
     clean_body = re.sub(
         r"headerbar\s+entry\s*\{[^}]*inset\s+1px\s+1px[^}]*\}",
-        "headerbar entry { background-color: alpha(currentColor, 0.06); background-image: none; box-shadow: none; border: 1px solid alpha(currentColor, 0.10); }",
+        "headerbar entry { background-color: alpha(currentColor, 0.08); background-image: none; box-shadow: none; border: none; }",
         clean_body
     )
     clean_body = re.sub(
         r"headerbar\s+entry:hover\s*\{[^}]*inset\s+1px\s+1px[^}]*\}",
-        "headerbar entry:hover { background-color: alpha(currentColor, 0.08); background-image: none; box-shadow: none; border: 1px solid alpha(currentColor, 0.12); }",
+        "headerbar entry:hover { background-color: alpha(currentColor, 0.10); background-image: none; box-shadow: none; border: none; }",
         clean_body
     )
     import_block = "\n".join(imports).strip()
@@ -6052,7 +6057,8 @@ columnview.view > header > button:active,
 
 /* Nautilus pathbar and path buttons */
 .nautilus-pathbar,
-#NautilusPathBar {
+#NautilusPathBar,
+nautilus-path-bar {
   background-color: alpha(currentColor, 0.08);
   color: @headerbar_fg_color;
   border-radius: 9999px;
@@ -6060,6 +6066,28 @@ columnview.view > header > button:active,
   box-shadow: none;
 }
 
+.nautilus-pathbar scrolledwindow,
+.nautilus-pathbar scrolledwindow.view,
+.nautilus-pathbar scrolledwindow viewport,
+.nautilus-pathbar > scrolledwindow,
+.nautilus-pathbar > scrolledwindow > viewport,
+.nautilus-pathbar box,
+.nautilus-pathbar menubutton,
+.nautilus-pathbar menubutton > button,
+.nautilus-window .nautilus-pathbar scrolledwindow,
+.nautilus-window .nautilus-pathbar scrolledwindow viewport,
+.nautilus-window .nautilus-pathbar button,
+.nautilus-window .nautilus-pathbar .nautilus-path-button,
+.nautilus-window .content-pane .nautilus-pathbar scrolledwindow,
+.nautilus-window .content-pane .nautilus-pathbar scrolledwindow viewport,
+#NautilusPathBar scrolledwindow,
+#NautilusPathBar scrolledwindow viewport,
+#NautilusPathBar box,
+#NautilusPathBar menubutton,
+#NautilusPathBar menubutton > button,
+nautilus-path-bar scrolledwindow,
+nautilus-path-bar scrolledwindow viewport,
+nautilus-path-bar button,
 .nautilus-pathbar button,
 .nautilus-pathbar button:backdrop,
 .nautilus-pathbar .nautilus-path-button,
@@ -6158,6 +6186,7 @@ popover,
 popover:backdrop {
   background-color: transparent;
   color: @popover_fg_color;
+  border: none;
 }
 
 popover > arrow,
@@ -6168,9 +6197,18 @@ popover.menu.background > contents {
   background-color: @popover_bg_color;
   background-image: none;
   color: @popover_fg_color;
-  border: 1px solid @headerbar_border_color;
+  border: none;
   border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+/* Tooltips and popups - strictly borderless */
+tooltip,
+.tooltip,
+popover.tooltip,
+popover.background.tooltip {
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Popover internal containers - strictly transparent so outer card background-color fills 100% seamlessly */
@@ -6301,7 +6339,7 @@ entry.location-entry {
   background-color: alpha(currentColor, 0.06);
   background-image: none;
   box-shadow: none;
-  border: 1px solid alpha(currentColor, 0.10);
+  border: none;
   border-radius: 6px;
   color: @window_fg_color;
   caret-color: @accent_color;
@@ -6325,8 +6363,8 @@ entry.location-entry:focus,
 entry.location-entry:focus-within {
   background-color: alpha(currentColor, 0.09);
   background-image: none;
-  border-color: @accent_color;
-  box-shadow: 0 0 0 2px alpha(@accent_color, 0.30);
+  border: none;
+  box-shadow: 0 0 0 2px alpha(@accent_color, 0.35);
   color: @window_fg_color;
 }
 
@@ -6337,7 +6375,7 @@ searchbar entry > text > selection {
   color: @window_fg_color;
 }
 
-/* Headerbar, Pathbar & Top-bar Entry overrides - clean, seamless & flavor-tinted */
+/* Headerbar, Pathbar & Top-bar Entry overrides - clean, seamless, borderless & flavor-tinted */
 headerbar entry,
 headerbar entry:hover,
 headerbar entry:backdrop,
@@ -6351,12 +6389,13 @@ headerbar entry:backdrop,
 nautilus-path-bar,
 .nautilus-pathbar:backdrop,
 #NautilusPathBar:backdrop {
-  background-color: alpha(currentColor, 0.06);
+  background-color: alpha(currentColor, 0.08);
   background-image: none;
   box-shadow: none;
-  border: 1px solid alpha(currentColor, 0.10);
+  border: none;
   color: @headerbar_fg_color;
   caret-color: @accent_color;
+  border-radius: 9999px;
 }
 
 headerbar entry:focus,
@@ -6365,10 +6404,10 @@ headerbar entry:focus-within,
 .top-bar entry:focus-within,
 .nautilus-window headerbar entry:focus,
 .nautilus-window headerbar entry:focus-within {
-  background-color: alpha(currentColor, 0.09);
+  background-color: alpha(currentColor, 0.11);
   background-image: none;
-  border-color: @accent_color;
-  box-shadow: 0 0 0 2px alpha(@accent_color, 0.30);
+  border: none;
+  box-shadow: 0 0 0 2px alpha(@accent_color, 0.35);
   color: @headerbar_fg_color;
 }
 
