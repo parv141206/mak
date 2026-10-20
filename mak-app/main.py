@@ -677,9 +677,9 @@ class MakAppWindow(Adw.ApplicationWindow):
             subtitle="Display percentage inside the battery capsule (Mac style), beside the icon, or hidden"
         )
         bat_model = Gtk.StringList.new([
-            "Percentage Inside Battery Icon (macOS Style)",
-            "Percentage Beside Battery Icon",
-            "Hidden (Battery Capsule Only)"
+            "Inside Battery Icon (macOS)",
+            "Beside Battery Icon",
+            "Hidden (Icon Only)"
         ])
         bat_mode_row.set_model(bat_model)
         mode_keys = ["inside", "side", "hidden"]
@@ -1276,7 +1276,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         flavor_model = Gtk.StringList()
         for k in flavor_keys:
             flv = theme_manager.THEME_FLAVORS[k]
-            flavor_model.append(f"{flv['name']} ({flv['subtitle']})")
+            flavor_model.append(flv["name"])
 
         flavor_row = Adw.ComboRow(
             title="Active Color Flavor",
@@ -1285,7 +1285,10 @@ class MakAppWindow(Adw.ApplicationWindow):
         )
         curr_flavor = self.bridge.get_theme_flavor()
         if curr_flavor in flavor_keys:
-            flavor_row.set_selected(flavor_keys.index(curr_flavor))
+            init_idx = flavor_keys.index(curr_flavor)
+            flavor_row.set_selected(init_idx)
+            flv_init = theme_manager.THEME_FLAVORS[curr_flavor]
+            flavor_row.set_subtitle(f"{flv_init['subtitle']} • {flv_init['description']}")
         else:
             flavor_row.set_selected(0)
 
@@ -1293,9 +1296,10 @@ class MakAppWindow(Adw.ApplicationWindow):
             idx = row.get_selected()
             if 0 <= idx < len(flavor_keys):
                 chosen_key = flavor_keys[idx]
+                flv = theme_manager.THEME_FLAVORS[chosen_key]
+                row.set_subtitle(f"{flv['subtitle']} • {flv['description']}")
                 self.bridge.set_theme_flavor(chosen_key)
-                flv_name = theme_manager.THEME_FLAVORS[chosen_key]["name"]
-                self.theme_status_label.set_text(f"🎨 Applied {flv_name} color flavor!")
+                self.theme_status_label.set_text(f"🎨 Applied {flv['name']} color flavor!")
 
         flavor_row.connect("notify::selected", _on_flavor_selected)
         flavor_group.add(flavor_row)

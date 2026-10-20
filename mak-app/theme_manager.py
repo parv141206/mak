@@ -5961,6 +5961,15 @@ split-view > separator {
   background-color: @headerbar_border_color;
 }
 
+/* ComboRow Dropdowns & Popovers (Generous width to prevent truncated text) */
+row.combo popover > contents {
+  min-width: 240px;
+}
+
+row.combo listview.inline {
+  min-width: 110px;
+}
+
 window.background > contents > toastoverlay > leaflet > box + separator + box,
 window.background > widget > toastoverlay > leaflet > box + separator + box {
   background-color: @window_bg_color;
