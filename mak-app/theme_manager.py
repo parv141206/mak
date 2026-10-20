@@ -5602,6 +5602,132 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
     import_block = "\n".join(imports).strip()
 
     is_gtk4 = "gtk-4.0" in dst_css_path or "gtk-3.0" not in dst_css_path
+
+    if is_gtk4:
+        popover_surface_rules = """/* ── Mak Flavor Popover & Dropdown Menu Styling (GTK4) ── */
+popover,
+popover:backdrop,
+popover.menu,
+popover.menu:backdrop,
+popover.background,
+popover.background:backdrop,
+popover.menu.background,
+popover.menu.background:backdrop,
+window popover,
+window.csd popover,
+window.background.csd popover,
+.menu.background,
+menubutton > popover,
+menubutton > popover.menu,
+popover:focus,
+popover:focus-visible,
+popover:focus-within,
+popover.menu:focus,
+popover.menu:focus-visible,
+popover.menu:focus-within {
+  background-color: transparent;
+  color: @popover_fg_color;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+popover > arrow,
+popover > contents,
+popover.menu > arrow,
+popover.menu > contents,
+popover.menu.background > contents {
+  background-color: @popover_bg_color;
+  background-image: none;
+  color: @popover_fg_color;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}"""
+        popover_cleanup_rules = """/* Explicit absolute suppression of popover and popup container wireframe borders (GTK4) */
+popover,
+popover:backdrop,
+popover.menu,
+popover.menu:backdrop,
+popover.background,
+popover.background:backdrop,
+popover.menu.background,
+popover.menu.background:backdrop,
+popover:focus,
+popover:focus-visible,
+popover:focus-within,
+popover.menu:focus,
+popover.menu:focus-visible,
+popover.menu:focus-within,
+window popover,
+window.csd popover,
+window.background.csd popover {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}"""
+    else:
+        popover_surface_rules = """/* ── Mak Flavor Popover & Dropdown Menu Styling (GTK3) ── */
+popover,
+popover:backdrop,
+popover.menu,
+popover.menu:backdrop,
+popover.background,
+popover.background:backdrop,
+popover.menu.background,
+popover.menu.background:backdrop,
+window popover,
+window.csd popover,
+window.background.csd popover,
+.csd popover.background,
+.menu.background,
+menubutton > popover,
+menubutton > popover.menu {
+  background-color: @popover_bg_color;
+  background-image: none;
+  color: @popover_fg_color;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+  padding: 4px;
+}
+
+popover > arrow,
+popover > contents,
+popover.menu > arrow,
+popover.menu > contents,
+popover.menu.background > contents {
+  background-color: @popover_bg_color;
+  background-image: none;
+  color: @popover_fg_color;
+  border: none;
+  outline: none;
+  border-radius: 12px;
+}"""
+        popover_cleanup_rules = """/* Explicit absolute suppression of popover and popup container wireframe borders (GTK3) */
+popover,
+popover:backdrop,
+popover.menu,
+popover.menu:backdrop,
+popover.background,
+popover.background:backdrop,
+popover.menu.background,
+popover.menu.background:backdrop,
+popover:focus,
+popover:focus-visible,
+popover:focus-within,
+popover.menu:focus,
+popover.menu:focus-visible,
+popover.menu:focus-within,
+window popover,
+window.csd popover,
+window.background.csd popover {
+  border: none;
+  outline: none;
+}"""
+
     kiwi_ext_path = os.path.expanduser("~/.local/share/gnome-shell/extensions/kiwi@kemma")
     kiwi_block = ""
     if os.path.exists(kiwi_ext_path):
@@ -6171,6 +6297,39 @@ separator:backdrop {
   background-color: @headerbar_border_color;
 }
 
+/* Traffic lights / titlebutton separator suppression in headerbars */
+separator.titlebutton,
+separator.titlebutton:backdrop,
+headerbar separator.titlebutton,
+headerbar separator.titlebutton:backdrop,
+headerbar box.left > separator,
+headerbar box.left > separator:backdrop,
+headerbar box.right > separator,
+headerbar box.right > separator:backdrop,
+headerbar box.horizontal.left > separator,
+headerbar box.horizontal.left > separator:backdrop,
+headerbar box.horizontal.right > separator,
+headerbar box.horizontal.right > separator:backdrop,
+headerbar windowcontrols + separator,
+headerbar windowcontrols ~ separator,
+headerbar windowcontrols separator,
+headerbar > windowhandle > box > box.left > separator,
+headerbar > windowhandle > box > box.right > separator,
+headerbar windowhandle box.left separator,
+headerbar windowhandle box.right separator,
+windowcontrols ~ separator,
+windowcontrols + separator,
+windowcontrols separator {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+}
+
 /* ComboRow Dropdowns & Popovers (Generous width to prevent truncated text) */
 row.combo popover > contents {
   min-width: 240px;
@@ -6180,47 +6339,7 @@ row.combo listview.inline {
   min-width: 110px;
 }
 
-/* ── Mak Flavor Popover & Dropdown Menu Styling ── */
-popover,
-popover:backdrop,
-popover.menu,
-popover.menu:backdrop,
-popover.background,
-popover.background:backdrop,
-popover.menu.background,
-popover.menu.background:backdrop,
-window popover,
-window.csd popover,
-window.background.csd popover,
-.menu.background,
-menubutton > popover,
-menubutton > popover.menu,
-popover:focus,
-popover:focus-visible,
-popover:focus-within,
-popover.menu:focus,
-popover.menu:focus-visible,
-popover.menu:focus-within {
-  background-color: transparent;
-  color: @popover_fg_color;
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
-
-popover > arrow,
-popover > contents,
-popover.menu > arrow,
-popover.menu > contents,
-popover.menu.background > contents {
-  background-color: @popover_bg_color;
-  background-image: none;
-  color: @popover_fg_color;
-  border: none;
-  outline: none;
-  border-radius: 12px;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
-}
+__POPOVER_SURFACE_RULES__
 
 /* Tooltips and popups - strictly borderless */
 tooltip,
@@ -6472,7 +6591,9 @@ menubar > menu:backdrop,
   color: @popover_fg_color;
   border: none;
   outline: none;
-  box-shadow: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  padding: 4px 0;
 }
 
 menu menuitem,
@@ -6508,30 +6629,10 @@ window.background > widget > toastoverlay > leaflet > box + separator + box {
   color: @window_fg_color;
 }
 
-/* Explicit absolute suppression of popover and popup container wireframe borders */
-popover,
-popover:backdrop,
-popover.menu,
-popover.menu:backdrop,
-popover.background,
-popover.background:backdrop,
-popover.menu.background,
-popover.menu.background:backdrop,
-popover:focus,
-popover:focus-visible,
-popover:focus-within,
-popover.menu:focus,
-popover.menu:focus-visible,
-popover.menu:focus-within,
-window popover,
-window.csd popover,
-window.background.csd popover,
-.menu {
-  border: none;
-  outline: none;
-  box-shadow: none;
-}
+__POPOVER_CLEANUP_RULES__
 """
+    safe_surface_rules = safe_surface_rules.replace("__POPOVER_SURFACE_RULES__", popover_surface_rules)
+    safe_surface_rules = safe_surface_rules.replace("__POPOVER_CLEANUP_RULES__", popover_cleanup_rules)
     parts.append(safe_surface_rules.strip())
 
     custom_rules = []

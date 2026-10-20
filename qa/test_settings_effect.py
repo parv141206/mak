@@ -166,6 +166,16 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn("popover.menu modelbutton", c_gtk4)
             self.assertIn("dropdown button.combo", c_gtk4)
 
+            # Verify GTK 3 popovers get @popover_bg_color on popover node directly (fixes invisible menu bug in GTK 3 apps)
+            self.assertIn(".csd popover.background,", c_gtk3)
+            self.assertIn("background-color: @popover_bg_color;", c_gtk3)
+
+            # Verify traffic lights separator suppression in apps without sidebars (both GTK 3 and GTK 4)
+            self.assertIn("separator.titlebutton,", c_gtk3)
+            self.assertIn("headerbar separator.titlebutton,", c_gtk3)
+            self.assertIn("separator.titlebutton,", c_gtk4)
+            self.assertIn("headerbar separator.titlebutton,", c_gtk4)
+
             # Verify text inputs, search entries, pathbars, and dialogs adapt to flavor palette without dual color
             self.assertIn("caret-color: @accent_color;", c_gtk4)
             self.assertIn("searchbar entry", c_gtk4)
