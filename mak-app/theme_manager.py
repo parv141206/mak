@@ -5575,6 +5575,11 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         r"\1@window_bg_color;",
         clean_body
     )
+    clean_body = re.sub(
+        r"(popover(?:\.menu)?(?:\.background)?\s*>\s*(?:contents|arrow)\s*\{[^}]*background-color:\s*)#333333;",
+        r"\1@popover_bg_color;",
+        clean_body
+    )
     import_block = "\n".join(imports).strip()
 
     is_gtk4 = "gtk-4.0" in dst_css_path or "gtk-3.0" not in dst_css_path
@@ -5853,12 +5858,37 @@ split-view > .sidebar-pane:first-child:dir(rtl),
   border: none;
 }
 
-/* Sidebar headerbars - transparent to blend seamlessly into top of floating card */
+/* Sidebar headerbars - strictly transparent with top rounded corners to seamlessly blend into top of floating card */
+window.background.csd .sidebar-pane headerbar,
+window.background.csd .sidebar-pane headerbar:backdrop,
+window.background.csd .sidebar-pane windowhandle,
+window.background.csd .sidebar-pane toolbarview,
+window.background.csd .sidebar-pane toolbarview > .top-bar,
+window.background.csd .sidebar-pane toolbarview > .top-bar headerbar,
+window.background.csd overlay-split-view > .sidebar-pane headerbar,
+window.background.csd overlay-split-view > .sidebar-pane headerbar:backdrop,
+window.background.csd navigation-split-view > .sidebar-pane headerbar,
+window.background.csd navigation-split-view > .sidebar-pane headerbar:backdrop,
+window.background.csd split-view > .sidebar-pane headerbar,
+window.background.csd split-view > .sidebar-pane headerbar:backdrop,
+window.background.csd .nautilus-window .sidebar-pane headerbar,
+window.background.csd .nautilus-window .sidebar-pane headerbar:backdrop,
+window.background.csd #NautilusFileChooser .sidebar-pane headerbar,
+window.background.csd #NautilusFileChooser .sidebar-pane headerbar:backdrop,
+window.background.csd .nautilus-file-chooser .sidebar-pane headerbar,
+window.background.csd .nautilus-file-chooser .sidebar-pane headerbar:backdrop,
+window.csd .sidebar-pane headerbar,
+window.csd .sidebar-pane headerbar:backdrop,
+window.background .sidebar-pane headerbar,
+window.background .sidebar-pane headerbar:backdrop,
+window .sidebar-pane headerbar,
+window .sidebar-pane headerbar:backdrop,
 .sidebar-pane headerbar,
 .sidebar-pane headerbar:backdrop,
 .sidebar-pane windowhandle,
 .sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar,
 .sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar:backdrop,
+.sidebar-pane toolbarview,
 .sidebar-pane toolbarview > .top-bar,
 .sidebar-pane toolbarview > .top-bar.raised,
 .sidebar-pane toolbarview > .top-bar.border,
@@ -5868,10 +5898,13 @@ split-view > .sidebar-pane:first-child:dir(rtl),
 .sidebar-pane toolbarview > .top-bar > revealer > windowhandle > box,
 overlay-split-view > .sidebar-pane headerbar,
 overlay-split-view > .sidebar-pane headerbar:backdrop,
+overlay-split-view > .sidebar-pane toolbarview > .top-bar,
 navigation-split-view > .sidebar-pane headerbar,
 navigation-split-view > .sidebar-pane headerbar:backdrop,
+navigation-split-view > .sidebar-pane toolbarview > .top-bar,
 split-view > .sidebar-pane headerbar,
 split-view > .sidebar-pane headerbar:backdrop,
+split-view > .sidebar-pane toolbarview > .top-bar,
 .nautilus-window .sidebar-pane headerbar,
 .nautilus-window .sidebar-pane headerbar:backdrop,
 #NautilusFileChooser .sidebar-pane headerbar,
@@ -5883,6 +5916,8 @@ split-view > .sidebar-pane headerbar:backdrop,
   color: @headerbar_fg_color;
   box-shadow: none;
   border: none;
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
 }
 
 /* Traffic lights / window controls positioning in floating sidebar headerbar */
@@ -6101,6 +6136,222 @@ row.combo popover > contents {
 
 row.combo listview.inline {
   min-width: 110px;
+}
+
+/* ── Mak Flavor Popover & Dropdown Menu Styling ── */
+popover,
+popover:backdrop {
+  background-color: transparent;
+  color: @popover_fg_color;
+}
+
+popover > arrow,
+popover > contents,
+popover.menu > arrow,
+popover.menu > contents,
+popover.menu.background > contents {
+  background-color: @popover_bg_color;
+  background-image: none;
+  color: @popover_fg_color;
+  border: 1px solid @headerbar_border_color;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+popover modelbutton,
+popover.menu modelbutton,
+modelbutton.flat {
+  color: @popover_fg_color;
+  background-color: transparent;
+  background-image: none;
+  border-radius: 6px;
+}
+
+popover modelbutton:hover,
+popover.menu modelbutton:hover,
+popover.menu modelbutton:hover:focus,
+modelbutton.flat:hover {
+  background-color: alpha(currentColor, 0.08);
+  color: @popover_fg_color;
+}
+
+popover modelbutton:selected,
+popover modelbutton:selected:active,
+popover.menu modelbutton:selected,
+popover.menu modelbutton:selected:active,
+modelbutton.flat:selected,
+modelbutton.flat:active {
+  background-color: @accent_bg_color;
+  color: #ffffff;
+}
+
+popover modelbutton accelerator,
+popover.menu modelbutton accelerator,
+popover.menu accelerator {
+  color: alpha(@popover_fg_color, 0.55);
+}
+
+popover separator,
+popover.menu separator {
+  background-color: @headerbar_border_color;
+  margin: 4px 6px;
+  min-height: 1px;
+}
+
+popover listview,
+popover listview > row,
+dropdown popover listview,
+dropdown popover listview > row {
+  color: @popover_fg_color;
+  background-color: transparent;
+  border-radius: 6px;
+}
+
+popover listview > row:hover,
+dropdown popover listview > row:hover {
+  background-color: alpha(currentColor, 0.08);
+  color: @popover_fg_color;
+}
+
+popover listview > row:selected,
+dropdown popover listview > row:selected {
+  background-color: @accent_bg_color;
+  color: #ffffff;
+}
+
+/* Dropdowns and Comboboxes */
+dropdown,
+combobox {
+  color: @window_fg_color;
+}
+
+dropdown button.combo,
+combobox button.combo,
+dropdown > button,
+combobox > button {
+  color: @window_fg_color;
+}
+
+dropdown button.combo arrow,
+combobox button.combo arrow {
+  color: @window_fg_color;
+}
+
+headerbar dropdown button.combo,
+headerbar combobox button.combo,
+headerbar dropdown > button,
+headerbar combobox > button {
+  color: @headerbar_fg_color;
+}
+
+headerbar dropdown button.combo arrow,
+headerbar combobox button.combo arrow {
+  color: @headerbar_fg_color;
+}
+
+/* ── Mak Flavor Text Inputs, Entries & Searchbars ── */
+entry,
+spinbutton > text,
+searchbar entry {
+  color: @window_fg_color;
+  caret-color: @accent_color;
+}
+
+entry placeholder,
+spinbutton > text placeholder,
+searchbar entry placeholder {
+  color: @placeholder_text_color;
+}
+
+entry:focus-within,
+spinbutton > text:focus-within,
+searchbar entry:focus-within {
+  color: @window_fg_color;
+  box-shadow: inset 0 0 0 2px alpha(@accent_color, 0.75);
+}
+
+entry > text > selection,
+spinbutton > text > selection,
+searchbar entry > text > selection {
+  background-color: alpha(@accent_color, 0.35);
+  color: @window_fg_color;
+}
+
+headerbar entry,
+.top-bar entry {
+  color: @headerbar_fg_color;
+  caret-color: @accent_color;
+}
+
+headerbar entry:focus-within,
+.top-bar entry:focus-within {
+  color: @headerbar_fg_color;
+  box-shadow: inset 0 0 0 2px alpha(@accent_color, 0.75);
+}
+
+headerbar entry placeholder,
+.top-bar entry placeholder {
+  color: alpha(@headerbar_fg_color, 0.5);
+}
+
+headerbar entry > text > selection,
+.top-bar entry > text > selection {
+  background-color: alpha(@accent_color, 0.35);
+  color: @headerbar_fg_color;
+}
+
+/* Searchbars & Revealer Boxes */
+searchbar,
+searchbar > revealer > box,
+searchbar:not(.inline) > revealer > box {
+  background-color: @headerbar_bg_color;
+  color: @headerbar_fg_color;
+  border-color: @headerbar_border_color;
+}
+
+/* Dialogs, Sheets, and Modals */
+dialog,
+dialog.background,
+dialog.background sheet,
+dialog-host > dialog.background sheet {
+  background-color: @dialog_bg_color;
+  color: @dialog_fg_color;
+  border-color: @headerbar_border_color;
+}
+
+/* GTK3 Menus & Menubars */
+menu,
+.menu,
+menu:backdrop,
+.menu:backdrop,
+menubar menu,
+menubar .menu {
+  background-color: @popover_bg_color;
+  color: @popover_fg_color;
+  border: 1px solid @headerbar_border_color;
+}
+
+menu menuitem,
+.menu menuitem {
+  color: @popover_fg_color;
+  background-color: transparent;
+}
+
+menu menuitem:hover,
+.menu menuitem:hover {
+  background-color: alpha(currentColor, 0.08);
+  color: @popover_fg_color;
+}
+
+menu menuitem:selected,
+.menu menuitem:selected {
+  background-color: @accent_bg_color;
+  color: #ffffff;
+}
+
+menu separator,
+.menu separator {
+  background-color: @headerbar_border_color;
 }
 
 window.background > contents > toastoverlay > leaflet > box + separator + box,

@@ -155,8 +155,22 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn(".sidebar-pane list:not(.boxed-list),", c_gtk4)
             self.assertIn(".sidebar-pane headerbar,", c_gtk4)
             self.assertIn("background-color: transparent;", c_gtk4)
+            self.assertIn("window.background.csd .sidebar-pane headerbar,", c_gtk4)
+            self.assertIn("border-top-left-radius: 13px;", c_gtk4)
 
-            # Verify traffic lights window controls padding inside sidebar headerbar
+            # Verify popovers, menus, and dropdowns adapt to flavor palette
+            self.assertIn("popover > contents,", c_gtk4)
+            self.assertIn("background-color: @popover_bg_color;", c_gtk4)
+            self.assertIn("popover.menu modelbutton", c_gtk4)
+            self.assertIn("dropdown button.combo", c_gtk4)
+
+            # Verify text inputs, search entries, and dialogs adapt to flavor palette
+            self.assertIn("caret-color: @accent_color;", c_gtk4)
+            self.assertIn("searchbar entry", c_gtk4)
+            self.assertIn("dialog.background sheet", c_gtk4)
+            self.assertIn("background-color: @dialog_bg_color;", c_gtk4)
+
+            # Verify traffic lights window controls positioning inside sidebar headerbar
             self.assertIn("padding-left: 8px;", c_gtk4)
 
             # Verify horizontal divider seam elimination
