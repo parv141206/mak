@@ -140,11 +140,48 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn(".nautilus-window .content-pane", c_gtk4)
             self.assertIn("background-color: @view_bg_color;", c_gtk4)
 
+            # Verify sidebar pane and split-view rules
+            self.assertIn(".sidebar-pane,", c_gtk4)
+            self.assertIn("overlay-split-view > .sidebar-pane,", c_gtk4)
+            self.assertIn("navigation-split-view > .sidebar-pane,", c_gtk4)
+            self.assertIn("background-color: @sidebar_bg_color;", c_gtk4)
+            self.assertIn("background-image: none;", c_gtk4)
+
+            # Verify universal window background rules
+            self.assertIn(".background,", c_gtk4)
+            self.assertIn("background-color: @window_bg_color;", c_gtk4)
+
             # Verify no destructive button overrides
             self.assertNotIn("button { background-color:", c_gtk3)
             self.assertNotIn("button { background-color:", c_gtk4)
 
+    def test_rose_pine_and_flavors_palette_consistency(self):
+        """Verify Rosé Pine and other flavors define deep non-gray sidebar palettes."""
+        from theme_manager import THEME_FLAVORS, get_flavor_palette
+        
+        # Test Rosé Pine specifically
+        rp_dark = THEME_FLAVORS["rose-pine"]["dark"]
+        self.assertEqual(rp_dark["sidebar_bg"], "#14121e")
+        self.assertEqual(rp_dark["view_bg"], "#191724")
+        self.assertEqual(rp_dark["window_bg"], "#191724")
+        self.assertEqual(rp_dark["headerbar_bg"], "#191724")
+
+        rp_palette = get_flavor_palette("rose-pine", is_dark=True)
+        self.assertIn("@define-color sidebar_bg_color #14121e;", rp_palette)
+        self.assertIn("@define-color window_bg_color #191724;", rp_palette)
+        self.assertIn("@define-color view_bg_color #191724;", rp_palette)
+
+        # Verify all flavors have both dark and light modes with valid hex colors
+        for key, flv in THEME_FLAVORS.items():
+            self.assertIn("dark", flv, f"{key} missing dark mode")
+            self.assertIn("light", flv, f"{key} missing light mode")
+            for mode in ("dark", "light"):
+                for col_key in ("window_bg", "view_bg", "sidebar_bg", "headerbar_bg", "accent_color"):
+                    val = flv[mode].get(col_key)
+                    self.assertTrue(val and val.startswith("#"), f"{key}.{mode}.{col_key} invalid: {val}")
+
 
 if __name__ == "__main__":
     unittest.main()
+
 

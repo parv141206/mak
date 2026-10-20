@@ -346,12 +346,12 @@ THEME_FLAVORS = {
             "name": "Rosé Pine Main",
             "window_bg": "#191724",
             "window_fg": "#e0def4",
-            "view_bg": "#1f1d2e",
+            "view_bg": "#191724",
             "view_fg": "#e0def4",
             "headerbar_bg": "#191724",
             "headerbar_solid_bg": "#191724",
             "headerbar_fg": "#e0def4",
-            "sidebar_bg": "#1f1d2e",
+            "sidebar_bg": "#14121e",
             "sidebar_fg": "#e0def4",
             "card_bg": "#26233a",
             "card_fg": "#e0def4",
@@ -5604,6 +5604,12 @@ toolbarview > headerbar,
 toolbarview > headerbar:backdrop,
 navigation-split-view headerbar,
 navigation-split-view headerbar:backdrop,
+overlay-split-view headerbar,
+overlay-split-view headerbar:backdrop,
+.sidebar-pane headerbar,
+.sidebar-pane headerbar:backdrop,
+.content-pane headerbar,
+.content-pane headerbar:backdrop,
 window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-left,
 window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-right,
 window.background.csd > contents > leaflet.unfolded > box > headerbar,
@@ -5633,19 +5639,136 @@ window.background.csd > widget > leaflet.unfolded > box > searchbar > revealer >
   color: @headerbar_fg_color;
 }
 
-/* Nautilus & File Choosers Content & Sidebar Panes */
+/* Universal Background Overrides - Eliminates hardcoded dark gray leaking from clean_body */
+.background,
+.background.view,
+.background:backdrop,
+window,
+window:backdrop,
+window.background,
+window.background:backdrop,
+window.csd,
+window.csd:backdrop,
+window.background.csd,
+window.background.csd:backdrop,
+window.view,
+window.view:backdrop,
+window.background.view,
+window.background.view:backdrop,
+dialog-host,
+dialog-host:backdrop,
+toastoverlay,
+toastoverlay:backdrop,
+navigation-split-view,
+navigation-split-view:backdrop,
+overlay-split-view,
+overlay-split-view:backdrop,
+split-view,
+split-view:backdrop,
+leaflet,
+leaflet:backdrop,
+leaflet.unfolded,
+leaflet.unfolded:backdrop,
 .nautilus-window,
 .nautilus-window:backdrop,
 #NautilusFileChooser,
 #NautilusFileChooser:backdrop,
 .nautilus-file-chooser,
-.nautilus-file-chooser:backdrop,
-window.nautilus-window,
-window.nautilus-window:backdrop {
+.nautilus-file-chooser:backdrop {
   background-color: @window_bg_color;
   color: @window_fg_color;
 }
 
+/* Sidebar Containers & Navigation Lists (Zero Off-Gray Panels) */
+.sidebar-pane,
+.sidebar-pane:backdrop,
+.content-pane .sidebar-pane,
+.sidebar-pane .content-pane,
+.sidebar-pane.background,
+.sidebar-pane.background:backdrop,
+overlay-split-view > .sidebar-pane,
+overlay-split-view > .sidebar-pane:backdrop,
+navigation-split-view > .sidebar-pane,
+navigation-split-view > .sidebar-pane:backdrop,
+split-view > .sidebar-pane,
+split-view > .sidebar-pane:backdrop,
+overlay-split-view > widget:first-child,
+navigation-split-view > widget:first-child,
+split-view > widget:first-child,
+.sidebar-pane > toolbarview,
+.sidebar-pane toolbarview,
+.sidebar-pane scrolledwindow,
+.sidebar-pane scrolledwindow viewport,
+.sidebar-pane viewport,
+.sidebar-pane placessidebar,
+.sidebar-pane placessidebar:backdrop,
+.sidebar-pane placessidebar viewport,
+.sidebar-pane list,
+.sidebar-pane list:backdrop,
+.sidebar-pane listview,
+.sidebar-pane listview:backdrop,
+.sidebar-pane .navigation-sidebar,
+.sidebar-pane list.navigation-sidebar,
+.sidebar-pane list.navigation-sidebar:not(.view),
+.sidebar-pane list.navigation-sidebar:backdrop,
+.nautilus-window .sidebar-pane,
+.nautilus-window .sidebar-pane:backdrop,
+#NautilusFileChooser .sidebar-pane,
+#NautilusFileChooser .sidebar-pane:backdrop,
+.nautilus-file-chooser .sidebar-pane,
+.nautilus-file-chooser .sidebar-pane:backdrop,
+navigation-view-page:first-child,
+sidebar,
+sidebar:backdrop,
+.sidebar,
+.sidebar:backdrop,
+placessidebar,
+placessidebar:backdrop,
+.navigation-sidebar,
+.navigation-sidebar:backdrop,
+list.navigation-sidebar,
+list.navigation-sidebar:backdrop,
+.nautilus-window .navigation-sidebar,
+.nautilus-window placessidebar,
+window.background.csd > dialog-host > widget > widget > box > leaflet list.navigation-sidebar,
+window.background.csd > contents > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > list.navigation-sidebar,
+window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > list.navigation-sidebar,
+window.background.csd > contents > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > box > list.navigation-sidebar,
+window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > box > list.navigation-sidebar {
+  background-color: @sidebar_bg_color;
+  background-image: none;
+  color: @sidebar_fg_color;
+  box-shadow: none;
+}
+
+/* Sidebar headerbars */
+.sidebar-pane headerbar,
+.sidebar-pane headerbar:backdrop,
+.sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar,
+.sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar:backdrop,
+overlay-split-view > .sidebar-pane headerbar,
+overlay-split-view > .sidebar-pane headerbar:backdrop,
+navigation-split-view > .sidebar-pane headerbar,
+navigation-split-view > .sidebar-pane headerbar:backdrop {
+  background-color: @headerbar_bg_color;
+  background-image: none;
+  color: @headerbar_fg_color;
+  border-color: @headerbar_border_color;
+}
+
+/* Content Pane Surfaces (Nautilus, Libadwaita & GTK Views) */
+.content-pane,
+.content-pane:backdrop,
+overlay-split-view > .content-pane,
+overlay-split-view > .content-pane:backdrop,
+navigation-split-view > .content-pane,
+navigation-split-view > .content-pane:backdrop,
+split-view > .content-pane,
+split-view > .content-pane:backdrop,
+.content-pane > toolbarview,
+.content-pane scrolledwindow,
+.content-pane scrolledwindow.view,
+.content-pane .view,
 .nautilus-window .content-pane,
 .nautilus-window .content-pane:backdrop,
 .nautilus-window .content-pane > toolbarview,
@@ -5659,32 +5782,32 @@ window.nautilus-window:backdrop {
 .nautilus-window columnview.view,
 .nautilus-window listview,
 .nautilus-window gridview,
+.nautilus-window .view,
+.nautilus-window .view:backdrop,
 #NautilusFileChooser .content-pane,
 #NautilusFileChooser .content-pane:backdrop,
 .nautilus-file-chooser .content-pane,
-.nautilus-file-chooser .content-pane:backdrop {
-  background-color: @view_bg_color;
-  color: @view_fg_color;
-}
-
-.nautilus-window .sidebar-pane,
-.nautilus-window .sidebar-pane:backdrop,
-#NautilusFileChooser .sidebar-pane,
-#NautilusFileChooser .sidebar-pane:backdrop,
-.nautilus-file-chooser .sidebar-pane,
-.nautilus-file-chooser .sidebar-pane:backdrop {
-  background-color: @sidebar_bg_color;
-  color: @sidebar_fg_color;
-  box-shadow: none;
-}
-
-.nautilus-window .view,
-.nautilus-window .view:backdrop {
+.nautilus-file-chooser .content-pane:backdrop,
+.nautilus-list-view,
+.nautilus-grid-view,
+.nautilus-network-view,
+columnview,
+columnview.view,
+listview,
+gridview,
+.view,
+.view:backdrop,
+window.background.csd > contents > leaflet.unfolded > box > stack.background,
+window.background.csd > widget > leaflet.unfolded > box > stack.background,
+window.background > contents > toastoverlay > leaflet > box,
+window.background > widget > toastoverlay > leaflet > box {
   background-color: @view_bg_color;
   color: @view_fg_color;
 }
 
 /* Nautilus columnview header buttons & pathbar */
+columnview.view > header > button,
+columnview.view > header > button:backdrop,
 .nautilus-window columnview.view > header > button,
 .nautilus-window columnview.view > header > button:backdrop {
   background-color: transparent;
@@ -5692,13 +5815,15 @@ window.nautilus-window:backdrop {
   border-color: @headerbar_border_color;
 }
 
+columnview.view > header > button:hover,
+columnview.view > header > button:active,
 .nautilus-window columnview.view > header > button:hover,
 .nautilus-window columnview.view > header > button:active {
   background-color: alpha(currentColor, 0.08);
   color: @headerbar_fg_color;
 }
 
-.nautilus-window .nautilus-pathbar {
+.nautilus-pathbar {
   background-color: alpha(currentColor, 0.08);
   color: @headerbar_fg_color;
 }
@@ -5707,49 +5832,21 @@ window.nautilus-window:backdrop {
 .navigation-sidebar > row:selected,
 .navigation-sidebar:not(.view) > row:selected,
 placessidebar .navigation-sidebar > row:selected,
+.sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected,
+.sidebar-pane list.navigation-sidebar:not(.view) > row:selected,
 .nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected {
   color: @accent_color;
   background-color: alpha(@accent_color, 0.18);
 }
 
 /* Separators */
+separator,
+separator:backdrop,
 .nautilus-window separator,
 navigation-split-view > separator,
+overlay-split-view > separator,
 split-view > separator {
   background-color: @headerbar_border_color;
-}
-
-/* Sidebars & Navigation Lists */
-window.background.csd > dialog-host > widget > widget > box > leaflet list.navigation-sidebar,
-window.background.csd > contents > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > list.navigation-sidebar,
-window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > list.navigation-sidebar,
-window.background.csd > contents > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > box > list.navigation-sidebar,
-window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > box > list.navigation-sidebar,
-.nautilus-window .navigation-sidebar,
-.nautilus-window placessidebar,
-.navigation-sidebar,
-.navigation-sidebar:backdrop,
-placessidebar,
-placessidebar:backdrop {
-  background-color: @sidebar_bg_color;
-  color: @sidebar_fg_color;
-}
-
-/* General Window Surfaces */
-window.background,
-window.background:backdrop,
-window.background.csd,
-window.background.csd:backdrop {
-  background-color: @window_bg_color;
-  color: @window_fg_color;
-}
-
-window.background.csd > contents > leaflet.unfolded > box > stack.background,
-window.background.csd > widget > leaflet.unfolded > box > stack.background,
-window.background > contents > toastoverlay > leaflet > box,
-window.background > widget > toastoverlay > leaflet > box {
-  background-color: @view_bg_color;
-  color: @view_fg_color;
 }
 
 window.background > contents > toastoverlay > leaflet > box + separator + box,
