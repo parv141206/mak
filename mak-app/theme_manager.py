@@ -5580,6 +5580,21 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         r"\1@popover_bg_color;",
         clean_body
     )
+    clean_body = re.sub(
+        r"popover\s*>\s*contents\s+stack\s+scrolledwindow(?::not\(\.view\))?\s*>\s*viewport\s*\{[^}]*\}",
+        "popover > contents stack scrolledwindow:not(.view) > viewport { background-color: transparent; border: none; }",
+        clean_body
+    )
+    clean_body = re.sub(
+        r"headerbar\s+entry\s*\{[^}]*inset\s+1px\s+1px[^}]*\}",
+        "headerbar entry { background-color: alpha(currentColor, 0.06); background-image: none; box-shadow: none; border: 1px solid alpha(currentColor, 0.10); }",
+        clean_body
+    )
+    clean_body = re.sub(
+        r"headerbar\s+entry:hover\s*\{[^}]*inset\s+1px\s+1px[^}]*\}",
+        "headerbar entry:hover { background-color: alpha(currentColor, 0.08); background-image: none; box-shadow: none; border: 1px solid alpha(currentColor, 0.12); }",
+        clean_body
+    )
     import_block = "\n".join(imports).strip()
 
     is_gtk4 = "gtk-4.0" in dst_css_path or "gtk-3.0" not in dst_css_path
@@ -6158,6 +6173,34 @@ popover.menu.background > contents {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }
 
+/* Popover internal containers - strictly transparent so outer card background-color fills 100% seamlessly */
+popover scrolledwindow,
+popover viewport,
+popover stack,
+popover box,
+popover list,
+popover > contents scrolledwindow,
+popover > contents viewport,
+popover > contents stack,
+popover > contents box,
+popover > contents stack scrolledwindow > viewport,
+popover > contents stack scrolledwindow:not(.view) > viewport,
+popover.menu scrolledwindow,
+popover.menu viewport,
+popover.menu stack,
+popover.menu box,
+popover.menu > contents scrolledwindow,
+popover.menu > contents viewport,
+popover.menu > contents stack,
+popover.menu > contents box,
+popover.menu > contents stack scrolledwindow > viewport,
+popover.menu > contents stack scrolledwindow:not(.view) > viewport {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+}
+
 popover modelbutton,
 popover.menu modelbutton,
 modelbutton.flat {
@@ -6252,7 +6295,14 @@ headerbar combobox button.combo arrow {
 /* ── Mak Flavor Text Inputs, Entries & Searchbars ── */
 entry,
 spinbutton > text,
-searchbar entry {
+searchbar entry,
+entry.search,
+entry.location-entry {
+  background-color: alpha(currentColor, 0.06);
+  background-image: none;
+  box-shadow: none;
+  border: 1px solid alpha(currentColor, 0.10);
+  border-radius: 6px;
   color: @window_fg_color;
   caret-color: @accent_color;
 }
@@ -6263,11 +6313,21 @@ searchbar entry placeholder {
   color: @placeholder_text_color;
 }
 
+entry:focus,
 entry:focus-within,
+spinbutton > text:focus,
 spinbutton > text:focus-within,
-searchbar entry:focus-within {
+searchbar entry:focus,
+searchbar entry:focus-within,
+entry.search:focus,
+entry.search:focus-within,
+entry.location-entry:focus,
+entry.location-entry:focus-within {
+  background-color: alpha(currentColor, 0.09);
+  background-image: none;
+  border-color: @accent_color;
+  box-shadow: 0 0 0 2px alpha(@accent_color, 0.30);
   color: @window_fg_color;
-  box-shadow: inset 0 0 0 2px alpha(@accent_color, 0.75);
 }
 
 entry > text > selection,
@@ -6277,16 +6337,39 @@ searchbar entry > text > selection {
   color: @window_fg_color;
 }
 
+/* Headerbar, Pathbar & Top-bar Entry overrides - clean, seamless & flavor-tinted */
 headerbar entry,
-.top-bar entry {
+headerbar entry:hover,
+headerbar entry:backdrop,
+.top-bar entry,
+.top-bar entry:hover,
+.top-bar entry:backdrop,
+.nautilus-window headerbar entry,
+.nautilus-window .top-bar entry,
+.nautilus-pathbar,
+#NautilusPathBar,
+nautilus-path-bar,
+.nautilus-pathbar:backdrop,
+#NautilusPathBar:backdrop {
+  background-color: alpha(currentColor, 0.06);
+  background-image: none;
+  box-shadow: none;
+  border: 1px solid alpha(currentColor, 0.10);
   color: @headerbar_fg_color;
   caret-color: @accent_color;
 }
 
+headerbar entry:focus,
 headerbar entry:focus-within,
-.top-bar entry:focus-within {
+.top-bar entry:focus,
+.top-bar entry:focus-within,
+.nautilus-window headerbar entry:focus,
+.nautilus-window headerbar entry:focus-within {
+  background-color: alpha(currentColor, 0.09);
+  background-image: none;
+  border-color: @accent_color;
+  box-shadow: 0 0 0 2px alpha(@accent_color, 0.30);
   color: @headerbar_fg_color;
-  box-shadow: inset 0 0 0 2px alpha(@accent_color, 0.75);
 }
 
 headerbar entry placeholder,
