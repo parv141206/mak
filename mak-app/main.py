@@ -1265,6 +1265,94 @@ class MakAppWindow(Adw.ApplicationWindow):
         self.theme_status_label.set_margin_top(8)
         sync_group.add(self.theme_status_label)
 
+        # ── Theme Flavors (Color Palettes) ──
+        flavor_group = Adw.PreferencesGroup(
+            title="Theme Flavors (Aesthetic Color Palettes)",
+            description="Curated color schemes (Catppuccin, Deep Teal, Rosé Pine, Tokyo Night, Nord, etc.). Flavors ONLY modify color tones; buttons, traffic lights, and geometry remain 100% untouched:"
+        )
+        page.add(flavor_group)
+
+        flavor_keys = list(theme_manager.THEME_FLAVORS.keys())
+        flavor_model = Gtk.StringList()
+        for k in flavor_keys:
+            flv = theme_manager.THEME_FLAVORS[k]
+            flavor_model.append(f"{flv['name']} ({flv['subtitle']})")
+
+        flavor_row = Adw.ComboRow(
+            title="Active Color Flavor",
+            subtitle="Changes application background, headerbars, cards, and accent colors",
+            model=flavor_model
+        )
+        curr_flavor = self.bridge.get_theme_flavor()
+        if curr_flavor in flavor_keys:
+            flavor_row.set_selected(flavor_keys.index(curr_flavor))
+        else:
+            flavor_row.set_selected(0)
+
+        def _on_flavor_selected(row, param):
+            idx = row.get_selected()
+            if 0 <= idx < len(flavor_keys):
+                chosen_key = flavor_keys[idx]
+                self.bridge.set_theme_flavor(chosen_key)
+                flv_name = theme_manager.THEME_FLAVORS[chosen_key]["name"]
+                self.theme_status_label.set_text(f"🎨 Applied {flv_name} color flavor!")
+
+        flavor_row.connect("notify::selected", _on_flavor_selected)
+        flavor_group.add(flavor_row)
+
+        # Quick Flavor Swatch Cards
+        for k in flavor_keys:
+            flv = theme_manager.THEME_FLAVORS[k]
+            row = Adw.ActionRow(
+                title=flv["name"],
+                subtitle=f"{flv['subtitle']} • {flv['description']}"
+            )
+            
+            # Swatch Box with 3 dots: Window Bg, Card/Surface, and Accent color
+            swatch_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=6)
+            swatch_box.set_valign(Gtk.Align.CENTER)
+            
+            # Use current dark/light mode for preview dots
+            curr_th = theme_manager.get_current_theme()
+            is_dark_curr = theme_manager.THEMES.get(curr_th, {}).get("is_dark", True)
+            mode_preview = flv["dark"] if is_dark_curr else flv["light"]
+            
+            colors_to_show = [
+                ("Window", mode_preview["window_bg"]),
+                ("Card", mode_preview["card_bg"]),
+                ("Accent", mode_preview["accent_color"])
+            ]
+            
+            for label, col in colors_to_show:
+                dot = Gtk.DrawingArea()
+                dot.set_size_request(20, 20)
+                dot.set_tooltip_text(f"{label}: {col}")
+                dot.set_draw_func(lambda da, cr, w, h, c=col: (
+                    cr.set_source_rgb(
+                        int(c[1:3], 16) / 255.0,
+                        int(c[3:5], 16) / 255.0,
+                        int(c[5:7], 16) / 255.0
+                    ),
+                    cr.arc(w / 2.0, h / 2.0, min(w, h) / 2.0 - 1, 0, 2 * 3.14159),
+                    cr.fill(),
+                    cr.set_source_rgba(0, 0, 0, 0.15),
+                    cr.arc(w / 2.0, h / 2.0, min(w, h) / 2.0 - 1, 0, 2 * 3.14159),
+                    cr.stroke()
+                ))
+                swatch_box.append(dot)
+            
+            select_btn = Gtk.Button(label="Apply")
+            select_btn.add_css_class("pill")
+            select_btn.set_valign(Gtk.Align.CENTER)
+            select_btn.connect("clicked", lambda b, key=k: (
+                flavor_row.set_selected(flavor_keys.index(key))
+            ))
+            
+            swatch_box.append(select_btn)
+            row.add_suffix(swatch_box)
+            row.set_activatable_widget(select_btn)
+            flavor_group.add(row)
+
         # ── System Accent Color (GNOME & Libadwaita) ──
         accent_group = Adw.PreferencesGroup(
             title="System Accent Color",

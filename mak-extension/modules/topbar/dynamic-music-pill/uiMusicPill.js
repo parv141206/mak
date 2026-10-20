@@ -1139,7 +1139,7 @@ export const MusicPill = GObject.registerClass(
                             try { this._interfaceSettings.set_string('accent-color', this._originalAccent || 'blue'); } catch (e) { }
                         }
 
-                        if (this._settings.get_boolean('immersive-music-theme')) {
+                        if (this._settings?.settings_schema?.has_key('immersive-music-theme') && this._settings.get_boolean('immersive-music-theme')) {
                             let ext = Main.extensionManager.lookup('bar-enhanced@mrvanguardia');
                             if (ext && ext.stateObj) {
                                 ext.stateObj.immersiveColorOverride = null;
@@ -1379,7 +1379,7 @@ export const MusicPill = GObject.registerClass(
                     this._currentBorderOp = targetBorderOp; 
                     this._colorAnimId = null; 
                     
-                    if (this._settings.get_boolean('immersive-music-theme')) {
+                    if (this._settings?.settings_schema?.has_key('immersive-music-theme') && this._settings.get_boolean('immersive-music-theme')) {
                         let ext = Main.extensionManager.lookup('bar-enhanced@mrvanguardia');
                         if (ext && ext.stateObj) {
                             ext.stateObj.immersiveColorOverride = this._displayedColor;

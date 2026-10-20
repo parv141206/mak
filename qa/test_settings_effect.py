@@ -106,5 +106,45 @@ class TestSettingsEffect(unittest.TestCase):
             self.assertIn(".popup-menu-content", content)
             self.assertIn("border-radius: 10px;", content)
 
+    def test_flavor_surface_and_headerbar_injection(self):
+        """Verify universal headerbar, titlebar, and Nautilus pane rules inject into both GTK 3 and GTK 4."""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_gtk3 = os.path.join(tmpdir, "gtk-3.0_src.css")
+            src_gtk4 = os.path.join(tmpdir, "gtk-4.0_src.css")
+            dst_gtk3 = os.path.join(tmpdir, "gtk-3.0", "gtk.css")
+            dst_gtk4 = os.path.join(tmpdir, "gtk-4.0", "gtk.css")
+
+            with open(src_gtk3, "w") as f:
+                f.write("/* base gtk3 */\nheaderbar { background-color: #333333; }\n")
+            with open(src_gtk4, "w") as f:
+                f.write("/* base gtk4 */\nheaderbar { background-color: #333333; }\n")
+
+            from theme_manager import get_flavor_palette
+            palette = get_flavor_palette("deep-teal", is_dark=True)
+
+            inject_theme_css(src_gtk3, dst_gtk3, palette, is_glassy=False, is_dark=True)
+            inject_theme_css(src_gtk4, dst_gtk4, palette, is_glassy=False, is_dark=True)
+
+            with open(dst_gtk3) as f:
+                c_gtk3 = f.read()
+            with open(dst_gtk4) as f:
+                c_gtk4 = f.read()
+
+            # Verify both GTK 3 and GTK 4 have the universal headerbar rule
+            self.assertIn("headerbar,\nheaderbar:backdrop", c_gtk3)
+            self.assertIn("background-color: @headerbar_bg_color;", c_gtk3)
+            self.assertIn("headerbar,\nheaderbar:backdrop", c_gtk4)
+            self.assertIn("background-color: @headerbar_bg_color;", c_gtk4)
+
+            # Verify Nautilus surface rules
+            self.assertIn(".nautilus-window .content-pane", c_gtk4)
+            self.assertIn("background-color: @view_bg_color;", c_gtk4)
+
+            # Verify no destructive button overrides
+            self.assertNotIn("button { background-color:", c_gtk3)
+            self.assertNotIn("button { background-color:", c_gtk4)
+
+
 if __name__ == "__main__":
     unittest.main()
+

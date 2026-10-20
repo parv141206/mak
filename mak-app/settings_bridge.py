@@ -756,6 +756,19 @@ class MakSettingsBridge:
             except Exception:
                 pass
 
+    def get_theme_flavor(self): return self._get_s("theme-flavor", None, None, "default")
+    def set_theme_flavor(self, v):
+        self._set_s("theme-flavor", None, None, v)
+        try:
+            from .theme_manager import apply_flavor
+            apply_flavor(v)
+        except Exception:
+            try:
+                import theme_manager
+                theme_manager.apply_flavor(v)
+            except Exception as e:
+                print(f"[Bridge] Error applying flavor: {e}")
+
     def get_system_accent_color(self):
         try:
             return Gio.Settings.new("org.gnome.desktop.interface").get_string("accent-color")

@@ -150,6 +150,732 @@ THEMES = {
     }
 }
 
+def hex_to_rgba(hex_str, alpha=1.0):
+    hex_str = hex_str.lstrip('#')
+    if len(hex_str) == 3:
+        hex_str = ''.join(c * 2 for c in hex_str)
+    r = int(hex_str[0:2], 16)
+    g = int(hex_str[2:4], 16)
+    b = int(hex_str[4:6], 16)
+    return f"rgba({r}, {g}, {b}, {alpha:.2f})"
+
+def deepen_hex(hex_str, factor=0.25):
+    hex_str = hex_str.lstrip('#')
+    if len(hex_str) == 3:
+        hex_str = ''.join(c * 2 for c in hex_str)
+    r = max(0, min(255, int(int(hex_str[0:2], 16) * factor)))
+    g = max(0, min(255, int(int(hex_str[2:4], 16) * factor)))
+    b = max(0, min(255, int(int(hex_str[4:6], 16) * factor)))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+THEME_FLAVORS = {
+    "default": {
+        "id": "default",
+        "name": "macOS Native",
+        "subtitle": "Sonoma Graphite / Apple White",
+        "description": "Authentic macOS Sonoma native styling with precision-balanced graphite dark mode and crisp luminous light mode.",
+        "dark": {
+            "name": "Sonoma Graphite",
+            "window_bg": "#242426",
+            "window_fg": "#f5f5f7",
+            "view_bg": "#1c1c1e",
+            "view_fg": "#f5f5f7",
+            "headerbar_bg": "#242426",
+            "headerbar_solid_bg": "#242426",
+            "headerbar_fg": "#ffffff",
+            "sidebar_bg": "#242426",
+            "sidebar_fg": "#f5f5f7",
+            "card_bg": "#2c2c2e",
+            "card_fg": "#f5f5f7",
+            "dialog_bg": "#28282a",
+            "dialog_fg": "#f5f5f7",
+            "popover_bg": "#2c2c2e",
+            "popover_fg": "#f5f5f7",
+            "accent_color": "#007aff",
+            "border_color": "rgba(255, 255, 255, 0.12)",
+            "placeholder_text_color": "rgba(255, 255, 255, 0.45)",
+            "dock_pill": "rgba(42, 42, 50, 0.40)",
+            "dock_border": "rgba(255, 255, 255, 0.28)",
+            "app_tint": "#242426",
+            "gnome_accent": "blue"
+        },
+        "light": {
+            "name": "Apple Crisp White",
+            "window_bg": "#ececf0",
+            "window_fg": "#1d1d1f",
+            "view_bg": "#ffffff",
+            "view_fg": "#1d1d1f",
+            "headerbar_bg": "#ececf0",
+            "headerbar_solid_bg": "#ececf0",
+            "headerbar_fg": "#1d1d1f",
+            "sidebar_bg": "#ececf0",
+            "sidebar_fg": "#1d1d1f",
+            "card_bg": "#ffffff",
+            "card_fg": "#1d1d1f",
+            "dialog_bg": "#ebebef",
+            "dialog_fg": "#1d1d1f",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#1d1d1f",
+            "accent_color": "#007aff",
+            "border_color": "rgba(0, 0, 0, 0.10)",
+            "placeholder_text_color": "rgba(0, 0, 0, 0.45)",
+            "dock_pill": "rgba(255, 255, 255, 0.42)",
+            "dock_border": "rgba(255, 255, 255, 0.65)",
+            "app_tint": "#ececf0",
+            "gnome_accent": "blue"
+        }
+    },
+    "catppuccin": {
+        "id": "catppuccin",
+        "name": "Catppuccin",
+        "subtitle": "Mocha / Latte",
+        "description": "Soothing pastel palette with deep Mocha velvety dark mode and warm comforting Latte light mode.",
+        "dark": {
+            "name": "Mocha",
+            "window_bg": "#1e1e2e",
+            "window_fg": "#cdd6f4",
+            "view_bg": "#181825",
+            "view_fg": "#cdd6f4",
+            "headerbar_bg": "#1e1e2e",
+            "headerbar_solid_bg": "#1e1e2e",
+            "headerbar_fg": "#cdd6f4",
+            "sidebar_bg": "#181825",
+            "sidebar_fg": "#cdd6f4",
+            "card_bg": "#313244",
+            "card_fg": "#cdd6f4",
+            "dialog_bg": "#181825",
+            "dialog_fg": "#cdd6f4",
+            "popover_bg": "#313244",
+            "popover_fg": "#cdd6f4",
+            "accent_color": "#cba6f7",
+            "border_color": "rgba(203, 166, 247, 0.15)",
+            "placeholder_text_color": "rgba(205, 214, 244, 0.45)",
+            "dock_pill": "rgba(30, 30, 46, 0.45)",
+            "dock_border": "rgba(203, 166, 247, 0.35)",
+            "app_tint": "#1e1e2e",
+            "gnome_accent": "purple"
+        },
+        "light": {
+            "name": "Latte",
+            "window_bg": "#eff1f5",
+            "window_fg": "#4c4f69",
+            "view_bg": "#ffffff",
+            "view_fg": "#4c4f69",
+            "headerbar_bg": "#e6e9ef",
+            "headerbar_solid_bg": "#e6e9ef",
+            "headerbar_fg": "#4c4f69",
+            "sidebar_bg": "#e6e9ef",
+            "sidebar_fg": "#4c4f69",
+            "card_bg": "#ccd0da",
+            "card_fg": "#4c4f69",
+            "dialog_bg": "#e6e9ef",
+            "dialog_fg": "#4c4f69",
+            "popover_bg": "#eff1f5",
+            "popover_fg": "#4c4f69",
+            "accent_color": "#8839ef",
+            "border_color": "rgba(136, 57, 239, 0.15)",
+            "placeholder_text_color": "rgba(76, 79, 105, 0.45)",
+            "dock_pill": "rgba(239, 241, 245, 0.55)",
+            "dock_border": "rgba(136, 57, 239, 0.35)",
+            "app_tint": "#eff1f5",
+            "gnome_accent": "purple"
+        }
+    },
+    "deep-teal": {
+        "id": "deep-teal",
+        "name": "Deep Teal",
+        "subtitle": "Teal Abyss / Mint Ocean",
+        "description": "Rich oceanic atmosphere featuring deep midnight teal waters and vibrant crisp mint accents.",
+        "dark": {
+            "name": "Teal Abyss",
+            "window_bg": "#0b1d20",
+            "window_fg": "#e0f2f1",
+            "view_bg": "#0b1d20",
+            "view_fg": "#e0f2f1",
+            "headerbar_bg": "#0b1d20",
+            "headerbar_solid_bg": "#0b1d20",
+            "headerbar_fg": "#e0f2f1",
+            "sidebar_bg": "#07171a",
+            "sidebar_fg": "#e0f2f1",
+            "card_bg": "#11282c",
+            "card_fg": "#e0f2f1",
+            "dialog_bg": "#0b1d20",
+            "dialog_fg": "#e0f2f1",
+            "popover_bg": "#11282c",
+            "popover_fg": "#e0f2f1",
+            "accent_color": "#20b2aa",
+            "border_color": "rgba(32, 178, 170, 0.20)",
+            "placeholder_text_color": "rgba(224, 242, 241, 0.45)",
+            "dock_pill": "rgba(11, 29, 32, 0.50)",
+            "dock_border": "rgba(32, 178, 170, 0.35)",
+            "app_tint": "#0b1d20",
+            "gnome_accent": "teal"
+        },
+        "light": {
+            "name": "Mint Ocean",
+            "window_bg": "#e6f4f3",
+            "window_fg": "#0c2b2e",
+            "view_bg": "#ffffff",
+            "view_fg": "#0c2b2e",
+            "headerbar_bg": "#d9eded",
+            "headerbar_solid_bg": "#d9eded",
+            "headerbar_fg": "#0c2b2e",
+            "sidebar_bg": "#eaf4f3",
+            "sidebar_fg": "#0c2b2e",
+            "card_bg": "#ffffff",
+            "card_fg": "#0c2b2e",
+            "dialog_bg": "#d9eded",
+            "dialog_fg": "#0c2b2e",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#0c2b2e",
+            "accent_color": "#008b8b",
+            "border_color": "rgba(0, 139, 139, 0.15)",
+            "placeholder_text_color": "rgba(12, 43, 46, 0.45)",
+            "dock_pill": "rgba(230, 244, 243, 0.60)",
+            "dock_border": "rgba(0, 139, 139, 0.35)",
+            "app_tint": "#e6f4f3",
+            "gnome_accent": "teal"
+        }
+    },
+    "rose-pine": {
+        "id": "rose-pine",
+        "name": "Rosé Pine",
+        "subtitle": "Rosé Pine / Dawn",
+        "description": "All natural pine, faux fur, and delicate rose highlights inspired by moody Pacific Northwest tones.",
+        "dark": {
+            "name": "Rosé Pine Main",
+            "window_bg": "#191724",
+            "window_fg": "#e0def4",
+            "view_bg": "#1f1d2e",
+            "view_fg": "#e0def4",
+            "headerbar_bg": "#191724",
+            "headerbar_solid_bg": "#191724",
+            "headerbar_fg": "#e0def4",
+            "sidebar_bg": "#1f1d2e",
+            "sidebar_fg": "#e0def4",
+            "card_bg": "#26233a",
+            "card_fg": "#e0def4",
+            "dialog_bg": "#191724",
+            "dialog_fg": "#e0def4",
+            "popover_bg": "#26233a",
+            "popover_fg": "#e0def4",
+            "accent_color": "#eb6f92",
+            "border_color": "rgba(235, 111, 146, 0.16)",
+            "placeholder_text_color": "rgba(224, 222, 244, 0.45)",
+            "dock_pill": "rgba(25, 23, 36, 0.50)",
+            "dock_border": "rgba(235, 111, 146, 0.35)",
+            "app_tint": "#191724",
+            "gnome_accent": "purple"
+        },
+        "light": {
+            "name": "Rosé Pine Dawn",
+            "window_bg": "#faf4ed",
+            "window_fg": "#575279",
+            "view_bg": "#fffaf3",
+            "view_fg": "#575279",
+            "headerbar_bg": "#f2e9de",
+            "headerbar_solid_bg": "#f2e9de",
+            "headerbar_fg": "#575279",
+            "sidebar_bg": "#f2e9de",
+            "sidebar_fg": "#575279",
+            "card_bg": "#ebdfcf",
+            "card_fg": "#575279",
+            "dialog_bg": "#f2e9de",
+            "dialog_fg": "#575279",
+            "popover_bg": "#fffaf3",
+            "popover_fg": "#575279",
+            "accent_color": "#d7827e",
+            "border_color": "rgba(215, 130, 126, 0.18)",
+            "placeholder_text_color": "rgba(87, 82, 121, 0.45)",
+            "dock_pill": "rgba(250, 244, 237, 0.60)",
+            "dock_border": "rgba(215, 130, 126, 0.35)",
+            "app_tint": "#faf4ed",
+            "gnome_accent": "purple"
+        }
+    },
+    "tokyo-night": {
+        "id": "tokyo-night",
+        "name": "Tokyo Night",
+        "subtitle": "Storm / Day",
+        "description": "Clean, stylish dark and daylight palettes celebrating the neon twilight of downtown Tokyo.",
+        "dark": {
+            "name": "Tokyo Night Storm",
+            "window_bg": "#24283b",
+            "window_fg": "#c0caf5",
+            "view_bg": "#1a1b26",
+            "view_fg": "#c0caf5",
+            "headerbar_bg": "#1f2335",
+            "headerbar_solid_bg": "#1f2335",
+            "headerbar_fg": "#c0caf5",
+            "sidebar_bg": "#1a1b26",
+            "sidebar_fg": "#c0caf5",
+            "card_bg": "#292e42",
+            "card_fg": "#c0caf5",
+            "dialog_bg": "#1f2335",
+            "dialog_fg": "#c0caf5",
+            "popover_bg": "#292e42",
+            "popover_fg": "#c0caf5",
+            "accent_color": "#7aa2f7",
+            "border_color": "rgba(122, 162, 247, 0.16)",
+            "placeholder_text_color": "rgba(192, 202, 245, 0.45)",
+            "dock_pill": "rgba(31, 35, 53, 0.50)",
+            "dock_border": "rgba(122, 162, 247, 0.35)",
+            "app_tint": "#24283b",
+            "gnome_accent": "blue"
+        },
+        "light": {
+            "name": "Tokyo Night Day",
+            "window_bg": "#e1e2e7",
+            "window_fg": "#3760bf",
+            "view_bg": "#ffffff",
+            "view_fg": "#3760bf",
+            "headerbar_bg": "#d5d6db",
+            "headerbar_solid_bg": "#d5d6db",
+            "headerbar_fg": "#3760bf",
+            "sidebar_bg": "#d5d6db",
+            "sidebar_fg": "#3760bf",
+            "card_bg": "#cbccd1",
+            "card_fg": "#3760bf",
+            "dialog_bg": "#d5d6db",
+            "dialog_fg": "#3760bf",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#3760bf",
+            "accent_color": "#2e7de9",
+            "border_color": "rgba(46, 125, 233, 0.15)",
+            "placeholder_text_color": "rgba(55, 96, 191, 0.45)",
+            "dock_pill": "rgba(225, 226, 231, 0.60)",
+            "dock_border": "rgba(46, 125, 233, 0.35)",
+            "app_tint": "#e1e2e7",
+            "gnome_accent": "blue"
+        }
+    },
+    "nord": {
+        "id": "nord",
+        "name": "Nord",
+        "subtitle": "Polar Night / Snow Storm",
+        "description": "Arctic, north-bluish clean aesthetic with cold polar slate tones and frosted icy highlights.",
+        "dark": {
+            "name": "Polar Night",
+            "window_bg": "#2e3440",
+            "window_fg": "#eceff4",
+            "view_bg": "#242933",
+            "view_fg": "#eceff4",
+            "headerbar_bg": "#2e3440",
+            "headerbar_solid_bg": "#2e3440",
+            "headerbar_fg": "#eceff4",
+            "sidebar_bg": "#242933",
+            "sidebar_fg": "#eceff4",
+            "card_bg": "#3b4252",
+            "card_fg": "#eceff4",
+            "dialog_bg": "#2e3440",
+            "dialog_fg": "#eceff4",
+            "popover_bg": "#3b4252",
+            "popover_fg": "#eceff4",
+            "accent_color": "#88c0d0",
+            "border_color": "rgba(136, 192, 208, 0.16)",
+            "placeholder_text_color": "rgba(236, 239, 244, 0.45)",
+            "dock_pill": "rgba(46, 52, 64, 0.50)",
+            "dock_border": "rgba(136, 192, 208, 0.35)",
+            "app_tint": "#2e3440",
+            "gnome_accent": "teal"
+        },
+        "light": {
+            "name": "Snow Storm",
+            "window_bg": "#eceff4",
+            "window_fg": "#2e3440",
+            "view_bg": "#ffffff",
+            "view_fg": "#2e3440",
+            "headerbar_bg": "#e5e9f0",
+            "headerbar_solid_bg": "#e5e9f0",
+            "headerbar_fg": "#2e3440",
+            "sidebar_bg": "#e5e9f0",
+            "sidebar_fg": "#2e3440",
+            "card_bg": "#d8dee9",
+            "card_fg": "#2e3440",
+            "dialog_bg": "#e5e9f0",
+            "dialog_fg": "#2e3440",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#2e3440",
+            "accent_color": "#5e81ac",
+            "border_color": "rgba(94, 129, 172, 0.15)",
+            "placeholder_text_color": "rgba(46, 52, 64, 0.45)",
+            "dock_pill": "rgba(236, 239, 244, 0.60)",
+            "dock_border": "rgba(94, 129, 172, 0.35)",
+            "app_tint": "#eceff4",
+            "gnome_accent": "blue"
+        }
+    },
+    "dracula": {
+        "id": "dracula",
+        "name": "Dracula",
+        "subtitle": "Vamp / Alucard",
+        "description": "Legendary dark gothic aesthetic with vibrant neon purple, pink, and cyan highlights.",
+        "dark": {
+            "name": "Dracula Vamp",
+            "window_bg": "#282a36",
+            "window_fg": "#f8f8f2",
+            "view_bg": "#21222c",
+            "view_fg": "#f8f8f2",
+            "headerbar_bg": "#282a36",
+            "headerbar_solid_bg": "#282a36",
+            "headerbar_fg": "#f8f8f2",
+            "sidebar_bg": "#21222c",
+            "sidebar_fg": "#f8f8f2",
+            "card_bg": "#343746",
+            "card_fg": "#f8f8f2",
+            "dialog_bg": "#282a36",
+            "dialog_fg": "#f8f8f2",
+            "popover_bg": "#343746",
+            "popover_fg": "#f8f8f2",
+            "accent_color": "#bd93f9",
+            "border_color": "rgba(189, 147, 249, 0.18)",
+            "placeholder_text_color": "rgba(248, 248, 242, 0.45)",
+            "dock_pill": "rgba(40, 42, 54, 0.50)",
+            "dock_border": "rgba(189, 147, 249, 0.35)",
+            "app_tint": "#282a36",
+            "gnome_accent": "purple"
+        },
+        "light": {
+            "name": "Dracula Alucard",
+            "window_bg": "#f8f8f2",
+            "window_fg": "#282a36",
+            "view_bg": "#ffffff",
+            "view_fg": "#282a36",
+            "headerbar_bg": "#ecebe4",
+            "headerbar_solid_bg": "#ecebe4",
+            "headerbar_fg": "#282a36",
+            "sidebar_bg": "#ecebe4",
+            "sidebar_fg": "#282a36",
+            "card_bg": "#deded4",
+            "card_fg": "#282a36",
+            "dialog_bg": "#ecebe4",
+            "dialog_fg": "#282a36",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#282a36",
+            "accent_color": "#955ec7",
+            "border_color": "rgba(149, 94, 199, 0.15)",
+            "placeholder_text_color": "rgba(40, 42, 54, 0.45)",
+            "dock_pill": "rgba(248, 248, 242, 0.60)",
+            "dock_border": "rgba(149, 94, 199, 0.35)",
+            "app_tint": "#f8f8f2",
+            "gnome_accent": "purple"
+        }
+    },
+    "gruvbox": {
+        "id": "gruvbox",
+        "name": "Gruvbox",
+        "subtitle": "Gruvbox Dark / Light",
+        "description": "Retro groove color scheme with warm earthy undertones and unmistakable retro orange accents.",
+        "dark": {
+            "name": "Gruvbox Dark",
+            "window_bg": "#282828",
+            "window_fg": "#ebdbb2",
+            "view_bg": "#1d2021",
+            "view_fg": "#ebdbb2",
+            "headerbar_bg": "#282828",
+            "headerbar_solid_bg": "#282828",
+            "headerbar_fg": "#ebdbb2",
+            "sidebar_bg": "#1d2021",
+            "sidebar_fg": "#ebdbb2",
+            "card_bg": "#3c3836",
+            "card_fg": "#ebdbb2",
+            "dialog_bg": "#282828",
+            "dialog_fg": "#ebdbb2",
+            "popover_bg": "#3c3836",
+            "popover_fg": "#ebdbb2",
+            "accent_color": "#fe8019",
+            "border_color": "rgba(254, 128, 25, 0.18)",
+            "placeholder_text_color": "rgba(235, 219, 178, 0.45)",
+            "dock_pill": "rgba(40, 40, 40, 0.50)",
+            "dock_border": "rgba(254, 128, 25, 0.35)",
+            "app_tint": "#282828",
+            "gnome_accent": "orange"
+        },
+        "light": {
+            "name": "Gruvbox Light",
+            "window_bg": "#fbf1c7",
+            "window_fg": "#3c3836",
+            "view_bg": "#ffffff",
+            "view_fg": "#3c3836",
+            "headerbar_bg": "#f2e5bc",
+            "headerbar_solid_bg": "#f2e5bc",
+            "headerbar_fg": "#3c3836",
+            "sidebar_bg": "#f2e5bc",
+            "sidebar_fg": "#3c3836",
+            "card_bg": "#ebdbb2",
+            "card_fg": "#3c3836",
+            "dialog_bg": "#f2e5bc",
+            "dialog_fg": "#3c3836",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#3c3836",
+            "accent_color": "#af3a03",
+            "border_color": "rgba(175, 58, 3, 0.18)",
+            "placeholder_text_color": "rgba(60, 56, 54, 0.45)",
+            "dock_pill": "rgba(251, 241, 199, 0.60)",
+            "dock_border": "rgba(175, 58, 3, 0.35)",
+            "app_tint": "#fbf1c7",
+            "gnome_accent": "orange"
+        }
+    },
+    "cyberpunk": {
+        "id": "cyberpunk",
+        "name": "Cyberpunk",
+        "subtitle": "Neon / Sunrise",
+        "description": "High-octane synthwave and neon cyberpunk aesthetic with blazing magenta and cyan glows.",
+        "dark": {
+            "name": "Cyberpunk Neon",
+            "window_bg": "#120e24",
+            "window_fg": "#00f0ff",
+            "view_bg": "#090614",
+            "view_fg": "#00f0ff",
+            "headerbar_bg": "#120e24",
+            "headerbar_solid_bg": "#120e24",
+            "headerbar_fg": "#00f0ff",
+            "sidebar_bg": "#090614",
+            "sidebar_fg": "#00f0ff",
+            "card_bg": "#20183b",
+            "card_fg": "#00f0ff",
+            "dialog_bg": "#120e24",
+            "dialog_fg": "#00f0ff",
+            "popover_bg": "#20183b",
+            "popover_fg": "#00f0ff",
+            "accent_color": "#ff0055",
+            "border_color": "rgba(0, 240, 255, 0.22)",
+            "placeholder_text_color": "rgba(0, 240, 255, 0.45)",
+            "dock_pill": "rgba(18, 14, 36, 0.55)",
+            "dock_border": "rgba(0, 240, 255, 0.40)",
+            "app_tint": "#120e24",
+            "gnome_accent": "red"
+        },
+        "light": {
+            "name": "Cyberpunk Sunrise",
+            "window_bg": "#fbf0f8",
+            "window_fg": "#2b1029",
+            "view_bg": "#ffffff",
+            "view_fg": "#2b1029",
+            "headerbar_bg": "#f4dced",
+            "headerbar_solid_bg": "#f4dced",
+            "headerbar_fg": "#2b1029",
+            "sidebar_bg": "#f4dced",
+            "sidebar_fg": "#2b1029",
+            "card_bg": "#eac3df",
+            "card_fg": "#2b1029",
+            "dialog_bg": "#f4dced",
+            "dialog_fg": "#2b1029",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#2b1029",
+            "accent_color": "#d6006e",
+            "border_color": "rgba(214, 0, 110, 0.18)",
+            "placeholder_text_color": "rgba(43, 16, 41, 0.45)",
+            "dock_pill": "rgba(251, 240, 248, 0.60)",
+            "dock_border": "rgba(214, 0, 110, 0.35)",
+            "app_tint": "#fbf0f8",
+            "gnome_accent": "red"
+        }
+    },
+    "monokai": {
+        "id": "monokai",
+        "name": "Monokai Pro",
+        "subtitle": "Dark / Light",
+        "description": "Refined pro developer color scheme with warm charcoal foundations and vibrant syntax accents.",
+        "dark": {
+            "name": "Monokai Pro Dark",
+            "window_bg": "#2d2a2e",
+            "window_fg": "#fcfcfa",
+            "view_bg": "#221f22",
+            "view_fg": "#fcfcfa",
+            "headerbar_bg": "#2d2a2e",
+            "headerbar_solid_bg": "#2d2a2e",
+            "headerbar_fg": "#fcfcfa",
+            "sidebar_bg": "#221f22",
+            "sidebar_fg": "#fcfcfa",
+            "card_bg": "#3a383d",
+            "card_fg": "#fcfcfa",
+            "dialog_bg": "#2d2a2e",
+            "dialog_fg": "#fcfcfa",
+            "popover_bg": "#3a383d",
+            "popover_fg": "#fcfcfa",
+            "accent_color": "#ffd866",
+            "border_color": "rgba(255, 216, 102, 0.18)",
+            "placeholder_text_color": "rgba(252, 252, 250, 0.45)",
+            "dock_pill": "rgba(45, 42, 46, 0.50)",
+            "dock_border": "rgba(255, 216, 102, 0.35)",
+            "app_tint": "#2d2a2e",
+            "gnome_accent": "yellow"
+        },
+        "light": {
+            "name": "Monokai Pro Light",
+            "window_bg": "#faf4f0",
+            "window_fg": "#2d2a2e",
+            "view_bg": "#ffffff",
+            "view_fg": "#2d2a2e",
+            "headerbar_bg": "#f0eae5",
+            "headerbar_solid_bg": "#f0eae5",
+            "headerbar_fg": "#2d2a2e",
+            "sidebar_bg": "#f0eae5",
+            "sidebar_fg": "#2d2a2e",
+            "card_bg": "#e4dbd4",
+            "card_fg": "#2d2a2e",
+            "dialog_bg": "#f0eae5",
+            "dialog_fg": "#2d2a2e",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#2d2a2e",
+            "accent_color": "#e05574",
+            "border_color": "rgba(224, 85, 116, 0.18)",
+            "placeholder_text_color": "rgba(45, 42, 46, 0.45)",
+            "dock_pill": "rgba(250, 244, 240, 0.60)",
+            "dock_border": "rgba(224, 85, 116, 0.35)",
+            "app_tint": "#faf4f0",
+            "gnome_accent": "red"
+        }
+    },
+    "everforest": {
+        "id": "everforest",
+        "name": "Everforest",
+        "subtitle": "Dark / Light",
+        "description": "Comfortable, nature-inspired green palette designed to be easy on the eyes and organic.",
+        "dark": {
+            "name": "Everforest Dark",
+            "window_bg": "#2d353b",
+            "window_fg": "#d3c6aa",
+            "view_bg": "#232a2e",
+            "view_fg": "#d3c6aa",
+            "headerbar_bg": "#2d353b",
+            "headerbar_solid_bg": "#2d353b",
+            "headerbar_fg": "#d3c6aa",
+            "sidebar_bg": "#232a2e",
+            "sidebar_fg": "#d3c6aa",
+            "card_bg": "#343f44",
+            "card_fg": "#d3c6aa",
+            "dialog_bg": "#2d353b",
+            "dialog_fg": "#d3c6aa",
+            "popover_bg": "#343f44",
+            "popover_fg": "#d3c6aa",
+            "accent_color": "#a7c080",
+            "border_color": "rgba(167, 192, 128, 0.18)",
+            "placeholder_text_color": "rgba(211, 198, 170, 0.45)",
+            "dock_pill": "rgba(45, 53, 59, 0.50)",
+            "dock_border": "rgba(167, 192, 128, 0.35)",
+            "app_tint": "#2d353b",
+            "gnome_accent": "green"
+        },
+        "light": {
+            "name": "Everforest Light",
+            "window_bg": "#fdf6e3",
+            "window_fg": "#5c6a72",
+            "view_bg": "#ffffff",
+            "view_fg": "#5c6a72",
+            "headerbar_bg": "#f4ede0",
+            "headerbar_solid_bg": "#f4ede0",
+            "headerbar_fg": "#5c6a72",
+            "sidebar_bg": "#f4ede0",
+            "sidebar_fg": "#5c6a72",
+            "card_bg": "#eae1ce",
+            "card_fg": "#5c6a72",
+            "dialog_bg": "#f4ede0",
+            "dialog_fg": "#5c6a72",
+            "popover_bg": "#ffffff",
+            "popover_fg": "#5c6a72",
+            "accent_color": "#8da101",
+            "border_color": "rgba(141, 161, 1, 0.18)",
+            "placeholder_text_color": "rgba(92, 106, 114, 0.45)",
+            "dock_pill": "rgba(253, 246, 227, 0.60)",
+            "dock_border": "rgba(141, 161, 1, 0.35)",
+            "app_tint": "#fdf6e3",
+            "gnome_accent": "green"
+        }
+    }
+}
+
+def get_flavor_palette(flavor_key, is_dark, is_glassy=False, is_amoled=False):
+    if not flavor_key or flavor_key not in THEME_FLAVORS:
+        flavor_key = "default"
+
+    flv = THEME_FLAVORS[flavor_key]
+    mode_dict = flv["dark"] if is_dark else flv["light"]
+
+    window_bg = mode_dict["window_bg"]
+    view_bg = mode_dict["view_bg"]
+    headerbar_bg = mode_dict["headerbar_bg"]
+    headerbar_solid_bg = mode_dict.get("headerbar_solid_bg", headerbar_bg)
+    headerbar_fg = mode_dict.get("headerbar_fg", mode_dict["window_fg"])
+    sidebar_bg = mode_dict.get("sidebar_bg", window_bg)
+    sidebar_fg = mode_dict.get("sidebar_fg", mode_dict["window_fg"])
+    card_bg = mode_dict["card_bg"]
+    card_fg = mode_dict.get("card_fg", mode_dict["window_fg"])
+    dialog_bg = mode_dict.get("dialog_bg", window_bg)
+    dialog_fg = mode_dict.get("dialog_fg", mode_dict["window_fg"])
+    popover_bg = mode_dict.get("popover_bg", card_bg)
+    popover_fg = mode_dict.get("popover_fg", mode_dict["window_fg"])
+    border_color = mode_dict.get("border_color", "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.10)")
+    placeholder_text_color = mode_dict.get("placeholder_text_color", "rgba(255, 255, 255, 0.45)" if is_dark else "rgba(0, 0, 0, 0.45)")
+    accent_color = mode_dict.get("accent_color", "#007aff")
+    window_fg = mode_dict["window_fg"]
+    view_fg = mode_dict["view_fg"]
+
+    if is_amoled and is_dark and flavor_key == "default":
+        window_bg = "#000000"
+        view_bg = "#000000"
+        headerbar_bg = "#0a0a0c"
+        headerbar_solid_bg = "#0a0a0c"
+        sidebar_bg = "#0a0a0c"
+        card_bg = "#121214"
+        dialog_bg = "#121214"
+        popover_bg = "#141416"
+
+    if is_glassy:
+        window_bg = hex_to_rgba(window_bg, 0.75)
+        view_bg = hex_to_rgba(view_bg, 0.68)
+        headerbar_bg = hex_to_rgba(headerbar_bg, 0.75)
+        sidebar_bg = hex_to_rgba(sidebar_bg, 0.75)
+        card_bg = hex_to_rgba(card_bg, 0.72)
+        dialog_bg = hex_to_rgba(dialog_bg, 0.82)
+        popover_bg = hex_to_rgba(popover_bg, 0.82)
+
+    mode_label = ("AMOLED " if is_amoled and is_dark else "") + ("Glass " if is_glassy else "Solid ") + ("Dark" if is_dark else "Light")
+
+    return f"""/* ── Mak Flavor Palette: {flv['name']} ({mode_label}) ────────────────────────────── */
+@define-color window_bg_color {window_bg};
+@define-color window_fg_color {window_fg};
+@define-color view_bg_color {view_bg};
+@define-color view_fg_color {view_fg};
+@define-color headerbar_bg_color {headerbar_bg};
+@define-color headerbar_solid_bg {headerbar_solid_bg};
+@define-color headerbar_fg_color {headerbar_fg};
+@define-color headerbar_border_color {border_color};
+@define-color sidebar_bg_color {sidebar_bg};
+@define-color sidebar_fg_color {sidebar_fg};
+@define-color secondary_sidebar_bg_color {sidebar_bg};
+@define-color card_bg_color {card_bg};
+@define-color card_fg_color {card_fg};
+@define-color dialog_bg_color {dialog_bg};
+@define-color dialog_fg_color {dialog_fg};
+@define-color popover_bg_color {popover_bg};
+@define-color popover_fg_color {popover_fg};
+@define-color placeholder_text_color {placeholder_text_color};
+@define-color theme_bg_color {window_bg};
+@define-color theme_fg_color {window_fg};
+@define-color theme_base_color {view_bg};
+@define-color theme_text_color {view_fg};
+@define-color theme_selected_bg_color @accent_color;
+@define-color theme_selected_fg_color #ffffff;
+@define-color theme_unfocused_bg_color {window_bg};
+@define-color theme_unfocused_fg_color {window_fg};
+@define-color theme_unfocused_base_color {view_bg};
+@define-color theme_unfocused_text_color {view_fg};
+@define-color accent_bg_color {accent_color};
+@define-color accent_fg_color #ffffff;
+@define-color accent_color {accent_color};
+@define-color bg_color {window_bg};
+@define-color fg_color {window_fg};
+@define-color base_color {view_bg};
+@define-color text_color {view_fg};
+@define-color selected_bg_color @accent_color;
+@define-color selected_fg_color #ffffff;
+@define-color content_view_bg {view_bg};
+@define-color text_view_bg {view_bg};
+"""
+
 GRAPHITE_PALETTE_OVERRIDE = """
 /* ── Mak macOS Sonoma Graphite Frosted Palette ────────────────────────────── */
 @define-color window_bg_color #242426;
@@ -180,6 +906,9 @@ GRAPHITE_PALETTE_OVERRIDE = """
 @define-color theme_unfocused_fg_color #f5f5f7;
 @define-color theme_unfocused_base_color #1c1c1e;
 @define-color theme_unfocused_text_color #f5f5f7;
+@define-color accent_bg_color #007aff;
+@define-color accent_fg_color #ffffff;
+@define-color accent_color #007aff;
 """
 
 GRAPHITE_GLASSY_PALETTE_OVERRIDE = """
@@ -632,6 +1361,7 @@ window.background.brave windowcontrols button:backdrop {{
     box-shadow: none;
     border-radius: 9999px;
     padding: 0;
+    margin: 0 {margin}px;
     margin-left: {margin}px;
     margin-right: {margin}px;
     margin-top: 0;
@@ -4760,6 +5490,10 @@ image.well {{
 
 
 def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True, sync_repo=False):
+    # Safety guard: NEVER overwrite or truncate master theme assets in ~/.themes or repo themes
+    if (os.path.abspath(dst_css_path) == os.path.abspath(src_css_path) or "/themes/" in dst_css_path or "/.themes/" in dst_css_path) and not os.path.exists(src_css_path + ".base"):
+        return
+
     base_path = src_css_path + ".base"
     read_path = base_path if os.path.exists(base_path) else src_css_path
     try:
@@ -4775,7 +5509,10 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
         "/* === Mak Suite Refinements",
         "/* ── Mak Clean macOS Traffic Light Button Controls",
         "/* ── Mak macOS Window Corner",
-        "/* ── Mak Dynamic Customizations"
+        "/* ── Mak Dynamic Customizations",
+        "/* ── Mak Flavor Palette:",
+        "/* ── Mak Flavor Clean Surface Mapping",
+        "/* ── Mak Flavor Window & Surface Palette Mapping"
     ]
     base_end = len(content)
     for om in override_markers:
@@ -4784,6 +5521,244 @@ def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size
             base_end = pos
 
     content = content[:base_end].strip()
+
+    # Filter out existing @define-color definitions that our palette overrides
+    palette_keys = [
+        "window_bg_color", "window_fg_color", "view_bg_color", "view_fg_color",
+        "headerbar_bg_color", "headerbar_solid_bg", "headerbar_fg_color", "headerbar_border_color",
+        "sidebar_bg_color", "sidebar_fg_color", "secondary_sidebar_bg_color",
+        "card_bg_color", "card_fg_color", "dialog_bg_color", "dialog_fg_color",
+        "popover_bg_color", "popover_fg_color", "placeholder_text_color",
+        "theme_bg_color", "theme_fg_color", "theme_base_color", "theme_text_color",
+        "theme_selected_bg_color", "theme_selected_fg_color",
+        "theme_unfocused_bg_color", "theme_unfocused_fg_color",
+        "theme_unfocused_base_color", "theme_unfocused_text_color",
+        "accent_bg_color", "accent_fg_color", "accent_color",
+        "bg_color", "fg_color", "base_color", "text_color",
+        "selected_bg_color", "selected_fg_color", "content_view_bg", "text_view_bg"
+    ]
+    lines = content.splitlines()
+    imports = []
+    rest_lines = []
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("@import ") or "/* Kiwi (is not Apple)" in line:
+            imports.append(line)
+            continue
+        if any(stripped.startswith(f"@define-color {k} ") or stripped.startswith(f"@define-color {k};") for k in palette_keys):
+            continue
+        rest_lines.append(line)
+
+    clean_body = "\n".join(rest_lines).strip()
+    import_block = "\n".join(imports).strip()
+
+    is_gtk4 = "gtk-4.0" in dst_css_path or "gtk-3.0" not in dst_css_path
+    kiwi_ext_path = os.path.expanduser("~/.local/share/gnome-shell/extensions/kiwi@kemma")
+    kiwi_block = ""
+    if os.path.exists(kiwi_ext_path):
+        if is_gtk4:
+            kiwi_block = """/* Kiwi (is not Apple) - managed imports: begin */
+@import url("file:///home/parv/.local/share/gnome-shell/extensions/kiwi@kemma/css/titlebuttons4.css");
+@import url("file:///home/parv/.local/share/gnome-shell/extensions/kiwi@kemma/css/titlebuttons-size-small4.css");
+@import url("file:///home/parv/.local/share/gnome-shell/extensions/kiwi@kemma/css/fixes4.css");
+/* Kiwi (is not Apple) - managed imports: end */"""
+        else:
+            kiwi_block = """/* Kiwi (is not Apple) - managed imports: begin */
+@import url("file:///home/parv/.local/share/gnome-shell/extensions/kiwi@kemma/css/titlebuttons3.css");
+@import url("file:///home/parv/.local/share/gnome-shell/extensions/kiwi@kemma/css/titlebuttons-size-small3.css");
+@import url("file:///home/parv/.local/share/gnome-shell/extensions/kiwi@kemma/css/fixes3.css");
+/* Kiwi (is not Apple) - managed imports: end */"""
+
+    parts = []
+    if kiwi_block:
+        parts.append(kiwi_block)
+    elif import_block:
+        parts.append(import_block)
+
+    if palette:
+        parts.append(palette.strip())
+
+    if is_gtk4 and clean_body:
+        parts.append(clean_body)
+
+    if is_glassy:
+        parts.append(GLASSY_CONTAINER_RULES.strip())
+
+    safe_surface_rules = """
+/* ── Mak Flavor Clean Surface Mapping (Zero-Impact on Buttons & Controls) ── */
+
+/* Universal Headerbars & Titlebars (GTK3, GTK4, Libadwaita, libdecor) */
+headerbar,
+headerbar:backdrop,
+headerbar.titlebar,
+headerbar.titlebar:backdrop,
+.titlebar,
+.titlebar:backdrop,
+window headerbar,
+window headerbar:backdrop,
+window.csd headerbar,
+window.csd headerbar:backdrop,
+window.background.csd headerbar,
+window.background.csd headerbar:backdrop,
+toolbarview > headerbar,
+toolbarview > headerbar:backdrop,
+navigation-split-view headerbar,
+navigation-split-view headerbar:backdrop,
+window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-left,
+window.background.csd > dialog-host > widget > widget > box > leaflet > headerbar.titlebar.tweak-titlebar-right,
+window.background.csd > contents > leaflet.unfolded > box > headerbar,
+window.background.csd > contents > leaflet.unfolded > box > stack > widget > box > widget > headerbar,
+window.background.csd > contents > leaflet.unfolded > box > stack > widget > overlay > leaflet.folded > box > headerbar,
+window.background.csd > widget > leaflet.unfolded > box > headerbar,
+window.background.csd > widget > leaflet.unfolded > box > stack > widget > box > widget > headerbar,
+window.background.csd > widget > leaflet.unfolded > box > stack > widget > overlay > leaflet.folded > box > headerbar,
+.nautilus-window headerbar,
+.nautilus-window headerbar:backdrop,
+.nautilus-window .content-pane headerbar,
+.nautilus-window .content-pane headerbar:backdrop,
+.nautilus-window .sidebar-pane headerbar,
+.nautilus-window .sidebar-pane headerbar:backdrop,
+.nautilus-window toolbarview > headerbar,
+.nautilus-window toolbarview > headerbar:backdrop {
+  background-color: @headerbar_bg_color;
+  color: @headerbar_fg_color;
+  border-color: @headerbar_border_color;
+}
+
+/* Headerbar searchbars & revealer boxes */
+window.background.csd > dialog-host > widget > widget > box > leaflet > box > searchbar > revealer > box,
+window.background.csd > contents > leaflet.unfolded > box > searchbar > revealer > box,
+window.background.csd > widget > leaflet.unfolded > box > searchbar > revealer > box {
+  background-color: @headerbar_bg_color;
+  color: @headerbar_fg_color;
+}
+
+/* Nautilus & File Choosers Content & Sidebar Panes */
+.nautilus-window,
+.nautilus-window:backdrop,
+#NautilusFileChooser,
+#NautilusFileChooser:backdrop,
+.nautilus-file-chooser,
+.nautilus-file-chooser:backdrop,
+window.nautilus-window,
+window.nautilus-window:backdrop {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+.nautilus-window .content-pane,
+.nautilus-window .content-pane:backdrop,
+.nautilus-window .content-pane > toolbarview,
+.nautilus-window .content-pane scrolledwindow,
+.nautilus-window .content-pane scrolledwindow.view,
+.nautilus-window .content-pane .view,
+.nautilus-window .nautilus-list-view,
+.nautilus-window .nautilus-grid-view,
+.nautilus-window .nautilus-network-view,
+.nautilus-window columnview,
+.nautilus-window columnview.view,
+.nautilus-window listview,
+.nautilus-window gridview,
+#NautilusFileChooser .content-pane,
+#NautilusFileChooser .content-pane:backdrop,
+.nautilus-file-chooser .content-pane,
+.nautilus-file-chooser .content-pane:backdrop {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+.nautilus-window .sidebar-pane,
+.nautilus-window .sidebar-pane:backdrop,
+#NautilusFileChooser .sidebar-pane,
+#NautilusFileChooser .sidebar-pane:backdrop,
+.nautilus-file-chooser .sidebar-pane,
+.nautilus-file-chooser .sidebar-pane:backdrop {
+  background-color: @sidebar_bg_color;
+  color: @sidebar_fg_color;
+  box-shadow: none;
+}
+
+.nautilus-window .view,
+.nautilus-window .view:backdrop {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+/* Nautilus columnview header buttons & pathbar */
+.nautilus-window columnview.view > header > button,
+.nautilus-window columnview.view > header > button:backdrop {
+  background-color: transparent;
+  color: @headerbar_fg_color;
+  border-color: @headerbar_border_color;
+}
+
+.nautilus-window columnview.view > header > button:hover,
+.nautilus-window columnview.view > header > button:active {
+  background-color: alpha(currentColor, 0.08);
+  color: @headerbar_fg_color;
+}
+
+.nautilus-window .nautilus-pathbar {
+  background-color: alpha(currentColor, 0.08);
+  color: @headerbar_fg_color;
+}
+
+/* Sidebar selected row */
+.navigation-sidebar > row:selected,
+.navigation-sidebar:not(.view) > row:selected,
+placessidebar .navigation-sidebar > row:selected,
+.nautilus-window .sidebar-pane placessidebar .navigation-sidebar:not(.view) > row:selected {
+  color: @accent_color;
+  background-color: alpha(@accent_color, 0.18);
+}
+
+/* Separators */
+.nautilus-window separator,
+navigation-split-view > separator,
+split-view > separator {
+  background-color: @headerbar_border_color;
+}
+
+/* Sidebars & Navigation Lists */
+window.background.csd > dialog-host > widget > widget > box > leaflet list.navigation-sidebar,
+window.background.csd > contents > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > list.navigation-sidebar,
+window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > list.navigation-sidebar,
+window.background.csd > contents > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > box > list.navigation-sidebar,
+window.background.csd > widget > leaflet.unfolded > box > scrolledwindow > viewport > widget > stack > box > list.navigation-sidebar,
+.nautilus-window .navigation-sidebar,
+.nautilus-window placessidebar,
+.navigation-sidebar,
+.navigation-sidebar:backdrop,
+placessidebar,
+placessidebar:backdrop {
+  background-color: @sidebar_bg_color;
+  color: @sidebar_fg_color;
+}
+
+/* General Window Surfaces */
+window.background,
+window.background:backdrop,
+window.background.csd,
+window.background.csd:backdrop {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+
+window.background.csd > contents > leaflet.unfolded > box > stack.background,
+window.background.csd > widget > leaflet.unfolded > box > stack.background,
+window.background > contents > toastoverlay > leaflet > box,
+window.background > widget > toastoverlay > leaflet > box {
+  background-color: @view_bg_color;
+  color: @view_fg_color;
+}
+
+window.background > contents > toastoverlay > leaflet > box + separator + box,
+window.background > widget > toastoverlay > leaflet > box + separator + box {
+  background-color: @window_bg_color;
+  color: @window_fg_color;
+}
+"""
+    parts.append(safe_surface_rules.strip())
 
     custom_rules = []
     # 1. Chromium headerbar accent
@@ -4821,26 +5796,13 @@ windowcontrols button.minimize {{
 """)
 
     if custom_rules:
-        content = content + "\n\n/* ── Mak Dynamic Customizations ─────────────────────────────────── */\n" + "\n".join(custom_rules) + "\n"
+        parts.append("/* ── Mak Dynamic Customizations ─────────────────────────────────── */\n" + "\n".join(custom_rules))
+
+    final_content = "\n\n".join(parts) + "\n"
 
     os.makedirs(os.path.dirname(dst_css_path), exist_ok=True)
     with open(dst_css_path, "w", encoding="utf-8") as f:
-        f.write(content)
-
-    if sync_repo:
-        try:
-            repo_themes_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "themes")
-            parts = os.path.normpath(src_css_path).split(os.sep)
-            if len(parts) >= 3:
-                t_name = parts[-3]
-                gtk_ver = parts[-2]
-                f_name = parts[-1]
-                repo_file = os.path.join(repo_themes_dir, t_name, gtk_ver, f_name)
-                if os.path.exists(os.path.dirname(repo_file)):
-                    with open(repo_file, "w", encoding="utf-8") as f:
-                        f.write(content)
-        except Exception:
-            pass
+        f.write(final_content)
 
 
 def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_accent=None):
@@ -4875,16 +5837,18 @@ def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_acce
     source_dir = os.path.join(THEMES_DIR, theme_name)
     is_glassy = theme_info.get("is_glassy", False)
     is_dark = theme_info.get("is_dark", True)
+    is_amoled = "amoled" in theme_key
 
-    palette_map = {
-        "dark": GRAPHITE_PALETTE_OVERRIDE,
-        "dark-glassy": GRAPHITE_GLASSY_PALETTE_OVERRIDE,
-        "amoled": AMOLED_PALETTE_OVERRIDE,
-        "amoled-glassy": AMOLED_GLASSY_PALETTE_OVERRIDE,
-        "light": LIGHT_PALETTE_OVERRIDE,
-        "light-glassy": LIGHT_GLASSY_PALETTE_OVERRIDE,
-    }
-    palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
+    try:
+        res_flv = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "theme-flavor"],
+                                 capture_output=True, text=True)
+        flavor_key = res_flv.stdout.strip().strip("'\"")
+        if not flavor_key or flavor_key not in THEME_FLAVORS:
+            flavor_key = "default"
+    except Exception:
+        flavor_key = "default"
+
+    palette_override = get_flavor_palette(flavor_key, is_dark, is_glassy=is_glassy, is_amoled=is_amoled)
 
     # GTK 4
     src_gtk4 = os.path.join(source_dir, "gtk-4.0")
@@ -4974,7 +5938,7 @@ def get_current_theme():
     except Exception:
         return "dark"
 
-def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False, css_path=None):
+def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False, css_path=None, flavor_key=None):
     if css_path is None:
         css_path = os.path.join(THEMES_DIR, theme_name, "gnome-shell", "gnome-shell.css")
     if not os.path.exists(css_path):
@@ -4992,19 +5956,38 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False, css_path=N
         notif_r = TokenManager.get("geometry", "notifications", "corner_radius", default=16)
         btn_r = TokenManager.get("geometry", "buttons", "corner_radius", default=5)
 
+        if flavor_key is None:
+            try:
+                res_flv = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "theme-flavor"], capture_output=True, text=True)
+                flavor_key = res_flv.stdout.strip().strip("'\"")
+                if not flavor_key or flavor_key not in THEME_FLAVORS:
+                    flavor_key = "default"
+            except Exception:
+                flavor_key = "default"
+
+        flv = THEME_FLAVORS.get(flavor_key, THEME_FLAVORS["default"])
+        mode_dict = flv["dark"] if is_dark else flv["light"]
+
         if not is_dark:
-            bg_color = "rgba(255, 255, 255, 0.82)"
-            banner_bg = "rgba(255, 255, 255, 0.86)"
-            border_color = "rgba(0, 0, 0, 0.08)"
-            fg_color = "#1d1d1f"
-            hover_bg = "rgba(0, 0, 0, 0.08)"
+            bg_color = hex_to_rgba(mode_dict.get("window_bg", "#ececf0"), 0.82)
+            banner_bg = hex_to_rgba(mode_dict.get("card_bg", "#ffffff"), 0.86)
+            border_color = mode_dict.get("border_color", "rgba(0, 0, 0, 0.08)")
+            fg_color = mode_dict.get("window_fg", "#1d1d1f")
+            hover_bg = hex_to_rgba(mode_dict.get("accent_color", "#000000"), 0.10)
+            selected_acc = mode_dict.get("accent_color", "#007aff")
             shadow = "0 12px 32px rgba(0, 0, 0, 0.16)"
         else:
-            bg_color = "rgba(22, 22, 26, 0.85)" if is_amoled else "rgba(36, 36, 40, 0.82)"
-            banner_bg = "rgba(22, 22, 26, 0.88)" if is_amoled else "rgba(36, 36, 40, 0.86)"
-            border_color = "rgba(255, 255, 255, 0.08)"
-            fg_color = "#f5f5f7"
-            hover_bg = "rgba(255, 255, 255, 0.12)"
+            raw_bg = mode_dict.get("window_bg", "#242426")
+            raw_card = mode_dict.get("card_bg", "#2c2c2e")
+            if is_amoled:
+                raw_bg = deepen_hex(raw_bg, 0.3)
+                raw_card = deepen_hex(raw_card, 0.5)
+            bg_color = hex_to_rgba(raw_bg, 0.85 if is_amoled else 0.82)
+            banner_bg = hex_to_rgba(raw_card, 0.88 if is_amoled else 0.86)
+            border_color = mode_dict.get("border_color", "rgba(255, 255, 255, 0.08)")
+            fg_color = mode_dict.get("window_fg", "#f5f5f7")
+            hover_bg = hex_to_rgba(mode_dict.get("accent_color", "#ffffff"), 0.14)
+            selected_acc = mode_dict.get("accent_color", "#007aff")
             shadow = "0 12px 32px rgba(0, 0, 0, 0.28)"
 
         block = f"""\n\n{marker}
@@ -5036,7 +6019,7 @@ def inject_shell_theme_contrast(theme_name, is_dark, is_amoled=False, css_path=N
 }}
 
 .popup-menu-item:selected {{
-    background-color: #007aff;
+    background-color: {selected_acc};
     color: #ffffff;
 }}
 
@@ -5149,9 +6132,18 @@ def apply_global_theme(theme_key):
     except Exception as e:
         log.append(f"Error setting GNOME interface: {e}")
 
+    try:
+        res_flv = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "theme-flavor"],
+                                 capture_output=True, text=True)
+        flavor_key = res_flv.stdout.strip().strip("'\"")
+        if not flavor_key or flavor_key not in THEME_FLAVORS:
+            flavor_key = "default"
+    except Exception:
+        flavor_key = "default"
+
     # 2. GNOME Shell Theme
     try:
-        inject_shell_theme_contrast(theme_name, is_dark=is_dark, is_amoled=is_amoled)
+        inject_shell_theme_contrast(theme_name, is_dark=is_dark, is_amoled=is_amoled, flavor_key=flavor_key)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.user-theme", "name", theme_name], check=True)
         log.append(f"Set GNOME Shell theme to '{theme_name}' and injected contrast styling.")
     except Exception as e:
@@ -5161,15 +6153,7 @@ def apply_global_theme(theme_key):
     try:
         os.makedirs(GTK4_CONFIG, exist_ok=True)
         src_gtk4 = os.path.join(source_dir, "gtk-4.0")
-        palette_map = {
-            "dark": GRAPHITE_PALETTE_OVERRIDE,
-            "dark-glassy": GRAPHITE_GLASSY_PALETTE_OVERRIDE,
-            "amoled": AMOLED_PALETTE_OVERRIDE,
-            "amoled-glassy": AMOLED_GLASSY_PALETTE_OVERRIDE,
-            "light": LIGHT_PALETTE_OVERRIDE,
-            "light-glassy": LIGHT_GLASSY_PALETTE_OVERRIDE,
-        }
-        palette_override = palette_map.get(theme_key, GRAPHITE_PALETTE_OVERRIDE)
+        palette_override = get_flavor_palette(flavor_key, is_dark, is_glassy=theme_info["is_glassy"], is_amoled=is_amoled)
 
         is_glassy = theme_info["is_glassy"]
         if is_glassy:
@@ -5349,13 +6333,17 @@ def apply_global_theme(theme_key):
 
     # 7. Aqua Dock Pro and Mak Dock Colors
     try:
-        dock_pill = theme_info.get("dock_pill_color", "rgba(42, 42, 50, 0.40)")
-        dock_border = theme_info.get("dock_border_color", "rgba(255, 255, 255, 0.28)")
+        flv_dict = THEME_FLAVORS.get(flavor_key, THEME_FLAVORS["default"])
+        flv_mode = flv_dict["dark"] if is_dark else flv_dict["light"]
+        dock_pill = flv_mode.get("dock_pill", theme_info.get("dock_pill_color", "rgba(42, 42, 50, 0.40)"))
+        dock_border = flv_mode.get("dock_border", theme_info.get("dock_border_color", "rgba(255, 255, 255, 0.28)"))
+        app_tint = flv_mode.get("app_tint", "#242426" if is_dark else "#ececf0")
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.aqua-dock-pro", "pill-color", dock_pill], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.aqua-dock-pro", "border-color", dock_border], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "pill-color", dock_pill], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "border-color", dock_border], check=False)
-        log.append(f"Updated dock pill color to '{dock_pill}' and border to '{dock_border}'.")
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "app-tint-color", app_tint], check=False)
+        log.append(f"Updated dock pill color to '{dock_pill}', border to '{dock_border}', and app tint to '{app_tint}'.")
     except Exception as e:
         log.append(f"Error updating dock colors: {e}")
 
@@ -5482,6 +6470,65 @@ def apply_global_theme(theme_key):
         "theme": theme_name,
         "log": log
     }
+
+
+def apply_flavor(flavor_key):
+    """
+    Applies an aesthetic theme flavor palette across GTK 4, GTK 3, Shell, Dock, and Desktop accents.
+    Changes ONLY colors; preserves 100% of widget elements, buttons, and geometry.
+    """
+    if flavor_key not in THEME_FLAVORS:
+        flavor_key = "default"
+
+    # Save to GSettings
+    try:
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "theme-flavor", flavor_key], check=False)
+    except Exception:
+        pass
+
+    theme_key = get_current_theme()
+    theme_info = THEMES.get(theme_key, THEMES["dark"])
+    is_dark = theme_info.get("is_dark", True)
+    is_glassy = theme_info.get("is_glassy", False)
+    is_amoled = "amoled" in theme_key
+
+    # 1. Regenerate GTK 4 and GTK 3 stylesheets
+    update_titlebar_buttons()
+
+    # 2. Update Shell theme contrast styling
+    try:
+        inject_shell_theme_contrast(theme_info["theme_name"], is_dark=is_dark, is_amoled=is_amoled, flavor_key=flavor_key)
+    except Exception as e:
+        print(f"[ThemeManager] Error updating shell contrast for flavor: {e}")
+
+    # 3. Update Dock and tint colors
+    flv = THEME_FLAVORS[flavor_key]
+    mode_dict = flv["dark"] if is_dark else flv["light"]
+
+    dock_pill = mode_dict.get("dock_pill", theme_info.get("dock_pill_color", "rgba(42, 42, 50, 0.40)"))
+    dock_border = mode_dict.get("dock_border", theme_info.get("dock_border_color", "rgba(255, 255, 255, 0.28)"))
+    app_tint = mode_dict.get("app_tint", mode_dict.get("window_bg", "#242426"))
+    gnome_accent = mode_dict.get("gnome_accent", "purple")
+
+    try:
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "pill-color", dock_pill], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.aqua-dock-pro", "pill-color", dock_pill], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "border-color", dock_border], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.aqua-dock-pro", "border-color", dock_border], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "app-tint-color", app_tint], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "dock-tint-color", app_tint], check=False)
+        subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "topbar-tint-color", app_tint], check=False)
+    except Exception as e:
+        print(f"[ThemeManager] Error updating dock/tint colors: {e}")
+
+    # 4. Update GNOME desktop interface accent
+    if gnome_accent:
+        try:
+            subprocess.run(["gsettings", "set", "org.gnome.desktop.interface", "accent-color", gnome_accent], check=False)
+        except Exception:
+            pass
+
+    return {"success": True, "flavor": flavor_key}
 
 
 def sync_all_theme_directories():

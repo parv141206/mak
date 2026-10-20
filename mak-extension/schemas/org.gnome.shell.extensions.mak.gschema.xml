@@ -1320,6 +1320,12 @@
       <description>Selected theme: dark-amoled, dark-solid, or light-solid.</description>
     </key>
 
+    <key type="s" name="theme-flavor">
+      <default>'default'</default>
+      <summary>Theme Flavor Color Palette</summary>
+      <description>Color aesthetic flavor: default, catppuccin, deep-teal, rose-pine, tokyo-night, nord, dracula, gruvbox, cyberpunk, monokai, everforest.</description>
+    </key>
+
     <key type="s" name="accent-color">
       <default>'purple'</default>
       <choices>
