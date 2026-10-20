@@ -5706,96 +5706,103 @@ leaflet.unfolded:backdrop,
 
 /* Full Floating Sidebar Card Surface (encompasses traffic lights & places list) */
 .sidebar-pane,
+.sidebar-pane:first-child,
 .content-pane .sidebar-pane,
+.content-pane .sidebar-pane:first-child,
 .sidebar-pane .content-pane,
+.sidebar-pane .content-pane:first-child,
 overlay-split-view > .sidebar-pane,
+overlay-split-view > .sidebar-pane:first-child,
 navigation-split-view > .sidebar-pane,
+navigation-split-view > .sidebar-pane:first-child,
 split-view > .sidebar-pane,
+split-view > .sidebar-pane:first-child,
 .nautilus-window .sidebar-pane,
+.nautilus-window .sidebar-pane:first-child,
 #NautilusFileChooser .sidebar-pane,
-.nautilus-file-chooser .sidebar-pane {
+#NautilusFileChooser .sidebar-pane:first-child,
+.nautilus-file-chooser .sidebar-pane,
+.nautilus-file-chooser .sidebar-pane:first-child {
   background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.03), transparent 80%, rgba(255, 255, 255, 0.03));
   color: @sidebar_fg_color;
   border-radius: 14px;
   background-color: @sidebar_bg_color;
+  border: 1px solid alpha(currentColor, 0.16);
 }
 
-/* Floating Card Margins for ALL apps */
+/* Floating Card Margins and Elevation Drop Shadow for ALL apps */
 .sidebar-pane:dir(ltr),
-.content-pane .sidebar-pane:dir(ltr),
-.sidebar-pane .content-pane:dir(ltr),
-overlay-split-view > .sidebar-pane:dir(ltr),
-navigation-split-view > .sidebar-pane:dir(ltr),
-split-view > .sidebar-pane:dir(ltr),
-.nautilus-window .sidebar-pane:dir(ltr),
-#NautilusFileChooser .sidebar-pane:dir(ltr),
-.nautilus-file-chooser .sidebar-pane:dir(ltr) {
-  margin: 6px 0 6px 6px;
-}
-
-.sidebar-pane:dir(rtl),
-.content-pane .sidebar-pane:dir(rtl),
-.sidebar-pane .content-pane:dir(rtl),
-overlay-split-view > .sidebar-pane:dir(rtl),
-navigation-split-view > .sidebar-pane:dir(rtl),
-split-view > .sidebar-pane:dir(rtl),
-.nautilus-window .sidebar-pane:dir(rtl),
-#NautilusFileChooser .sidebar-pane:dir(rtl),
-.nautilus-file-chooser .sidebar-pane:dir(rtl) {
-  margin: 6px 6px 6px 0;
-}
-
-/* Thin Border and Elevation Drop Shadow for ALL apps */
-.sidebar-pane:dir(ltr),
+.sidebar-pane:first-child:dir(ltr),
 .sidebar-pane:dir(ltr) banner > revealer > widget,
 .content-pane .sidebar-pane:dir(ltr),
+.content-pane .sidebar-pane:first-child:dir(ltr),
 .content-pane .sidebar-pane:dir(ltr) banner > revealer > widget,
 .sidebar-pane .content-pane:dir(ltr),
+.sidebar-pane .content-pane:first-child:dir(ltr),
 .sidebar-pane .content-pane:dir(ltr) banner > revealer > widget,
 overlay-split-view > .sidebar-pane:dir(ltr),
+overlay-split-view > .sidebar-pane:first-child:dir(ltr),
 navigation-split-view > .sidebar-pane:dir(ltr),
+navigation-split-view > .sidebar-pane:first-child:dir(ltr),
 split-view > .sidebar-pane:dir(ltr),
+split-view > .sidebar-pane:first-child:dir(ltr),
 .nautilus-window .sidebar-pane:dir(ltr),
+.nautilus-window .sidebar-pane:first-child:dir(ltr),
 .nautilus-window .sidebar-pane:dir(ltr) banner > revealer > widget,
 #NautilusFileChooser .sidebar-pane:dir(ltr),
+#NautilusFileChooser .sidebar-pane:first-child:dir(ltr),
 #NautilusFileChooser .sidebar-pane:dir(ltr) banner > revealer > widget,
 .nautilus-file-chooser .sidebar-pane:dir(ltr),
+.nautilus-file-chooser .sidebar-pane:first-child:dir(ltr),
 .nautilus-file-chooser .sidebar-pane:dir(ltr) banner > revealer > widget {
-  box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px alpha(currentColor, 0.14);
-  border-right: none;
+  margin: 6px 0 6px 6px;
+  box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid alpha(currentColor, 0.16);
 }
 
 .sidebar-pane:dir(rtl),
+.sidebar-pane:first-child:dir(rtl),
 .sidebar-pane:dir(rtl) banner > revealer > widget,
 .content-pane .sidebar-pane:dir(rtl),
+.content-pane .sidebar-pane:first-child:dir(rtl),
 .content-pane .sidebar-pane:dir(rtl) banner > revealer > widget,
 .sidebar-pane .content-pane:dir(rtl),
+.sidebar-pane .content-pane:first-child:dir(rtl),
 .sidebar-pane .content-pane:dir(rtl) banner > revealer > widget,
 overlay-split-view > .sidebar-pane:dir(rtl),
+overlay-split-view > .sidebar-pane:first-child:dir(rtl),
 navigation-split-view > .sidebar-pane:dir(rtl),
+navigation-split-view > .sidebar-pane:first-child:dir(rtl),
 split-view > .sidebar-pane:dir(rtl),
+split-view > .sidebar-pane:first-child:dir(rtl),
 .nautilus-window .sidebar-pane:dir(rtl),
+.nautilus-window .sidebar-pane:first-child:dir(rtl),
 .nautilus-window .sidebar-pane:dir(rtl) banner > revealer > widget,
 #NautilusFileChooser .sidebar-pane:dir(rtl),
+#NautilusFileChooser .sidebar-pane:first-child:dir(rtl),
 #NautilusFileChooser .sidebar-pane:dir(rtl) banner > revealer > widget,
 .nautilus-file-chooser .sidebar-pane:dir(rtl),
+.nautilus-file-chooser .sidebar-pane:first-child:dir(rtl),
 .nautilus-file-chooser .sidebar-pane:dir(rtl) banner > revealer > widget {
-  box-shadow: -2px 3px 12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px alpha(currentColor, 0.14);
-  border-left: none;
+  margin: 6px 6px 6px 0;
+  box-shadow: -2px 3px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid alpha(currentColor, 0.16);
 }
 
 /* Sidebar Backdrop (Unfocused Window) */
 .sidebar-pane:backdrop,
+.sidebar-pane:first-child:backdrop,
 .content-pane .sidebar-pane:backdrop,
 .sidebar-pane .content-pane:backdrop,
 .nautilus-window .sidebar-pane:backdrop,
+.nautilus-window .sidebar-pane:first-child:backdrop,
 #NautilusFileChooser .sidebar-pane:backdrop,
 .nautilus-file-chooser .sidebar-pane:backdrop {
   transition: background-color 150ms cubic-bezier(0, 0, 0.2, 1);
   background-color: alpha(@window_fg_color, 0.015);
   background-image: none;
   box-shadow: none;
-  border: none;
+  border: 1px solid alpha(currentColor, 0.08);
 }
 
 .sidebar-pane:backdrop:dir(ltr),
@@ -5849,12 +5856,16 @@ split-view > .sidebar-pane:dir(rtl),
 /* Sidebar headerbars - transparent to blend seamlessly into top of floating card */
 .sidebar-pane headerbar,
 .sidebar-pane headerbar:backdrop,
+.sidebar-pane windowhandle,
 .sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar,
 .sidebar-pane > toolbarview > revealer > windowhandle > box > headerbar:backdrop,
 .sidebar-pane toolbarview > .top-bar,
 .sidebar-pane toolbarview > .top-bar.raised,
 .sidebar-pane toolbarview > .top-bar.border,
 .sidebar-pane toolbarview > .top-bar.raised.border,
+.sidebar-pane toolbarview > .top-bar > revealer,
+.sidebar-pane toolbarview > .top-bar > revealer > windowhandle,
+.sidebar-pane toolbarview > .top-bar > revealer > windowhandle > box,
 overlay-split-view > .sidebar-pane headerbar,
 overlay-split-view > .sidebar-pane headerbar:backdrop,
 navigation-split-view > .sidebar-pane headerbar,
@@ -5989,9 +6000,58 @@ columnview.view > header > button:active,
   color: @headerbar_fg_color;
 }
 
-.nautilus-pathbar {
+/* Nautilus pathbar and path buttons */
+.nautilus-pathbar,
+#NautilusPathBar {
   background-color: alpha(currentColor, 0.08);
   color: @headerbar_fg_color;
+  border-radius: 9999px;
+  border: none;
+  box-shadow: none;
+}
+
+.nautilus-pathbar button,
+.nautilus-pathbar button:backdrop,
+.nautilus-pathbar .nautilus-path-button,
+.nautilus-pathbar .nautilus-path-button:backdrop,
+.nautilus-pathbar .nautilus-path-button.current-dir,
+.nautilus-pathbar .nautilus-path-button.current-dir:backdrop,
+#NautilusPathBar button,
+#NautilusPathBar button:backdrop,
+#NautilusPathBar #NautilusPathButton,
+#NautilusPathBar #NautilusPathButton:backdrop,
+#NautilusPathBar #NautilusPathButton.current-dir,
+#NautilusPathBar #NautilusPathButton.current-dir:backdrop,
+#NautilusPathBar .nautilus-path-button,
+#NautilusPathBar .nautilus-path-button:backdrop,
+#NautilusPathBar .nautilus-path-button.current-dir,
+#NautilusPathBar .nautilus-path-button.current-dir:backdrop {
+  background: transparent;
+  background-color: transparent;
+  background-image: none;
+  box-shadow: none;
+  border: none;
+  color: @headerbar_fg_color;
+}
+
+.nautilus-pathbar button:hover,
+.nautilus-pathbar .nautilus-path-button:hover,
+#NautilusPathBar button:hover,
+#NautilusPathBar #NautilusPathButton:hover,
+#NautilusPathBar .nautilus-path-button:hover {
+  background-color: alpha(currentColor, 0.08);
+  color: @headerbar_fg_color;
+  box-shadow: none;
+}
+
+.nautilus-pathbar button:active,
+.nautilus-pathbar .nautilus-path-button:active,
+#NautilusPathBar button:active,
+#NautilusPathBar #NautilusPathButton:active,
+#NautilusPathBar .nautilus-path-button:active {
+  background-color: alpha(currentColor, 0.14);
+  color: @headerbar_fg_color;
+  box-shadow: none;
 }
 
 /* Sidebar selected row */
@@ -6005,13 +6065,32 @@ placessidebar .navigation-sidebar > row:selected,
   background-color: alpha(@accent_color, 0.18);
 }
 
-/* Separators */
-separator,
-separator:backdrop,
-.nautilus-window separator,
-navigation-split-view > separator,
+/* Splitbuttons, Linked Buttons and Toolbar Separators */
+splitbutton separator,
+headerbar splitbutton separator,
+.linked separator,
+button separator,
+.linked > separator,
+headerbar separator,
+headerbar separator:backdrop {
+  background-color: alpha(currentColor, 0.12);
+  min-width: 1px;
+}
+
 overlay-split-view > separator,
-split-view > separator {
+navigation-split-view > separator,
+split-view > separator,
+overlay-split-view > border,
+navigation-split-view > border {
+  background-color: transparent;
+  background-image: none;
+  border: none;
+  box-shadow: none;
+}
+
+/* General Content Separators */
+separator,
+separator:backdrop {
   background-color: @headerbar_border_color;
 }
 

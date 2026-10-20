@@ -148,7 +148,8 @@ class TestSettingsEffect(unittest.TestCase):
 
             # Verify thin border and elevation drop shadow on floating sidebar
             self.assertIn(".sidebar-pane:dir(ltr),", c_gtk4)
-            self.assertIn("box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.15), inset 0 0 0 1px alpha(currentColor, 0.14);", c_gtk4)
+            self.assertIn("box-shadow: 2px 3px 12px rgba(0, 0, 0, 0.15);", c_gtk4)
+            self.assertIn("border: 1px solid alpha(currentColor, 0.16);", c_gtk4)
 
             # Verify sidebar internal widgets and headerbars are transparent so full card floats seamlessly
             self.assertIn(".sidebar-pane list:not(.boxed-list),", c_gtk4)
@@ -160,6 +161,14 @@ class TestSettingsEffect(unittest.TestCase):
 
             # Verify horizontal divider seam elimination
             self.assertIn(".sidebar-pane > separator.horizontal,", c_gtk4)
+
+            # Verify Nautilus pathbar transparent button blending
+            self.assertIn(".nautilus-pathbar button,", c_gtk4)
+            self.assertIn(".nautilus-pathbar .nautilus-path-button.current-dir,", c_gtk4)
+
+            # Verify splitbutton & button separators are subtle (not harsh accent lines)
+            self.assertIn("splitbutton separator,", c_gtk4)
+            self.assertIn("background-color: alpha(currentColor, 0.12);", c_gtk4)
 
             # Verify universal window background rules
             self.assertIn(".background,", c_gtk4)
