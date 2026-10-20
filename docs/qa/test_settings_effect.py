@@ -10,7 +10,10 @@ import os
 import unittest
 import tempfile
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "mak-app"))
+mak_app_dir = os.path.join(os.path.dirname(__file__), "..", "mak-app")
+if not os.path.exists(mak_app_dir):
+    mak_app_dir = os.path.join(os.path.dirname(__file__), "..", "..", "mak-app")
+sys.path.insert(0, os.path.abspath(mak_app_dir))
 import theme_manager
 from theme_manager import (
     TokenManager,
