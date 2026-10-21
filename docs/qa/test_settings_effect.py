@@ -56,6 +56,48 @@ class TestSettingsEffect(unittest.TestCase):
         self.assertIn("margin: 0 6px;", css_18_12)
         self.assertNotEqual(css_14_8, css_18_12)
 
+    def test_traffic_lights_tactile_styling_and_backdrop_darkness(self):
+        """Verify macOS tactile gloss gradients and authentic dark graphite backdrop buttons."""
+        css = generate_traffic_lights_override(button_size=14, button_spacing=8, is_dark=True)
+        
+        # Tactile gradients on focused buttons
+        self.assertIn("linear-gradient(to bottom, #ff6058, #e0382e)", css)
+        self.assertIn("linear-gradient(to bottom, #ffbe2e, #f59f00)", css)
+        self.assertIn("linear-gradient(to bottom, #2acb42, #1ca832)", css)
+        self.assertIn("box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45)", css)
+
+        # Dark graphite gray backdrop (never bright silver)
+        self.assertIn("linear-gradient(to bottom, #5a5c64, #464850)", css)
+        self.assertIn("background-color: #4c4f56;", css)
+        self.assertNotIn("#d2cbc9", css)
+        self.assertNotIn("#cecece", css)
+
+    def test_chrome_traffic_lights_glyph_suppression_and_sizing(self):
+        """Verify Chrome/Chromium titlebuttons suppress unhovered glyphs and match Mak size/spacing settings."""
+        css_16 = generate_traffic_lights_override(button_size=16, button_spacing=10, is_dark=True)
+        
+        # Chrome titlebuttons use dynamic size and margin
+        self.assertIn("window.background.chromium headerbar.header-bar.titlebar button.titlebutton", css_16)
+        self.assertIn("min-width: 16px;", css_16)
+        self.assertIn("margin: 0 5px;", css_16)
+
+        # Unhovered buttons have transparent color & font-size 0 to suppress vector icon artifacts
+        self.assertIn("color: transparent;", css_16)
+        self.assertIn("font-size: 0px;", css_16)
+
+        # Hover buttons show contrast glyph
+        self.assertIn("window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:hover", css_16)
+        self.assertIn("color: rgba(77, 0, 0, 0.85);", css_16)
+
+    def test_maximized_window_minimize_button_turns_gray(self):
+        """Verify maximized windows turn the middle traffic button (minimize) into unfocused gray."""
+        css = generate_traffic_lights_override(button_size=14, button_spacing=8, is_dark=True)
+        self.assertIn(".maximized windowcontrols button.minimize", css)
+        self.assertIn("window.maximized windowcontrols button.minimize", css)
+        self.assertIn("window.background.chromium.maximized headerbar.header-bar.titlebar button.minimize.titlebutton", css)
+        self.assertIn("background-image: linear-gradient(to bottom, #5a5c64, #464850);", css)
+        self.assertIn("background-color: #4c4f56;", css)
+
     def test_accent_color_injection_tunable(self):
         """Verify accent color changes produce distinct CSS palettes."""
         with tempfile.TemporaryDirectory() as tmpdir:
