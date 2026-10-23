@@ -382,4 +382,10 @@ export class ExtensionManager {
         this._bus = null;
         clearRuntimeWarnings();
     }
+
+    setZenMode(enabled) {
+        for (const dock of this._docks) {
+            try { dock.setZenMode(enabled); } catch (e) { logError(e, 'dock setZenMode'); }
+        }
+    }
 }

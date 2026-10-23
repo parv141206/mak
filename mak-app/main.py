@@ -891,6 +891,24 @@ class MakAppWindow(Adw.ApplicationWindow):
         self.stack.add_titled_with_icon(page, "windows", "Window Management", "preferences-desktop-display-symbolic")
         self._add_nav_item("windows", "Window Management", "preferences-desktop-display-symbolic")
 
+        # Zen Mode (Distraction-Free Immersion)
+        zen_group = Adw.PreferencesGroup(title="Zen Mode (Distraction-Free Immersion)")
+        page.add(zen_group)
+
+        zen_sw = Adw.SwitchRow(
+            title="Enable Zen Mode",
+            subtitle="Maximize windows to literal full screen with auto-hiding top bar and dock"
+        )
+        zen_sw.set_active(self.bridge.get_zen_mode_enabled())
+        zen_sw.connect("notify::active", lambda s, p: self.bridge.set_zen_mode_enabled(s.get_active()))
+        zen_group.add(zen_sw)
+
+        zen_sc_row = Adw.ActionRow(title="Keyboard Shortcut", subtitle="Press anywhere on desktop to toggle Zen Mode")
+        zen_sc_badge = Gtk.Label(label="Ctrl + Shift + Alt + F11")
+        zen_sc_badge.add_css_class("pill")
+        zen_sc_row.add_suffix(zen_sc_badge)
+        zen_group.add(zen_sc_row)
+
         # Window Gaps
         gaps_group = Adw.PreferencesGroup(title="Outer Screen Window Gaps")
         page.add(gaps_group)
@@ -958,6 +976,7 @@ class MakAppWindow(Adw.ApplicationWindow):
         corn_group.add(create_color_row("Window Border Highlight Color", "Edge border stroke tint and alpha for application windows", self.bridge.get_corner_border_color(), on_change=self.bridge.set_corner_border_color))
         corn_group.add(create_spin_row("Title Bar Button Size", "Diameter in pixels of macOS traffic light buttons (close, minimize, maximize)", 10, 22, 1, self.bridge.get_titlebar_button_size(), digits=0, on_change=self.bridge.set_titlebar_button_size))
         corn_group.add(create_spin_row("Title Bar Button Spacing", "Gap in pixels between traffic light buttons (closer or farther apart)", 0, 24, 1, self.bridge.get_titlebar_button_spacing(), digits=0, on_change=self.bridge.set_titlebar_button_spacing))
+        corn_group.add(create_spin_row("Title Bar Button Left Margin", "Padding / distance in pixels from the left window edge to traffic lights", 0, 40, 1, self.bridge.get_titlebar_button_margin_left(), digits=0, on_change=self.bridge.set_titlebar_button_margin_left))
 
         unround_max = Adw.SwitchRow(title="Square Off Maximized Windows", subtitle="Disable rounded corners when a window is maximized")
         unround_max.set_active(self.bridge.get_unround_maximized())

@@ -531,6 +531,21 @@
       <description>Genie animation duration in milliseconds.</description>
     </key>
 
+    <!-- ═════════════════════════════════════════════════════════════════════
+         ZEN MODE (IMMERSIVE FULL SCREEN)
+         ═════════════════════════════════════════════════════════════════════ -->
+    <key type="b" name="zen-mode-enabled">
+      <default>false</default>
+      <summary>Zen Mode Active State</summary>
+      <description>Immersive distraction-free full screen mode hiding dock and top bar with edge reveal.</description>
+    </key>
+
+    <key type="as" name="zen-mode-toggle">
+      <default><![CDATA[['<Control><Shift><Alt>F11']]]></default>
+      <summary>Zen Mode Toggle Shortcut</summary>
+      <description>Keyboard shortcut to toggle Zen Mode on and off.</description>
+    </key>
+
 
     <!-- ═════════════════════════════════════════════════════════════════════
          2. TOP BAR & APPLE MENU SETTINGS
@@ -1067,6 +1082,13 @@
       <range min="0" max="24"/>
       <summary>Title Bar Button Spacing</summary>
       <description>Horizontal spacing in pixels between macOS traffic light buttons in window titlebars.</description>
+    </key>
+
+    <key type="i" name="titlebar-button-margin-left">
+      <default>8</default>
+      <range min="0" max="40"/>
+      <summary>Title Bar Button Left Margin</summary>
+      <description>Padding/distance in pixels from the left window edge to the traffic lights.</description>
     </key>
 
     <key type="b" name="unround-maximized">

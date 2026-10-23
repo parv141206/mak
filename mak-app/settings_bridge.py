@@ -601,6 +601,10 @@ class MakSettingsBridge:
     def set_spotlight_gnome_providers(self, v): self._set_b("spotlight-gnome-search-providers", self.spotlight, "gnome-search-providers-enabled", v)
 
 
+    # ── ZEN MODE (IMMERSIVE FULL SCREEN) ──────────────────────────────────
+    def get_zen_mode_enabled(self): return self._get_b("zen-mode-enabled", None, None, False)
+    def set_zen_mode_enabled(self, v): self._set_b("zen-mode-enabled", None, None, v)
+
     # ── 4. WINDOW GAPS SETTINGS ────────────────────────────────────────────
     def get_gaps_enabled(self): return self._get_b("gaps-enabled", None, None, True)
     def set_gaps_enabled(self, v):
@@ -740,6 +744,19 @@ class MakSettingsBridge:
             try:
                 import theme_manager
                 theme_manager.update_titlebar_buttons(button_spacing=v)
+            except Exception:
+                pass
+
+    def get_titlebar_button_margin_left(self): return self._get_i("titlebar-button-margin-left", None, None, 8)
+    def set_titlebar_button_margin_left(self, v):
+        self._set_i("titlebar-button-margin-left", None, None, v)
+        try:
+            from .theme_manager import update_titlebar_buttons
+            update_titlebar_buttons(button_margin_left=v)
+        except Exception:
+            try:
+                import theme_manager
+                theme_manager.update_titlebar_buttons(button_margin_left=v)
             except Exception:
                 pass
 

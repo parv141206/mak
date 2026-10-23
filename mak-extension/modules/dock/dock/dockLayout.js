@@ -513,7 +513,7 @@ export function computeLayout(base, chips, monitor, monitorFullscreen = false, a
     }
 
     let strut = null;
-    if (!cfg.autoHideActive && !monitorFullscreen) {
+    if (!cfg.autoHideActive && !monitorFullscreen && !cfg.zenModeActive) {
         const reserve = Math.max(1, em + thick + em);
         if (side === 'left') strut = { x: monitor.x, y: monitor.y, w: reserve, h: monitor.height };
         else if (side === 'right') strut = { x: monitor.x + monitor.width - reserve, y: monitor.y, w: reserve, h: monitor.height };

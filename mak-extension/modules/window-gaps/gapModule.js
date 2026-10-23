@@ -11,10 +11,19 @@ export class GapManager {
         this._settings = settings;
         this._extension = extension;
         this._actors = [];
+        this._zenMode = false;
+    }
+
+    setZenMode(enabled) {
+        this._zenMode = enabled;
+        this.rebuild();
     }
 
     rebuild() {
         this._destroyActors();
+
+        if (this._zenMode)
+            return;
 
         if (!this._settings || !this._settings.get_boolean('gaps-enabled'))
             return;
@@ -186,6 +195,10 @@ export class WindowGapModule {
 
     rebuild() {
         this._gapManager?.rebuild();
+    }
+
+    setZenMode(enabled) {
+        this._gapManager?.setZenMode(enabled);
     }
 
     disable() {

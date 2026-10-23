@@ -32,7 +32,7 @@ class TokenManager:
         cls._tokens = {
             "geometry": {
                 "window": {"corner_radius": 14, "headerbar_standard_height": 52, "headerbar_compact_height": 38},
-                "traffic_lights": {"size": 14, "spacing": 8, "margin_left": 13},
+                "traffic_lights": {"size": 14, "spacing": 8, "margin_left": 8},
                 "buttons": {"height_regular": 24, "corner_radius": 5, "capsule_corner_radius": 9999},
                 "segmented": {"height": 22, "container_radius": 9999, "segment_radius": 9999},
                 "entries": {"height_regular": 22, "corner_radius": 5, "focus_ring_width": 3},
@@ -1208,11 +1208,19 @@ def get_icon_theme_for_accent(accent=None, is_dark=True):
         return "MacTahoe-purple-dark" if is_dark else "MacTahoe-purple-light"
     return "MacTahoe-dark" if is_dark else "MacTahoe-light"
 
-def generate_traffic_lights_override(button_size=14, button_spacing=8, chromium_accent=None, is_dark=True):
+def generate_traffic_lights_override(button_size=14, button_spacing=8, button_margin_left=None, chromium_accent=None, is_dark=True):
     size = max(10, min(24, int(button_size)))
     spacing = max(0, min(24, int(button_spacing)))
     margin = max(0, round(spacing / 2))
-    margin_left = TokenManager.get("geometry", "traffic_lights", "margin_left", default=13)
+
+    if button_margin_left is None:
+        try:
+            res_ml = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-margin-left"],
+                                    capture_output=True, text=True)
+            button_margin_left = int(res_ml.stdout.strip())
+        except Exception:
+            button_margin_left = TokenManager.get("geometry", "traffic_lights", "margin_left", default=8)
+    margin_left = max(0, min(40, int(button_margin_left)))
 
     if chromium_accent is None:
         try:
@@ -1222,10 +1230,13 @@ def generate_traffic_lights_override(button_size=14, button_spacing=8, chromium_
         except Exception:
             chromium_accent = "default"
 
-    border_color = "rgba(255, 255, 255, 0.12)" if is_dark else "rgba(0, 0, 0, 0.10)"
+    accent_data = CHROMIUM_ACCENT_PALETTES.get(chromium_accent, CHROMIUM_ACCENT_PALETTES["default"])
+    chrom_bg = accent_data["dark"] if is_dark else accent_data["light"]
+    if chromium_accent == "default":
+        chrom_bg = "@headerbar_bg_color"
 
     return f"""
-/* ── Mak Clean macOS Traffic Light Button Controls ({size}px, spacing {spacing}px) ── */
+/* ── Mak Clean macOS Traffic Light Button Controls ({size}px, spacing {spacing}px, left margin {margin_left}px) ── */
 windowcontrols,
 headerbar windowcontrols,
 .titlebar windowcontrols {{
@@ -1233,21 +1244,20 @@ headerbar windowcontrols,
     background: none;
     background-color: transparent;
     box-shadow: none;
+    padding: 0;
 }}
 
-window.background.chromium windowcontrols,
-window.background.brave windowcontrols,
-window.background.chromium headerbar windowcontrols,
-window.background.brave headerbar windowcontrols,
-window.background.chromium .titlebar windowcontrols,
-window.background.brave .titlebar windowcontrols,
 windowcontrols.start,
 headerbar windowcontrols.start,
 .titlebar windowcontrols.start,
 headerbar windowcontrols:first-child,
-.titlebar windowcontrols:first-child {{
+.titlebar windowcontrols:first-child,
+headerbar windowcontrols:not(.empty).start:dir(ltr),
+headerbar windowcontrols:not(.empty).start:dir(rtl) {{
     margin-left: {margin_left}px;
-    margin-right: 18px;
+    padding-left: 0px;
+    padding-right: 0px;
+    margin-right: 14px;
 }}
 
 windowcontrols.end,
@@ -1256,59 +1266,10 @@ headerbar windowcontrols.end,
 headerbar windowcontrols:last-child,
 .titlebar windowcontrols:last-child {{
     margin-right: 12px;
-    margin-left: 18px;
+    margin-left: 14px;
 }}
 
-/* Universal Chrome, Chromium, Brave & Electron clean titlebar background */
-headerbar.header-bar.titlebar,
-window.background.chromium headerbar,
-window.background.chromium headerbar.titlebar,
-window.background.chromium headerbar.header-bar.titlebar,
-window.background.brave headerbar,
-window.background.brave headerbar.titlebar,
-window.background.brave headerbar.header-bar.titlebar,
-window.background.chrome headerbar,
-window.background.chrome headerbar.titlebar,
-window.background.chrome headerbar.header-bar.titlebar,
-window.background.csd headerbar.header-bar.titlebar,
-headerbar.titlebar.default-decoration,
-window.csd headerbar.titlebar.default-decoration {{
-    padding-left: 14px;
-    padding-right: 18px;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin: 0;
-    background: transparent;
-    background-color: transparent;
-    background-image: none;
-    box-shadow: none;
-    border: none;
-    border-image: none;
-}}
-
-/* Chrome & Chromium Bubble / Notification / Popup Windows (high contrast fix) */
-window.bubble,
-window.background.bubble,
-.bubble,
-bubble,
-window.background.chromium popover,
-window.background.brave popover {{
-    background-color: @card_bg_color;
-    color: @card_fg_color;
-    border: 1px solid {border_color};
-    border-radius: 10px;
-}}
-
-window.bubble label,
-window.background.bubble label,
-.bubble label,
-bubble label,
-window.background.chromium popover label,
-window.background.brave popover label {{
-    color: @card_fg_color;
-}}
-
-/* ── Universal Traffic Lights Base Properties ── */
+/* GTK Window Controls Button Base (Strict Circular Centering - No Pills) */
 windowcontrols button,
 headerbar windowcontrols button,
 .titlebar windowcontrols button,
@@ -1316,395 +1277,38 @@ window.background.csd windowcontrols button,
 window.background.csd headerbar windowcontrols button,
 windowcontrols > button,
 headerbar windowcontrols > button,
-.titlebar windowcontrols > button,
-button.titlebutton,
-headerbar button.titlebutton,
-button.close,
-button.minimize,
-button.maximize,
-headerbar.header-bar.titlebar windowcontrols button,
-headerbar.header-bar.titlebar button.titlebutton,
-window.background.chromium headerbar windowcontrols button,
-window.background.chromium windowcontrols button,
-window.background.chromium headerbar.header-bar.titlebar button.titlebutton,
-window.background.chromium headerbar.titlebar button.titlebutton,
-window.background.chromium button.titlebutton,
-window.background.brave headerbar windowcontrols button,
-window.background.brave windowcontrols button,
-window.background.brave headerbar.header-bar.titlebar button.titlebutton,
-window.background.brave headerbar.titlebar button.titlebutton,
-window.background.brave button.titlebutton {{
+.titlebar windowcontrols > button {{
+    border-color: transparent;
     background-color: transparent;
-    background-image: none;
-    border: none;
     box-shadow: none;
-    border-radius: 9999px;
+    border: none;
     padding: 0;
     margin: 0 {margin}px;
-    margin-left: {margin}px;
-    margin-right: {margin}px;
-    margin-top: 0;
-    margin-bottom: 0;
     min-width: {size}px;
     min-height: {size}px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: {size}px {size}px;
     color: transparent;
-    font-size: 0px;
-    -gtk-icon-source: none;
-    -gtk-icon-shadow: none;
 }}
 
-/* Universally suppress unhovered symbolic glyphs */
+/* Suppress any stretched widget borders or icons in GTK window controls */
 windowcontrols button image,
 windowcontrols button:backdrop image,
 windowcontrols button label,
-windowcontrols button widget,
 headerbar windowcontrols button image,
 headerbar windowcontrols button:backdrop image,
-headerbar windowcontrols button label,
-headerbar windowcontrols button widget,
-.titlebar windowcontrols button image,
-.titlebar windowcontrols button:backdrop image,
-.titlebar windowcontrols button label,
-.titlebar windowcontrols button widget,
-button.titlebutton image,
-button.titlebutton:backdrop image,
-button.titlebutton label,
-button.close image,
-button.close:backdrop image,
-button.close label,
-button.minimize image,
-button.minimize:backdrop image,
-button.minimize label,
-button.maximize image,
-button.maximize:backdrop image,
-button.maximize label,
-headerbar.header-bar.titlebar windowcontrols button image,
-headerbar.header-bar.titlebar button.titlebutton image,
-window.background.chromium headerbar windowcontrols button image,
-window.background.brave headerbar windowcontrols button image,
-window.background.chromium headerbar.header-bar.titlebar button.titlebutton image,
-window.background.brave headerbar.header-bar.titlebar button.titlebutton image {{
-    -gtk-icon-source: none;
+.titlebar windowcontrols button image {{
     color: transparent;
     opacity: 0;
     min-width: 0;
     min-height: 0;
     margin: 0;
     padding: 0;
-    -gtk-icon-transform: scale(0);
     font-size: 0px;
 }}
 
-/* ── Close Button (Red: Tactile macOS Pill) ── */
-window.background.csd windowcontrols button.close,
-window.background.csd headerbar windowcontrols button.close,
-windowcontrols button.close,
-headerbar windowcontrols button.close,
-.titlebar windowcontrols button.close,
-windowcontrols > button.close,
-headerbar windowcontrols > button.close,
-.titlebar windowcontrols > button.close,
-button.titlebutton.close,
-headerbar button.titlebutton.close,
-button.close,
-headerbar.header-bar.titlebar windowcontrols button.close,
-headerbar.header-bar.titlebar button.close,
-window.background.chromium headerbar windowcontrols button.close,
-window.background.chromium windowcontrols button.close,
-window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton,
-window.background.chromium headerbar.titlebar button.close.titlebutton,
-window.background.chromium button.close.titlebutton,
-window.background.brave headerbar windowcontrols button.close,
-window.background.brave windowcontrols button.close,
-window.background.brave headerbar.header-bar.titlebar button.close.titlebutton,
-window.background.brave headerbar.titlebar button.close.titlebutton,
-window.background.brave button.close.titlebutton {{
-    background-image: linear-gradient(to bottom, #ff6058, #e0382e);
-    background-color: #ff5c60;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
-    border: 0.5px solid rgba(0, 0, 0, 0.25);
-    color: transparent;
-    font-size: 0px;
-    -gtk-icon-source: none;
-}}
-
-window.background.csd windowcontrols button.close:hover,
-window.background.csd headerbar windowcontrols button.close:hover,
-windowcontrols button.close:hover,
-headerbar windowcontrols button.close:hover,
-.titlebar windowcontrols button.close:hover,
-windowcontrols > button.close:hover,
-headerbar windowcontrols > button.close:hover,
-.titlebar windowcontrols > button.close:hover,
-button.titlebutton.close:hover,
-headerbar button.titlebutton.close:hover,
-button.close:hover,
-window.background.chromium headerbar windowcontrols button.close:hover,
-window.background.chromium windowcontrols button.close:hover,
-window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:hover,
-window.background.chromium headerbar.titlebar button.close.titlebutton:hover,
-window.background.chromium button.close.titlebutton:hover,
-window.background.brave headerbar windowcontrols button.close:hover,
-window.background.brave windowcontrols button.close:hover,
-window.background.brave headerbar.header-bar.titlebar button.close.titlebutton:hover,
-window.background.brave headerbar.titlebar button.close.titlebutton:hover,
-window.background.brave button.close.titlebutton:hover {{
-    background-image: linear-gradient(to bottom, #ff726b, #e0382e);
-    background-color: #ff5c60;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
-    border: 0.5px solid rgba(0, 0, 0, 0.3);
-    color: rgba(77, 0, 0, 0.85);
-    font-size: 9px;
-}}
-
-window.background.csd windowcontrols button.close:active,
-window.background.csd headerbar windowcontrols button.close:active,
-windowcontrols button.close:active,
-headerbar windowcontrols button.close:active,
-.titlebar windowcontrols button.close:active,
-windowcontrols > button.close:active,
-headerbar windowcontrols > button.close:active,
-.titlebar windowcontrols > button.close:active,
-button.titlebutton.close:active,
-headerbar button.titlebutton.close:active,
-button.close:active,
-window.background.chromium headerbar windowcontrols button.close:active,
-window.background.chromium windowcontrols button.close:active,
-window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:active,
-window.background.chromium headerbar.titlebar button.close.titlebutton:active,
-window.background.chromium button.close.titlebutton:active,
-window.background.brave headerbar windowcontrols button.close:active,
-window.background.brave windowcontrols button.close:active,
-window.background.brave headerbar.header-bar.titlebar button.close.titlebutton:active,
-window.background.brave headerbar.titlebar button.close.titlebutton:active,
-window.background.brave button.close.titlebutton:active {{
-    background-image: linear-gradient(to bottom, #cf2a20, #bf241b);
-    background-color: #bf241b;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-    border: 0.5px solid rgba(0, 0, 0, 0.35);
-    color: rgba(50, 0, 0, 0.9);
-}}
-
-/* ── Minimize Button (Yellow: Tactile macOS Pill) ── */
-window.background.csd windowcontrols button.minimize,
-window.background.csd headerbar windowcontrols button.minimize,
-windowcontrols button.minimize,
-headerbar windowcontrols button.minimize,
-.titlebar windowcontrols button.minimize,
-windowcontrols > button.minimize,
-headerbar windowcontrols > button.minimize,
-.titlebar windowcontrols > button.minimize,
-button.titlebutton.minimize,
-headerbar button.titlebutton.minimize,
-button.minimize,
-headerbar.header-bar.titlebar windowcontrols button.minimize,
-headerbar.header-bar.titlebar button.minimize,
-window.background.chromium headerbar windowcontrols button.minimize,
-window.background.chromium windowcontrols button.minimize,
-window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton,
-window.background.chromium headerbar.titlebar button.minimize.titlebutton,
-window.background.chromium button.minimize.titlebutton,
-window.background.brave headerbar windowcontrols button.minimize,
-window.background.brave windowcontrols button.minimize,
-window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton,
-window.background.brave headerbar.titlebar button.minimize.titlebutton,
-window.background.brave button.minimize.titlebutton {{
-    background-image: linear-gradient(to bottom, #ffbe2e, #f59f00);
-    background-color: #fac800;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
-    border: 0.5px solid rgba(0, 0, 0, 0.25);
-    color: transparent;
-    font-size: 0px;
-    -gtk-icon-source: none;
-}}
-
-window.background.csd windowcontrols button.minimize:hover,
-window.background.csd headerbar windowcontrols button.minimize:hover,
-windowcontrols button.minimize:hover,
-headerbar windowcontrols button.minimize:hover,
-.titlebar windowcontrols button.minimize:hover,
-windowcontrols > button.minimize:hover,
-headerbar windowcontrols > button.minimize:hover,
-.titlebar windowcontrols > button.minimize:hover,
-button.titlebutton.minimize:hover,
-headerbar button.titlebutton.minimize:hover,
-button.minimize:hover,
-window.background.chromium headerbar windowcontrols button.minimize:hover,
-window.background.chromium windowcontrols button.minimize:hover,
-window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:hover,
-window.background.chromium headerbar.titlebar button.minimize.titlebutton:hover,
-window.background.chromium button.minimize.titlebutton:hover,
-window.background.brave headerbar windowcontrols button.minimize:hover,
-window.background.brave windowcontrols button.minimize:hover,
-window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton:hover,
-window.background.brave headerbar.titlebar button.minimize.titlebutton:hover,
-window.background.brave button.minimize.titlebutton:hover {{
-    background-image: linear-gradient(to bottom, #ffd043, #f59f00);
-    background-color: #fac800;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
-    border: 0.5px solid rgba(0, 0, 0, 0.3);
-    color: rgba(90, 50, 0, 0.85);
-    font-size: 9px;
-}}
-
-window.background.csd windowcontrols button.minimize:active,
-window.background.csd headerbar windowcontrols button.minimize:active,
-windowcontrols button.minimize:active,
-headerbar windowcontrols button.minimize:active,
-.titlebar windowcontrols button.minimize:active,
-windowcontrols > button.minimize:active,
-headerbar windowcontrols > button.minimize:active,
-.titlebar windowcontrols > button.minimize:active,
-button.titlebutton.minimize:active,
-headerbar button.titlebutton.minimize:active,
-button.minimize:active,
-window.background.chromium headerbar windowcontrols button.minimize:active,
-window.background.chromium windowcontrols button.minimize:active,
-window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:active,
-window.background.chromium headerbar.titlebar button.minimize.titlebutton:active,
-window.background.chromium button.minimize.titlebutton:active,
-window.background.brave headerbar windowcontrols button.minimize:active,
-window.background.brave windowcontrols button.minimize:active,
-window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton:active,
-window.background.brave headerbar.titlebar button.minimize.titlebutton:active,
-window.background.brave button.minimize.titlebutton:active {{
-    background-image: linear-gradient(to bottom, #d68700, #c07800);
-    background-color: #c07800;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-    border: 0.5px solid rgba(0, 0, 0, 0.35);
-    color: rgba(60, 30, 0, 0.9);
-}}
-
-/* ── Maximize Button (Green: Tactile macOS Pill) ── */
-window.background.csd windowcontrols button.maximize,
-window.background.csd headerbar windowcontrols button.maximize,
-windowcontrols button.maximize,
-headerbar windowcontrols button.maximize,
-.titlebar windowcontrols button.maximize,
-windowcontrols > button.maximize,
-headerbar windowcontrols > button.maximize,
-.titlebar windowcontrols > button.maximize,
-button.titlebutton.maximize,
-headerbar button.titlebutton.maximize,
-button.maximize,
-headerbar.header-bar.titlebar windowcontrols button.maximize,
-headerbar.header-bar.titlebar button.maximize,
-window.background.chromium headerbar windowcontrols button.maximize,
-window.background.chromium windowcontrols button.maximize,
-window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton,
-window.background.chromium headerbar.titlebar button.maximize.titlebutton,
-window.background.chromium button.maximize.titlebutton,
-window.background.brave headerbar windowcontrols button.maximize,
-window.background.brave windowcontrols button.maximize,
-window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton,
-window.background.brave headerbar.titlebar button.maximize.titlebutton,
-window.background.brave button.maximize.titlebutton {{
-    background-image: linear-gradient(to bottom, #2acb42, #1ca832);
-    background-color: #35c759;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45), inset 0 -1px 1px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
-    border: 0.5px solid rgba(0, 0, 0, 0.25);
-    color: transparent;
-    font-size: 0px;
-    -gtk-icon-source: none;
-}}
-
-window.background.csd windowcontrols button.maximize:hover,
-window.background.csd headerbar windowcontrols button.maximize:hover,
-windowcontrols button.maximize:hover,
-headerbar windowcontrols button.maximize:hover,
-.titlebar windowcontrols button.maximize:hover,
-windowcontrols > button.maximize:hover,
-headerbar windowcontrols > button.maximize:hover,
-.titlebar windowcontrols > button.maximize:hover,
-button.titlebutton.maximize:hover,
-headerbar button.titlebutton.maximize:hover,
-button.maximize:hover,
-window.background.chromium headerbar windowcontrols button.maximize:hover,
-window.background.chromium windowcontrols button.maximize:hover,
-window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:hover,
-window.background.chromium headerbar.titlebar button.maximize.titlebutton:hover,
-window.background.chromium button.maximize.titlebutton:hover,
-window.background.brave headerbar windowcontrols button.maximize:hover,
-window.background.brave windowcontrols button.maximize:hover,
-window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton:hover,
-window.background.brave headerbar.titlebar button.maximize.titlebutton:hover,
-window.background.brave button.maximize.titlebutton:hover {{
-    background-image: linear-gradient(to bottom, #39d951, #1ca832);
-    background-color: #35c759;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6), inset 0 -1px 1px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
-    border: 0.5px solid rgba(0, 0, 0, 0.3);
-    color: rgba(0, 60, 0, 0.85);
-    font-size: 9px;
-}}
-
-window.background.csd windowcontrols button.maximize:active,
-window.background.csd headerbar windowcontrols button.maximize:active,
-windowcontrols button.maximize:active,
-headerbar windowcontrols button.maximize:active,
-.titlebar windowcontrols button.maximize:active,
-windowcontrols > button.maximize:active,
-headerbar windowcontrols > button.maximize:active,
-.titlebar windowcontrols > button.maximize:active,
-button.titlebutton.maximize:active,
-headerbar button.titlebutton.maximize:active,
-button.maximize:active,
-window.background.chromium headerbar windowcontrols button.maximize:active,
-window.background.chromium windowcontrols button.maximize:active,
-window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:active,
-window.background.chromium headerbar.titlebar button.maximize.titlebutton:active,
-window.background.chromium button.maximize.titlebutton:active,
-window.background.brave headerbar windowcontrols button.maximize:active,
-window.background.brave windowcontrols button.maximize:active,
-window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton:active,
-window.background.brave headerbar.titlebar button.maximize.titlebutton:active,
-window.background.brave button.maximize.titlebutton:active {{
-    background-image: linear-gradient(to bottom, #168d28, #117520);
-    background-color: #117520;
-    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
-    border: 0.5px solid rgba(0, 0, 0, 0.35);
-    color: rgba(0, 40, 0, 0.9);
-}}
-
-/* ── Inactive / Backdrop Window Traffic Lights (Dark Graphite Gray) ── */
-windowcontrols button:backdrop:not(:hover),
-headerbar windowcontrols button:backdrop:not(:hover),
-.titlebar windowcontrols button:backdrop:not(:hover),
-windowcontrols button.close:backdrop:not(:hover),
-headerbar windowcontrols button.close:backdrop:not(:hover),
-.titlebar windowcontrols button.close:backdrop:not(:hover),
-windowcontrols button.minimize:backdrop:not(:hover),
-headerbar windowcontrols button.minimize:backdrop:not(:hover),
-.titlebar windowcontrols button.minimize:backdrop:not(:hover),
-windowcontrols button.maximize:backdrop:not(:hover),
-headerbar windowcontrols button.maximize:backdrop:not(:hover),
-.titlebar windowcontrols button.maximize:backdrop:not(:hover),
-window.background.csd headerbar windowcontrols button:backdrop:not(:hover),
-window.background.csd headerbar windowcontrols button.close:backdrop:not(:hover),
-window.background.csd headerbar windowcontrols button.minimize:backdrop:not(:hover),
-window.background.csd headerbar windowcontrols button.maximize:backdrop:not(:hover),
-window.background.chromium headerbar.header-bar.titlebar button.titlebutton:backdrop:not(:hover),
-window.background.chromium headerbar.titlebar button.titlebutton:backdrop:not(:hover),
-window.background.chromium button.titlebutton:backdrop:not(:hover),
-window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:backdrop:not(:hover),
-window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:backdrop:not(:hover),
-window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:backdrop:not(:hover),
-window.background.brave headerbar.header-bar.titlebar button.titlebutton:backdrop:not(:hover),
-window.background.brave headerbar.titlebar button.titlebutton:backdrop:not(:hover),
-window.background.brave button.titlebutton:backdrop:not(:hover),
-window.background.brave headerbar.header-bar.titlebar button.close.titlebutton:backdrop:not(:hover),
-window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton:backdrop:not(:hover),
-window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton:backdrop:not(:hover) {{
-    background-image: linear-gradient(to bottom, #5a5c64, #464850);
-    background-color: #4c4f56;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
-    border: none;
-    opacity: 0.85;
-    color: transparent;
-    font-size: 0px;
-    -gtk-icon-source: none;
-}}
-
-/* ── Maximized Window: Middle Traffic Button (Minimize/Orange) Turns Gray ── */
+/* GTK Maximized Window: Middle Traffic Button (Minimize) Turns Gray Backdrop Asset */
 window.maximized windowcontrols button.minimize,
 .maximized windowcontrols button.minimize,
 window.maximized headerbar windowcontrols button.minimize,
@@ -1712,56 +1316,104 @@ window.maximized headerbar windowcontrols button.minimize,
 window.maximized .titlebar windowcontrols button.minimize,
 .maximized .titlebar windowcontrols button.minimize,
 window.background.csd.maximized windowcontrols button.minimize,
-window.background.csd.maximized headerbar windowcontrols button.minimize,
-window.background.maximized windowcontrols button.minimize,
-headerbar.maximized windowcontrols button.minimize,
-window.background.chromium.maximized headerbar.header-bar.titlebar button.minimize.titlebutton,
-window.background.chromium.maximized button.minimize.titlebutton,
-window.background.brave.maximized headerbar.header-bar.titlebar button.minimize.titlebutton,
-window.background.brave.maximized button.minimize.titlebutton,
-window.maximized button.titlebutton.minimize,
-.maximized button.titlebutton.minimize {{
-    background-image: linear-gradient(to bottom, #5a5c64, #464850);
-    background-color: #4c4f56;
-    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 0 0 1px rgba(0, 0, 0, 0.25);
+window.background.csd.maximized headerbar windowcontrols button.minimize {{
+    background-image: -gtk-scaled(url("windows-assets/titlebutton-minimize-backdrop-dark.png"), url("windows-assets/titlebutton-minimize-backdrop-dark@2.png"));
+}}
+
+/* Universal Chrome, Chromium, Brave Solid Headerbar Background (Never Transparent) */
+window.background.chromium,
+window.background.chromium headerbar,
+window.background.chromium headerbar.titlebar,
+window.background.chromium headerbar.header-bar.titlebar,
+window.background.brave,
+window.background.brave headerbar,
+window.background.brave headerbar.titlebar,
+window.background.brave headerbar.header-bar.titlebar {{
+    background-color: {chrom_bg};
+}}
+
+/* Chrome, Chromium, Brave Titlebuttons (Precise Circular Metrics & Suppression) */
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton {{
+    min-width: {size}px;
+    min-height: {size}px;
+    margin: 0 {margin}px;
+    padding: 0;
+    border-radius: 9999px;
+    background-image: none;
     border: none;
-    opacity: 0.85;
+    box-shadow: none;
     color: transparent;
     font-size: 0px;
     -gtk-icon-source: none;
 }}
 
-window.maximized windowcontrols button.minimize image,
-.maximized windowcontrols button.minimize image,
-window.background.chromium.maximized headerbar.header-bar.titlebar button.minimize.titlebutton image {{
-    opacity: 0;
+/* Chrome Close Button */
+window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton,
+window.background.brave headerbar.header-bar.titlebar button.close.titlebutton {{
+    background-color: #ff5c60;
     color: transparent;
 }}
-
-/* ── Hover Activation over Backdrop Controls ── */
-windowcontrols button:hover,
-headerbar windowcontrols button:hover,
-.titlebar windowcontrols button:hover,
-windowcontrols button:backdrop:hover,
-headerbar windowcontrols button:backdrop:hover,
-.titlebar windowcontrols button:backdrop:hover,
-window.background.chromium windowcontrols button:hover,
-window.background.brave windowcontrols button:hover,
-window.background.chromium:backdrop windowcontrols button:hover,
-window.background.brave:backdrop windowcontrols button:hover {{
-    opacity: 1.0;
+window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:hover,
+window.background.brave headerbar.header-bar.titlebar button.close.titlebutton:hover {{
+    background-color: #ff5c60;
+    color: mix(black, #e9524a, 0.5);
+}}
+window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:active,
+window.background.brave headerbar.header-bar.titlebar button.close.titlebutton:active {{
+    background-color: #ba423b;
+    color: mix(black, #ba423b, 0.5);
 }}
 
-headerbar:backdrop label.title,
-headerbar:backdrop .title,
-.titlebar:backdrop label.title,
-.titlebar:backdrop .title {{
-    opacity: 0.55;
+/* Chrome Minimize Button */
+window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton,
+window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton {{
+    background-color: #fac800;
+    color: transparent;
+}}
+window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:hover,
+window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton:hover {{
+    background-color: #fac800;
+    color: mix(black, #f1ae1b, 0.5);
+}}
+window.background.chromium headerbar.header-bar.titlebar button.minimize.titlebutton:active,
+window.background.brave headerbar.header-bar.titlebar button.minimize.titlebutton:active {{
+    background-color: #c18b16;
+    color: mix(black, #c18b16, 0.5);
 }}
 
-headerbar:backdrop button:not(.suggested-action):not(.destructive-action):not(.close):not(.minimize):not(.maximize):not(.titlebutton),
-.titlebar:backdrop button:not(.suggested-action):not(.destructive-action):not(.close):not(.minimize):not(.maximize):not(.titlebutton) {{
-    opacity: 0.65;
+/* Chrome Maximize Button */
+window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton,
+window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton {{
+    background-color: #35c759;
+    color: transparent;
+}}
+window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:hover,
+window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton:hover {{
+    background-color: #35c759;
+    color: mix(black, #59c837, 0.5);
+}}
+window.background.chromium headerbar.header-bar.titlebar button.maximize.titlebutton:active,
+window.background.brave headerbar.header-bar.titlebar button.maximize.titlebutton:active {{
+    background-color: #47a02c;
+    color: mix(black, #47a02c, 0.5);
+}}
+
+/* Chrome Unfocused / Backdrop Buttons (Dark Graphite #4c4f56) */
+window.background.chromium headerbar.header-bar.titlebar button.titlebutton:backdrop,
+window.background.chromium:backdrop headerbar.header-bar.titlebar button.titlebutton,
+window.background.brave headerbar.header-bar.titlebar button.titlebutton:backdrop,
+window.background.brave:backdrop headerbar.header-bar.titlebar button.titlebutton {{
+    background-color: #4c4f56;
+    color: transparent;
+    box-shadow: none;
+}}
+
+/* Chrome Maximized Window: Middle Traffic Button (Minimize) Turns Gray */
+window.background.chromium.maximized headerbar.header-bar.titlebar button.minimize.titlebutton,
+window.background.brave.maximized headerbar.header-bar.titlebar button.minimize.titlebutton {{
+    background-color: #4c4f56;
+    color: transparent;
 }}
 """
 
@@ -5481,7 +5133,7 @@ image.well {{
 """
 
 
-def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, chromium_accent=None, is_dark=True, sync_repo=False):
+def inject_theme_css(src_css_path, dst_css_path, palette, is_glassy, button_size=14, button_spacing=8, button_margin_left=None, chromium_accent=None, is_dark=True, sync_repo=False):
     # Safety guard: NEVER overwrite or truncate master theme assets in ~/.themes or repo themes
     if (os.path.abspath(dst_css_path) == os.path.abspath(src_css_path) or "/themes/" in dst_css_path or "/.themes/" in dst_css_path) and not os.path.exists(src_css_path + ".base"):
         return
@@ -6641,6 +6293,7 @@ __POPOVER_CLEANUP_RULES__
     traffic_override = generate_traffic_lights_override(
         button_size=button_size,
         button_spacing=button_spacing,
+        button_margin_left=button_margin_left,
         chromium_accent=chromium_accent,
         is_dark=is_dark
     )
@@ -6691,8 +6344,8 @@ windowcontrols button.minimize {{
         f.write(final_content)
 
 
-def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_accent=None):
-    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size, spacing, and Chromium accent."""
+def update_titlebar_buttons(button_size=None, button_spacing=None, button_margin_left=None, chromium_accent=None):
+    """Dynamically regenerates GTK 4 and GTK 3 active CSS configurations with the new traffic light button size, spacing, left margin, and Chromium accent."""
     if button_size is None:
         try:
             res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-size"],
@@ -6708,6 +6361,14 @@ def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_acce
             button_spacing = int(res.stdout.strip())
         except Exception:
             button_spacing = 8
+
+    if button_margin_left is None:
+        try:
+            res_ml = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-margin-left"],
+                                    capture_output=True, text=True)
+            button_margin_left = int(res_ml.stdout.strip())
+        except Exception:
+            button_margin_left = 8
 
     if chromium_accent is None:
         try:
@@ -6743,7 +6404,7 @@ def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_acce
             src_css = os.path.join(src_gtk4, css_file)
             dst_css = os.path.join(GTK4_CONFIG, css_file)
             if os.path.exists(src_css):
-                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, button_margin_left=button_margin_left, chromium_accent=chromium_accent, is_dark=is_dark)
 
     # GTK 3
     src_gtk3 = os.path.join(source_dir, "gtk-3.0")
@@ -6752,7 +6413,7 @@ def update_titlebar_buttons(button_size=None, button_spacing=None, chromium_acce
             src_css = os.path.join(src_gtk3, css_file)
             dst_css = os.path.join(GTK3_CONFIG, css_file)
             if os.path.exists(src_css):
-                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
+                inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, button_margin_left=button_margin_left, chromium_accent=chromium_accent, is_dark=is_dark)
 
     ensure_settings_ini_decoration_layout()
 
@@ -7062,6 +6723,13 @@ def apply_global_theme(theme_key):
             button_spacing = 8
 
         try:
+            res_ml = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-margin-left"],
+                                    capture_output=True, text=True)
+            button_margin_left = int(res_ml.stdout.strip())
+        except Exception:
+            button_margin_left = 8
+
+        try:
             res_acc = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "chromium-topbar-accent"],
                                      capture_output=True, text=True)
             chromium_accent = res_acc.stdout.strip().strip("'\"")
@@ -7074,7 +6742,7 @@ def apply_global_theme(theme_key):
                 src_css = os.path.join(src_gtk4, css_file)
                 dst_css = os.path.join(GTK4_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, button_margin_left=button_margin_left, chromium_accent=chromium_accent, is_dark=is_dark)
 
             # Update symlinks for assets and windows-assets
             for asset_folder in ["assets", "windows-assets"]:
@@ -7111,7 +6779,7 @@ def apply_global_theme(theme_key):
                 src_css = os.path.join(src_gtk3, css_file)
                 dst_css = os.path.join(GTK3_CONFIG, css_file)
                 if os.path.exists(src_css):
-                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
+                    inject_theme_css(src_css, dst_css, palette_override, is_glassy, button_size, button_spacing, button_margin_left=button_margin_left, chromium_accent=chromium_accent, is_dark=is_dark)
 
             # Update symlinks for assets and windows-assets for GTK 3
             for asset_folder in ["assets", "windows-assets"]:
@@ -7434,6 +7102,13 @@ def sync_all_theme_directories():
         button_spacing = 8
 
     try:
+        res_ml = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "titlebar-button-margin-left"],
+                                capture_output=True, text=True)
+        button_margin_left = int(res_ml.stdout.strip())
+    except Exception:
+        button_margin_left = 8
+
+    try:
         res_acc = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "chromium-topbar-accent"],
                                  capture_output=True, text=True)
         chromium_accent = res_acc.stdout.strip().strip("'\"")
@@ -7473,7 +7148,7 @@ def sync_all_theme_directories():
                     base_css = src_css + ".base"
                     read_src = base_css if os.path.exists(base_css) else src_css
                     if os.path.exists(read_src):
-                        inject_theme_css(read_src, src_css, palette, is_glassy, button_size, button_spacing, chromium_accent=chromium_accent, is_dark=is_dark)
+                        inject_theme_css(read_src, src_css, palette, is_glassy, button_size, button_spacing, button_margin_left=button_margin_left, chromium_accent=chromium_accent, is_dark=is_dark)
 
 def stage_all_themes(stage_dir=None):
     """
@@ -7497,6 +7172,7 @@ def stage_all_themes(stage_dir=None):
 
     button_size = TokenManager.get("geometry", "traffic_lights", "size", default=14)
     button_spacing = TokenManager.get("geometry", "traffic_lights", "spacing", default=8)
+    button_margin_left = TokenManager.get("geometry", "traffic_lights", "margin_left", default=8)
 
     for key, info in THEMES.items():
         tname = info["theme_name"]
@@ -7535,7 +7211,7 @@ def stage_all_themes(stage_dir=None):
                 base_css = src_css + ".base"
                 read_src = base_css if os.path.exists(base_css) else src_css
                 if os.path.exists(read_src):
-                    inject_theme_css(read_src, dst_css, palette, is_glassy, button_size, button_spacing, chromium_accent="default", is_dark=is_dark)
+                    inject_theme_css(read_src, dst_css, palette, is_glassy, button_size, button_spacing, button_margin_left=button_margin_left, chromium_accent="default", is_dark=is_dark)
 
         # Stage and inject shell theme contrast
         d_shell_css = os.path.join(dst_tdir, "gnome-shell", "gnome-shell.css")
@@ -7558,10 +7234,13 @@ if __name__ == "__main__":
     elif len(sys.argv) > 1 and sys.argv[1] == "--buttons":
         bsize = int(sys.argv[2]) if len(sys.argv) > 2 else 14
         bspacing = int(sys.argv[3]) if len(sys.argv) > 3 else 8
+        bml = int(sys.argv[4]) if len(sys.argv) > 4 else None
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "titlebar-button-size", str(bsize)], check=False)
         subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "titlebar-button-spacing", str(bspacing)], check=False)
-        update_titlebar_buttons(button_size=bsize, button_spacing=bspacing)
-        print(f"Updated titlebar buttons to size={bsize}, spacing={bspacing}")
+        if bml is not None:
+            subprocess.run(["gsettings", "set", "org.gnome.shell.extensions.mak", "titlebar-button-margin-left", str(bml)], check=False)
+        update_titlebar_buttons(button_size=bsize, button_spacing=bspacing, button_margin_left=bml)
+        print(f"Updated titlebar buttons to size={bsize}, spacing={bspacing}, margin_left={bml}")
     else:
         t = sys.argv[1] if len(sys.argv) > 1 else "dark"
         res = apply_global_theme(t)

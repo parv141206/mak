@@ -10,6 +10,7 @@ import { WindowGapModule } from './modules/window-gaps/gapModule.js';
 import { WindowCornersModule } from './modules/window-corners/cornersModule.js';
 import { BlurModule } from './modules/blur/blurModule.js';
 import { MenuStyleController } from './modules/appearance/menuStyleController.js';
+import { ZenModule } from './modules/zen/zenModule.js';
 
 export default class MakExtension extends Extension {
     async enable() {
@@ -58,6 +59,13 @@ export default class MakExtension extends Extension {
             this._menuStyle = new MenuStyleController(this);
         }
 
+        try {
+            const { ZenModule: DynamicZen } = await import(`./modules/zen/zenModule.js?v=${Date.now()}`);
+            this._zen = new DynamicZen(this);
+        } catch (err) {
+            this._zen = new ZenModule(this);
+        }
+
         this._settingsChangedId = this._settings.connect('changed', (settings, key) => {
             this._onSettingChanged(key);
         });
@@ -85,6 +93,8 @@ export default class MakExtension extends Extension {
         if (this._settings.get_boolean('blur-enabled')) {
             try { this._blur.enable(); } catch (e) { console.error('[Mak Blur] Enable error:', e); }
         }
+
+        try { this._zen.enable(); } catch (e) { console.error('[Mak Zen] Enable error:', e); }
 
         console.log('[Mak] Unified macOS Experience Suite Enabled successfully.');
     }
@@ -132,6 +142,11 @@ export default class MakExtension extends Extension {
         } else if (key.startsWith('gap') || key === 'gaps-maximized' ||
                    key === 'auto-hide-mode' || key === 'dock-enabled' || key === 'dock-position') {
             this._windowGaps?.rebuild();
+        } else if (key === 'zen-mode-enabled') {
+            if (this._settings.get_boolean('zen-mode-enabled'))
+                this._zen?.activate();
+            else
+                this._zen?.deactivate();
         }
     }
 
@@ -141,6 +156,7 @@ export default class MakExtension extends Extension {
             this._settingsChangedId = 0;
         }
 
+        try { this._zen?.disable(); } catch (e) {}
         try { this._dock?.disable(); } catch (e) {}
         try { this._topbar?.disable(); } catch (e) {}
         try { this._spotlight?.disable(); } catch (e) {}
@@ -149,6 +165,7 @@ export default class MakExtension extends Extension {
         try { this._blur?.disable(); } catch (e) {}
         try { this._menuStyle?.disable(); } catch (e) {}
 
+        this._zen = null;
         this._dock = null;
         this._topbar = null;
         this._spotlight = null;

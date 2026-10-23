@@ -68,6 +68,7 @@ export class AutohideManager {
         this._transitionTimeouts = new Map();
         this._transitionReleaseId = 0;
         this._enabled = false;
+        this._zenMode = false;
     }
 
     get hidden() { return this._vis.hidden; }
@@ -317,6 +318,19 @@ export class AutohideManager {
 
     updateIntellihide() {
         if (!this._enabled) return;
+        if (this._zenMode) {
+            if (this._host.isInteractionActive?.() || this._pointerReallyInside()) {
+                this._cancelHide();
+                this._setHidden(false, true);
+                return;
+            }
+            if (this._vis.hidden) {
+                this._cancelHide();
+                return;
+            }
+            this._scheduleHide(null, true);
+            return;
+        }
         const cfg = this._host.getConfig();
         const mode = cfg.autoHideMode;
 
@@ -501,13 +515,23 @@ export class AutohideManager {
         this._setHidden(false, true, true);
     }
 
+    setZenMode(enabled) {
+        this._zenMode = enabled;
+        if (enabled) {
+            this._cancelHide();
+            this._setHidden(true, true);
+        } else {
+            this.updateIntellihide();
+        }
+    }
+
     // ── Slide + side effects ──────────────────────────────────────────────────
     _setHidden(hidden, animate, userReveal = false) {
         const cfg = this._host.getConfig();
         if (hidden) this._cancelDodgeReveal();
         const fullscreen = this._fullscreenBlocksDock();
         if (!hidden && !userReveal && this._transitionBlocksReveal()) hidden = true;
-        else if (!fullscreen && cfg.autoHideMode === 'never' && hidden) hidden = false;
+        else if (!this._zenMode && !fullscreen && cfg.autoHideMode === 'never' && hidden) hidden = false;
         const geom = this._host.getGeom();
         if (!geom) return;
 

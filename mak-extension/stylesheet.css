@@ -27,6 +27,12 @@
     transition: background-color 200ms ease;
 }
 
+#panel.mak-panel.mak-zen-revealed,
+.mak-panel.mak-zen-revealed {
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.55) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
 /* When Blur-My-Shell applies transparent-panel, allow the blur to show through.
    Double-class selector (.mak-panel.transparent-panel) has higher specificity (120)
    than single-class (.mak-panel = 110), so it wins the !important cascade. */

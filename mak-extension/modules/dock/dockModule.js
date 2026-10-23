@@ -34,4 +34,8 @@ export class DockModule {
         }
         this._manager = null;
     }
+
+    setZenMode(enabled) {
+        this._manager?.setZenMode(enabled);
+    }
 }

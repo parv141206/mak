@@ -597,6 +597,17 @@ export class DockController {
         this._autohide?.onRelayout(reevaluateAutohide);
     }
 
+    setZenMode(enabled) {
+        this._zenMode = enabled;
+        if (this._cfg) this._cfg.zenModeActive = enabled;
+        if (enabled) {
+            this._chrome?.applyStrut(null);
+        } else {
+            this._chrome?.applyStrut(this._geom?.strut);
+        }
+        this._autohide?.setZenMode(enabled);
+    }
+
     // Monitor position/scale changes do not require tearing down every shared
     // service. Close geometry-bound transient UI, cancel active drag state, and
     // relayout this controller in place.

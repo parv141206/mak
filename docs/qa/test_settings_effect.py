@@ -56,18 +56,26 @@ class TestSettingsEffect(unittest.TestCase):
         self.assertIn("margin: 0 6px;", css_18_12)
         self.assertNotEqual(css_14_8, css_18_12)
 
+    def test_titlebar_button_margin_left_tunable(self):
+        """Verify traffic light button left margin (direction padding) is dynamically configurable."""
+        css_default = generate_traffic_lights_override(button_margin_left=8)
+        self.assertIn("margin-left: 8px;", css_default)
+
+        css_custom = generate_traffic_lights_override(button_margin_left=16)
+        self.assertIn("margin-left: 16px;", css_custom)
+        self.assertNotEqual(css_default, css_custom)
+
     def test_traffic_lights_tactile_styling_and_backdrop_darkness(self):
-        """Verify macOS tactile gloss gradients and authentic dark graphite backdrop buttons."""
+        """Verify strict circular centering and authentic dark graphite backdrop buttons."""
         css = generate_traffic_lights_override(button_size=14, button_spacing=8, is_dark=True)
         
-        # Tactile gradients on focused buttons
-        self.assertIn("linear-gradient(to bottom, #ff6058, #e0382e)", css)
-        self.assertIn("linear-gradient(to bottom, #ffbe2e, #f59f00)", css)
-        self.assertIn("linear-gradient(to bottom, #2acb42, #1ca832)", css)
-        self.assertIn("box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45)", css)
+        # Strict circular centering on GTK buttons
+        self.assertIn("background-position: center;", css)
+        self.assertIn("background-repeat: no-repeat;", css)
+        self.assertIn("background-size: 14px 14px;", css)
+        self.assertIn("border-color: transparent;", css)
 
-        # Dark graphite gray backdrop (never bright silver)
-        self.assertIn("linear-gradient(to bottom, #5a5c64, #464850)", css)
+        # Chrome dark graphite gray backdrop (never bright silver)
         self.assertIn("background-color: #4c4f56;", css)
         self.assertNotIn("#d2cbc9", css)
         self.assertNotIn("#cecece", css)
@@ -87,15 +95,15 @@ class TestSettingsEffect(unittest.TestCase):
 
         # Hover buttons show contrast glyph
         self.assertIn("window.background.chromium headerbar.header-bar.titlebar button.close.titlebutton:hover", css_16)
-        self.assertIn("color: rgba(77, 0, 0, 0.85);", css_16)
+        self.assertIn("color: mix(black, #e9524a, 0.5);", css_16)
 
     def test_maximized_window_minimize_button_turns_gray(self):
         """Verify maximized windows turn the middle traffic button (minimize) into unfocused gray."""
         css = generate_traffic_lights_override(button_size=14, button_spacing=8, is_dark=True)
         self.assertIn(".maximized windowcontrols button.minimize", css)
         self.assertIn("window.maximized windowcontrols button.minimize", css)
+        self.assertIn("titlebutton-minimize-backdrop-dark.png", css)
         self.assertIn("window.background.chromium.maximized headerbar.header-bar.titlebar button.minimize.titlebutton", css)
-        self.assertIn("background-image: linear-gradient(to bottom, #5a5c64, #464850);", css)
         self.assertIn("background-color: #4c4f56;", css)
 
     def test_accent_color_injection_tunable(self):
@@ -288,6 +296,25 @@ class TestSettingsEffect(unittest.TestCase):
                 for col_key in ("window_bg", "view_bg", "sidebar_bg", "headerbar_bg", "accent_color"):
                     val = flv[mode].get(col_key)
                     self.assertTrue(val and val.startswith("#"), f"{key}.{mode}.{col_key} invalid: {val}")
+
+    def test_zen_mode_settings_and_shortcut(self):
+        """Verify Zen Mode gsettings keys, bridge integration, and default shortcut."""
+        from settings_bridge import MakSettingsBridge
+        bridge = MakSettingsBridge()
+        
+        # Verify Zen mode toggle default shortcut is <Control><Shift><Alt>F11
+        import subprocess
+        res = subprocess.run(["gsettings", "get", "org.gnome.shell.extensions.mak", "zen-mode-toggle"],
+                             capture_output=True, text=True)
+        self.assertIn("<Control><Shift><Alt>F11", res.stdout)
+
+        # Verify bridge getter / setter
+        initial = bridge.get_zen_mode_enabled()
+        self.assertIsInstance(initial, bool)
+        bridge.set_zen_mode_enabled(True)
+        self.assertTrue(bridge.get_zen_mode_enabled())
+        bridge.set_zen_mode_enabled(False)
+        self.assertFalse(bridge.get_zen_mode_enabled())
 
 
 if __name__ == "__main__":
